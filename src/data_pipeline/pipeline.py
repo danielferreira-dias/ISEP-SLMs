@@ -24,6 +24,10 @@ from src.data_pipeline.common import (
     write_manifest,
 )
 from src.data_pipeline.deduplication import deduplicate_manifests
+from src.data_pipeline.confusion_sets import (
+    build_confusion_set_release,
+    validate_confusion_set_release,
+)
 from src.data_pipeline.reporting import build_reports, write_combined_pool
 from src.data_pipeline.splitting import (
     build_benchmark_release,
@@ -100,6 +104,7 @@ def build_pipeline(root: Path, selected_ids: list[str] | None = None) -> dict[st
 
     reports: dict[str, Path] = {}
     benchmark_release: dict[str, Any] | None = None
+    confusion_set_release: dict[str, Any] | None = None
     combined_path = root / "data/combined/visual_top_k_development_pool_v3.parquet"
     combined_rows: int | None = None
     if all(dataset_id in manifest_paths for dataset_id in contributor_ids):
@@ -144,6 +149,19 @@ def build_pipeline(root: Path, selected_ids: list[str] | None = None) -> dict[st
                     f"{path.relative_to(root)}",
                     flush=True,
                 )
+            confusion_set_release = build_confusion_set_release(root)
+            print(
+                "[confusion-set-release] "
+                f"{confusion_set_release['integrity']['pair_count']} pairs, "
+                f"{confusion_set_release['integrity']['task_count']} tasks",
+                flush=True,
+            )
+            for name, path in confusion_set_release["paths"].items():
+                print(
+                    f"[confusion-set-release] {name}: "
+                    f"{path.relative_to(root)}",
+                    flush=True,
+                )
         else:
             missing_release_ids = sorted(
                 required_release_ids - set(manifest_paths)
@@ -170,6 +188,7 @@ def build_pipeline(root: Path, selected_ids: list[str] | None = None) -> dict[st
         "combined_rows": combined_rows,
         "reports": reports,
         "benchmark_release": benchmark_release,
+        "confusion_set_release": confusion_set_release,
     }
 
 
@@ -308,6 +327,19 @@ def validate_outputs(root: Path) -> None:
         print(
             f"[validate] benchmark release {release['id']} "
             f"version {release['version']}",
+            flush=True,
+        )
+    confusion_benchmark = load_yaml(
+        root / "configs/benchmarks/visual_confusion_sets.yaml"
+    )
+    confusion_release_path = (
+        root / confusion_benchmark["dataset"]["release_manifest"]
+    )
+    if confusion_release_path.exists():
+        confusion_release = validate_confusion_set_release(root)
+        print(
+            f"[validate] confusion-set release {confusion_release['id']} "
+            f"version {confusion_release['version']}",
             flush=True,
         )
 

@@ -65,6 +65,12 @@ are stored under `reports/`, and integrity metadata under `release/`. Its
 release manifest records checksums for the source manifests, configurations,
 review decisions, and generated artifacts.
 
+After the visual Top-K release is available, the pipeline also creates the
+provisional paired confusion-set release under
+`data/benchmarks/visual_confusion_sets_v1/`. It selects a balanced subset of
+the sealed 1,000-case benchmark and creates one low-confusability and one
+high-confusability three-way ranking task for every selected image.
+
 The primary paired pre-training/post-training evaluation uses
 `datasets/internal/internal_benchmark_1000.parquet`: exactly 1,000 images from
 1,000 distinct internal-test leakage groups. Age, sex/gender, skin tone,
@@ -84,10 +90,18 @@ Validate the frozen release without rebuilding it:
 .venv/bin/python -m src.data_pipeline.splitting --validate-only
 ```
 
+Build or validate only the confusion-set release:
+
+```bash
+.venv/bin/python -m src.data_pipeline.confusion_sets
+.venv/bin/python -m src.data_pipeline.confusion_sets --validate-only
+```
+
 Run the benchmark execution smoke test:
 
 ```bash
 .venv/bin/python -m src.benchmark.smoke_test
+.venv/bin/python -m src.benchmark.confusion_smoke_test
 ```
 
 Image bytes are not duplicated during normalization. Direct files use normal

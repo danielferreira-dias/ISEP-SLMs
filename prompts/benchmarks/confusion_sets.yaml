@@ -1,0 +1,65 @@
+# Prompt used by the controlled dermatology confusion-set benchmark.
+
+id: visual_disease_confusion_sets
+version: 0.1.0
+task: visual_disease_contrast_ranking
+language: en
+description: >
+  Instructs a vision-language model to rank all three diseases supplied for a
+  controlled visual discrimination task.
+
+system_prompt: |
+  You are performing a closed-set dermatological image-ranking task.
+
+  Analyze only the supplied image and rank all {{ top_k }} allowed diseases
+  from most plausible to least plausible.
+
+  Rules:
+    1. Use only disease IDs from the supplied candidate list.
+    2. Return exactly {{ top_k }} unique disease predictions.
+    3. Rank every supplied candidate exactly once.
+    4. Use consecutive integer ranks from 1 through {{ top_k }}.
+    5. Do not infer or invent symptoms, patient history, or clinical context.
+    6. Return valid JSON matching the supplied schema.
+    7. Do not include explanations, Markdown, confidence values, or text
+       outside the JSON object.
+
+user_template: |
+  Analyze the attached dermatological image.
+
+  Candidate diseases:
+  {{ disease_taxonomy }}
+
+  Rank all {{ top_k }} candidates using this JSON structure:
+  {
+    "predictions": [
+      {
+        "rank": 1,
+        "disease_id": "D001"
+      }
+    ]
+  }
+
+  The example demonstrates the structure only. Return every supplied candidate
+  exactly once, ordered by visual plausibility, and return no text outside the
+  JSON object.
+
+schema_path: schemas/visual_confusion_sets.schema.json
+
+taxonomy_rendering:
+  fields:
+    - id
+    - display_name
+  item_template: "- {{ id }}: {{ display_name }}"
+
+input_requirements:
+  image: required
+  candidate_diseases: exactly_three
+  clinical_context: forbidden
+
+output_requirements:
+  prediction_count: 3
+  unique_candidates: required
+  consecutive_ranks: required
+  confidence: forbidden
+

@@ -1,0 +1,32 @@
+smoke_test:
+  status: passed
+  benchmark_release:
+    id: visual_confusion_sets_dataset_v1
+    version: 0.1.0
+  pair_id: acneiform_follicular::FITZPATRICK17K_C_0c01d0d93ee3960681f59dbd79df8663
+  task_count: 2
+  model_id: candidate_schema_smoke_backend
+  metrics:
+    task_count: 2
+    pair_count: 1
+    top_1_accuracy: 1.0
+    top_2_accuracy: 1.0
+    mean_reciprocal_rank: 1.0
+    macro_f1_top_1: 1.0
+    macro_set_top_1_accuracy: 1.0
+    low_confusability_accuracy: 1.0
+    high_confusability_accuracy: 1.0
+    confusability_accuracy_gap: 0.0
+    confusability_accuracy_gap_ci_lower: 0.0
+    confusability_accuracy_gap_ci_upper: 0.0
+    json_validity_rate: 1.0
+    schema_compliance_rate: 1.0
+    invalid_candidate_id_rate: 0.0
+    duplicate_prediction_rate: 0.0
+    by_condition_top_1_accuracy:
+      high_confusability: 1.0
+      low_confusability: 1.0
+    by_confusion_set_top_1_accuracy:
+      acneiform_follicular: 1.0
+    by_disease_top_1_accuracy:
+      D012: 1.0

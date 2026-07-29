@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "visual_confusion_sets.schema.json",
+  "title": "Visual Disease Confusion-Set Ranking",
+  "description": "Structured ranking of all three diseases supplied for one controlled visual discrimination task. The disease enum is narrowed to the task candidates at runtime.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "predictions"
+  ],
+  "properties": {
+    "predictions": {
+      "type": "array",
+      "description": "All three candidate diseases ordered from most to least plausible.",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rank",
+          "disease_id"
+        ],
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "description": "Prediction position, where 1 is the most plausible diagnosis.",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "disease_id": {
+            "type": "string",
+            "description": "Disease identifier from the three candidates supplied for this task.",
+            "enum": [
+              "D001",
+              "D002",
+              "D003",
+              "D004",
+              "D005",
+              "D006",
+              "D007",
+              "D009",
+              "D011",
+              "D012",
+              "D013",
+              "D014",
+              "D015",
+              "D016",
+              "D017",
+              "D018",
+              "D019",
+              "D022",
+              "D023",
+              "D024",
+              "D025"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+

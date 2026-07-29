@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass, field
 import json
 from typing import Any, Iterable, Protocol
@@ -46,6 +47,8 @@ class BenchmarkSample:
     image_uri: str
     disease_id: str
     metadata: dict[str, Any]
+    task_id: str | None = None
+    candidate_disease_ids: tuple[str, ...] | None = None
 
 
 @dataclass(slots=True)
@@ -54,6 +57,8 @@ class BenchmarkPrediction:
     model_id: str
     ground_truth_disease_id: str
     response: ModelResponse
+    task_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class BenchmarkRunner:
@@ -86,9 +91,37 @@ class BenchmarkRunner:
         self,
         sample: BenchmarkSample,
     ) -> BenchmarkPrediction:
+        candidate_ids = (
+            list(sample.candidate_disease_ids)
+            if sample.candidate_disease_ids is not None
+            else [item["id"] for item in self.taxonomy_items]
+        )
+        if len(candidate_ids) != len(set(candidate_ids)):
+            raise ValueError("Task candidate disease IDs must be unique")
+        unknown_candidates = (
+            set(candidate_ids) - self.allowed_disease_ids
+        )
+        if unknown_candidates:
+            raise ValueError(
+                "Task contains candidates outside the benchmark taxonomy: "
+                + ", ".join(sorted(unknown_candidates))
+            )
+        if sample.candidate_disease_ids is not None and (
+            len(candidate_ids) != self.top_k
+        ):
+            raise ValueError(
+                f"Task must contain exactly {self.top_k} candidates"
+            )
+        taxonomy_by_id = {
+            item["id"]: item
+            for item in self.taxonomy_items
+        }
         taxonomy = "\n".join(
             f"- {item['id']}: {item['display_name']}"
-            for item in self.taxonomy_items
+            for item in (
+                taxonomy_by_id[disease_id]
+                for disease_id in candidate_ids
+            )
         )
         system_prompt = _render_template(
             self.system_prompt_template,
@@ -101,12 +134,17 @@ class BenchmarkRunner:
             disease_taxonomy=taxonomy,
         )
         image_bytes = self.image_loader(sample.image_uri)
+        task_schema = _schema_for_candidates(
+            self.schema,
+            candidate_ids=candidate_ids,
+            prediction_count=self.top_k,
+        )
         try:
             raw_text = self.backend.generate(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
                 image_bytes=image_bytes,
-                schema=self.schema,
+                schema=task_schema,
             )
         except Exception as exc:
             response = ModelResponse(
@@ -121,14 +159,21 @@ class BenchmarkRunner:
             response = parse_and_validate_response(
                 model_id=self.backend.model_id,
                 raw_text=raw_text,
-                allowed_disease_ids=self.allowed_disease_ids,
+                allowed_disease_ids=set(candidate_ids),
                 top_k=self.top_k,
             )
+        prediction_metadata = dict(sample.metadata)
+        prediction_metadata.setdefault(
+            "candidate_disease_ids",
+            list(candidate_ids),
+        )
         return BenchmarkPrediction(
             sample_id=sample.sample_id,
             model_id=self.backend.model_id,
             ground_truth_disease_id=sample.disease_id,
             response=response,
+            task_id=sample.task_id or sample.sample_id,
+            metadata=prediction_metadata,
         )
 
     def run(
@@ -215,3 +260,22 @@ def _render_template(template: str, **values: Any) -> str:
         rendered = rendered.replace(f"{{{{ {key} }}}}", str(value))
         rendered = rendered.replace(f"{{{{{key}}}}}", str(value))
     return rendered
+
+
+def _schema_for_candidates(
+    schema: dict[str, Any],
+    *,
+    candidate_ids: list[str],
+    prediction_count: int,
+) -> dict[str, Any]:
+    """Return a per-task schema restricted to the rendered candidates."""
+
+    narrowed = deepcopy(schema)
+    predictions = narrowed["properties"]["predictions"]
+    predictions["minItems"] = prediction_count
+    predictions["maxItems"] = prediction_count
+    item_properties = predictions["items"]["properties"]
+    item_properties["rank"]["minimum"] = 1
+    item_properties["rank"]["maximum"] = prediction_count
+    item_properties["disease_id"]["enum"] = list(candidate_ids)
+    return narrowed

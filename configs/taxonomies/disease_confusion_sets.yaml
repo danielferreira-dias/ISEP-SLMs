@@ -1,0 +1,123 @@
+# Provisional disease contrast sets for controlled visual discrimination.
+
+taxonomy:
+  id: dermatology_disease_confusion_sets
+  version: 0.1.0
+  language: en
+  status: provisional_pending_clinical_review
+  description: >
+    Defines balanced three-way visual discrimination tasks. High-confusability
+    tasks contain clinically motivated look-alike diseases. Low-confusability
+    tasks use the same images with distractors drawn from different appearance
+    partitions. The sets must be validated on the validation split and reviewed
+    clinically before the benchmark is frozen for thesis reporting.
+  active_disease_taxonomy: configs/taxonomies/diseases.yaml
+  candidate_count: 3
+
+selection:
+  source_manifest: data/benchmarks/visual_top_k_v1/datasets/internal/internal_benchmark_1000.parquet
+  source_release: data/benchmarks/visual_top_k_v1/release/benchmark_release_v1.yaml
+  seed: 2042
+  strategy: deterministic_downsample_to_rarest_class
+  sample_order: seeded_sha256
+  candidate_order: seeded_sha256
+  maximum_images_per_leakage_group: 1
+  require_disjoint_high_confusability_sets: true
+
+high_confusability_sets:
+  - id: melanocytic_lookalike_lesions
+    description: >
+      Distinguishes melanoma from a melanocytic nevus and seborrheic keratosis.
+    disease_ids:
+      - D001
+      - D002
+      - D006
+
+  - id: keratinocytic_lesions
+    description: >
+      Distinguishes basal cell carcinoma, squamous cell carcinoma, and actinic
+      keratosis.
+    disease_ids:
+      - D004
+      - D005
+      - D007
+
+  - id: eczematous_dermatitis
+    description: >
+      Distinguishes contact dermatitis, broad eczema, and seborrheic
+      dermatitis.
+    disease_ids:
+      - D009
+      - D014
+      - D015
+
+  - id: acneiform_follicular
+    description: >
+      Distinguishes acne vulgaris, rosacea, and folliculitis.
+    disease_ids:
+      - D011
+      - D012
+      - D016
+
+  - id: reactive_eruptions
+    description: >
+      Distinguishes urticaria, erythema multiforme, and drug eruption.
+    disease_ids:
+      - D017
+      - D024
+      - D025
+
+low_confusability_partitions:
+  description: >
+    Construction-only appearance partitions used to select distractors for the
+    paired low-confusability condition. They are not routing labels and are not
+    shown to the model.
+  partitions:
+    - id: lesion
+      disease_ids:
+        - D001
+        - D002
+        - D004
+        - D005
+        - D006
+        - D007
+
+    - id: inflammatory_eruption
+      disease_ids:
+        - D009
+        - D014
+        - D015
+        - D017
+        - D024
+        - D025
+
+    - id: acneiform
+      disease_ids:
+        - D011
+        - D012
+        - D016
+
+  distractor_policy:
+    strategy: balanced_seeded_round_robin
+    select_one_from_each_other_partition: true
+    require_truth_in_candidate_set: true
+    require_unique_candidates: true
+
+excluded_from_v1:
+  description: >
+    Active diseases without a supported, non-overlapping three-way confusion
+    set in the current 1,000-case benchmark. They remain part of visual_top_k.
+  disease_ids:
+    - D003
+    - D013
+    - D018
+    - D019
+    - D022
+    - D023
+
+expected_release:
+  active_confusion_set_count: 5
+  covered_disease_count: 15
+  unique_image_count: 414
+  paired_task_count: 828
+

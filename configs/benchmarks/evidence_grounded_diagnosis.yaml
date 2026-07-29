@@ -2,9 +2,9 @@
 
 benchmark:
   id: evidence_grounded_diagnosis
-  version: 1.0.0
+  version: 1.0.1
   task: evidence_grounded_visual_diagnosis
-  status: declarative_specification
+  status: dataset_ready
   description: >
     Evaluates whether a vision-language model identifies dermatologist-defined
     morphology concepts, expresses them as an observation-only clinical
@@ -126,6 +126,9 @@ taxonomy:
         display_name: Cyst
 
 dataset:
+  manifest: data/benchmarks/evidence_grounded_diagnosis_v1/datasets/external/evidence_grounded_ddi.parquet
+  release_manifest: data/benchmarks/evidence_grounded_diagnosis_v1/release/benchmark_release_v1.yaml
+  evaluation_origin: external
   source_manifest: data/manifests/ddi_v3.parquet
   morphology_annotations: configs/datasets/skincon/data/annotations/annotations_ddi.csv
   caption_metadata: configs/datasets/skincap/data/skincap_v240623.csv
@@ -166,6 +169,7 @@ dataset:
     morphology_cohort: 636
     description_cohort: 635
     diagnosis_cohort: 294
+    unique_leakage_groups: 632
   reference_policy:
     morphology: positive SKINCON binary concept columns
     description: SkinCAP caption_zh_polish_en

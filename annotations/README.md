@@ -28,3 +28,7 @@ Each annotation should identify:
 10. [Leakage-safe benchmark release](dataset_pipeline/10_leakage_safe_benchmark_release.md)
 11. [Benchmark execution smoke test](dataset_pipeline/11_benchmark_smoke_test.md)
 12. [Fixed paired benchmark and demographic balance](dataset_pipeline/12_fixed_paired_benchmark_and_demographic_balance.md)
+
+## Benchmarks
+
+1. [Paired visual disease confusion sets](benchmarks/01_visual_disease_confusion_sets.md)
