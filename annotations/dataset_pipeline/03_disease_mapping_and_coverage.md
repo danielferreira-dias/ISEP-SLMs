@@ -1,9 +1,10 @@
 # Disease mapping and coverage analysis
 
 > Historical stage note: this document records the initial 13-class v1
-> analysis. The current 20-class taxonomy and complete canonical-label
-> coverage are documented in
-> `05_twenty_class_taxonomy_expansion.md`.
+> analysis. The 20-class expansion is documented in
+> `05_twenty_class_taxonomy_expansion.md`; the current 21-class taxonomy and
+> version 3 coverage are documented in
+> `06_demographic_subgroups_drug_eruption_and_dermnet.md`.
 
 ## Objective
 

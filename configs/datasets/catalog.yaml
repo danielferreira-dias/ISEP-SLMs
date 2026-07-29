@@ -20,6 +20,10 @@ datasets:
     config: configs/datasets/scin/config.yaml
     role: taxonomy_contributor
 
+  - id: skindisnet
+    config: configs/datasets/skindisnet/config.yaml
+    role: external_evaluation_only
+
   - id: ddi
     config: configs/datasets/ddi/config.yaml
     role: external_evaluation_only

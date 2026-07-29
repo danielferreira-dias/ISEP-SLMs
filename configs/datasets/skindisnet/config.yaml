@@ -1,0 +1,56 @@
+dataset:
+  id: skindisnet
+  version: mendeley_v2_2025_06_26
+  name: SkinDisNet
+  task_type: disease_classification
+  description: >
+    Smartphone clinical photographs of six inflammatory or infectious skin
+    diseases, with patient, age, sex, lesion-location, and diagnosis metadata.
+  license_id: CC_BY_NC_4_0
+
+source:
+  url: https://doi.org/10.17632/yj3md44hxg.2
+  format: csv_inside_zip_with_image_directories
+  image_archive: configs/datasets/skindisnet/data/raw/SkinDisNet_2.zip
+  metadata_member: SkinDisNet_Metadata.csv
+  preprocessed_root: Preprocessed
+  excluded_roots:
+    - Augmented
+  archive_member_template: "Preprocessed/{Folder_name}/{Image_id}.jpg"
+  row_unit: image
+
+mapping:
+  original_image_id: Image_id
+  patient_id: Patient_id
+  group_id: Patient_id
+  disease_original: Diagnosis
+  diagnosis_basis: dermatologist_review
+  age: Age
+  sex_or_gender: Sex
+  anatomical_site: Leision_location
+  folder_label: Folder_name
+
+normalization:
+  taxonomy: configs/taxonomies/diseases.yaml
+  mapping_order:
+    - canonical_name
+    - alias
+    - reviewed_manual_mapping
+  unmapped_label_policy: canonicalize_report_and_exclude_from_benchmark
+  cautions:
+    - Use only the 1,710 preprocessed images as independent source observations.
+    - Never split or count the 11,970 augmented derivatives as independent cases.
+    - Split by Patient_id because each patient can contribute multiple images.
+    - Atopic dermatitis and tinea corporis are outside the active taxonomy until separately reviewed.
+    - The released images were cropped, had their backgrounds removed, and were resized to 512 by 512 pixels.
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/skindisnet_v3.parquet
+
+coverage:
+  role: external_evaluation_only
+  count_unit: group_id
+  reason: >
+    Preserve SkinDisNet as a geographically distinct smartphone-photography
+    evaluation source; its cases must not determine the benchmark taxonomy.
