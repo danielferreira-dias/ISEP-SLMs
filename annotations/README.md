@@ -21,3 +21,4 @@ Each annotation should identify:
 3. [Disease mapping and coverage analysis](dataset_pipeline/03_disease_mapping_and_coverage.md)
 4. [Validation findings and current limitations](dataset_pipeline/04_validation_and_current_limitations.md)
 5. [Twenty-class taxonomy expansion](dataset_pipeline/05_twenty_class_taxonomy_expansion.md)
+6. [Demographic subgroups, drug eruption, and Dermnet audit integration](dataset_pipeline/06_demographic_subgroups_drug_eruption_and_dermnet.md)

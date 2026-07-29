@@ -1,9 +1,10 @@
-"""Source-specific adapters for the four benchmark classification datasets."""
+"""Source-specific adapters for benchmark and audit-only classification data."""
 
 from __future__ import annotations
 
 import ast
 import glob
+import hashlib
 from pathlib import Path
 from typing import Any, Callable, Iterable
 import zipfile
@@ -16,6 +17,7 @@ from src.data_pipeline.common import (
     make_manifest_row,
     optional_string,
     reference_diagnosis,
+    standardize_age_group,
 )
 
 
@@ -120,6 +122,8 @@ def build_pad_ufes_20(
             source="diagnostic",
         )
         fst = _fitzpatrick_value(record.get("fitspatrick"))
+        age_years = _optional_age(record.get("age"))
+        gender = optional_string(record.get("gender"))
         rows.append(
             make_manifest_row(
                 mapper=mapper,
@@ -135,6 +139,14 @@ def build_pad_ufes_20(
                 diagnosis_basis="pathology" if biopsied else "clinical_consensus",
                 diagnosis_gradable=True,
                 license_id=dataset["license_id"],
+                age_years=age_years,
+                age_group_standardized=standardize_age_group(
+                    age_years=age_years
+                ),
+                age_source="clinical_metadata" if age_years is not None else None,
+                sex_or_gender=gender.casefold() if gender is not None else None,
+                sex_or_gender_system="source_gender" if gender is not None else None,
+                sex_or_gender_source="clinical_metadata" if gender is not None else None,
                 skin_tone_system="fitzpatrick" if fst is not None else None,
                 skin_tone=f"FST_{fst}" if fst is not None else None,
                 skin_tone_source="source_metadata" if fst is not None else None,
@@ -222,6 +234,10 @@ def build_scin(
 
     base_columns = [
         "case_id",
+        "age_group",
+        "sex_at_birth",
+        "combined_race",
+        "race_ethnicity_two_or_more_after_mitigation",
         "weighted_skin_condition_label",
         "dermatologist_skin_condition_on_label_name",
         "dermatologist_skin_condition_confidence",
@@ -255,6 +271,11 @@ def build_scin(
             )
             gradable = _scin_is_gradable(record) and bool(reference_diagnoses)
             case_id = str(record["case_id"])
+            age_group_source = optional_string(record.get("age_group"))
+            sex_at_birth = optional_string(record.get("sex_at_birth"))
+            race_ethnicity = _normalize_scin_race_ethnicity(
+                record.get("combined_race")
+            )
             for image_number in range(1, 4):
                 image_name = optional_string(image_paths[image_number][source_row])
                 if image_name is None:
@@ -281,6 +302,32 @@ def build_scin(
                         diagnosis_basis="dermatologist_differential",
                         diagnosis_gradable=gradable,
                         license_id=dataset["license_id"],
+                        age_group_source=age_group_source,
+                        age_group_standardized=standardize_age_group(
+                            source_group=age_group_source
+                        ),
+                        age_source="self_reported" if age_group_source is not None else None,
+                        sex_or_gender=(
+                            sex_at_birth.casefold()
+                            if sex_at_birth is not None
+                            else None
+                        ),
+                        sex_or_gender_system=(
+                            "sex_at_birth"
+                            if sex_at_birth is not None
+                            else None
+                        ),
+                        sex_or_gender_source=(
+                            "self_reported"
+                            if sex_at_birth is not None
+                            else None
+                        ),
+                        race_ethnicity=race_ethnicity,
+                        race_ethnicity_source=(
+                            "self_reported_combined"
+                            if race_ethnicity is not None
+                            else None
+                        ),
                         skin_tone_system="monk" if monk_value is not None else None,
                         skin_tone=f"MST_{monk_value}" if monk_value is not None else None,
                         skin_tone_source=monk_source,
@@ -307,6 +354,156 @@ def build_scin(
                         },
                     )
                 )
+    return rows
+
+
+def build_dermnet_kaggle(
+    root: Path,
+    config: dict[str, Any],
+    mapper: DiseaseMapper,
+    progress: ProgressCallback,
+) -> list[dict[str, Any]]:
+    """Index the coarse Kaggle directory labels without using them as benchmark truth."""
+
+    dataset = config["dataset"]
+    archive_path = root / config["source"]["image_archive"]
+    rows: list[dict[str, Any]] = []
+    with zipfile.ZipFile(archive_path) as archive:
+        members = [
+            member
+            for member in archive.namelist()
+            if not member.endswith("/")
+        ]
+    progress(f"Reading {len(members)} Dermnet Kaggle archive members")
+
+    for member in members:
+        parts = Path(member).parts
+        if len(parts) < 3:
+            raise ValueError(f"Unexpected Dermnet archive path: {member!r}")
+        source_split, category = parts[0], parts[1]
+        digest = hashlib.sha256(member.encode("utf-8")).hexdigest()[:20]
+        diagnosis = reference_diagnosis(
+            mapper=mapper,
+            dataset_id=dataset["id"],
+            disease_original=category,
+            rank=1,
+            weight=1.0,
+            source="parent_directory",
+        )
+        rows.append(
+            make_manifest_row(
+                mapper=mapper,
+                dataset_id=dataset["id"],
+                dataset_version=str(dataset["version"]),
+                sample_id=f"DERMNET_KAGGLE_{digest}",
+                original_image_id=member,
+                original_case_id=None,
+                patient_id=None,
+                group_id=f"DERMNET_KAGGLE_IMAGE_{digest}",
+                image_uri=_zip_uri(root, archive_path, member),
+                reference_diagnoses=[diagnosis],
+                diagnosis_basis="atlas_label",
+                diagnosis_gradable=True,
+                license_id=dataset["license_id"],
+                force_exclusion_reason="dataset_excluded_from_benchmark",
+                source_metadata={
+                    "source_split": source_split,
+                    "directory_category": category,
+                    "archive_member": member,
+                    "label_granularity": "coarse_mixed_category",
+                    "patient_grouping_available": False,
+                },
+            )
+        )
+    return rows
+
+
+def build_skindisnet(
+    root: Path,
+    config: dict[str, Any],
+    mapper: DiseaseMapper,
+    progress: ProgressCallback,
+) -> list[dict[str, Any]]:
+    """Index patient-grouped preprocessed images and exclude augmented derivatives."""
+
+    dataset = config["dataset"]
+    source = config["source"]
+    archive_path = root / source["image_archive"]
+    metadata_member = source["metadata_member"]
+    preprocessed_root = source["preprocessed_root"]
+
+    with zipfile.ZipFile(archive_path) as archive:
+        archive_members = set(archive.namelist())
+        with archive.open(metadata_member) as metadata:
+            frame = pd.read_csv(metadata)
+
+    progress(f"Reading {len(frame)} SkinDisNet metadata rows")
+    rows: list[dict[str, Any]] = []
+    for record in frame.to_dict(orient="records"):
+        folder_name = str(record["Folder_name"])
+        image_id = str(record["Image_id"])
+        patient_id = str(record["Patient_id"])
+        archive_member = f"{preprocessed_root}/{folder_name}/{image_id}.jpg"
+        if archive_member not in archive_members:
+            raise ValueError(
+                f"SkinDisNet image {archive_member!r} was not found in the archive"
+            )
+
+        diagnosis = reference_diagnosis(
+            mapper=mapper,
+            dataset_id=dataset["id"],
+            disease_original=record.get("Diagnosis"),
+            rank=1,
+            weight=1.0,
+            source="Diagnosis",
+        )
+        age_source = optional_string(record.get("Age"))
+        age_numeric = float(age_source) if age_source is not None else None
+        age_years = (
+            int(age_numeric)
+            if age_numeric is not None and age_numeric.is_integer()
+            else None
+        )
+        age_for_grouping = (
+            int(age_numeric)
+            if age_numeric is not None and age_numeric >= 0
+            else None
+        )
+        sex = optional_string(record.get("Sex"))
+        digest = hashlib.sha256(archive_member.encode("utf-8")).hexdigest()[:20]
+        rows.append(
+            make_manifest_row(
+                mapper=mapper,
+                dataset_id=dataset["id"],
+                dataset_version=str(dataset["version"]),
+                sample_id=f"SKINDISNET_{digest}",
+                original_image_id=image_id,
+                original_case_id=None,
+                patient_id=patient_id,
+                group_id=f"SKINDISNET_PATIENT_{patient_id}",
+                image_uri=_zip_uri(root, archive_path, archive_member),
+                reference_diagnoses=[diagnosis],
+                diagnosis_basis="dermatologist_review",
+                diagnosis_gradable=True,
+                license_id=dataset["license_id"],
+                age_years=age_years,
+                age_group_standardized=standardize_age_group(
+                    age_years=age_for_grouping
+                ),
+                age_source="clinical_metadata" if age_source is not None else None,
+                sex_or_gender=sex.casefold() if sex is not None else None,
+                sex_or_gender_system="source_gender" if sex is not None else None,
+                sex_or_gender_source="clinical_metadata" if sex is not None else None,
+                source_metadata={
+                    "folder_name": folder_name,
+                    "anatomical_site": record.get("Leision_location"),
+                    "source_age_years": age_source,
+                    "archive_member": archive_member,
+                    "preprocessing": "cropped_background_removed_resized_512x512",
+                    "augmented_derivatives_excluded": True,
+                },
+            )
+        )
     return rows
 
 
@@ -358,6 +555,18 @@ def _scin_is_gradable(record: dict[str, Any]) -> bool:
     )
 
 
+def _normalize_scin_race_ethnicity(value: Any) -> str | None:
+    """Normalize SCIN's combined category without exposing its boolean helper."""
+
+    normalized = optional_string(value)
+    if normalized is None:
+        return None
+    normalized = normalized.casefold()
+    if normalized == "two_or_more_after_mitigation":
+        return "two_or_more_races"
+    return normalized
+
+
 def _preferred_scin_monk_value(
     record: dict[str, Any],
 ) -> tuple[str | None, str | None]:
@@ -384,6 +593,16 @@ def _fitzpatrick_value(value: Any) -> str | None:
     if numeric < 1 or numeric > 6:
         return None
     return str(int(numeric)) if numeric.is_integer() else text
+
+
+def _optional_age(value: Any) -> int | None:
+    text = optional_string(value)
+    if text is None:
+        return None
+    numeric = float(text)
+    if numeric < 0:
+        return None
+    return int(numeric)
 
 
 def _index_zip_members(

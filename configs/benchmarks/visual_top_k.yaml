@@ -2,7 +2,7 @@
 
 benchmark:
   id: visual_top_k_closed_set
-  version: 2.0.0
+  version: 3.0.0
   task: visual_disease_ranking
   description: >
     Evaluates how accurately a vision-language model ranks dermatological diseases from a fixed taxonomy. The same configuration must be used for
@@ -19,10 +19,10 @@ taxonomy:
   path: configs/taxonomies/diseases.yaml
   id_field: id
   label_field: display_name
-  expected_size: 20
+  expected_size: 21
 
 dataset:
-  manifest: data/benchmarks/visual_top_k_v2/internal_test.parquet
+  manifest: data/benchmarks/visual_top_k_v3/internal_test.parquet
   manifest_schema: configs/datasets/manifest_schema.yaml
   dataset_catalog: configs/datasets/catalog.yaml
   disease_inclusion_policy: configs/datasets/disease_inclusion.yaml
@@ -39,6 +39,30 @@ dataset:
     every source differential in reference_diagnoses for auditing. Only rows
     that pass the disease-inclusion and leakage-prevention policies may enter
     this generated test manifest.
+
+subgroup_evaluation:
+  metadata_usage: evaluation_only
+  include_metadata_in_model_prompt: false
+  minimum_subgroup_unique_groups: 30
+  minimum_per_disease_unique_groups: 10
+  dimensions:
+    - age_group_standardized
+    - skin_tone_system_and_value
+    - sex_or_gender_system_and_value
+    - race_ethnicity
+  metrics:
+    - top_1_accuracy
+    - top_3_accuracy
+    - top_6_accuracy
+    - mean_reciprocal_rank
+  reporting:
+    include_image_count: true
+    include_unique_group_count: true
+    include_missingness: true
+    include_confidence_intervals: true
+    include_worst_group_metric: true
+    report_by_dataset: true
+    report_by_disease_when_supported: true
 
 metrics:
   - id: top_1_accuracy

@@ -31,6 +31,13 @@ mapping:
     - dermatologist_gradable_for_skin_condition_1
     - dermatologist_gradable_for_skin_condition_2
     - dermatologist_gradable_for_skin_condition_3
+  demographics:
+    age_group_source: age_group
+    age_group_standardized: derived_from_age_group
+    sex_or_gender: sex_at_birth
+    sex_or_gender_system: sex_at_birth
+    race_ethnicity: combined_race
+    race_ethnicity_source: self_reported_combined
   skin_tone:
     available_systems:
       - self_reported_fitzpatrick
@@ -48,7 +55,7 @@ normalization:
 
 manifest:
   schema: configs/datasets/manifest_schema.yaml
-  output: data/manifests/scin_v2.parquet
+  output: data/manifests/scin_v3.parquet
 
 coverage:
   role: taxonomy_contributor

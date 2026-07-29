@@ -27,6 +27,11 @@ mapping:
     value_from: biopsed
     true: pathology
     false: clinical_consensus
+  demographics:
+    age_years: age
+    age_group_standardized: derived_from_age_years
+    sex_or_gender: gender
+    sex_or_gender_system: source_gender
   skin_tone:
     system: fitzpatrick
     value: fitspatrick
@@ -45,7 +50,7 @@ normalization:
 
 manifest:
   schema: configs/datasets/manifest_schema.yaml
-  output: data/manifests/pad_ufes_20_v2.parquet
+  output: data/manifests/pad_ufes_20_v3.parquet
 
 coverage:
   role: taxonomy_contributor

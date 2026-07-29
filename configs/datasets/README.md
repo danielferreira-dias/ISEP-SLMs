@@ -43,15 +43,16 @@ Validate existing outputs without rebuilding them:
 ```
 
 The pipeline builds normalized manifests for Fitzpatrick17k-C, PAD-UFES-20,
-SCIN, and DDI. It then concatenates the three taxonomy contributors into
-`data/combined/visual_top_k_development_pool_v2.parquet` and creates the
-source-label inventory and preliminary disease-coverage reports under
-`data/reports/`.
+SCIN, SkinDisNet, DDI, and the Dermnet Kaggle mirror. It then concatenates the
+three taxonomy contributors into
+`data/combined/visual_top_k_development_pool_v3.parquet` and creates the
+source-label inventory, demographic-availability report, subgroup-support
+report, and preliminary disease-coverage reports under `data/reports/`.
 
 The combined development pool retains out-of-scope rows with their `include`
 and `exclusion_reason` fields. Every non-empty source diagnosis receives a
 countable `canonical_source_label`, but only clinically reviewed labels map to
-one of the 20 active benchmark disease IDs. The pool is not a final training
+one of the 21 active benchmark disease IDs. The pool is not a final training
 dataset.
 Final train, validation, and test splits must only be created after mapping
 review, duplicate analysis, and taxonomy approval.
@@ -61,12 +62,19 @@ relative paths, images inside ZIP archives use `zip://` locators, and embedded
 SCIN images use `parquet://` locators containing the shard, source row, and
 image column.
 
+Demographic fields are source-dependent and are used only for evaluation
+stratification. They are never added to the model prompt. Age, sex or gender,
+race or ethnicity, and skin-tone values retain their provenance. Fitzpatrick,
+grouped Fitzpatrick, and Monk Skin Tone values are reported as separate
+measurement systems rather than converted into a single scale.
+
 | Directory | Dataset | Local payload |
 | --- | --- | --- |
 | `fitzpatrick17k/` | Fitzpatrick17k and Fitzpatrick17k-C | Complete original image archive plus original and corrected metadata |
 | `scin/` | SCIN | Complete official Hugging Face snapshot |
 | `pad-ufes-20/` | PAD-UFES-20 | Metadata and three official image archives |
 | `ddi/` | Diverse Dermatology Images | Complete metadata and all 656 official images |
+| `skindisnet/` | SkinDisNet | Complete official version 2 archive with 1,710 preprocessed smartphone images and patient metadata |
 | `skincon/` | SKINCON | Complete concept annotations; images remain subject to Fitzpatrick17k/DDI access |
 | `skincap/` | SkinCAP | Complete gated Hugging Face snapshot for the locally authenticated account |
 | `skincare/` | SkinCaRe | Complete gated Hugging Face snapshot for the locally authenticated account |
@@ -78,6 +86,8 @@ image column.
 - These datasets contain sensitive or graphic medical images.
 - They are research data, not a substitute for clinical validation.
 - Keep patient, case, lesion, or encounter groups intact when creating splits.
+- Treat SkinDisNet's augmented images as derivatives, not independent cases;
+  benchmark only the preprocessed images and split them by patient.
 - Count unique groups when measuring disease support. Do not use raw image
   counts to decide whether a disease has enough data.
 - Keep excluded low-frequency diseases in the long-tail report so selection

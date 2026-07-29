@@ -6,11 +6,23 @@ from pathlib import Path
 import json
 import unittest
 
+import pandas as pd
 import yaml
 
-from src.data_pipeline.adapters import _fitzpatrick_value, _parse_scin_differential
-from src.data_pipeline.common import DiseaseMapper, normalize_label
-from src.data_pipeline.reporting import _support_status
+from src.data_pipeline.adapters import (
+    _fitzpatrick_value,
+    _normalize_scin_race_ethnicity,
+    _parse_scin_differential,
+)
+from src.data_pipeline.common import (
+    DiseaseMapper,
+    normalize_label,
+    standardize_age_group,
+)
+from src.data_pipeline.reporting import (
+    _informative_demographic_mask,
+    _support_status,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +51,9 @@ class DiseaseMappingTests(unittest.TestCase):
     def test_generic_tinea_remains_out_of_benchmark_scope(self) -> None:
         self.assertIsNone(self.mapper.map("scin", "Tinea"))
 
+    def test_drug_rash_maps_to_drug_eruption(self) -> None:
+        self.assertEqual(self.mapper.map("scin", "Drug Rash"), "D025")
+
     def test_every_source_label_has_a_canonical_counting_label(self) -> None:
         self.assertEqual(
             self.mapper.canonical_source_label("scin", "Rare Example Disease"),
@@ -57,6 +72,12 @@ class DiseaseMappingTests(unittest.TestCase):
     def test_invalid_fitzpatrick_value_is_omitted(self) -> None:
         self.assertIsNone(_fitzpatrick_value(0))
         self.assertEqual(_fitzpatrick_value(4.0), "4")
+
+    def test_scin_two_or_more_races_uses_a_category_not_a_boolean(self) -> None:
+        self.assertEqual(
+            _normalize_scin_race_ethnicity("TWO_OR_MORE_AFTER_MITIGATION"),
+            "two_or_more_races",
+        )
 
 
 class CoverageTests(unittest.TestCase):
@@ -82,6 +103,30 @@ class CoverageTests(unittest.TestCase):
         self.assertIn("insufficient_unique_groups", reason)
         self.assertIn("insufficient_independent_datasets", reason)
 
+    def test_age_standardization_preserves_source_granularity(self) -> None:
+        self.assertEqual(
+            standardize_age_group(source_group="AGE_30_TO_39"),
+            "30_to_39",
+        )
+        self.assertEqual(
+            standardize_age_group(age_years=72),
+            "70_and_over",
+        )
+        self.assertEqual(
+            standardize_age_group(source_group="AGE_UNKNOWN"),
+            "unknown",
+        )
+
+    def test_missingness_categories_are_not_metric_subgroups(self) -> None:
+        values = pd.Series(["female", "other_or_unspecified", None])
+        self.assertEqual(
+            _informative_demographic_mask(
+                values,
+                dimension="sex_or_gender",
+            ).tolist(),
+            [True, False, False],
+        )
+
 
 class TaxonomyContractTests(unittest.TestCase):
     def test_active_taxonomy_and_output_schema_are_synchronized(self) -> None:
@@ -100,10 +145,10 @@ class TaxonomyContractTests(unittest.TestCase):
             "disease_id"
         ]["enum"]
 
-        self.assertEqual(len(active_ids), 20)
+        self.assertEqual(len(active_ids), 21)
         self.assertEqual(active_ids, schema_ids)
         self.assertFalse(set(active_ids) & retired_ids)
-        self.assertEqual(benchmark["taxonomy"]["expected_size"], 20)
+        self.assertEqual(benchmark["taxonomy"]["expected_size"], 21)
 
 
 if __name__ == "__main__":

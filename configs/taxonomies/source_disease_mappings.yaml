@@ -2,7 +2,7 @@
 
 mapping:
   id: dermatology_source_disease_mappings
-  version: 2.1.0
+  version: 2.2.0
   language: en
   taxonomy: configs/taxonomies/diseases.yaml
   description: >
@@ -32,6 +32,7 @@ global:
   seborrheic eczema: D015
   seborrhoeic eczema: D015
   hives: D017
+  drug rash: D025
 
 dataset_specific:
   pad_ufes_20:

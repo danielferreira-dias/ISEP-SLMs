@@ -25,6 +25,14 @@ def build_reports(
 
     inventory = _source_inventory(manifest_paths, mapper)
     all_source_coverage = _all_source_coverage(manifest_paths, mapper)
+    demographic_availability = _demographic_availability(
+        manifest_paths,
+        policy,
+    )
+    subgroup_coverage = _subgroup_coverage(
+        manifest_paths,
+        policy,
+    )
     coverage = _coverage_table(
         manifest_paths=manifest_paths,
         contributor_ids=contributor_ids,
@@ -35,6 +43,8 @@ def build_reports(
     outputs = policy["outputs"]
     inventory_path = root / outputs["source_label_inventory"]
     all_source_coverage_path = root / outputs["all_source_disease_coverage"]
+    demographic_availability_path = root / outputs["demographic_availability"]
+    subgroup_coverage_path = root / outputs["subgroup_coverage"]
     coverage_csv_path = root / outputs["coverage_csv"]
     coverage_parquet_path = root / outputs["coverage_parquet"]
     included_path = root / outputs["included_diseases"]
@@ -44,6 +54,8 @@ def build_reports(
     for path in [
         inventory_path,
         all_source_coverage_path,
+        demographic_availability_path,
+        subgroup_coverage_path,
         coverage_csv_path,
         coverage_parquet_path,
         included_path,
@@ -54,6 +66,8 @@ def build_reports(
 
     inventory.to_csv(inventory_path, index=False)
     all_source_coverage.to_csv(all_source_coverage_path, index=False)
+    demographic_availability.to_csv(demographic_availability_path, index=False)
+    subgroup_coverage.to_csv(subgroup_coverage_path, index=False)
     coverage.to_csv(coverage_csv_path, index=False)
     pq.write_table(pa.Table.from_pandas(coverage, preserve_index=False), coverage_parquet_path)
 
@@ -101,6 +115,8 @@ def build_reports(
     return {
         "source_label_inventory": inventory_path,
         "all_source_disease_coverage": all_source_coverage_path,
+        "demographic_availability": demographic_availability_path,
+        "subgroup_coverage": subgroup_coverage_path,
         "coverage_csv": coverage_csv_path,
         "coverage_parquet": coverage_parquet_path,
         "included_diseases": included_path,
@@ -408,3 +424,305 @@ def _support_status(
     if reasons:
         return "long_tail", ";".join(reasons)
     return "pending_split_validation", None
+
+
+def _demographic_availability(
+    manifest_paths: dict[str, Path],
+    policy: dict[str, Any],
+) -> pd.DataFrame:
+    columns = [
+        "dataset_id",
+        "dataset_role",
+        "record_scope",
+        "image_count",
+        "unique_group_count",
+        "exact_age_group_count",
+        "standardized_age_group_count",
+        "standardized_age_group_coverage",
+        "skin_tone_group_count",
+        "skin_tone_group_coverage",
+        "sex_or_gender_group_count",
+        "sex_or_gender_group_coverage",
+        "race_ethnicity_group_count",
+        "race_ethnicity_group_coverage",
+    ]
+    records: list[dict[str, Any]] = []
+    for dataset_id, path in manifest_paths.items():
+        frame = pq.read_table(
+            path,
+            columns=[
+                "sample_id",
+                "group_id",
+                "include",
+                "age_years",
+                "age_group_standardized",
+                "skin_tone",
+                "sex_or_gender",
+                "race_ethnicity",
+            ],
+        ).to_pandas()
+        for scope, scoped in [
+            ("all_source_rows", frame),
+            ("benchmark_mapped_rows", frame[frame["include"]]),
+        ]:
+            total_groups = int(scoped["group_id"].nunique())
+            informative_age = scoped[
+                _informative_demographic_mask(
+                    scoped["age_group_standardized"],
+                    dimension="age_group",
+                )
+            ]
+            informative_sex_or_gender = scoped[
+                _informative_demographic_mask(
+                    scoped["sex_or_gender"],
+                    dimension="sex_or_gender",
+                )
+            ]
+            informative_race_ethnicity = scoped[
+                _informative_demographic_mask(
+                    scoped["race_ethnicity"],
+                    dimension="race_ethnicity",
+                )
+            ]
+            records.append(
+                {
+                    "dataset_id": dataset_id,
+                    "dataset_role": _dataset_role(dataset_id, policy),
+                    "record_scope": scope,
+                    "image_count": int(scoped["sample_id"].nunique()),
+                    "unique_group_count": total_groups,
+                    "exact_age_group_count": int(
+                        scoped.loc[scoped["age_years"].notna(), "group_id"].nunique()
+                    ),
+                    "standardized_age_group_count": int(
+                        informative_age["group_id"].nunique()
+                    ),
+                    "standardized_age_group_coverage": _coverage_fraction(
+                        informative_age["group_id"].nunique(),
+                        total_groups,
+                    ),
+                    "skin_tone_group_count": int(
+                        scoped.loc[scoped["skin_tone"].notna(), "group_id"].nunique()
+                    ),
+                    "skin_tone_group_coverage": _coverage_fraction(
+                        scoped.loc[
+                            scoped["skin_tone"].notna(),
+                            "group_id",
+                        ].nunique(),
+                        total_groups,
+                    ),
+                    "sex_or_gender_group_count": int(
+                        informative_sex_or_gender["group_id"].nunique()
+                    ),
+                    "sex_or_gender_group_coverage": _coverage_fraction(
+                        informative_sex_or_gender["group_id"].nunique(),
+                        total_groups,
+                    ),
+                    "race_ethnicity_group_count": int(
+                        informative_race_ethnicity["group_id"].nunique()
+                    ),
+                    "race_ethnicity_group_coverage": _coverage_fraction(
+                        informative_race_ethnicity["group_id"].nunique(),
+                        total_groups,
+                    ),
+                }
+            )
+    return pd.DataFrame(records, columns=columns)
+
+
+def _subgroup_coverage(
+    manifest_paths: dict[str, Path],
+    policy: dict[str, Any],
+) -> pd.DataFrame:
+    manifest_frames: dict[str, pd.DataFrame] = {}
+    for dataset_id, path in manifest_paths.items():
+        frame = pq.read_table(
+            path,
+            columns=[
+                "sample_id",
+                "group_id",
+                "include",
+                "disease_id",
+                "age_group_standardized",
+                "skin_tone_system",
+                "skin_tone",
+                "sex_or_gender_system",
+                "sex_or_gender",
+                "race_ethnicity_source",
+                "race_ethnicity",
+            ],
+        ).to_pandas()
+        manifest_frames[dataset_id] = frame[frame["include"]].copy()
+
+    contributor_ids = policy["dataset_roles"]["taxonomy_contributors"]
+    contributor_frames = [
+        manifest_frames[dataset_id]
+        for dataset_id in contributor_ids
+        if dataset_id in manifest_frames
+    ]
+    scopes = dict(manifest_frames)
+    if contributor_frames:
+        scopes["all_contributors"] = pd.concat(
+            contributor_frames,
+            ignore_index=True,
+        )
+
+    minimum_overall = int(
+        policy["subgroup_reporting"]["minimum_subgroup_unique_groups"]
+    )
+    minimum_per_disease = int(
+        policy["subgroup_reporting"][
+            "minimum_disease_subgroup_unique_groups"
+        ]
+    )
+    records: list[dict[str, Any]] = []
+    for dataset_id, frame in scopes.items():
+        if frame.empty:
+            continue
+        dimension_frames = [
+            (
+                "age_group",
+                pd.Series("standardized_age_v1", index=frame.index),
+                frame["age_group_standardized"],
+            ),
+            (
+                "skin_tone",
+                frame["skin_tone_system"],
+                frame["skin_tone"],
+            ),
+            (
+                "sex_or_gender",
+                frame["sex_or_gender_system"],
+                frame["sex_or_gender"],
+            ),
+            (
+                "race_ethnicity",
+                frame["race_ethnicity_source"],
+                frame["race_ethnicity"],
+            ),
+        ]
+        for dimension, systems, values in dimension_frames:
+            dimension_frame = frame.assign(
+                _subgroup_system=systems,
+                _subgroup_value=values,
+            ).dropna(subset=["_subgroup_system", "_subgroup_value"])
+            dimension_frame = dimension_frame[
+                _informative_demographic_mask(
+                    dimension_frame["_subgroup_value"],
+                    dimension=dimension,
+                )
+            ]
+            for (system, value), subgroup in dimension_frame.groupby(
+                ["_subgroup_system", "_subgroup_value"],
+                sort=True,
+            ):
+                _append_subgroup_record(
+                    records,
+                    dataset_id=dataset_id,
+                    dimension=dimension,
+                    system=str(system),
+                    value=str(value),
+                    disease_id="all_active_diseases",
+                    frame=subgroup,
+                    minimum_required=minimum_overall,
+                )
+                for disease_id, disease_rows in subgroup.groupby(
+                    "disease_id",
+                    sort=True,
+                ):
+                    _append_subgroup_record(
+                        records,
+                        dataset_id=dataset_id,
+                        dimension=dimension,
+                        system=str(system),
+                        value=str(value),
+                        disease_id=str(disease_id),
+                        frame=disease_rows,
+                        minimum_required=minimum_per_disease,
+                    )
+
+    columns = [
+        "dataset_id",
+        "subgroup_dimension",
+        "subgroup_system",
+        "subgroup_value",
+        "disease_id",
+        "unique_group_count",
+        "image_count",
+        "minimum_required",
+        "eligible_for_metric",
+    ]
+    return pd.DataFrame(records, columns=columns).sort_values(
+        [
+            "dataset_id",
+            "subgroup_dimension",
+            "subgroup_system",
+            "subgroup_value",
+            "disease_id",
+        ],
+        ignore_index=True,
+    )
+
+
+def _append_subgroup_record(
+    records: list[dict[str, Any]],
+    *,
+    dataset_id: str,
+    dimension: str,
+    system: str,
+    value: str,
+    disease_id: str,
+    frame: pd.DataFrame,
+    minimum_required: int,
+) -> None:
+    group_count = int(frame["group_id"].nunique())
+    records.append(
+        {
+            "dataset_id": dataset_id,
+            "subgroup_dimension": dimension,
+            "subgroup_system": system,
+            "subgroup_value": value,
+            "disease_id": disease_id,
+            "unique_group_count": group_count,
+            "image_count": int(frame["sample_id"].nunique()),
+            "minimum_required": minimum_required,
+            "eligible_for_metric": group_count >= minimum_required,
+        }
+    )
+
+
+def _coverage_fraction(numerator: int, denominator: int) -> float | None:
+    if denominator == 0:
+        return None
+    return round(float(numerator) / float(denominator), 6)
+
+
+def _informative_demographic_mask(
+    values: pd.Series,
+    *,
+    dimension: str,
+) -> pd.Series:
+    """Select values that define reportable subgroups rather than missingness."""
+
+    excluded_values = {
+        "age_group": {"unknown"},
+        "sex_or_gender": {"other_or_unspecified", "unknown", "unspecified"},
+        "race_ethnicity": {
+            "prefer_not_to_answer",
+            "unknown",
+            "unspecified",
+        },
+    }.get(dimension, set())
+    normalized = values.astype("string").str.casefold()
+    return values.notna() & ~normalized.isin(excluded_values)
+
+
+def _dataset_role(dataset_id: str, policy: dict[str, Any]) -> str:
+    roles = policy["dataset_roles"]
+    if dataset_id in roles["taxonomy_contributors"]:
+        return "taxonomy_contributor"
+    if dataset_id in roles["external_evaluation_only"]:
+        return "external_evaluation_only"
+    if dataset_id in roles["excluded_from_coverage"]:
+        return "excluded_from_coverage"
+    return "unregistered"

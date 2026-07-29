@@ -1,0 +1,532 @@
+dataset_id,disease_original,normalized_source_label,canonical_source_label,disease_id,mapping_status,any_reference_image_count,any_reference_group_count,primary_image_count,primary_group_count
+ddi,verruca-vulgaris,verruca vulgaris,verruca_vulgaris,,out_of_benchmark_scope,50,50,50,50
+ddi,epidermal-cyst,epidermal cyst,epidermal_cyst,,out_of_benchmark_scope,35,35,35,35
+ddi,mycosis-fungoides,mycosis fungoides,mycosis_fungoides,,out_of_benchmark_scope,32,32,32,32
+ddi,dermatofibroma,dermatofibroma,dermatofibroma,,out_of_benchmark_scope,22,22,22,22
+ddi,acrochordon,acrochordon,acrochordon,,out_of_benchmark_scope,19,19,19,19
+ddi,dysplastic-nevus,dysplastic nevus,dysplastic_nevus,,out_of_benchmark_scope,16,16,16,16
+ddi,pyogenic-granuloma,pyogenic granuloma,pyogenic_granuloma,,out_of_benchmark_scope,14,14,14,14
+ddi,neurofibroma,neurofibroma,neurofibroma,,out_of_benchmark_scope,12,12,12,12
+ddi,angioma,angioma,angioma,,out_of_benchmark_scope,11,11,11,11
+ddi,eccrine-poroma,eccrine poroma,eccrine_poroma,,out_of_benchmark_scope,10,10,10,10
+ddi,squamous-cell-carcinoma-keratoacanthoma,squamous cell carcinoma keratoacanthoma,squamous_cell_carcinoma_keratoacanthoma,,out_of_benchmark_scope,8,8,8,8
+ddi,melanoma-acral-lentiginous,melanoma acral lentiginous,melanoma_acral_lentiginous,,out_of_benchmark_scope,7,7,7,7
+ddi,basal-cell-carcinoma-nodular,basal cell carcinoma nodular,basal_cell_carcinoma_nodular,,out_of_benchmark_scope,6,6,6,6
+ddi,blue-nevus,blue nevus,blue_nevus,,out_of_benchmark_scope,6,6,6,6
+ddi,kaposi-sarcoma,kaposi sarcoma,kaposi_sarcoma,,out_of_benchmark_scope,6,6,6,6
+ddi,lipoma,lipoma,lipoma,,out_of_benchmark_scope,6,6,6,6
+ddi,molluscum-contagiosum,molluscum contagiosum,molluscum_contagiosum,,out_of_benchmark_scope,6,6,6,6
+ddi,nevus-lipomatosus-superficialis,nevus lipomatosus superficialis,nevus_lipomatosus_superficialis,,out_of_benchmark_scope,6,6,6,6
+ddi,inverted-follicular-keratosis,inverted follicular keratosis,inverted_follicular_keratosis,,out_of_benchmark_scope,5,5,5,5
+ddi,metastatic-carcinoma,metastatic carcinoma,metastatic_carcinoma,,out_of_benchmark_scope,5,5,5,5
+ddi,eczema-spongiotic-dermatitis,eczema spongiotic dermatitis,eczema_spongiotic_dermatitis,,out_of_benchmark_scope,4,4,4,4
+ddi,solar-lentigo,solar lentigo,solar_lentigo,,out_of_benchmark_scope,4,4,4,4
+ddi,abrasions-ulcerations-and-physical-injuries,abrasions ulcerations and physical injuries,abrasions_ulcerations_and_physical_injuries,,out_of_benchmark_scope,3,3,3,3
+ddi,arteriovenous-hemangioma,arteriovenous hemangioma,arteriovenous_hemangioma,,out_of_benchmark_scope,3,3,3,3
+ddi,benign-keratosis,benign keratosis,benign_keratosis,,out_of_benchmark_scope,3,3,3,3
+ddi,hyperpigmentation,hyperpigmentation,hyperpigmentation,,out_of_benchmark_scope,3,3,3,3
+ddi,trichilemmoma,trichilemmoma,trichilemmoma,,out_of_benchmark_scope,3,3,3,3
+ddi,acquired-digital-fibrokeratoma,acquired digital fibrokeratoma,acquired_digital_fibrokeratoma,,out_of_benchmark_scope,2,2,2,2
+ddi,basal-cell-carcinoma-superficial,basal cell carcinoma superficial,basal_cell_carcinoma_superficial,,out_of_benchmark_scope,2,2,2,2
+ddi,condyloma-accuminatum,condyloma accuminatum,condyloma_accuminatum,,out_of_benchmark_scope,2,2,2,2
+ddi,fibrous-papule,fibrous papule,fibrous_papule,,out_of_benchmark_scope,2,2,2,2
+ddi,foreign-body-granuloma,foreign body granuloma,foreign_body_granuloma,,out_of_benchmark_scope,2,2,2,2
+ddi,graft-vs-host-disease,graft vs host disease,graft_vs_host_disease,,out_of_benchmark_scope,2,2,2,2
+ddi,onychomycosis,onychomycosis,onychomycosis,,out_of_benchmark_scope,2,2,2,2
+ddi,scar,scar,scar,,out_of_benchmark_scope,2,2,2,2
+ddi,syringocystadenoma-papilliferum,syringocystadenoma papilliferum,syringocystadenoma_papilliferum,,out_of_benchmark_scope,2,2,2,2
+ddi,trichofolliculoma,trichofolliculoma,trichofolliculoma,,out_of_benchmark_scope,2,2,2,2
+ddi,xanthogranuloma,xanthogranuloma,xanthogranuloma,,out_of_benchmark_scope,2,2,2,2
+ddi,abscess,abscess,abscess,,out_of_benchmark_scope,1,1,1,1
+ddi,acne-cystic,acne cystic,acne_cystic,,out_of_benchmark_scope,1,1,1,1
+ddi,acral-melanotic-macule,acral melanotic macule,acral_melanotic_macule,,out_of_benchmark_scope,1,1,1,1
+ddi,angioleiomyoma,angioleiomyoma,angioleiomyoma,,out_of_benchmark_scope,1,1,1,1
+ddi,atypical-spindle-cell-nevus-of-reed,atypical spindle cell nevus of reed,atypical_spindle_cell_nevus_of_reed,,out_of_benchmark_scope,1,1,1,1
+ddi,blastic-plasmacytoid-dendritic-cell-neoplasm,blastic plasmacytoid dendritic cell neoplasm,blastic_plasmacytoid_dendritic_cell_neoplasm,,out_of_benchmark_scope,1,1,1,1
+ddi,cellular-neurothekeoma,cellular neurothekeoma,cellular_neurothekeoma,,out_of_benchmark_scope,1,1,1,1
+ddi,chondroid-syringoma,chondroid syringoma,chondroid_syringoma,,out_of_benchmark_scope,1,1,1,1
+ddi,clear-cell-acanthoma,clear cell acanthoma,clear_cell_acanthoma,,out_of_benchmark_scope,1,1,1,1
+ddi,coccidioidomycosis,coccidioidomycosis,coccidioidomycosis,,out_of_benchmark_scope,1,1,1,1
+ddi,dermatomyositis,dermatomyositis,dermatomyositis,,out_of_benchmark_scope,1,1,1,1
+ddi,epidermal-nevus,epidermal nevus,epidermal_nevus,,out_of_benchmark_scope,1,1,1,1
+ddi,focal-acral-hyperkeratosis,focal acral hyperkeratosis,focal_acral_hyperkeratosis,,out_of_benchmark_scope,1,1,1,1
+ddi,glomangioma,glomangioma,glomangioma,,out_of_benchmark_scope,1,1,1,1
+ddi,hematoma,hematoma,hematoma,,out_of_benchmark_scope,1,1,1,1
+ddi,keloid,keloid,keloid,,out_of_benchmark_scope,1,1,1,1
+ddi,leukemia-cutis,leukemia cutis,leukemia_cutis,,out_of_benchmark_scope,1,1,1,1
+ddi,lichenoid-keratosis,lichenoid keratosis,lichenoid_keratosis,,out_of_benchmark_scope,1,1,1,1
+ddi,lymphocytic-infiltrations,lymphocytic infiltrations,lymphocytic_infiltrations,,out_of_benchmark_scope,1,1,1,1
+ddi,morphea,morphea,morphea,,out_of_benchmark_scope,1,1,1,1
+ddi,neuroma,neuroma,neuroma,,out_of_benchmark_scope,1,1,1,1
+ddi,nodular-melanoma-(nm),nodular melanoma nm,nodular_melanoma_nm,,out_of_benchmark_scope,1,1,1,1
+ddi,pigmented-spindle-cell-nevus-of-reed,pigmented spindle cell nevus of reed,pigmented_spindle_cell_nevus_of_reed,,out_of_benchmark_scope,1,1,1,1
+ddi,reactive-lymphoid-hyperplasia,reactive lymphoid hyperplasia,reactive_lymphoid_hyperplasia,,out_of_benchmark_scope,1,1,1,1
+ddi,sebaceous-carcinoma,sebaceous carcinoma,sebaceous_carcinoma,,out_of_benchmark_scope,1,1,1,1
+ddi,subcutaneous-t-cell-lymphoma,subcutaneous t cell lymphoma,subcutaneous_t_cell_lymphoma,,out_of_benchmark_scope,1,1,1,1
+ddi,tinea-pedis,tinea pedis,tinea_pedis,,out_of_benchmark_scope,1,1,1,1
+ddi,verruciform-xanthoma,verruciform xanthoma,verruciform_xanthoma,,out_of_benchmark_scope,1,1,1,1
+ddi,wart,wart,wart,,out_of_benchmark_scope,1,1,1,1
+dermnet_kaggle,Psoriasis pictures Lichen Planus and related diseases,psoriasis pictures lichen planus and related diseases,psoriasis_pictures_lichen_planus_and_related_diseases,,out_of_benchmark_scope,1757,1757,1757,1757
+dermnet_kaggle,Seborrheic Keratoses and other Benign Tumors,seborrheic keratoses and other benign tumors,seborrheic_keratoses_and_other_benign_tumors,,out_of_benchmark_scope,1714,1714,1714,1714
+dermnet_kaggle,Tinea Ringworm Candidiasis and other Fungal Infections,tinea ringworm candidiasis and other fungal infections,tinea_ringworm_candidiasis_and_other_fungal_infections,,out_of_benchmark_scope,1625,1625,1625,1625
+dermnet_kaggle,Eczema Photos,eczema photos,eczema_photos,,out_of_benchmark_scope,1544,1544,1544,1544
+dermnet_kaggle,Actinic Keratosis Basal Cell Carcinoma and other Malignant Lesions,actinic keratosis basal cell carcinoma and other malignant lesions,actinic_keratosis_basal_cell_carcinoma_and_other_malignant_lesions,,out_of_benchmark_scope,1437,1437,1437,1437
+dermnet_kaggle,Warts Molluscum and other Viral Infections,warts molluscum and other viral infections,warts_molluscum_and_other_viral_infections,,out_of_benchmark_scope,1358,1358,1358,1358
+dermnet_kaggle,Nail Fungus and other Nail Disease,nail fungus and other nail disease,nail_fungus_and_other_nail_disease,,out_of_benchmark_scope,1301,1301,1301,1301
+dermnet_kaggle,Acne and Rosacea Photos,acne and rosacea photos,acne_and_rosacea_photos,,out_of_benchmark_scope,1152,1152,1152,1152
+dermnet_kaggle,Systemic Disease,systemic disease,systemic_disease,,out_of_benchmark_scope,758,758,758,758
+dermnet_kaggle,Light Diseases and Disorders of Pigmentation,light diseases and disorders of pigmentation,light_diseases_and_disorders_of_pigmentation,,out_of_benchmark_scope,711,711,711,711
+dermnet_kaggle,Atopic Dermatitis Photos,atopic dermatitis photos,atopic_dermatitis_photos,,out_of_benchmark_scope,612,612,612,612
+dermnet_kaggle,Vascular Tumors,vascular tumors,vascular_tumors,,out_of_benchmark_scope,603,603,603,603
+dermnet_kaggle,Melanoma Skin Cancer Nevi and Moles,melanoma skin cancer nevi and moles,melanoma_skin_cancer_nevi_and_moles,,out_of_benchmark_scope,579,579,579,579
+dermnet_kaggle,Bullous Disease Photos,bullous disease photos,bullous_disease_photos,,out_of_benchmark_scope,561,561,561,561
+dermnet_kaggle,Scabies Lyme Disease and other Infestations and Bites,scabies lyme disease and other infestations and bites,scabies_lyme_disease_and_other_infestations_and_bites,,out_of_benchmark_scope,539,539,539,539
+dermnet_kaggle,Lupus and other Connective Tissue diseases,lupus and other connective tissue diseases,lupus_and_other_connective_tissue_diseases,,out_of_benchmark_scope,525,525,525,525
+dermnet_kaggle,Vasculitis Photos,vasculitis photos,vasculitis_photos,,out_of_benchmark_scope,521,521,521,521
+dermnet_kaggle,Herpes HPV and other STDs Photos,herpes hpv and other stds photos,herpes_hpv_and_other_stds_photos,,out_of_benchmark_scope,507,507,507,507
+dermnet_kaggle,Exanthems and Drug Eruptions,exanthems and drug eruptions,exanthems_and_drug_eruptions,,out_of_benchmark_scope,505,505,505,505
+dermnet_kaggle,Cellulitis Impetigo and other Bacterial Infections,cellulitis impetigo and other bacterial infections,cellulitis_impetigo_and_other_bacterial_infections,,out_of_benchmark_scope,361,361,361,361
+dermnet_kaggle,Poison Ivy Photos and other Contact Dermatitis,poison ivy photos and other contact dermatitis,poison_ivy_photos_and_other_contact_dermatitis,,out_of_benchmark_scope,325,325,325,325
+dermnet_kaggle,Hair Loss Photos Alopecia and other Hair Diseases,hair loss photos alopecia and other hair diseases,hair_loss_photos_alopecia_and_other_hair_diseases,,out_of_benchmark_scope,299,299,299,299
+dermnet_kaggle,Urticaria Hives,urticaria hives,urticaria_hives,,out_of_benchmark_scope,265,265,265,265
+fitzpatrick17k_c,lichen planus,lichen planus,lichen_planus,,out_of_benchmark_scope,377,377,377,377
+fitzpatrick17k_c,lupus erythematosus,lupus erythematosus,lupus_erythematosus,,out_of_benchmark_scope,257,257,257,257
+fitzpatrick17k_c,sarcoidosis,sarcoidosis,sarcoidosis,,out_of_benchmark_scope,257,257,257,257
+fitzpatrick17k_c,scleroderma,scleroderma,scleroderma,,out_of_benchmark_scope,246,246,246,246
+fitzpatrick17k_c,neutrophilic dermatoses,neutrophilic dermatoses,neutrophilic_dermatoses,,out_of_benchmark_scope,244,244,244,244
+fitzpatrick17k_c,photodermatoses,photodermatoses,photodermatoses,,out_of_benchmark_scope,242,242,242,242
+fitzpatrick17k_c,pityriasis rubra pilaris,pityriasis rubra pilaris,pityriasis_rubra_pilaris,,out_of_benchmark_scope,176,176,176,176
+fitzpatrick17k_c,mycosis fungoides,mycosis fungoides,mycosis_fungoides,,out_of_benchmark_scope,143,143,143,143
+fitzpatrick17k_c,dermatomyositis,dermatomyositis,dermatomyositis,,out_of_benchmark_scope,135,135,135,135
+fitzpatrick17k_c,dariers disease,dariers disease,dariers_disease,,out_of_benchmark_scope,130,130,130,130
+fitzpatrick17k_c,nematode infection,nematode infection,nematode_infection,,out_of_benchmark_scope,113,113,113,113
+fitzpatrick17k_c,neurofibromatosis,neurofibromatosis,neurofibromatosis,,out_of_benchmark_scope,109,109,109,109
+fitzpatrick17k_c,juvenile xanthogranuloma,juvenile xanthogranuloma,juvenile_xanthogranuloma,,out_of_benchmark_scope,104,104,104,104
+fitzpatrick17k_c,superficial spreading melanoma ssm,superficial spreading melanoma ssm,superficial_spreading_melanoma_ssm,,out_of_benchmark_scope,104,104,104,104
+fitzpatrick17k_c,telangiectases,telangiectases,telangiectases,,out_of_benchmark_scope,100,100,100,100
+fitzpatrick17k_c,kaposi sarcoma,kaposi sarcoma,kaposi_sarcoma,,out_of_benchmark_scope,98,98,98,98
+fitzpatrick17k_c,pyogenic granuloma,pyogenic granuloma,pyogenic_granuloma,,out_of_benchmark_scope,95,95,95,95
+fitzpatrick17k_c,porokeratosis actinic,porokeratosis actinic,porokeratosis_actinic,,out_of_benchmark_scope,93,93,93,93
+fitzpatrick17k_c,urticaria pigmentosa,urticaria pigmentosa,urticaria_pigmentosa,,out_of_benchmark_scope,90,90,90,90
+fitzpatrick17k_c,stevens johnson syndrome,stevens johnson syndrome,stevens_johnson_syndrome,,out_of_benchmark_scope,89,89,89,89
+fitzpatrick17k_c,milia,milia,milia,,out_of_benchmark_scope,88,88,88,88
+fitzpatrick17k_c,nevus sebaceous of jadassohn,nevus sebaceous of jadassohn,nevus_sebaceous_of_jadassohn,,out_of_benchmark_scope,88,88,88,88
+fitzpatrick17k_c,porphyria,porphyria,porphyria,,out_of_benchmark_scope,87,87,87,87
+fitzpatrick17k_c,fixed eruptions,fixed eruptions,fixed_eruptions,,out_of_benchmark_scope,85,85,85,85
+fitzpatrick17k_c,keloid,keloid,keloid,,out_of_benchmark_scope,83,83,83,83
+fitzpatrick17k_c,lyme disease,lyme disease,lyme_disease,,out_of_benchmark_scope,83,83,83,83
+fitzpatrick17k_c,necrobiosis lipoidica,necrobiosis lipoidica,necrobiosis_lipoidica,,out_of_benchmark_scope,82,82,82,82
+fitzpatrick17k_c,pilar cyst,pilar cyst,pilar_cyst,,out_of_benchmark_scope,80,80,80,80
+fitzpatrick17k_c,lymphangioma,lymphangioma,lymphangioma,,out_of_benchmark_scope,79,79,79,79
+fitzpatrick17k_c,epidermal nevus,epidermal nevus,epidermal_nevus,,out_of_benchmark_scope,78,78,78,78
+fitzpatrick17k_c,scleromyxedema,scleromyxedema,scleromyxedema,,out_of_benchmark_scope,76,76,76,76
+fitzpatrick17k_c,lupus subacute,lupus subacute,lupus_subacute,,out_of_benchmark_scope,73,73,73,73
+fitzpatrick17k_c,cheilitis,cheilitis,cheilitis,,out_of_benchmark_scope,71,71,71,71
+fitzpatrick17k_c,halo nevus,halo nevus,halo_nevus,,out_of_benchmark_scope,69,69,69,69
+fitzpatrick17k_c,acanthosis nigricans,acanthosis nigricans,acanthosis_nigricans,,out_of_benchmark_scope,66,66,66,66
+fitzpatrick17k_c,dyshidrotic eczema,dyshidrotic eczema,dyshidrotic_eczema,,out_of_benchmark_scope,66,66,66,66
+fitzpatrick17k_c,ehlers danlos syndrome,ehlers danlos syndrome,ehlers_danlos_syndrome,,out_of_benchmark_scope,66,66,66,66
+fitzpatrick17k_c,syringoma,syringoma,syringoma,,out_of_benchmark_scope,66,66,66,66
+fitzpatrick17k_c,lichen simplex,lichen simplex,lichen_simplex,,out_of_benchmark_scope,65,65,65,65
+fitzpatrick17k_c,tuberous sclerosis,tuberous sclerosis,tuberous_sclerosis,,out_of_benchmark_scope,65,65,65,65
+fitzpatrick17k_c,tungiasis,tungiasis,tungiasis,,out_of_benchmark_scope,65,65,65,65
+fitzpatrick17k_c,incontinentia pigmenti,incontinentia pigmenti,incontinentia_pigmenti,,out_of_benchmark_scope,64,64,64,64
+fitzpatrick17k_c,keratosis pilaris,keratosis pilaris,keratosis_pilaris,,out_of_benchmark_scope,64,64,64,64
+fitzpatrick17k_c,epidermolysis bullosa,epidermolysis bullosa,epidermolysis_bullosa,,out_of_benchmark_scope,61,61,61,61
+fitzpatrick17k_c,hailey hailey disease,hailey hailey disease,hailey_hailey_disease,,out_of_benchmark_scope,61,61,61,61
+fitzpatrick17k_c,acquired autoimmune bullous diseaseherpes gestationis,acquired autoimmune bullous diseaseherpes gestationis,acquired_autoimmune_bullous_diseaseherpes_gestationis,,out_of_benchmark_scope,59,59,59,59
+fitzpatrick17k_c,lentigo maligna,lentigo maligna,lentigo_maligna,,out_of_benchmark_scope,59,59,59,59
+fitzpatrick17k_c,mucous cyst,mucous cyst,mucous_cyst,,out_of_benchmark_scope,58,58,58,58
+fitzpatrick17k_c,dermatofibroma,dermatofibroma,dermatofibroma,,out_of_benchmark_scope,57,57,57,57
+fitzpatrick17k_c,hidradenitis,hidradenitis,hidradenitis,,out_of_benchmark_scope,57,57,57,57
+fitzpatrick17k_c,paronychia,paronychia,paronychia,,out_of_benchmark_scope,57,57,57,57
+fitzpatrick17k_c,becker nevus,becker nevus,becker_nevus,,out_of_benchmark_scope,56,56,56,56
+fitzpatrick17k_c,mucinosis,mucinosis,mucinosis,,out_of_benchmark_scope,55,55,55,55
+fitzpatrick17k_c,papilomatosis confluentes and reticulate,papilomatosis confluentes and reticulate,papilomatosis_confluentes_and_reticulate,,out_of_benchmark_scope,55,55,55,55
+fitzpatrick17k_c,stasis edema,stasis edema,stasis_edema,,out_of_benchmark_scope,55,55,55,55
+fitzpatrick17k_c,sun damaged skin,sun damaged skin,sun_damaged_skin,,out_of_benchmark_scope,55,55,55,55
+fitzpatrick17k_c,neurodermatitis,neurodermatitis,neurodermatitis,,out_of_benchmark_scope,54,54,54,54
+fitzpatrick17k_c,acrodermatitis enteropathica,acrodermatitis enteropathica,acrodermatitis_enteropathica,,out_of_benchmark_scope,53,53,53,53
+fitzpatrick17k_c,erythema nodosum,erythema nodosum,erythema_nodosum,,out_of_benchmark_scope,53,53,53,53
+fitzpatrick17k_c,ichthyosis vulgaris,ichthyosis vulgaris,ichthyosis_vulgaris,,out_of_benchmark_scope,53,53,53,53
+fitzpatrick17k_c,perioral dermatitis,perioral dermatitis,perioral_dermatitis,,out_of_benchmark_scope,53,53,53,53
+fitzpatrick17k_c,port wine stain,port wine stain,port_wine_stain,,out_of_benchmark_scope,52,52,52,52
+fitzpatrick17k_c,erythema annulare centrifigum,erythema annulare centrifigum,erythema_annulare_centrifigum,,out_of_benchmark_scope,51,51,51,51
+fitzpatrick17k_c,aplasia cutis,aplasia cutis,aplasia_cutis,,out_of_benchmark_scope,50,50,50,50
+fitzpatrick17k_c,nevocytic nevus,nevocytic nevus,nevocytic_nevus,,out_of_benchmark_scope,50,50,50,50
+fitzpatrick17k_c,behcets disease,behcets disease,behcets_disease,,out_of_benchmark_scope,49,49,49,49
+fitzpatrick17k_c,drug induced pigmentary changes,drug induced pigmentary changes,drug_induced_pigmentary_changes,,out_of_benchmark_scope,49,49,49,49
+fitzpatrick17k_c,rhinophyma,rhinophyma,rhinophyma,,out_of_benchmark_scope,48,48,48,48
+fitzpatrick17k_c,striae,striae,striae,,out_of_benchmark_scope,48,48,48,48
+fitzpatrick17k_c,tick bite,tick bite,tick_bite,,out_of_benchmark_scope,48,48,48,48
+fitzpatrick17k_c,calcinosis cutis,calcinosis cutis,calcinosis_cutis,,out_of_benchmark_scope,47,47,47,47
+fitzpatrick17k_c,neurotic excoriations,neurotic excoriations,neurotic_excoriations,,out_of_benchmark_scope,47,47,47,47
+fitzpatrick17k_c,pustular psoriasis,pustular psoriasis,pustular_psoriasis,,out_of_benchmark_scope,47,47,47,47
+fitzpatrick17k_c,xeroderma pigmentosum,xeroderma pigmentosum,xeroderma_pigmentosum,,out_of_benchmark_scope,47,47,47,47
+fitzpatrick17k_c,basal cell carcinoma morpheiform,basal cell carcinoma morpheiform,basal_cell_carcinoma_morpheiform,,out_of_benchmark_scope,46,46,46,46
+fitzpatrick17k_c,livedo reticularis,livedo reticularis,livedo_reticularis,,out_of_benchmark_scope,45,45,45,45
+fitzpatrick17k_c,porokeratosis of mibelli,porokeratosis of mibelli,porokeratosis_of_mibelli,,out_of_benchmark_scope,45,45,45,45
+fitzpatrick17k_c,fordyce spots,fordyce spots,fordyce_spots,,out_of_benchmark_scope,44,44,44,44
+fitzpatrick17k_c,naevus comedonicus,naevus comedonicus,naevus_comedonicus,,out_of_benchmark_scope,44,44,44,44
+fitzpatrick17k_c,xanthomas,xanthomas,xanthomas,,out_of_benchmark_scope,44,44,44,44
+fitzpatrick17k_c,pityriasis lichenoides chronica,pityriasis lichenoides chronica,pityriasis_lichenoides_chronica,,out_of_benchmark_scope,43,43,43,43
+fitzpatrick17k_c,solid cystic basal cell carcinoma,solid cystic basal cell carcinoma,solid_cystic_basal_cell_carcinoma,,out_of_benchmark_scope,41,41,41,41
+fitzpatrick17k_c,pilomatricoma,pilomatricoma,pilomatricoma,,out_of_benchmark_scope,39,39,39,39
+fitzpatrick17k_c,congenital nevus,congenital nevus,congenital_nevus,,out_of_benchmark_scope,38,38,38,38
+fitzpatrick17k_c,factitial dermatitis,factitial dermatitis,factitial_dermatitis,,out_of_benchmark_scope,38,38,38,38
+fitzpatrick17k_c,myiasis,myiasis,myiasis,,out_of_benchmark_scope,38,38,38,38
+fitzpatrick17k_c,granuloma pyogenic,granuloma pyogenic,granuloma_pyogenic,,out_of_benchmark_scope,34,34,34,34
+fitzpatrick17k_c,langerhans cell histiocytosis,langerhans cell histiocytosis,langerhans_cell_histiocytosis,,out_of_benchmark_scope,33,33,33,33
+fitzpatrick17k_c,lichen amyloidosis,lichen amyloidosis,lichen_amyloidosis,,out_of_benchmark_scope,33,33,33,33
+fitzpatrick17k_c,pediculosis lids,pediculosis lids,pediculosis_lids,,out_of_benchmark_scope,32,32,32,32
+fitzpatrick17k_c,erythema elevatum diutinum,erythema elevatum diutinum,erythema_elevatum_diutinum,,out_of_benchmark_scope,24,24,24,24
+fitzpatrick17k_c,disseminated actinic porokeratosis,disseminated actinic porokeratosis,disseminated_actinic_porokeratosis,,out_of_benchmark_scope,20,20,20,20
+scin,Insect Bite,insect bite,insect_bite,,out_of_benchmark_scope,879,403,401,185
+scin,Tinea,tinea,tinea,,out_of_benchmark_scope,465,206,211,93
+scin,Impetigo,impetigo,impetigo,,out_of_benchmark_scope,267,121,136,69
+scin,Herpes Zoster,herpes zoster,herpes_zoster,,out_of_benchmark_scope,297,142,130,68
+scin,Pigmented purpuric eruption,pigmented purpuric eruption,pigmented_purpuric_eruption,,out_of_benchmark_scope,220,98,128,62
+scin,Herpes Simplex,herpes simplex,herpes_simplex,,out_of_benchmark_scope,295,141,109,55
+scin,"Acute dermatitis, NOS",acute dermatitis nos,acute_dermatitis_nos,,out_of_benchmark_scope,277,124,93,46
+scin,Tinea Versicolor,tinea versicolor,tinea_versicolor,,out_of_benchmark_scope,108,53,72,37
+scin,CD - Contact dermatitis,cd contact dermatitis,cd_contact_dermatitis,,out_of_benchmark_scope,190,70,98,36
+scin,Keratosis pilaris,keratosis pilaris,keratosis_pilaris,,out_of_benchmark_scope,148,61,77,32
+scin,Lichen Simplex Chronicus,lichen simplex chronicus,lichen_simplex_chronicus,,out_of_benchmark_scope,167,78,69,32
+scin,Viral Exanthem,viral exanthem,viral_exanthem,,out_of_benchmark_scope,187,82,53,29
+scin,Lichen planus/lichenoid eruption,lichen planus lichenoid eruption,lichen_planus_lichenoid_eruption,,out_of_benchmark_scope,209,89,62,28
+scin,O/E - ecchymoses present,o e ecchymoses present,o_e_ecchymoses_present,,out_of_benchmark_scope,103,50,53,28
+scin,Leukocytoclastic Vasculitis,leukocytoclastic vasculitis,leukocytoclastic_vasculitis,,out_of_benchmark_scope,218,99,57,25
+scin,Hypersensitivity,hypersensitivity,hypersensitivity,,out_of_benchmark_scope,249,113,51,24
+scin,"Abrasion, scrape, or scab",abrasion scrape or scab,abrasion_scrape_or_scab,,out_of_benchmark_scope,105,48,45,23
+scin,Photodermatitis,photodermatitis,photodermatitis,,out_of_benchmark_scope,87,43,44,23
+scin,Purpura,purpura,purpura,,out_of_benchmark_scope,67,36,34,21
+scin,Stasis Dermatitis,stasis dermatitis,stasis_dermatitis,,out_of_benchmark_scope,163,70,59,21
+scin,Verruca vulgaris,verruca vulgaris,verruca_vulgaris,,out_of_benchmark_scope,95,40,46,20
+scin,Acute and chronic dermatitis,acute and chronic dermatitis,acute_and_chronic_dermatitis,,out_of_benchmark_scope,108,47,39,19
+scin,Intertrigo,intertrigo,intertrigo,,out_of_benchmark_scope,64,31,36,19
+scin,Molluscum Contagiosum,molluscum contagiosum,molluscum_contagiosum,,out_of_benchmark_scope,135,63,33,18
+scin,Scar Condition,scar condition,scar_condition,,out_of_benchmark_scope,48,23,36,18
+scin,Abscess,abscess,abscess,,out_of_benchmark_scope,88,41,34,17
+scin,Cellulitis,cellulitis,cellulitis,,out_of_benchmark_scope,94,39,41,17
+scin,"Chronic dermatitis, NOS",chronic dermatitis nos,chronic_dermatitis_nos,,out_of_benchmark_scope,51,27,31,17
+scin,Miliaria,miliaria,miliaria,,out_of_benchmark_scope,76,36,27,15
+scin,Perioral Dermatitis,perioral dermatitis,perioral_dermatitis,,out_of_benchmark_scope,58,26,35,15
+scin,Cutaneous lupus,cutaneous lupus,cutaneous_lupus,,out_of_benchmark_scope,67,31,18,10
+scin,Inflicted skin lesions,inflicted skin lesions,inflicted_skin_lesions,,out_of_benchmark_scope,64,29,21,10
+scin,Hemangioma,hemangioma,hemangioma,,out_of_benchmark_scope,30,15,15,9
+scin,Lichen nitidus,lichen nitidus,lichen_nitidus,,out_of_benchmark_scope,64,27,19,9
+scin,Xerosis,xerosis,xerosis,,out_of_benchmark_scope,58,24,17,9
+scin,Ecthyma,ecthyma,ecthyma,,out_of_benchmark_scope,30,11,21,8
+scin,Infected eczema,infected eczema,infected_eczema,,out_of_benchmark_scope,46,23,12,8
+scin,Livedo reticularis,livedo reticularis,livedo_reticularis,,out_of_benchmark_scope,25,10,16,7
+scin,Pityriasis lichenoides,pityriasis lichenoides,pityriasis_lichenoides,,out_of_benchmark_scope,71,28,16,7
+scin,SK/ISK,sk isk,sk_isk,,out_of_benchmark_scope,39,17,14,7
+scin,Confluent and reticulate papillomatosis,confluent and reticulate papillomatosis,confluent_and_reticulate_papillomatosis,,out_of_benchmark_scope,11,8,9,6
+scin,Cutaneous T Cell Lymphoma,cutaneous t cell lymphoma,cutaneous_t_cell_lymphoma,,out_of_benchmark_scope,31,16,13,6
+scin,Cutaneous sarcoidosis,cutaneous sarcoidosis,cutaneous_sarcoidosis,,out_of_benchmark_scope,51,24,11,6
+scin,Dermatofibroma,dermatofibroma,dermatofibroma,,out_of_benchmark_scope,20,8,14,6
+scin,Erythema ab igne,erythema ab igne,erythema_ab_igne,,out_of_benchmark_scope,36,16,13,6
+scin,Hidradenitis,hidradenitis,hidradenitis,,out_of_benchmark_scope,26,14,11,6
+scin,Post-Inflammatory hyperpigmentation,post inflammatory hyperpigmentation,post_inflammatory_hyperpigmentation,,out_of_benchmark_scope,61,28,15,6
+scin,Superficial wound of body region,superficial wound of body region,superficial_wound_of_body_region,,out_of_benchmark_scope,24,10,16,6
+scin,Burn of skin,burn of skin,burn_of_skin,,out_of_benchmark_scope,33,16,8,5
+scin,Cyst,cyst,cyst,,out_of_benchmark_scope,38,20,9,5
+scin,Onychomycosis,onychomycosis,onychomycosis,,out_of_benchmark_scope,17,7,12,5
+scin,Skin infection,skin infection,skin_infection,,out_of_benchmark_scope,27,15,9,5
+scin,Traumatic petechiae,traumatic petechiae,traumatic_petechiae,,out_of_benchmark_scope,14,7,10,5
+scin,Acanthosis nigricans,acanthosis nigricans,acanthosis_nigricans,,out_of_benchmark_scope,12,5,9,4
+scin,Candida intertrigo,candida intertrigo,candida_intertrigo,,out_of_benchmark_scope,26,13,8,4
+scin,Cutaneous larva migrans,cutaneous larva migrans,cutaneous_larva_migrans,,out_of_benchmark_scope,22,9,9,4
+scin,Geographic tongue,geographic tongue,geographic_tongue,,out_of_benchmark_scope,17,8,8,4
+scin,Keratosis,keratosis,keratosis,,out_of_benchmark_scope,11,6,5,4
+scin,Lichen spinulosus,lichen spinulosus,lichen_spinulosus,,out_of_benchmark_scope,27,11,10,4
+scin,Lichenified eczematous dermatitis,lichenified eczematous dermatitis,lichenified_eczematous_dermatitis,,out_of_benchmark_scope,15,6,10,4
+scin,Melasma,melasma,melasma,,out_of_benchmark_scope,12,5,9,4
+scin,O/E - petechiae on skin,o e petechiae on skin,o_e_petechiae_on_skin,,out_of_benchmark_scope,11,7,7,4
+scin,Paronychia,paronychia,paronychia,,out_of_benchmark_scope,11,5,9,4
+scin,Bullous Pemphigoid,bullous pemphigoid,bullous_pemphigoid,,out_of_benchmark_scope,21,9,6,3
+scin,Contact purpura,contact purpura,contact_purpura,,out_of_benchmark_scope,7,3,7,3
+scin,Lichen striatus,lichen striatus,lichen_striatus,,out_of_benchmark_scope,10,4,7,3
+scin,O/E - pustules,o e pustules,o_e_pustules,,out_of_benchmark_scope,10,4,7,3
+scin,Pityriasis alba,pityriasis alba,pityriasis_alba,,out_of_benchmark_scope,9,4,8,3
+scin,Porokeratosis,porokeratosis,porokeratosis,,out_of_benchmark_scope,32,13,7,3
+scin,Remove from labeling tool,remove from labeling tool,remove_from_labeling_tool,,out_of_benchmark_scope,24,12,3,3
+scin,AKV - Acrokeratosis verruciformis,akv acrokeratosis verruciformis,akv_acrokeratosis_verruciformis,,out_of_benchmark_scope,6,3,3,2
+scin,Acute constitutional eczema,acute constitutional eczema,acute_constitutional_eczema,,out_of_benchmark_scope,5,2,5,2
+scin,Amyloidosis of skin,amyloidosis of skin,amyloidosis_of_skin,,out_of_benchmark_scope,23,9,4,2
+scin,Animal bite - wound,animal bite wound,animal_bite_wound,,out_of_benchmark_scope,21,7,6,2
+scin,Annular erythema,annular erythema,annular_erythema,,out_of_benchmark_scope,9,7,2,2
+scin,Chilblain,chilblain,chilblain,,out_of_benchmark_scope,13,6,2,2
+scin,Clavus,clavus,clavus,,out_of_benchmark_scope,9,4,5,2
+scin,Deep fungal infection,deep fungal infection,deep_fungal_infection,,out_of_benchmark_scope,36,16,3,2
+scin,Dermatitis herpetiformis,dermatitis herpetiformis,dermatitis_herpetiformis,,out_of_benchmark_scope,36,14,3,2
+scin,Epidermal nevus,epidermal nevus,epidermal_nevus,,out_of_benchmark_scope,12,5,4,2
+scin,Erythema gyratum repens,erythema gyratum repens,erythema_gyratum_repens,,out_of_benchmark_scope,9,4,5,2
+scin,Erythema nodosum,erythema nodosum,erythema_nodosum,,out_of_benchmark_scope,20,8,4,2
+scin,Foot ulcer,foot ulcer,foot_ulcer,,out_of_benchmark_scope,6,2,6,2
+scin,Grover's disease,grover s disease,grover_s_disease,,out_of_benchmark_scope,25,10,5,2
+scin,Hand foot and mouth disease,hand foot and mouth disease,hand_foot_and_mouth_disease,,out_of_benchmark_scope,5,4,2,2
+scin,Hematoma of skin,hematoma of skin,hematoma_of_skin,,out_of_benchmark_scope,4,2,4,2
+scin,Idiopathic guttate hypomelanosis,idiopathic guttate hypomelanosis,idiopathic_guttate_hypomelanosis,,out_of_benchmark_scope,2,2,2,2
+scin,Inverse psoriasis,inverse psoriasis,inverse_psoriasis,,out_of_benchmark_scope,4,2,4,2
+scin,Kaposi's sarcoma of skin,kaposi s sarcoma of skin,kaposi_s_sarcoma_of_skin,,out_of_benchmark_scope,24,13,4,2
+scin,Koebner phenomenon,koebner phenomenon,koebner_phenomenon,,out_of_benchmark_scope,11,4,6,2
+scin,Lichenoid myxedema,lichenoid myxedema,lichenoid_myxedema,,out_of_benchmark_scope,16,6,5,2
+scin,Milia,milia,milia,,out_of_benchmark_scope,24,11,5,2
+scin,Morphea/Scleroderma,morphea scleroderma,morphea_scleroderma,,out_of_benchmark_scope,15,6,5,2
+scin,O/E - petechiae present,o e petechiae present,o_e_petechiae_present,,out_of_benchmark_scope,6,3,4,2
+scin,Parapsoriasis,parapsoriasis,parapsoriasis,,out_of_benchmark_scope,17,8,6,2
+scin,Perforating dermatosis,perforating dermatosis,perforating_dermatosis,,out_of_benchmark_scope,21,7,6,2
+scin,Prurigo,prurigo,prurigo,,out_of_benchmark_scope,8,4,4,2
+scin,Pyogenic granuloma,pyogenic granuloma,pyogenic_granuloma,,out_of_benchmark_scope,9,4,6,2
+scin,Rheumatoid nodule,rheumatoid nodule,rheumatoid_nodule,,out_of_benchmark_scope,5,2,5,2
+scin,Skin and soft tissue atypical mycobacterial infection,skin and soft tissue atypical mycobacterial infection,skin_and_soft_tissue_atypical_mycobacterial_infection,,out_of_benchmark_scope,61,25,6,2
+scin,Syphilis,syphilis,syphilis,,out_of_benchmark_scope,70,32,3,2
+scin,Venous Stasis Ulcer,venous stasis ulcer,venous_stasis_ulcer,,out_of_benchmark_scope,4,2,4,2
+scin,Abrasion and/or friction burn of thigh without infection,abrasion and or friction burn of thigh without infection,abrasion_and_or_friction_burn_of_thigh_without_infection,,out_of_benchmark_scope,3,1,3,1
+scin,Acne keloidalis,acne keloidalis,acne_keloidalis,,out_of_benchmark_scope,6,2,3,1
+scin,Acne urticata,acne urticata,acne_urticata,,out_of_benchmark_scope,2,1,2,1
+scin,Actinic granuloma,actinic granuloma,actinic_granuloma,,out_of_benchmark_scope,4,2,3,1
+scin,Acute dermatitis,acute dermatitis,acute_dermatitis,,out_of_benchmark_scope,3,1,3,1
+scin,Acute vesicular dermatitis,acute vesicular dermatitis,acute_vesicular_dermatitis,,out_of_benchmark_scope,2,1,2,1
+scin,Acute-on-chronic dyshidrotic eczema of hands,acute on chronic dyshidrotic eczema of hands,acute_on_chronic_dyshidrotic_eczema_of_hands,,out_of_benchmark_scope,3,1,3,1
+scin,Adnexal neoplasm,adnexal neoplasm,adnexal_neoplasm,,out_of_benchmark_scope,10,4,3,1
+scin,Agminate folliculitis,agminate folliculitis,agminate_folliculitis,,out_of_benchmark_scope,3,1,3,1
+scin,Allergic contact dermatitis caused by allergenic hapten derived from plant,allergic contact dermatitis caused by allergenic hapten derived from plant,allergic_contact_dermatitis_caused_by_allergenic_hapten_derived_from_plant,,out_of_benchmark_scope,3,1,3,1
+scin,Arsenical keratosis,arsenical keratosis,arsenical_keratosis,,out_of_benchmark_scope,2,1,2,1
+scin,B-Cell Cutaneous Lymphoma,b cell cutaneous lymphoma,b_cell_cutaneous_lymphoma,,out_of_benchmark_scope,6,3,2,1
+scin,Berloque dermatitis,berloque dermatitis,berloque_dermatitis,,out_of_benchmark_scope,3,1,3,1
+scin,Blister,blister,blister,,out_of_benchmark_scope,8,3,3,1
+scin,Burn of forearm,burn of forearm,burn_of_forearm,,out_of_benchmark_scope,2,1,2,1
+scin,Candida,candida,candida,,out_of_benchmark_scope,9,4,3,1
+scin,Cheilitis,cheilitis,cheilitis,,out_of_benchmark_scope,1,1,1,1
+scin,Chicken pox exanthem,chicken pox exanthem,chicken_pox_exanthem,,out_of_benchmark_scope,4,2,1,1
+scin,Condyloma acuminatum,condyloma acuminatum,condyloma_acuminatum,,out_of_benchmark_scope,12,4,3,1
+scin,Contact dermatitis caused by Rhus diversiloba,contact dermatitis caused by rhus diversiloba,contact_dermatitis_caused_by_rhus_diversiloba,,out_of_benchmark_scope,5,3,3,1
+scin,"Contact dermatitis, NOS",contact dermatitis nos,contact_dermatitis_nos,,out_of_benchmark_scope,24,10,3,1
+scin,Cutaneous metastasis,cutaneous metastasis,cutaneous_metastasis,,out_of_benchmark_scope,4,2,3,1
+scin,Diffuse xanthoma,diffuse xanthoma,diffuse_xanthoma,,out_of_benchmark_scope,2,1,2,1
+scin,Ecthyma gangrenosum,ecthyma gangrenosum,ecthyma_gangrenosum,,out_of_benchmark_scope,1,1,1,1
+scin,Elephantiasis nostras,elephantiasis nostras,elephantiasis_nostras,,out_of_benchmark_scope,1,1,1,1
+scin,Erosion of skin,erosion of skin,erosion_of_skin,,out_of_benchmark_scope,3,1,3,1
+scin,Eruptive odontogenic cyst,eruptive odontogenic cyst,eruptive_odontogenic_cyst,,out_of_benchmark_scope,4,2,3,1
+scin,Eruptive xanthoma,eruptive xanthoma,eruptive_xanthoma,,out_of_benchmark_scope,1,1,1,1
+scin,Erythema dyschromicum perstans,erythema dyschromicum perstans,erythema_dyschromicum_perstans,,out_of_benchmark_scope,5,2,2,1
+scin,Erythema migrans,erythema migrans,erythema_migrans,,out_of_benchmark_scope,25,11,3,1
+scin,Foreign body reaction of the skin,foreign body reaction of the skin,foreign_body_reaction_of_the_skin,,out_of_benchmark_scope,8,3,3,1
+scin,Fox-Fordyce disease,fox fordyce disease,fox_fordyce_disease,,out_of_benchmark_scope,6,2,3,1
+scin,Fungal dermatitis,fungal dermatitis,fungal_dermatitis,,out_of_benchmark_scope,4,2,1,1
+scin,Fungal dermatosis,fungal dermatosis,fungal_dermatosis,,out_of_benchmark_scope,6,3,3,1
+scin,HK - Hyperkeratosis,hk hyperkeratosis,hk_hyperkeratosis,,out_of_benchmark_scope,10,4,3,1
+scin,Hemosiderin pigmentation of lower limb due to varicose veins of lower limb,hemosiderin pigmentation of lower limb due to varicose veins of lower limb,hemosiderin_pigmentation_of_lower_limb_due_to_varicose_veins_of_lower_limb,,out_of_benchmark_scope,3,1,3,1
+scin,Hemosiderin pigmentation of skin due to venous insufficiency,hemosiderin pigmentation of skin due to venous insufficiency,hemosiderin_pigmentation_of_skin_due_to_venous_insufficiency,,out_of_benchmark_scope,6,2,3,1
+scin,Histiocytosis of skin,histiocytosis of skin,histiocytosis_of_skin,,out_of_benchmark_scope,3,1,3,1
+scin,Hyperpigmentation,hyperpigmentation,hyperpigmentation,,out_of_benchmark_scope,1,1,1,1
+scin,Ichthyosis,ichthyosis,ichthyosis,,out_of_benchmark_scope,10,6,2,1
+scin,Infection of skin,infection of skin,infection_of_skin,,out_of_benchmark_scope,3,2,2,1
+scin,Inflammatory dermatosis,inflammatory dermatosis,inflammatory_dermatosis,,out_of_benchmark_scope,7,3,3,1
+scin,Jessner lymphocytic infiltrate,jessner lymphocytic infiltrate,jessner_lymphocytic_infiltrate,,out_of_benchmark_scope,1,1,1,1
+scin,Keratoderma,keratoderma,keratoderma,,out_of_benchmark_scope,16,6,3,1
+scin,Keratolysis exfoliativa,keratolysis exfoliativa,keratolysis_exfoliativa,,out_of_benchmark_scope,1,1,1,1
+scin,Knuckle pads,knuckle pads,knuckle_pads,,out_of_benchmark_scope,1,1,1,1
+scin,Leukonychia,leukonychia,leukonychia,,out_of_benchmark_scope,1,1,1,1
+scin,Lichen sclerosus,lichen sclerosus,lichen_sclerosus,,out_of_benchmark_scope,6,3,2,1
+scin,Lichenified eczema,lichenified eczema,lichenified_eczema,,out_of_benchmark_scope,1,1,1,1
+scin,Local infection of wound,local infection of wound,local_infection_of_wound,,out_of_benchmark_scope,3,1,3,1
+scin,Localised cutaneous vasculitis,localised cutaneous vasculitis,localised_cutaneous_vasculitis,,out_of_benchmark_scope,3,1,3,1
+scin,Localized skin infection,localized skin infection,localized_skin_infection,,out_of_benchmark_scope,27,11,1,1
+scin,Lymphangioma,lymphangioma,lymphangioma,,out_of_benchmark_scope,12,5,2,1
+scin,Majocchi granuloma,majocchi granuloma,majocchi_granuloma,,out_of_benchmark_scope,1,1,1,1
+scin,Melanin pigmentation due to exogenous substance,melanin pigmentation due to exogenous substance,melanin_pigmentation_due_to_exogenous_substance,,out_of_benchmark_scope,2,1,2,1
+scin,Morbilliform eruption,morbilliform eruption,morbilliform_eruption,,out_of_benchmark_scope,1,1,1,1
+scin,Nail dystrophy,nail dystrophy,nail_dystrophy,,out_of_benchmark_scope,3,2,2,1
+scin,Necrobiosis lipoidica,necrobiosis lipoidica,necrobiosis_lipoidica,,out_of_benchmark_scope,13,5,3,1
+scin,O/E - vesicles present,o e vesicles present,o_e_vesicles_present,,out_of_benchmark_scope,1,1,1,1
+scin,On examination - follicular pustules,on examination follicular pustules,on_examination_follicular_pustules,,out_of_benchmark_scope,3,1,3,1
+scin,Onychodystrophy,onychodystrophy,onychodystrophy,,out_of_benchmark_scope,5,2,3,1
+scin,Pemphigus vulgaris,pemphigus vulgaris,pemphigus_vulgaris,,out_of_benchmark_scope,8,3,3,1
+scin,Petechiae,petechiae,petechiae,,out_of_benchmark_scope,5,2,2,1
+scin,Photocontact dermatitis [berloque dermatitis],photocontact dermatitis berloque dermatitis,photocontact_dermatitis_berloque_dermatitis,,out_of_benchmark_scope,3,1,3,1
+scin,Phytophotodermatitis,phytophotodermatitis,phytophotodermatitis,,out_of_benchmark_scope,11,4,3,1
+scin,Pincer nail deformity,pincer nail deformity,pincer_nail_deformity,,out_of_benchmark_scope,2,1,2,1
+scin,Pityriasis rubra pilaris,pityriasis rubra pilaris,pityriasis_rubra_pilaris,,out_of_benchmark_scope,19,8,2,1
+scin,Poikiloderma,poikiloderma,poikiloderma,,out_of_benchmark_scope,3,1,3,1
+scin,Poisoning by nematocyst,poisoning by nematocyst,poisoning_by_nematocyst,,out_of_benchmark_scope,1,1,1,1
+scin,Post-Inflammatory hypopigmentation,post inflammatory hypopigmentation,post_inflammatory_hypopigmentation,,out_of_benchmark_scope,16,6,3,1
+scin,Pressure ulcer,pressure ulcer,pressure_ulcer,,out_of_benchmark_scope,1,1,1,1
+scin,Pyoderma,pyoderma,pyoderma,,out_of_benchmark_scope,1,1,1,1
+scin,Skin lesion in drug addict,skin lesion in drug addict,skin_lesion_in_drug_addict,,out_of_benchmark_scope,7,3,3,1
+scin,Skin ulcer,skin ulcer,skin_ulcer,,out_of_benchmark_scope,4,2,1,1
+scin,Sunburn,sunburn,sunburn,,out_of_benchmark_scope,14,6,3,1
+scin,Sweet syndrome,sweet syndrome,sweet_syndrome,,out_of_benchmark_scope,13,5,3,1
+scin,TMEP - telangiectasia macularis eruptiva perstans,tmep telangiectasia macularis eruptiva perstans,tmep_telangiectasia_macularis_eruptiva_perstans,,out_of_benchmark_scope,1,1,1,1
+scin,Traction alopecia,traction alopecia,traction_alopecia,,out_of_benchmark_scope,2,1,2,1
+scin,Traumatic blister,traumatic blister,traumatic_blister,,out_of_benchmark_scope,4,2,1,1
+scin,Traumatic ulcer,traumatic ulcer,traumatic_ulcer,,out_of_benchmark_scope,4,2,1,1
+scin,Varicose veins of lower extremity,varicose veins of lower extremity,varicose_veins_of_lower_extremity,,out_of_benchmark_scope,1,1,1,1
+scin,Vasculitis of the skin,vasculitis of the skin,vasculitis_of_the_skin,,out_of_benchmark_scope,24,10,1,1
+scin,hyperlinear palm,hyperlinear palm,hyperlinear_palm,,out_of_benchmark_scope,3,1,3,1
+scin,pathergy,pathergy,pathergy,,out_of_benchmark_scope,3,1,3,1
+scin,relapsing polychondritis,relapsing polychondritis,relapsing_polychondritis,,out_of_benchmark_scope,3,1,3,1
+scin,unilateral laterothoracic exanthem,unilateral laterothoracic exanthem,unilateral_laterothoracic_exanthem,,out_of_benchmark_scope,1,1,1,1
+scin,varicose vein,varicose vein,varicose_vein,,out_of_benchmark_scope,3,1,3,1
+scin,wound/abrasion,wound abrasion,wound_abrasion,,out_of_benchmark_scope,3,1,3,1
+scin,Abrasion and/or friction burn of lower limb without infection,abrasion and or friction burn of lower limb without infection,abrasion_and_or_friction_burn_of_lower_limb_without_infection,,out_of_benchmark_scope,1,1,0,0
+scin,Abrasion of wrist,abrasion of wrist,abrasion_of_wrist,,out_of_benchmark_scope,5,2,0,0
+scin,Acneiform eruption,acneiform eruption,acneiform_eruption,,out_of_benchmark_scope,1,1,0,0
+scin,Acquired digital fibrokeratoma,acquired digital fibrokeratoma,acquired_digital_fibrokeratoma,,out_of_benchmark_scope,3,1,0,0
+scin,Acquired poikiloderma,acquired poikiloderma,acquired_poikiloderma,,out_of_benchmark_scope,3,1,0,0
+scin,Acral erythema,acral erythema,acral_erythema,,out_of_benchmark_scope,2,1,0,0
+scin,Acral persistent papular mucinosis,acral persistent papular mucinosis,acral_persistent_papular_mucinosis,,out_of_benchmark_scope,3,1,0,0
+scin,Acute generalised exanthematous pustulosis,acute generalised exanthematous pustulosis,acute_generalised_exanthematous_pustulosis,,out_of_benchmark_scope,7,3,0,0
+scin,Acute ulcer of skin,acute ulcer of skin,acute_ulcer_of_skin,,out_of_benchmark_scope,3,1,0,0
+scin,Anetoderma,anetoderma,anetoderma,,out_of_benchmark_scope,2,1,0,0
+scin,Angiokeratoma of skin,angiokeratoma of skin,angiokeratoma_of_skin,,out_of_benchmark_scope,5,3,0,0
+scin,Angiosarcoma of skin,angiosarcoma of skin,angiosarcoma_of_skin,,out_of_benchmark_scope,1,1,0,0
+scin,Atrophic glossitis,atrophic glossitis,atrophic_glossitis,,out_of_benchmark_scope,3,1,0,0
+scin,Atypical Nevus,atypical nevus,atypical_nevus,,out_of_benchmark_scope,9,5,0,0
+scin,Autoimmune diseases affecting skin,autoimmune diseases affecting skin,autoimmune_diseases_affecting_skin,,out_of_benchmark_scope,4,2,0,0
+scin,Bacterial pyoderma,bacterial pyoderma,bacterial_pyoderma,,out_of_benchmark_scope,3,1,0,0
+scin,Benign cutaneous vascular tumor,benign cutaneous vascular tumor,benign_cutaneous_vascular_tumor,,out_of_benchmark_scope,5,2,0,0
+scin,Benign tumor of dermis,benign tumor of dermis,benign_tumor_of_dermis,,out_of_benchmark_scope,2,1,0,0
+scin,Blood blister,blood blister,blood_blister,,out_of_benchmark_scope,2,1,0,0
+scin,Bullosis diabeticorum,bullosis diabeticorum,bullosis_diabeticorum,,out_of_benchmark_scope,3,1,0,0
+scin,Bullous dermatitis,bullous dermatitis,bullous_dermatitis,,out_of_benchmark_scope,5,3,0,0
+scin,"Bullous dermatitis, NOS",bullous dermatitis nos,bullous_dermatitis_nos,,out_of_benchmark_scope,4,2,0,0
+scin,Bullous dermatosis,bullous dermatosis,bullous_dermatosis,,out_of_benchmark_scope,5,2,0,0
+scin,Burn erythema of abdominal wall,burn erythema of abdominal wall,burn_erythema_of_abdominal_wall,,out_of_benchmark_scope,3,1,0,0
+scin,Burn erythema of back of hand,burn erythema of back of hand,burn_erythema_of_back_of_hand,,out_of_benchmark_scope,9,3,0,0
+scin,Burn erythema of lower leg,burn erythema of lower leg,burn_erythema_of_lower_leg,,out_of_benchmark_scope,6,2,0,0
+scin,Burn erythema of neck,burn erythema of neck,burn_erythema_of_neck,,out_of_benchmark_scope,3,1,0,0
+scin,Calcinosis cutis,calcinosis cutis,calcinosis_cutis,,out_of_benchmark_scope,11,4,0,0
+scin,Calciphylaxis cutis,calciphylaxis cutis,calciphylaxis_cutis,,out_of_benchmark_scope,3,1,0,0
+scin,Candida infection of flexural skin,candida infection of flexural skin,candida_infection_of_flexural_skin,,out_of_benchmark_scope,3,1,0,0
+scin,Candidal intertrigo,candidal intertrigo,candidal_intertrigo,,out_of_benchmark_scope,15,6,0,0
+scin,Cat scratch disease,cat scratch disease,cat_scratch_disease,,out_of_benchmark_scope,3,1,0,0
+scin,Cat scratch injury,cat scratch injury,cat_scratch_injury,,out_of_benchmark_scope,3,1,0,0
+scin,Cellulitis of hand excluding finger,cellulitis of hand excluding finger,cellulitis_of_hand_excluding_finger,,out_of_benchmark_scope,2,1,0,0
+scin,Chemical leukoderma,chemical leukoderma,chemical_leukoderma,,out_of_benchmark_scope,4,2,0,0
+scin,Chronic dermatitis,chronic dermatitis,chronic_dermatitis,,out_of_benchmark_scope,3,1,0,0
+scin,Chronic ulcer of skin,chronic ulcer of skin,chronic_ulcer_of_skin,,out_of_benchmark_scope,3,1,0,0
+scin,Clinical neurofibromatosis,clinical neurofibromatosis,clinical_neurofibromatosis,,out_of_benchmark_scope,3,1,0,0
+scin,Collagenoma,collagenoma,collagenoma,,out_of_benchmark_scope,2,1,0,0
+scin,Comedone,comedone,comedone,,out_of_benchmark_scope,3,2,0,0
+scin,Contact burn of skin,contact burn of skin,contact_burn_of_skin,,out_of_benchmark_scope,1,1,0,0
+scin,Crohn disease of skin,crohn disease of skin,crohn_disease_of_skin,,out_of_benchmark_scope,3,1,0,0
+scin,Crusted eczematous dermatitis,crusted eczematous dermatitis,crusted_eczematous_dermatitis,,out_of_benchmark_scope,3,1,0,0
+scin,Cutaneous leishmaniasis,cutaneous leishmaniasis,cutaneous_leishmaniasis,,out_of_benchmark_scope,7,3,0,0
+scin,Cutaneous lyme disease,cutaneous lyme disease,cutaneous_lyme_disease,,out_of_benchmark_scope,8,3,0,0
+scin,Cutaneous polyarteritis nodosa,cutaneous polyarteritis nodosa,cutaneous_polyarteritis_nodosa,,out_of_benchmark_scope,1,1,0,0
+scin,Darier's disease,darier s disease,darier_s_disease,,out_of_benchmark_scope,6,2,0,0
+scin,Dehiscence,dehiscence,dehiscence,,out_of_benchmark_scope,3,1,0,0
+scin,Dermatofibrosarcoma protuberans,dermatofibrosarcoma protuberans,dermatofibrosarcoma_protuberans,,out_of_benchmark_scope,2,1,0,0
+scin,Dermatomyositis,dermatomyositis,dermatomyositis,,out_of_benchmark_scope,8,3,0,0
+scin,Dermatosis caused by lice,dermatosis caused by lice,dermatosis_caused_by_lice,,out_of_benchmark_scope,2,1,0,0
+scin,Dermatosis due to flea,dermatosis due to flea,dermatosis_due_to_flea,,out_of_benchmark_scope,6,2,0,0
+scin,Discrete papular lichen myxedematosus,discrete papular lichen myxedematosus,discrete_papular_lichen_myxedematosus,,out_of_benchmark_scope,2,1,0,0
+scin,Drug induced abnormal pigmentation of skin,drug induced abnormal pigmentation of skin,drug_induced_abnormal_pigmentation_of_skin,,out_of_benchmark_scope,4,2,0,0
+scin,Drug-induced pellagra,drug induced pellagra,drug_induced_pellagra,,out_of_benchmark_scope,2,1,0,0
+scin,Drug-induced photosensitivity,drug induced photosensitivity,drug_induced_photosensitivity,,out_of_benchmark_scope,1,1,0,0
+scin,Erysipelas,erysipelas,erysipelas,,out_of_benchmark_scope,3,1,0,0
+scin,Erythema annulare centrifugum,erythema annulare centrifugum,erythema_annulare_centrifugum,,out_of_benchmark_scope,35,13,0,0
+scin,Erythema elevatum diutinum,erythema elevatum diutinum,erythema_elevatum_diutinum,,out_of_benchmark_scope,3,1,0,0
+scin,Erythema marginatum,erythema marginatum,erythema_marginatum,,out_of_benchmark_scope,1,1,0,0
+scin,Erythema marginatum in acute rheumatic fever,erythema marginatum in acute rheumatic fever,erythema_marginatum_in_acute_rheumatic_fever,,out_of_benchmark_scope,3,1,0,0
+scin,Flagellate erythema,flagellate erythema,flagellate_erythema,,out_of_benchmark_scope,11,4,0,0
+scin,Flushing,flushing,flushing,,out_of_benchmark_scope,4,2,0,0
+scin,Folliculitis decalvans,folliculitis decalvans,folliculitis_decalvans,,out_of_benchmark_scope,3,1,0,0
+scin,Foreign body,foreign body,foreign_body,,out_of_benchmark_scope,6,2,0,0
+scin,Frontal fibrosing alopecia,frontal fibrosing alopecia,frontal_fibrosing_alopecia,,out_of_benchmark_scope,2,1,0,0
+scin,Furuncle,furuncle,furuncle,,out_of_benchmark_scope,1,1,0,0
+scin,Granuloma faciale,granuloma faciale,granuloma_faciale,,out_of_benchmark_scope,11,5,0,0
+scin,Granulomatous disorder of the skin and subcutaneous tissue,granulomatous disorder of the skin and subcutaneous tissue,granulomatous_disorder_of_the_skin_and_subcutaneous_tissue,,out_of_benchmark_scope,8,4,0,0
+scin,Hailey Hailey disease,hailey hailey disease,hailey_hailey_disease,,out_of_benchmark_scope,7,3,0,0
+scin,Hemosiderin pigmentation of skin,hemosiderin pigmentation of skin,hemosiderin_pigmentation_of_skin,,out_of_benchmark_scope,1,1,0,0
+scin,Hyperkeratosis of skin,hyperkeratosis of skin,hyperkeratosis_of_skin,,out_of_benchmark_scope,1,1,0,0
+scin,Hyperpigmentation disorder,hyperpigmentation disorder,hyperpigmentation_disorder,,out_of_benchmark_scope,3,1,0,0
+scin,Ichthyosiform dermatosis,ichthyosiform dermatosis,ichthyosiform_dermatosis,,out_of_benchmark_scope,3,1,0,0
+scin,Infection of tick bite,infection of tick bite,infection_of_tick_bite,,out_of_benchmark_scope,3,1,0,0
+scin,Infection of toe web,infection of toe web,infection_of_toe_web,,out_of_benchmark_scope,1,1,0,0
+scin,Infestation caused by Sarcoptes scabiei var bovis,infestation caused by sarcoptes scabiei var bovis,infestation_caused_by_sarcoptes_scabiei_var_bovis,,out_of_benchmark_scope,3,1,0,0
+scin,Ingrown hair,ingrown hair,ingrown_hair,,out_of_benchmark_scope,4,2,0,0
+scin,Injection site disorder,injection site disorder,injection_site_disorder,,out_of_benchmark_scope,3,1,0,0
+scin,Itchy skin eruption,itchy skin eruption,itchy_skin_eruption,,out_of_benchmark_scope,3,1,0,0
+scin,Lentigo,lentigo,lentigo,,out_of_benchmark_scope,7,3,0,0
+scin,Leprosy,leprosy,leprosy,,out_of_benchmark_scope,2,1,0,0
+scin,Leukemia cutis,leukemia cutis,leukemia_cutis,,out_of_benchmark_scope,4,2,0,0
+scin,Linear IgA disease,linear iga disease,linear_iga_disease,,out_of_benchmark_scope,6,3,0,0
+scin,Lipoma,lipoma,lipoma,,out_of_benchmark_scope,1,1,0,0
+scin,Livedoid vasculopathy,livedoid vasculopathy,livedoid_vasculopathy,,out_of_benchmark_scope,9,4,0,0
+scin,Localised skin eruption due to drugs and medicaments,localised skin eruption due to drugs and medicaments,localised_skin_eruption_due_to_drugs_and_medicaments,,out_of_benchmark_scope,3,1,0,0
+scin,Localised skin infection,localised skin infection,localised_skin_infection,,out_of_benchmark_scope,6,2,0,0
+scin,Localized cutaneous vasculitis,localized cutaneous vasculitis,localized_cutaneous_vasculitis,,out_of_benchmark_scope,4,3,0,0
+scin,Lymphocutaneous sporotrichosis,lymphocutaneous sporotrichosis,lymphocutaneous_sporotrichosis,,out_of_benchmark_scope,3,1,0,0
+scin,Lymphomatoid papulosis,lymphomatoid papulosis,lymphomatoid_papulosis,,out_of_benchmark_scope,9,3,0,0
+scin,Majocchi's granuloma,majocchi s granuloma,majocchi_s_granuloma,,out_of_benchmark_scope,1,1,0,0
+scin,Mastocytoma,mastocytoma,mastocytoma,,out_of_benchmark_scope,3,1,0,0
+scin,Mixed diabetic ulcer - foot,mixed diabetic ulcer foot,mixed_diabetic_ulcer_foot,,out_of_benchmark_scope,3,1,0,0
+scin,Muehrcke lines,muehrcke lines,muehrcke_lines,,out_of_benchmark_scope,1,1,0,0
+scin,Mycetoma,mycetoma,mycetoma,,out_of_benchmark_scope,6,2,0,0
+scin,Nail dystrophy due to trauma,nail dystrophy due to trauma,nail_dystrophy_due_to_trauma,,out_of_benchmark_scope,8,3,0,0
+scin,Nail pitting,nail pitting,nail_pitting,,out_of_benchmark_scope,2,1,0,0
+scin,Neoplasm of uncertain behavior of skin of arm,neoplasm of uncertain behavior of skin of arm,neoplasm_of_uncertain_behavior_of_skin_of_arm,,out_of_benchmark_scope,3,1,0,0
+scin,Nevus anemicus,nevus anemicus,nevus_anemicus,,out_of_benchmark_scope,2,1,0,0
+scin,Nodular vasculitis,nodular vasculitis,nodular_vasculitis,,out_of_benchmark_scope,3,1,0,0
+scin,Non-melanin pigmentation due to exogenous substance (disorder),non melanin pigmentation due to exogenous substance disorder,non_melanin_pigmentation_due_to_exogenous_substance_disorder,,out_of_benchmark_scope,1,1,0,0
+scin,Non-specific panniculitis,non specific panniculitis,non_specific_panniculitis,,out_of_benchmark_scope,1,1,0,0
+scin,O/E - purulent pustules,o e purulent pustules,o_e_purulent_pustules,,out_of_benchmark_scope,3,1,0,0
+scin,O/E - skin cyst present,o e skin cyst present,o_e_skin_cyst_present,,out_of_benchmark_scope,3,1,0,0
+scin,O/E - skin fissure,o e skin fissure,o_e_skin_fissure,,out_of_benchmark_scope,1,1,0,0
+scin,OK - Odontogenic keratocyst,ok odontogenic keratocyst,ok_odontogenic_keratocyst,,out_of_benchmark_scope,3,1,0,0
+scin,Ochronosis,ochronosis,ochronosis,,out_of_benchmark_scope,1,1,0,0
+scin,On examination - hemorrhagic bullae,on examination hemorrhagic bullae,on_examination_hemorrhagic_bullae,,out_of_benchmark_scope,3,1,0,0
+scin,PXE (pseudoxanthoma elasticum) like syndrome,pxe pseudoxanthoma elasticum like syndrome,pxe_pseudoxanthoma_elasticum_like_syndrome,,out_of_benchmark_scope,3,1,0,0
+scin,Pachyonychia congenita,pachyonychia congenita,pachyonychia_congenita,,out_of_benchmark_scope,3,1,0,0
+scin,Paget disease,paget disease,paget_disease,,out_of_benchmark_scope,4,2,0,0
+scin,Panniculitis,panniculitis,panniculitis,,out_of_benchmark_scope,3,2,0,0
+scin,"Panniculitis, NOS",panniculitis nos,panniculitis_nos,,out_of_benchmark_scope,3,1,0,0
+scin,Papular acrodermatitis of childhood,papular acrodermatitis of childhood,papular_acrodermatitis_of_childhood,,out_of_benchmark_scope,2,1,0,0
+scin,Pemphigoid gestationis,pemphigoid gestationis,pemphigoid_gestationis,,out_of_benchmark_scope,6,2,0,0
+scin,Pemphigus,pemphigus,pemphigus,,out_of_benchmark_scope,3,1,0,0
+scin,Pemphigus foliaceus,pemphigus foliaceus,pemphigus_foliaceus,,out_of_benchmark_scope,5,2,0,0
+scin,Perifollicular haemorrhage,perifollicular haemorrhage,perifollicular_haemorrhage,,out_of_benchmark_scope,3,1,0,0
+scin,Perifolliculitis,perifolliculitis,perifolliculitis,,out_of_benchmark_scope,3,1,0,0
+scin,Perleche,perleche,perleche,,out_of_benchmark_scope,3,1,0,0
+scin,Pressure ulcer stage 2,pressure ulcer stage 2,pressure_ulcer_stage_2,,out_of_benchmark_scope,2,1,0,0
+scin,Pretibial myxedema,pretibial myxedema,pretibial_myxedema,,out_of_benchmark_scope,12,4,0,0
+scin,Primary cutaneous lymphoma,primary cutaneous lymphoma,primary_cutaneous_lymphoma,,out_of_benchmark_scope,10,4,0,0
+scin,Pruritic dermatitis,pruritic dermatitis,pruritic_dermatitis,,out_of_benchmark_scope,2,1,0,0
+scin,Pruritic urticarial papules and plaques of pregnancy,pruritic urticarial papules and plaques of pregnancy,pruritic_urticarial_papules_and_plaques_of_pregnancy,,out_of_benchmark_scope,16,6,0,0
+scin,Pseudolymphoma,pseudolymphoma,pseudolymphoma,,out_of_benchmark_scope,15,5,0,0
+scin,Psoriasiform dermatitis,psoriasiform dermatitis,psoriasiform_dermatitis,,out_of_benchmark_scope,9,4,0,0
+scin,Pyoderma Gangrenosum,pyoderma gangrenosum,pyoderma_gangrenosum,,out_of_benchmark_scope,7,3,0,0
+scin,RMSF - Rocky Mountain spotted fever,rmsf rocky mountain spotted fever,rmsf_rocky_mountain_spotted_fever,,out_of_benchmark_scope,4,3,0,0
+scin,"Rosai Dorfman disease - I know rare, but I've seen a case like this unilateral.  Rosacea supported bilateral further images",rosai dorfman disease i know rare but i ve seen a case like this unilateral rosacea supported bilateral further images,rosai_dorfman_disease_i_know_rare_but_i_ve_seen_a_case_like_this_unilateral_rosacea_supported_bilateral_further_images,,out_of_benchmark_scope,2,1,0,0
+scin,SLE - Systemic lupus erythematosus-related syndrome,sle systemic lupus erythematosus related syndrome,sle_systemic_lupus_erythematosus_related_syndrome,,out_of_benchmark_scope,6,3,0,0
+scin,Secondary impetiginization,secondary impetiginization,secondary_impetiginization,,out_of_benchmark_scope,6,2,0,0
+scin,Skin atrophy,skin atrophy,skin_atrophy,,out_of_benchmark_scope,1,1,0,0
+scin,Skin cancer,skin cancer,skin_cancer,,out_of_benchmark_scope,14,7,0,0
+scin,Skin hypopigmented,skin hypopigmented,skin_hypopigmented,,out_of_benchmark_scope,3,1,0,0
+scin,Skin striae,skin striae,skin_striae,,out_of_benchmark_scope,3,1,0,0
+scin,Small plaque parapsoriasis,small plaque parapsoriasis,small_plaque_parapsoriasis,,out_of_benchmark_scope,5,2,0,0
+scin,Snake bite - wound,snake bite wound,snake_bite_wound,,out_of_benchmark_scope,3,1,0,0
+scin,Sneddon-Wilkinson disease,sneddon wilkinson disease,sneddon_wilkinson_disease,,out_of_benchmark_scope,3,1,0,0
+scin,Superficial frostbite,superficial frostbite,superficial_frostbite,,out_of_benchmark_scope,3,1,0,0
+scin,Tuberculosis of skin and subcutaneous tissue,tuberculosis of skin and subcutaneous tissue,tuberculosis_of_skin_and_subcutaneous_tissue,,out_of_benchmark_scope,6,2,0,0
+scin,Tufted angioma of skin,tufted angioma of skin,tufted_angioma_of_skin,,out_of_benchmark_scope,3,1,0,0
+scin,Urticarial vasculitis,urticarial vasculitis,urticarial_vasculitis,,out_of_benchmark_scope,3,1,0,0
+scin,Vascular nevus of skin,vascular nevus of skin,vascular_nevus_of_skin,,out_of_benchmark_scope,1,1,0,0
+scin,"Vasculitis of the skin, NOS",vasculitis of the skin nos,vasculitis_of_the_skin_nos,,out_of_benchmark_scope,3,1,0,0
+scin,Viral dermatological disorders,viral dermatological disorders,viral_dermatological_disorders,,out_of_benchmark_scope,3,1,0,0
+scin,Viral infection of skin,viral infection of skin,viral_infection_of_skin,,out_of_benchmark_scope,3,1,0,0
+scin,Xanthoma,xanthoma,xanthoma,,out_of_benchmark_scope,2,1,0,0
+scin,deep fungal infection,deep fungal infection,deep_fungal_infection,,out_of_benchmark_scope,1,1,0,0
+scin,deep vein thrombosis,deep vein thrombosis,deep_vein_thrombosis,,out_of_benchmark_scope,3,1,0,0
+scin,digital myxoid cyst,digital myxoid cyst,digital_myxoid_cyst,,out_of_benchmark_scope,3,1,0,0
+scin,gouty tophi,gouty tophi,gouty_tophi,,out_of_benchmark_scope,3,1,0,0
+scin,granular parakeratosis,granular parakeratosis,granular_parakeratosis,,out_of_benchmark_scope,1,1,0,0
+scin,panniculitis of skin,panniculitis of skin,panniculitis_of_skin,,out_of_benchmark_scope,3,1,0,0
+scin,post-sunburn peeling/superficial desquamation,post sunburn peeling superficial desquamation,post_sunburn_peeling_superficial_desquamation,,out_of_benchmark_scope,3,1,0,0
+scin,resolving dermatitis,resolving dermatitis,resolving_dermatitis,,out_of_benchmark_scope,2,1,0,0
+scin,scurvy,scurvy,scurvy,,out_of_benchmark_scope,3,1,0,0
+scin,superficial hemorrhage,superficial hemorrhage,superficial_hemorrhage,,out_of_benchmark_scope,3,1,0,0

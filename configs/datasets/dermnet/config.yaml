@@ -36,7 +36,7 @@ normalization:
 
 manifest:
   schema: configs/datasets/manifest_schema.yaml
-  output: data/manifests/dermnet_kaggle_v1.parquet
+  output: data/manifests/dermnet_kaggle_v3.parquet
 
 coverage:
   role: excluded_from_disease_coverage

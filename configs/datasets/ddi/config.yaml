@@ -41,7 +41,7 @@ normalization:
 
 manifest:
   schema: configs/datasets/manifest_schema.yaml
-  output: data/manifests/ddi_v2.parquet
+  output: data/manifests/ddi_v3.parquet
 
 coverage:
   role: external_evaluation_only

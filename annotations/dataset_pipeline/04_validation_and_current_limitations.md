@@ -17,7 +17,7 @@ The test command is:
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Ten tests pass, including a contract test that keeps the 20 active taxonomy
+Fourteen tests pass, including a contract test that keeps the 21 active taxonomy
 IDs, retired IDs, benchmark configuration, and JSON output schema synchronized.
 
 The manifest validator additionally checks:
@@ -29,8 +29,9 @@ The manifest validator additionally checks:
 - consecutive reference ranks;
 - exact alignment between the YAML manifest field list and Parquet columns.
 
-All four manifests pass validation. They contain 24,754 globally unique image
-samples, including the separately held-out DDI manifest.
+All five manifests pass validation. They contain 44,313 globally unique image
+samples, including the separately held-out DDI manifest and the audit-only
+Dermnet Kaggle manifest.
 
 All configuration YAML files parse successfully, source archive members and
 direct image paths are checked during normalization, and the dependency
@@ -73,13 +74,13 @@ addition to any combined result.
 
 ### Candidate taxonomy only
 
-The current taxonomy contains 20 active classes selected from the complete
+The current taxonomy contains 21 active classes selected from the complete
 source-label inventory. All pass preliminary total-support and source-diversity
 thresholds, but the taxonomy still requires clinical approval and duplicate-
 adjusted recounting before it can be frozen.
 
-The JSON output schema enumerates the 20 active candidate IDs and is currently
-synchronized with taxonomy version 2.1.0. It must be regenerated after any
+The JSON output schema enumerates the 21 active candidate IDs and is currently
+synchronized with taxonomy version 2.2.0. It must be regenerated after any
 future taxonomy revision.
 
 ### No final splits or benchmark dataset

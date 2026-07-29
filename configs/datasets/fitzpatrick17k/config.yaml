@@ -41,7 +41,7 @@ normalization:
 
 manifest:
   schema: configs/datasets/manifest_schema.yaml
-  output: data/manifests/fitzpatrick17k_c_v2.parquet
+  output: data/manifests/fitzpatrick17k_c_v3.parquet
 
 coverage:
   role: taxonomy_contributor

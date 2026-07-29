@@ -10,9 +10,11 @@ import pyarrow.parquet as pq
 
 from src.data_pipeline.adapters import (
     build_ddi,
+    build_dermnet_kaggle,
     build_fitzpatrick17k_c,
     build_pad_ufes_20,
     build_scin,
+    build_skindisnet,
 )
 from src.data_pipeline.common import DiseaseMapper, load_yaml, write_manifest
 from src.data_pipeline.reporting import build_reports, write_combined_pool
@@ -25,7 +27,9 @@ SUPPORTED_BUILDERS: dict[
     "fitzpatrick17k_c": build_fitzpatrick17k_c,
     "pad_ufes_20": build_pad_ufes_20,
     "scin": build_scin,
+    "skindisnet": build_skindisnet,
     "ddi": build_ddi,
+    "dermnet_kaggle": build_dermnet_kaggle,
 }
 
 
@@ -68,7 +72,7 @@ def build_pipeline(root: Path, selected_ids: list[str] | None = None) -> dict[st
 
     contributor_ids = policy["dataset_roles"]["taxonomy_contributors"]
     reports: dict[str, Path] = {}
-    combined_path = root / "data/combined/visual_top_k_development_pool_v2.parquet"
+    combined_path = root / "data/combined/visual_top_k_development_pool_v3.parquet"
     combined_rows: int | None = None
     if all(dataset_id in manifest_paths for dataset_id in contributor_ids):
         combined_rows = write_combined_pool(

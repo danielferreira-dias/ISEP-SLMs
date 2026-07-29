@@ -2,7 +2,7 @@
 
 manifest_schema:
   id: dermatology_image_manifest
-  version: 1.1.0
+  version: 1.2.0
   language: en
   row_unit: image
   description: >
@@ -148,6 +148,63 @@ fields:
     required: true
     description: Version of the normalized disease taxonomy.
 
+  - name: age_years
+    type: integer
+    nullable: true
+    description: Exact age in years when explicitly supplied by the source.
+
+  - name: age_group_source
+    type: string
+    nullable: true
+    description: Unmodified age-group label supplied by the source.
+
+  - name: age_group_standardized
+    type: string
+    nullable: true
+    allowed_values:
+      - under_18
+      - 18_to_29
+      - 30_to_39
+      - 40_to_49
+      - 50_to_59
+      - 60_to_69
+      - 70_and_over
+      - unknown
+    description: Project age band derived without inventing an exact age.
+
+  - name: age_source
+    type: string
+    nullable: true
+    description: Provenance of the exact age or source age group.
+
+  - name: sex_or_gender
+    type: string
+    nullable: true
+    description: Normalized source value without treating sex and gender as equivalent.
+
+  - name: sex_or_gender_system
+    type: string
+    nullable: true
+    allowed_values:
+      - sex_at_birth
+      - source_gender
+    description: Identifies whether the source field represents sex at birth or gender.
+
+  - name: sex_or_gender_source
+    type: string
+    nullable: true
+    description: Provenance of the sex or gender value.
+
+  - name: race_ethnicity
+    type: string
+    nullable: true
+    description: Source-provided combined race or ethnicity category.
+
+  - name: race_ethnicity_source
+    type: string
+    nullable: true
+    description: Provenance of the race or ethnicity value.
+
   - name: skin_tone_system
     type: string
     nullable: true
@@ -222,3 +279,4 @@ invariants:
   - rows without a normalized disease_id cannot enter the closed-set benchmark.
   - all rows with the same group_id must receive the same split.
   - exact and near duplicates must not cross train, validation, or test splits.
+  - demographic metadata is used for evaluation slicing and is not included in the image-only model prompt.

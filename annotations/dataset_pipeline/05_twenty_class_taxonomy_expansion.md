@@ -1,5 +1,9 @@
 # Twenty-class taxonomy expansion
 
+> Historical stage note: this document records the version 2 expansion.
+> Version 3 subsequently adds `drug_eruption` as the twenty-first active class
+> and is documented in stage 6.
+
 ## Objective
 
 The benchmark taxonomy was expanded from 13 to 20 active classes. The

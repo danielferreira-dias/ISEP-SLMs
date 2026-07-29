@@ -2,13 +2,13 @@
 
 taxonomy:
   id: dermatology_diseases
-  version: 2.1.0
+  version: 2.2.0
   language: en
   description: >
-    Twenty active diseases available to the model during the closed-set visual
-    disease-ranking benchmark. Retired IDs remain reserved and must not be
-    reused for a different clinical concept.
-  active_disease_count: 20
+    Twenty-one active diseases available to the model during the closed-set
+    visual disease-ranking benchmark. Retired IDs remain reserved and must
+    not be reused for a different clinical concept.
+  active_disease_count: 21
 
 diseases:
   - id: D001
@@ -119,6 +119,14 @@ diseases:
   - id: D024
     canonical_name: erythema_multiforme
     display_name: Erythema multiforme
+
+  - id: D025
+    canonical_name: drug_eruption
+    display_name: Drug eruption
+    aliases:
+      - drug rash
+      - cutaneous drug eruption
+      - medication eruption
 
 retired_diseases:
   - id: D008

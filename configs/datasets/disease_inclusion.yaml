@@ -1,8 +1,8 @@
 # Provisional policy for selecting diseases for the closed-set benchmark.
 
 disease_inclusion:
-  id: core_disease_coverage_v2
-  version: 2.1.0
+  id: core_disease_coverage_v3
+  version: 3.0.0
   language: en
   status: provisional
   description: >
@@ -32,6 +32,7 @@ dataset_roles:
     - scin
   external_evaluation_only:
     - ddi
+    - skindisnet
   excluded_from_coverage:
     skincon: Morphology annotation overlay; it does not provide independent disease cases.
     skincap: Derived from Fitzpatrick17k and DDI; counting it would duplicate upstream cases.
@@ -66,14 +67,25 @@ split_policy:
   prevent_duplicate_leakage: true
   external_datasets_do_not_influence_taxonomy: true
 
+subgroup_reporting:
+  metadata_usage: evaluation_only
+  minimum_subgroup_unique_groups: 30
+  minimum_disease_subgroup_unique_groups: 10
+  keep_measurement_systems_separate: true
+  description: >
+    Reports demographic support before splitting. Fitzpatrick, grouped
+    Fitzpatrick, and Monk Skin Tone values are not treated as one scale.
+
 outputs:
-  source_label_inventory: data/reports/source_disease_inventory_v2.csv
-  all_source_disease_coverage: data/reports/all_source_disease_coverage_v2.csv
-  coverage_parquet: data/reports/disease_coverage_v2.parquet
-  coverage_csv: data/reports/disease_coverage_v2.csv
-  included_diseases: data/reports/included_diseases_v2.yaml
-  long_tail_diseases: data/reports/long_tail_diseases_v2.csv
-  out_of_scope_labels: data/reports/out_of_scope_source_labels_v2.csv
+  source_label_inventory: data/reports/source_disease_inventory_v3.csv
+  all_source_disease_coverage: data/reports/all_source_disease_coverage_v3.csv
+  coverage_parquet: data/reports/disease_coverage_v3.parquet
+  coverage_csv: data/reports/disease_coverage_v3.csv
+  included_diseases: data/reports/included_diseases_v3.yaml
+  long_tail_diseases: data/reports/long_tail_diseases_v3.csv
+  out_of_scope_labels: data/reports/out_of_scope_source_labels_v3.csv
+  demographic_availability: data/reports/demographic_availability_v3.csv
+  subgroup_coverage: data/reports/subgroup_coverage_v3.csv
 
 report_columns:
   - disease_id

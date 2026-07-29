@@ -14,7 +14,7 @@ import pyarrow.parquet as pq
 import yaml
 
 
-MANIFEST_SCHEMA_VERSION = "1.1.0"
+MANIFEST_SCHEMA_VERSION = "1.2.0"
 
 REFERENCE_DIAGNOSIS_TYPE = pa.struct(
     [
@@ -52,6 +52,15 @@ MANIFEST_ARROW_SCHEMA = pa.schema(
         pa.field("diagnosis_gradable", pa.bool_(), nullable=False),
         pa.field("taxonomy_id", pa.string(), nullable=False),
         pa.field("taxonomy_version", pa.string(), nullable=False),
+        pa.field("age_years", pa.int32()),
+        pa.field("age_group_source", pa.string()),
+        pa.field("age_group_standardized", pa.string()),
+        pa.field("age_source", pa.string()),
+        pa.field("sex_or_gender", pa.string()),
+        pa.field("sex_or_gender_system", pa.string()),
+        pa.field("sex_or_gender_source", pa.string()),
+        pa.field("race_ethnicity", pa.string()),
+        pa.field("race_ethnicity_source", pa.string()),
         pa.field("skin_tone_system", pa.string()),
         pa.field("skin_tone", pa.string()),
         pa.field("skin_tone_source", pa.string()),
@@ -269,9 +278,19 @@ def make_manifest_row(
     diagnosis_gradable: bool,
     license_id: str,
     source_metadata: dict[str, Any],
+    age_years: int | None = None,
+    age_group_source: str | None = None,
+    age_group_standardized: str | None = None,
+    age_source: str | None = None,
+    sex_or_gender: str | None = None,
+    sex_or_gender_system: str | None = None,
+    sex_or_gender_source: str | None = None,
+    race_ethnicity: str | None = None,
+    race_ethnicity_source: str | None = None,
     skin_tone_system: str | None = None,
     skin_tone: str | None = None,
     skin_tone_source: str | None = None,
+    force_exclusion_reason: str | None = None,
 ) -> dict[str, Any]:
     """Create one row conforming to the shared Arrow manifest schema."""
 
@@ -297,6 +316,9 @@ def make_manifest_row(
     else:
         include = True
         exclusion_reason = None
+    if force_exclusion_reason is not None:
+        include = False
+        exclusion_reason = force_exclusion_reason
 
     return {
         "schema_version": MANIFEST_SCHEMA_VERSION,
@@ -317,6 +339,15 @@ def make_manifest_row(
         "diagnosis_gradable": bool(diagnosis_gradable),
         "taxonomy_id": mapper.taxonomy_id,
         "taxonomy_version": mapper.taxonomy_version,
+        "age_years": age_years,
+        "age_group_source": age_group_source,
+        "age_group_standardized": age_group_standardized,
+        "age_source": age_source,
+        "sex_or_gender": sex_or_gender,
+        "sex_or_gender_system": sex_or_gender_system,
+        "sex_or_gender_source": sex_or_gender_source,
+        "race_ethnicity": race_ethnicity,
+        "race_ethnicity_source": race_ethnicity_source,
         "skin_tone_system": skin_tone_system,
         "skin_tone": skin_tone,
         "skin_tone_source": skin_tone_source,
@@ -340,3 +371,42 @@ def write_manifest(rows: Iterable[dict[str, Any]], output_path: Path) -> int:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     pq.write_table(table, output_path, compression="zstd")
     return table.num_rows
+
+
+def standardize_age_group(
+    *,
+    age_years: int | None = None,
+    source_group: Any = None,
+) -> str | None:
+    """Map exact ages or known SCIN groups to project-wide age bands."""
+
+    source_mapping = {
+        "AGE_18_TO_29": "18_to_29",
+        "AGE_30_TO_39": "30_to_39",
+        "AGE_40_TO_49": "40_to_49",
+        "AGE_50_TO_59": "50_to_59",
+        "AGE_60_TO_69": "60_to_69",
+        "AGE_70_TO_79": "70_and_over",
+        "AGE_80_OR_ABOVE": "70_and_over",
+        "AGE_UNKNOWN": "unknown",
+    }
+    source_text = optional_string(source_group)
+    if source_text is not None:
+        return source_mapping.get(source_text.upper(), "unknown")
+    if age_years is None:
+        return None
+    if age_years < 0:
+        return None
+    if age_years < 18:
+        return "under_18"
+    if age_years < 30:
+        return "18_to_29"
+    if age_years < 40:
+        return "30_to_39"
+    if age_years < 50:
+        return "40_to_49"
+    if age_years < 60:
+        return "50_to_59"
+    if age_years < 70:
+        return "60_to_69"
+    return "70_and_over"
