@@ -13,3 +13,9 @@ dependencies = [
     "streamlit>=1.59.2",
     "unsloth>=2026.7.3",
 ]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.3.0",
+    "jupyterlab>=4.6.2",
+]
