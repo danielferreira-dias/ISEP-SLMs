@@ -1,0 +1,531 @@
+dataset_id,disease_original,normalized_source_label,disease_id,any_reference_image_count,any_reference_group_count,primary_image_count,primary_group_count
+ddi,verruca-vulgaris,verruca vulgaris,,50,50,50,50
+ddi,epidermal-cyst,epidermal cyst,,35,35,35,35
+ddi,mycosis-fungoides,mycosis fungoides,,32,32,32,32
+ddi,dermatofibroma,dermatofibroma,,22,22,22,22
+ddi,acrochordon,acrochordon,,19,19,19,19
+ddi,dysplastic-nevus,dysplastic nevus,,16,16,16,16
+ddi,pyogenic-granuloma,pyogenic granuloma,,14,14,14,14
+ddi,neurofibroma,neurofibroma,,12,12,12,12
+ddi,angioma,angioma,,11,11,11,11
+ddi,eccrine-poroma,eccrine poroma,,10,10,10,10
+ddi,squamous-cell-carcinoma-keratoacanthoma,squamous cell carcinoma keratoacanthoma,,8,8,8,8
+ddi,melanoma-acral-lentiginous,melanoma acral lentiginous,,7,7,7,7
+ddi,basal-cell-carcinoma-nodular,basal cell carcinoma nodular,,6,6,6,6
+ddi,blue-nevus,blue nevus,,6,6,6,6
+ddi,kaposi-sarcoma,kaposi sarcoma,,6,6,6,6
+ddi,lipoma,lipoma,,6,6,6,6
+ddi,molluscum-contagiosum,molluscum contagiosum,,6,6,6,6
+ddi,nevus-lipomatosus-superficialis,nevus lipomatosus superficialis,,6,6,6,6
+ddi,inverted-follicular-keratosis,inverted follicular keratosis,,5,5,5,5
+ddi,metastatic-carcinoma,metastatic carcinoma,,5,5,5,5
+ddi,prurigo-nodularis,prurigo nodularis,,5,5,5,5
+ddi,eczema-spongiotic-dermatitis,eczema spongiotic dermatitis,,4,4,4,4
+ddi,solar-lentigo,solar lentigo,,4,4,4,4
+ddi,abrasions-ulcerations-and-physical-injuries,abrasions ulcerations and physical injuries,,3,3,3,3
+ddi,arteriovenous-hemangioma,arteriovenous hemangioma,,3,3,3,3
+ddi,benign-keratosis,benign keratosis,,3,3,3,3
+ddi,hyperpigmentation,hyperpigmentation,,3,3,3,3
+ddi,trichilemmoma,trichilemmoma,,3,3,3,3
+ddi,acquired-digital-fibrokeratoma,acquired digital fibrokeratoma,,2,2,2,2
+ddi,basal-cell-carcinoma-superficial,basal cell carcinoma superficial,,2,2,2,2
+ddi,condyloma-accuminatum,condyloma accuminatum,,2,2,2,2
+ddi,fibrous-papule,fibrous papule,,2,2,2,2
+ddi,foreign-body-granuloma,foreign body granuloma,,2,2,2,2
+ddi,graft-vs-host-disease,graft vs host disease,,2,2,2,2
+ddi,onychomycosis,onychomycosis,,2,2,2,2
+ddi,scar,scar,,2,2,2,2
+ddi,syringocystadenoma-papilliferum,syringocystadenoma papilliferum,,2,2,2,2
+ddi,trichofolliculoma,trichofolliculoma,,2,2,2,2
+ddi,xanthogranuloma,xanthogranuloma,,2,2,2,2
+ddi,abscess,abscess,,1,1,1,1
+ddi,acne-cystic,acne cystic,,1,1,1,1
+ddi,acral-melanotic-macule,acral melanotic macule,,1,1,1,1
+ddi,angioleiomyoma,angioleiomyoma,,1,1,1,1
+ddi,atypical-spindle-cell-nevus-of-reed,atypical spindle cell nevus of reed,,1,1,1,1
+ddi,blastic-plasmacytoid-dendritic-cell-neoplasm,blastic plasmacytoid dendritic cell neoplasm,,1,1,1,1
+ddi,cellular-neurothekeoma,cellular neurothekeoma,,1,1,1,1
+ddi,chondroid-syringoma,chondroid syringoma,,1,1,1,1
+ddi,clear-cell-acanthoma,clear cell acanthoma,,1,1,1,1
+ddi,coccidioidomycosis,coccidioidomycosis,,1,1,1,1
+ddi,dermatomyositis,dermatomyositis,,1,1,1,1
+ddi,epidermal-nevus,epidermal nevus,,1,1,1,1
+ddi,focal-acral-hyperkeratosis,focal acral hyperkeratosis,,1,1,1,1
+ddi,folliculitis,folliculitis,,1,1,1,1
+ddi,glomangioma,glomangioma,,1,1,1,1
+ddi,hematoma,hematoma,,1,1,1,1
+ddi,keloid,keloid,,1,1,1,1
+ddi,leukemia-cutis,leukemia cutis,,1,1,1,1
+ddi,lichenoid-keratosis,lichenoid keratosis,,1,1,1,1
+ddi,lymphocytic-infiltrations,lymphocytic infiltrations,,1,1,1,1
+ddi,morphea,morphea,,1,1,1,1
+ddi,neuroma,neuroma,,1,1,1,1
+ddi,nodular-melanoma-(nm),nodular melanoma nm,,1,1,1,1
+ddi,pigmented-spindle-cell-nevus-of-reed,pigmented spindle cell nevus of reed,,1,1,1,1
+ddi,reactive-lymphoid-hyperplasia,reactive lymphoid hyperplasia,,1,1,1,1
+ddi,sebaceous-carcinoma,sebaceous carcinoma,,1,1,1,1
+ddi,subcutaneous-t-cell-lymphoma,subcutaneous t cell lymphoma,,1,1,1,1
+ddi,tinea-pedis,tinea pedis,,1,1,1,1
+ddi,verruciform-xanthoma,verruciform xanthoma,,1,1,1,1
+ddi,wart,wart,,1,1,1,1
+fitzpatrick17k_c,lichen planus,lichen planus,,377,377,377,377
+fitzpatrick17k_c,lupus erythematosus,lupus erythematosus,,257,257,257,257
+fitzpatrick17k_c,sarcoidosis,sarcoidosis,,257,257,257,257
+fitzpatrick17k_c,scleroderma,scleroderma,,246,246,246,246
+fitzpatrick17k_c,neutrophilic dermatoses,neutrophilic dermatoses,,244,244,244,244
+fitzpatrick17k_c,photodermatoses,photodermatoses,,242,242,242,242
+fitzpatrick17k_c,scabies,scabies,,203,203,203,203
+fitzpatrick17k_c,folliculitis,folliculitis,,182,182,182,182
+fitzpatrick17k_c,eczema,eczema,,176,176,176,176
+fitzpatrick17k_c,pityriasis rubra pilaris,pityriasis rubra pilaris,,176,176,176,176
+fitzpatrick17k_c,drug eruption,drug eruption,,157,157,157,157
+fitzpatrick17k_c,erythema multiforme,erythema multiforme,,154,154,154,154
+fitzpatrick17k_c,mycosis fungoides,mycosis fungoides,,143,143,143,143
+fitzpatrick17k_c,dermatomyositis,dermatomyositis,,135,135,135,135
+fitzpatrick17k_c,urticaria,urticaria,,134,134,134,134
+fitzpatrick17k_c,dariers disease,dariers disease,,130,130,130,130
+fitzpatrick17k_c,granuloma annulare,granuloma annulare,,130,130,130,130
+fitzpatrick17k_c,pityriasis rosea,pityriasis rosea,,123,123,123,123
+fitzpatrick17k_c,nematode infection,nematode infection,,113,113,113,113
+fitzpatrick17k_c,seborrheic dermatitis,seborrheic dermatitis,,113,113,113,113
+fitzpatrick17k_c,neurofibromatosis,neurofibromatosis,,109,109,109,109
+fitzpatrick17k_c,juvenile xanthogranuloma,juvenile xanthogranuloma,,104,104,104,104
+fitzpatrick17k_c,superficial spreading melanoma ssm,superficial spreading melanoma ssm,,104,104,104,104
+fitzpatrick17k_c,telangiectases,telangiectases,,100,100,100,100
+fitzpatrick17k_c,kaposi sarcoma,kaposi sarcoma,,98,98,98,98
+fitzpatrick17k_c,pyogenic granuloma,pyogenic granuloma,,95,95,95,95
+fitzpatrick17k_c,porokeratosis actinic,porokeratosis actinic,,93,93,93,93
+fitzpatrick17k_c,urticaria pigmentosa,urticaria pigmentosa,,90,90,90,90
+fitzpatrick17k_c,stevens johnson syndrome,stevens johnson syndrome,,89,89,89,89
+fitzpatrick17k_c,milia,milia,,88,88,88,88
+fitzpatrick17k_c,nevus sebaceous of jadassohn,nevus sebaceous of jadassohn,,88,88,88,88
+fitzpatrick17k_c,porphyria,porphyria,,87,87,87,87
+fitzpatrick17k_c,fixed eruptions,fixed eruptions,,85,85,85,85
+fitzpatrick17k_c,keloid,keloid,,83,83,83,83
+fitzpatrick17k_c,lyme disease,lyme disease,,83,83,83,83
+fitzpatrick17k_c,necrobiosis lipoidica,necrobiosis lipoidica,,82,82,82,82
+fitzpatrick17k_c,prurigo nodularis,prurigo nodularis,,81,81,81,81
+fitzpatrick17k_c,pilar cyst,pilar cyst,,80,80,80,80
+fitzpatrick17k_c,lymphangioma,lymphangioma,,79,79,79,79
+fitzpatrick17k_c,epidermal nevus,epidermal nevus,,78,78,78,78
+fitzpatrick17k_c,scleromyxedema,scleromyxedema,,76,76,76,76
+fitzpatrick17k_c,lupus subacute,lupus subacute,,73,73,73,73
+fitzpatrick17k_c,cheilitis,cheilitis,,71,71,71,71
+fitzpatrick17k_c,halo nevus,halo nevus,,69,69,69,69
+fitzpatrick17k_c,acanthosis nigricans,acanthosis nigricans,,66,66,66,66
+fitzpatrick17k_c,dyshidrotic eczema,dyshidrotic eczema,,66,66,66,66
+fitzpatrick17k_c,ehlers danlos syndrome,ehlers danlos syndrome,,66,66,66,66
+fitzpatrick17k_c,syringoma,syringoma,,66,66,66,66
+fitzpatrick17k_c,lichen simplex,lichen simplex,,65,65,65,65
+fitzpatrick17k_c,tuberous sclerosis,tuberous sclerosis,,65,65,65,65
+fitzpatrick17k_c,tungiasis,tungiasis,,65,65,65,65
+fitzpatrick17k_c,incontinentia pigmenti,incontinentia pigmenti,,64,64,64,64
+fitzpatrick17k_c,keratosis pilaris,keratosis pilaris,,64,64,64,64
+fitzpatrick17k_c,epidermolysis bullosa,epidermolysis bullosa,,61,61,61,61
+fitzpatrick17k_c,hailey hailey disease,hailey hailey disease,,61,61,61,61
+fitzpatrick17k_c,acquired autoimmune bullous diseaseherpes gestationis,acquired autoimmune bullous diseaseherpes gestationis,,59,59,59,59
+fitzpatrick17k_c,lentigo maligna,lentigo maligna,,59,59,59,59
+fitzpatrick17k_c,mucous cyst,mucous cyst,,58,58,58,58
+fitzpatrick17k_c,dermatofibroma,dermatofibroma,,57,57,57,57
+fitzpatrick17k_c,hidradenitis,hidradenitis,,57,57,57,57
+fitzpatrick17k_c,paronychia,paronychia,,57,57,57,57
+fitzpatrick17k_c,becker nevus,becker nevus,,56,56,56,56
+fitzpatrick17k_c,mucinosis,mucinosis,,55,55,55,55
+fitzpatrick17k_c,papilomatosis confluentes and reticulate,papilomatosis confluentes and reticulate,,55,55,55,55
+fitzpatrick17k_c,stasis edema,stasis edema,,55,55,55,55
+fitzpatrick17k_c,sun damaged skin,sun damaged skin,,55,55,55,55
+fitzpatrick17k_c,neurodermatitis,neurodermatitis,,54,54,54,54
+fitzpatrick17k_c,acrodermatitis enteropathica,acrodermatitis enteropathica,,53,53,53,53
+fitzpatrick17k_c,erythema nodosum,erythema nodosum,,53,53,53,53
+fitzpatrick17k_c,ichthyosis vulgaris,ichthyosis vulgaris,,53,53,53,53
+fitzpatrick17k_c,perioral dermatitis,perioral dermatitis,,53,53,53,53
+fitzpatrick17k_c,port wine stain,port wine stain,,52,52,52,52
+fitzpatrick17k_c,erythema annulare centrifigum,erythema annulare centrifigum,,51,51,51,51
+fitzpatrick17k_c,aplasia cutis,aplasia cutis,,50,50,50,50
+fitzpatrick17k_c,nevocytic nevus,nevocytic nevus,,50,50,50,50
+fitzpatrick17k_c,behcets disease,behcets disease,,49,49,49,49
+fitzpatrick17k_c,drug induced pigmentary changes,drug induced pigmentary changes,,49,49,49,49
+fitzpatrick17k_c,rhinophyma,rhinophyma,,48,48,48,48
+fitzpatrick17k_c,striae,striae,,48,48,48,48
+fitzpatrick17k_c,tick bite,tick bite,,48,48,48,48
+fitzpatrick17k_c,calcinosis cutis,calcinosis cutis,,47,47,47,47
+fitzpatrick17k_c,neurotic excoriations,neurotic excoriations,,47,47,47,47
+fitzpatrick17k_c,pustular psoriasis,pustular psoriasis,,47,47,47,47
+fitzpatrick17k_c,xeroderma pigmentosum,xeroderma pigmentosum,,47,47,47,47
+fitzpatrick17k_c,basal cell carcinoma morpheiform,basal cell carcinoma morpheiform,,46,46,46,46
+fitzpatrick17k_c,livedo reticularis,livedo reticularis,,45,45,45,45
+fitzpatrick17k_c,porokeratosis of mibelli,porokeratosis of mibelli,,45,45,45,45
+fitzpatrick17k_c,fordyce spots,fordyce spots,,44,44,44,44
+fitzpatrick17k_c,naevus comedonicus,naevus comedonicus,,44,44,44,44
+fitzpatrick17k_c,xanthomas,xanthomas,,44,44,44,44
+fitzpatrick17k_c,pityriasis lichenoides chronica,pityriasis lichenoides chronica,,43,43,43,43
+fitzpatrick17k_c,solid cystic basal cell carcinoma,solid cystic basal cell carcinoma,,41,41,41,41
+fitzpatrick17k_c,pilomatricoma,pilomatricoma,,39,39,39,39
+fitzpatrick17k_c,congenital nevus,congenital nevus,,38,38,38,38
+fitzpatrick17k_c,factitial dermatitis,factitial dermatitis,,38,38,38,38
+fitzpatrick17k_c,myiasis,myiasis,,38,38,38,38
+fitzpatrick17k_c,granuloma pyogenic,granuloma pyogenic,,34,34,34,34
+fitzpatrick17k_c,langerhans cell histiocytosis,langerhans cell histiocytosis,,33,33,33,33
+fitzpatrick17k_c,lichen amyloidosis,lichen amyloidosis,,33,33,33,33
+fitzpatrick17k_c,pediculosis lids,pediculosis lids,,32,32,32,32
+fitzpatrick17k_c,erythema elevatum diutinum,erythema elevatum diutinum,,24,24,24,24
+fitzpatrick17k_c,disseminated actinic porokeratosis,disseminated actinic porokeratosis,,20,20,20,20
+scin,Eczema,eczema,,2352,1056,1079,488
+scin,Urticaria,urticaria,,696,332,442,214
+scin,Insect Bite,insect bite,,879,403,401,185
+scin,Folliculitis,folliculitis,,586,268,306,142
+scin,Tinea,tinea,,465,206,211,93
+scin,Impetigo,impetigo,,267,121,136,69
+scin,Herpes Zoster,herpes zoster,,297,142,130,68
+scin,Pigmented purpuric eruption,pigmented purpuric eruption,,220,98,128,62
+scin,Drug Rash,drug rash,,335,148,129,58
+scin,Herpes Simplex,herpes simplex,,295,141,109,55
+scin,"Acute dermatitis, NOS",acute dermatitis nos,,277,124,93,46
+scin,Pityriasis rosea,pityriasis rosea,,173,80,93,44
+scin,Tinea Versicolor,tinea versicolor,,108,53,72,37
+scin,CD - Contact dermatitis,cd contact dermatitis,,190,70,98,36
+scin,Keratosis pilaris,keratosis pilaris,,148,61,77,32
+scin,Lichen Simplex Chronicus,lichen simplex chronicus,,167,78,69,32
+scin,Viral Exanthem,viral exanthem,,187,82,53,29
+scin,Lichen planus/lichenoid eruption,lichen planus lichenoid eruption,,209,89,62,28
+scin,O/E - ecchymoses present,o e ecchymoses present,,103,50,53,28
+scin,Granuloma annulare,granuloma annulare,,128,59,56,27
+scin,Leukocytoclastic Vasculitis,leukocytoclastic vasculitis,,218,99,57,25
+scin,Hypersensitivity,hypersensitivity,,249,113,51,24
+scin,"Abrasion, scrape, or scab",abrasion scrape or scab,,105,48,45,23
+scin,Photodermatitis,photodermatitis,,87,43,44,23
+scin,Prurigo nodularis,prurigo nodularis,,66,27,54,22
+scin,Purpura,purpura,,67,36,34,21
+scin,Scabies,scabies,,154,63,44,21
+scin,Stasis Dermatitis,stasis dermatitis,,163,70,59,21
+scin,Verruca vulgaris,verruca vulgaris,,95,40,46,20
+scin,Acute and chronic dermatitis,acute and chronic dermatitis,,108,47,39,19
+scin,Intertrigo,intertrigo,,64,31,36,19
+scin,Molluscum Contagiosum,molluscum contagiosum,,135,63,33,18
+scin,Scar Condition,scar condition,,48,23,36,18
+scin,Abscess,abscess,,88,41,34,17
+scin,Cellulitis,cellulitis,,94,39,41,17
+scin,"Chronic dermatitis, NOS",chronic dermatitis nos,,51,27,31,17
+scin,Miliaria,miliaria,,76,36,27,15
+scin,Perioral Dermatitis,perioral dermatitis,,58,26,35,15
+scin,Seborrheic Dermatitis,seborrheic dermatitis,,96,46,31,14
+scin,Cutaneous lupus,cutaneous lupus,,67,31,18,10
+scin,Inflicted skin lesions,inflicted skin lesions,,64,29,21,10
+scin,Hemangioma,hemangioma,,30,15,15,9
+scin,Lichen nitidus,lichen nitidus,,64,27,19,9
+scin,Xerosis,xerosis,,58,24,17,9
+scin,Ecthyma,ecthyma,,30,11,21,8
+scin,Infected eczema,infected eczema,,46,23,12,8
+scin,Erythema multiforme,erythema multiforme,,74,33,16,7
+scin,Livedo reticularis,livedo reticularis,,25,10,16,7
+scin,Pityriasis lichenoides,pityriasis lichenoides,,71,28,16,7
+scin,SK/ISK,sk isk,,39,17,14,7
+scin,Confluent and reticulate papillomatosis,confluent and reticulate papillomatosis,,11,8,9,6
+scin,Cutaneous T Cell Lymphoma,cutaneous t cell lymphoma,,31,16,13,6
+scin,Cutaneous sarcoidosis,cutaneous sarcoidosis,,51,24,11,6
+scin,Dermatofibroma,dermatofibroma,,20,8,14,6
+scin,Erythema ab igne,erythema ab igne,,36,16,13,6
+scin,Hidradenitis,hidradenitis,,26,14,11,6
+scin,Post-Inflammatory hyperpigmentation,post inflammatory hyperpigmentation,,61,28,15,6
+scin,Superficial wound of body region,superficial wound of body region,,24,10,16,6
+scin,Burn of skin,burn of skin,,33,16,8,5
+scin,Cyst,cyst,,38,20,9,5
+scin,Onychomycosis,onychomycosis,,17,7,12,5
+scin,Skin infection,skin infection,,27,15,9,5
+scin,Traumatic petechiae,traumatic petechiae,,14,7,10,5
+scin,Acanthosis nigricans,acanthosis nigricans,,12,5,9,4
+scin,Candida intertrigo,candida intertrigo,,26,13,8,4
+scin,Cutaneous larva migrans,cutaneous larva migrans,,22,9,9,4
+scin,Geographic tongue,geographic tongue,,17,8,8,4
+scin,Keratosis,keratosis,,11,6,5,4
+scin,Lichen spinulosus,lichen spinulosus,,27,11,10,4
+scin,Lichenified eczematous dermatitis,lichenified eczematous dermatitis,,15,6,10,4
+scin,Melasma,melasma,,12,5,9,4
+scin,O/E - petechiae on skin,o e petechiae on skin,,11,7,7,4
+scin,Paronychia,paronychia,,11,5,9,4
+scin,Bullous Pemphigoid,bullous pemphigoid,,21,9,6,3
+scin,Contact purpura,contact purpura,,7,3,7,3
+scin,Lichen striatus,lichen striatus,,10,4,7,3
+scin,O/E - pustules,o e pustules,,10,4,7,3
+scin,Pityriasis alba,pityriasis alba,,9,4,8,3
+scin,Porokeratosis,porokeratosis,,32,13,7,3
+scin,Remove from labeling tool,remove from labeling tool,,24,12,3,3
+scin,AKV - Acrokeratosis verruciformis,akv acrokeratosis verruciformis,,6,3,3,2
+scin,Acute constitutional eczema,acute constitutional eczema,,5,2,5,2
+scin,Amyloidosis of skin,amyloidosis of skin,,23,9,4,2
+scin,Animal bite - wound,animal bite wound,,21,7,6,2
+scin,Annular erythema,annular erythema,,9,7,2,2
+scin,Chilblain,chilblain,,13,6,2,2
+scin,Clavus,clavus,,9,4,5,2
+scin,Deep fungal infection,deep fungal infection,,36,16,3,2
+scin,Dermatitis herpetiformis,dermatitis herpetiformis,,36,14,3,2
+scin,Epidermal nevus,epidermal nevus,,12,5,4,2
+scin,Erythema gyratum repens,erythema gyratum repens,,9,4,5,2
+scin,Erythema nodosum,erythema nodosum,,20,8,4,2
+scin,Foot ulcer,foot ulcer,,6,2,6,2
+scin,Grover's disease,grover s disease,,25,10,5,2
+scin,Hand foot and mouth disease,hand foot and mouth disease,,5,4,2,2
+scin,Hematoma of skin,hematoma of skin,,4,2,4,2
+scin,Idiopathic guttate hypomelanosis,idiopathic guttate hypomelanosis,,2,2,2,2
+scin,Inverse psoriasis,inverse psoriasis,,4,2,4,2
+scin,Kaposi's sarcoma of skin,kaposi s sarcoma of skin,,24,13,4,2
+scin,Koebner phenomenon,koebner phenomenon,,11,4,6,2
+scin,Lichenoid myxedema,lichenoid myxedema,,16,6,5,2
+scin,Milia,milia,,24,11,5,2
+scin,Morphea/Scleroderma,morphea scleroderma,,15,6,5,2
+scin,O/E - petechiae present,o e petechiae present,,6,3,4,2
+scin,Parapsoriasis,parapsoriasis,,17,8,6,2
+scin,Perforating dermatosis,perforating dermatosis,,21,7,6,2
+scin,Prurigo,prurigo,,8,4,4,2
+scin,Pyogenic granuloma,pyogenic granuloma,,9,4,6,2
+scin,Rheumatoid nodule,rheumatoid nodule,,5,2,5,2
+scin,Skin and soft tissue atypical mycobacterial infection,skin and soft tissue atypical mycobacterial infection,,61,25,6,2
+scin,Syphilis,syphilis,,70,32,3,2
+scin,Venous Stasis Ulcer,venous stasis ulcer,,4,2,4,2
+scin,Abrasion and/or friction burn of thigh without infection,abrasion and or friction burn of thigh without infection,,3,1,3,1
+scin,Acne keloidalis,acne keloidalis,,6,2,3,1
+scin,Acne urticata,acne urticata,,2,1,2,1
+scin,Actinic granuloma,actinic granuloma,,4,2,3,1
+scin,Acute dermatitis,acute dermatitis,,3,1,3,1
+scin,Acute vesicular dermatitis,acute vesicular dermatitis,,2,1,2,1
+scin,Acute-on-chronic dyshidrotic eczema of hands,acute on chronic dyshidrotic eczema of hands,,3,1,3,1
+scin,Adnexal neoplasm,adnexal neoplasm,,10,4,3,1
+scin,Agminate folliculitis,agminate folliculitis,,3,1,3,1
+scin,Allergic contact dermatitis caused by allergenic hapten derived from plant,allergic contact dermatitis caused by allergenic hapten derived from plant,,3,1,3,1
+scin,Arsenical keratosis,arsenical keratosis,,2,1,2,1
+scin,B-Cell Cutaneous Lymphoma,b cell cutaneous lymphoma,,6,3,2,1
+scin,Berloque dermatitis,berloque dermatitis,,3,1,3,1
+scin,Blister,blister,,8,3,3,1
+scin,Burn of forearm,burn of forearm,,2,1,2,1
+scin,Candida,candida,,9,4,3,1
+scin,Cheilitis,cheilitis,,1,1,1,1
+scin,Chicken pox exanthem,chicken pox exanthem,,4,2,1,1
+scin,Condyloma acuminatum,condyloma acuminatum,,12,4,3,1
+scin,Contact dermatitis caused by Rhus diversiloba,contact dermatitis caused by rhus diversiloba,,5,3,3,1
+scin,"Contact dermatitis, NOS",contact dermatitis nos,,24,10,3,1
+scin,Cutaneous metastasis,cutaneous metastasis,,4,2,3,1
+scin,Diffuse xanthoma,diffuse xanthoma,,2,1,2,1
+scin,Ecthyma gangrenosum,ecthyma gangrenosum,,1,1,1,1
+scin,Elephantiasis nostras,elephantiasis nostras,,1,1,1,1
+scin,Erosion of skin,erosion of skin,,3,1,3,1
+scin,Eruptive odontogenic cyst,eruptive odontogenic cyst,,4,2,3,1
+scin,Eruptive xanthoma,eruptive xanthoma,,1,1,1,1
+scin,Erythema dyschromicum perstans,erythema dyschromicum perstans,,5,2,2,1
+scin,Erythema migrans,erythema migrans,,25,11,3,1
+scin,Foreign body reaction of the skin,foreign body reaction of the skin,,8,3,3,1
+scin,Fox-Fordyce disease,fox fordyce disease,,6,2,3,1
+scin,Fungal dermatitis,fungal dermatitis,,4,2,1,1
+scin,Fungal dermatosis,fungal dermatosis,,6,3,3,1
+scin,HK - Hyperkeratosis,hk hyperkeratosis,,10,4,3,1
+scin,Hemosiderin pigmentation of lower limb due to varicose veins of lower limb,hemosiderin pigmentation of lower limb due to varicose veins of lower limb,,3,1,3,1
+scin,Hemosiderin pigmentation of skin due to venous insufficiency,hemosiderin pigmentation of skin due to venous insufficiency,,6,2,3,1
+scin,Histiocytosis of skin,histiocytosis of skin,,3,1,3,1
+scin,Hyperpigmentation,hyperpigmentation,,1,1,1,1
+scin,Ichthyosis,ichthyosis,,10,6,2,1
+scin,Infection of skin,infection of skin,,3,2,2,1
+scin,Inflammatory dermatosis,inflammatory dermatosis,,7,3,3,1
+scin,Jessner lymphocytic infiltrate,jessner lymphocytic infiltrate,,1,1,1,1
+scin,Keratoderma,keratoderma,,16,6,3,1
+scin,Keratolysis exfoliativa,keratolysis exfoliativa,,1,1,1,1
+scin,Knuckle pads,knuckle pads,,1,1,1,1
+scin,Leukonychia,leukonychia,,1,1,1,1
+scin,Lichen sclerosus,lichen sclerosus,,6,3,2,1
+scin,Lichenified eczema,lichenified eczema,,1,1,1,1
+scin,Local infection of wound,local infection of wound,,3,1,3,1
+scin,Localised cutaneous vasculitis,localised cutaneous vasculitis,,3,1,3,1
+scin,Localized skin infection,localized skin infection,,27,11,1,1
+scin,Lymphangioma,lymphangioma,,12,5,2,1
+scin,Majocchi granuloma,majocchi granuloma,,1,1,1,1
+scin,Melanin pigmentation due to exogenous substance,melanin pigmentation due to exogenous substance,,2,1,2,1
+scin,Morbilliform eruption,morbilliform eruption,,1,1,1,1
+scin,Nail dystrophy,nail dystrophy,,3,2,2,1
+scin,Necrobiosis lipoidica,necrobiosis lipoidica,,13,5,3,1
+scin,O/E - vesicles present,o e vesicles present,,1,1,1,1
+scin,On examination - follicular pustules,on examination follicular pustules,,3,1,3,1
+scin,Onychodystrophy,onychodystrophy,,5,2,3,1
+scin,Pemphigus vulgaris,pemphigus vulgaris,,8,3,3,1
+scin,Petechiae,petechiae,,5,2,2,1
+scin,Photocontact dermatitis [berloque dermatitis],photocontact dermatitis berloque dermatitis,,3,1,3,1
+scin,Phytophotodermatitis,phytophotodermatitis,,11,4,3,1
+scin,Pincer nail deformity,pincer nail deformity,,2,1,2,1
+scin,Pityriasis rubra pilaris,pityriasis rubra pilaris,,19,8,2,1
+scin,Poikiloderma,poikiloderma,,3,1,3,1
+scin,Poisoning by nematocyst,poisoning by nematocyst,,1,1,1,1
+scin,Post-Inflammatory hypopigmentation,post inflammatory hypopigmentation,,16,6,3,1
+scin,Pressure ulcer,pressure ulcer,,1,1,1,1
+scin,Pyoderma,pyoderma,,1,1,1,1
+scin,Skin lesion in drug addict,skin lesion in drug addict,,7,3,3,1
+scin,Skin ulcer,skin ulcer,,4,2,1,1
+scin,Sunburn,sunburn,,14,6,3,1
+scin,Sweet syndrome,sweet syndrome,,13,5,3,1
+scin,TMEP - telangiectasia macularis eruptiva perstans,tmep telangiectasia macularis eruptiva perstans,,1,1,1,1
+scin,Traction alopecia,traction alopecia,,2,1,2,1
+scin,Traumatic blister,traumatic blister,,4,2,1,1
+scin,Traumatic ulcer,traumatic ulcer,,4,2,1,1
+scin,Varicose veins of lower extremity,varicose veins of lower extremity,,1,1,1,1
+scin,Vasculitis of the skin,vasculitis of the skin,,24,10,1,1
+scin,hyperlinear palm,hyperlinear palm,,3,1,3,1
+scin,pathergy,pathergy,,3,1,3,1
+scin,relapsing polychondritis,relapsing polychondritis,,3,1,3,1
+scin,unilateral laterothoracic exanthem,unilateral laterothoracic exanthem,,1,1,1,1
+scin,varicose vein,varicose vein,,3,1,3,1
+scin,wound/abrasion,wound abrasion,,3,1,3,1
+scin,Abrasion and/or friction burn of lower limb without infection,abrasion and or friction burn of lower limb without infection,,1,1,0,0
+scin,Abrasion of wrist,abrasion of wrist,,5,2,0,0
+scin,Acneiform eruption,acneiform eruption,,1,1,0,0
+scin,Acquired digital fibrokeratoma,acquired digital fibrokeratoma,,3,1,0,0
+scin,Acquired poikiloderma,acquired poikiloderma,,3,1,0,0
+scin,Acral erythema,acral erythema,,2,1,0,0
+scin,Acral persistent papular mucinosis,acral persistent papular mucinosis,,3,1,0,0
+scin,Acute generalised exanthematous pustulosis,acute generalised exanthematous pustulosis,,7,3,0,0
+scin,Acute ulcer of skin,acute ulcer of skin,,3,1,0,0
+scin,Anetoderma,anetoderma,,2,1,0,0
+scin,Angiokeratoma of skin,angiokeratoma of skin,,5,3,0,0
+scin,Angiosarcoma of skin,angiosarcoma of skin,,1,1,0,0
+scin,Atrophic glossitis,atrophic glossitis,,3,1,0,0
+scin,Atypical Nevus,atypical nevus,,9,5,0,0
+scin,Autoimmune diseases affecting skin,autoimmune diseases affecting skin,,4,2,0,0
+scin,Bacterial pyoderma,bacterial pyoderma,,3,1,0,0
+scin,Benign cutaneous vascular tumor,benign cutaneous vascular tumor,,5,2,0,0
+scin,Benign tumor of dermis,benign tumor of dermis,,2,1,0,0
+scin,Blood blister,blood blister,,2,1,0,0
+scin,Bullosis diabeticorum,bullosis diabeticorum,,3,1,0,0
+scin,Bullous dermatitis,bullous dermatitis,,5,3,0,0
+scin,"Bullous dermatitis, NOS",bullous dermatitis nos,,4,2,0,0
+scin,Bullous dermatosis,bullous dermatosis,,5,2,0,0
+scin,Burn erythema of abdominal wall,burn erythema of abdominal wall,,3,1,0,0
+scin,Burn erythema of back of hand,burn erythema of back of hand,,9,3,0,0
+scin,Burn erythema of lower leg,burn erythema of lower leg,,6,2,0,0
+scin,Burn erythema of neck,burn erythema of neck,,3,1,0,0
+scin,Calcinosis cutis,calcinosis cutis,,11,4,0,0
+scin,Calciphylaxis cutis,calciphylaxis cutis,,3,1,0,0
+scin,Candida infection of flexural skin,candida infection of flexural skin,,3,1,0,0
+scin,Candidal intertrigo,candidal intertrigo,,15,6,0,0
+scin,Cat scratch disease,cat scratch disease,,3,1,0,0
+scin,Cat scratch injury,cat scratch injury,,3,1,0,0
+scin,Cellulitis of hand excluding finger,cellulitis of hand excluding finger,,2,1,0,0
+scin,Chemical leukoderma,chemical leukoderma,,4,2,0,0
+scin,Chronic dermatitis,chronic dermatitis,,3,1,0,0
+scin,Chronic ulcer of skin,chronic ulcer of skin,,3,1,0,0
+scin,Clinical neurofibromatosis,clinical neurofibromatosis,,3,1,0,0
+scin,Collagenoma,collagenoma,,2,1,0,0
+scin,Comedone,comedone,,3,2,0,0
+scin,Contact burn of skin,contact burn of skin,,1,1,0,0
+scin,Crohn disease of skin,crohn disease of skin,,3,1,0,0
+scin,Crusted eczematous dermatitis,crusted eczematous dermatitis,,3,1,0,0
+scin,Cutaneous leishmaniasis,cutaneous leishmaniasis,,7,3,0,0
+scin,Cutaneous lyme disease,cutaneous lyme disease,,8,3,0,0
+scin,Cutaneous polyarteritis nodosa,cutaneous polyarteritis nodosa,,1,1,0,0
+scin,Darier's disease,darier s disease,,6,2,0,0
+scin,Dehiscence,dehiscence,,3,1,0,0
+scin,Dermatofibrosarcoma protuberans,dermatofibrosarcoma protuberans,,2,1,0,0
+scin,Dermatomyositis,dermatomyositis,,8,3,0,0
+scin,Dermatosis caused by lice,dermatosis caused by lice,,2,1,0,0
+scin,Dermatosis due to flea,dermatosis due to flea,,6,2,0,0
+scin,Discrete papular lichen myxedematosus,discrete papular lichen myxedematosus,,2,1,0,0
+scin,Drug induced abnormal pigmentation of skin,drug induced abnormal pigmentation of skin,,4,2,0,0
+scin,Drug-induced pellagra,drug induced pellagra,,2,1,0,0
+scin,Drug-induced photosensitivity,drug induced photosensitivity,,1,1,0,0
+scin,Erysipelas,erysipelas,,3,1,0,0
+scin,Erythema annulare centrifugum,erythema annulare centrifugum,,35,13,0,0
+scin,Erythema elevatum diutinum,erythema elevatum diutinum,,3,1,0,0
+scin,Erythema marginatum,erythema marginatum,,1,1,0,0
+scin,Erythema marginatum in acute rheumatic fever,erythema marginatum in acute rheumatic fever,,3,1,0,0
+scin,Flagellate erythema,flagellate erythema,,11,4,0,0
+scin,Flushing,flushing,,4,2,0,0
+scin,Folliculitis decalvans,folliculitis decalvans,,3,1,0,0
+scin,Foreign body,foreign body,,6,2,0,0
+scin,Frontal fibrosing alopecia,frontal fibrosing alopecia,,2,1,0,0
+scin,Furuncle,furuncle,,1,1,0,0
+scin,Granuloma faciale,granuloma faciale,,11,5,0,0
+scin,Granulomatous disorder of the skin and subcutaneous tissue,granulomatous disorder of the skin and subcutaneous tissue,,8,4,0,0
+scin,Hailey Hailey disease,hailey hailey disease,,7,3,0,0
+scin,Hemosiderin pigmentation of skin,hemosiderin pigmentation of skin,,1,1,0,0
+scin,Hyperkeratosis of skin,hyperkeratosis of skin,,1,1,0,0
+scin,Hyperpigmentation disorder,hyperpigmentation disorder,,3,1,0,0
+scin,Ichthyosiform dermatosis,ichthyosiform dermatosis,,3,1,0,0
+scin,Infection of tick bite,infection of tick bite,,3,1,0,0
+scin,Infection of toe web,infection of toe web,,1,1,0,0
+scin,Infestation caused by Sarcoptes scabiei var bovis,infestation caused by sarcoptes scabiei var bovis,,3,1,0,0
+scin,Ingrown hair,ingrown hair,,4,2,0,0
+scin,Injection site disorder,injection site disorder,,3,1,0,0
+scin,Itchy skin eruption,itchy skin eruption,,3,1,0,0
+scin,Lentigo,lentigo,,7,3,0,0
+scin,Leprosy,leprosy,,2,1,0,0
+scin,Leukemia cutis,leukemia cutis,,4,2,0,0
+scin,Linear IgA disease,linear iga disease,,6,3,0,0
+scin,Lipoma,lipoma,,1,1,0,0
+scin,Livedoid vasculopathy,livedoid vasculopathy,,9,4,0,0
+scin,Localised skin eruption due to drugs and medicaments,localised skin eruption due to drugs and medicaments,,3,1,0,0
+scin,Localised skin infection,localised skin infection,,6,2,0,0
+scin,Localized cutaneous vasculitis,localized cutaneous vasculitis,,4,3,0,0
+scin,Lymphocutaneous sporotrichosis,lymphocutaneous sporotrichosis,,3,1,0,0
+scin,Lymphomatoid papulosis,lymphomatoid papulosis,,9,3,0,0
+scin,Majocchi's granuloma,majocchi s granuloma,,1,1,0,0
+scin,Mastocytoma,mastocytoma,,3,1,0,0
+scin,Mixed diabetic ulcer - foot,mixed diabetic ulcer foot,,3,1,0,0
+scin,Muehrcke lines,muehrcke lines,,1,1,0,0
+scin,Mycetoma,mycetoma,,6,2,0,0
+scin,Nail dystrophy due to trauma,nail dystrophy due to trauma,,8,3,0,0
+scin,Nail pitting,nail pitting,,2,1,0,0
+scin,Neoplasm of uncertain behavior of skin of arm,neoplasm of uncertain behavior of skin of arm,,3,1,0,0
+scin,Nevus anemicus,nevus anemicus,,2,1,0,0
+scin,Nodular vasculitis,nodular vasculitis,,3,1,0,0
+scin,Non-melanin pigmentation due to exogenous substance (disorder),non melanin pigmentation due to exogenous substance disorder,,1,1,0,0
+scin,Non-specific panniculitis,non specific panniculitis,,1,1,0,0
+scin,O/E - purulent pustules,o e purulent pustules,,3,1,0,0
+scin,O/E - skin cyst present,o e skin cyst present,,3,1,0,0
+scin,O/E - skin fissure,o e skin fissure,,1,1,0,0
+scin,OK - Odontogenic keratocyst,ok odontogenic keratocyst,,3,1,0,0
+scin,Ochronosis,ochronosis,,1,1,0,0
+scin,On examination - hemorrhagic bullae,on examination hemorrhagic bullae,,3,1,0,0
+scin,PXE (pseudoxanthoma elasticum) like syndrome,pxe pseudoxanthoma elasticum like syndrome,,3,1,0,0
+scin,Pachyonychia congenita,pachyonychia congenita,,3,1,0,0
+scin,Paget disease,paget disease,,4,2,0,0
+scin,Panniculitis,panniculitis,,3,2,0,0
+scin,"Panniculitis, NOS",panniculitis nos,,3,1,0,0
+scin,Papular acrodermatitis of childhood,papular acrodermatitis of childhood,,2,1,0,0
+scin,Pemphigoid gestationis,pemphigoid gestationis,,6,2,0,0
+scin,Pemphigus,pemphigus,,3,1,0,0
+scin,Pemphigus foliaceus,pemphigus foliaceus,,5,2,0,0
+scin,Perifollicular haemorrhage,perifollicular haemorrhage,,3,1,0,0
+scin,Perifolliculitis,perifolliculitis,,3,1,0,0
+scin,Perleche,perleche,,3,1,0,0
+scin,Pressure ulcer stage 2,pressure ulcer stage 2,,2,1,0,0
+scin,Pretibial myxedema,pretibial myxedema,,12,4,0,0
+scin,Primary cutaneous lymphoma,primary cutaneous lymphoma,,10,4,0,0
+scin,Pruritic dermatitis,pruritic dermatitis,,2,1,0,0
+scin,Pruritic urticarial papules and plaques of pregnancy,pruritic urticarial papules and plaques of pregnancy,,16,6,0,0
+scin,Pseudolymphoma,pseudolymphoma,,15,5,0,0
+scin,Psoriasiform dermatitis,psoriasiform dermatitis,,9,4,0,0
+scin,Pyoderma Gangrenosum,pyoderma gangrenosum,,7,3,0,0
+scin,RMSF - Rocky Mountain spotted fever,rmsf rocky mountain spotted fever,,4,3,0,0
+scin,"Rosai Dorfman disease - I know rare, but I've seen a case like this unilateral.  Rosacea supported bilateral further images",rosai dorfman disease i know rare but i ve seen a case like this unilateral rosacea supported bilateral further images,,2,1,0,0
+scin,SLE - Systemic lupus erythematosus-related syndrome,sle systemic lupus erythematosus related syndrome,,6,3,0,0
+scin,Secondary impetiginization,secondary impetiginization,,6,2,0,0
+scin,Skin atrophy,skin atrophy,,1,1,0,0
+scin,Skin cancer,skin cancer,,14,7,0,0
+scin,Skin hypopigmented,skin hypopigmented,,3,1,0,0
+scin,Skin striae,skin striae,,3,1,0,0
+scin,Small plaque parapsoriasis,small plaque parapsoriasis,,5,2,0,0
+scin,Snake bite - wound,snake bite wound,,3,1,0,0
+scin,Sneddon-Wilkinson disease,sneddon wilkinson disease,,3,1,0,0
+scin,Superficial frostbite,superficial frostbite,,3,1,0,0
+scin,Tuberculosis of skin and subcutaneous tissue,tuberculosis of skin and subcutaneous tissue,,6,2,0,0
+scin,Tufted angioma of skin,tufted angioma of skin,,3,1,0,0
+scin,Urticarial vasculitis,urticarial vasculitis,,3,1,0,0
+scin,Vascular nevus of skin,vascular nevus of skin,,1,1,0,0
+scin,"Vasculitis of the skin, NOS",vasculitis of the skin nos,,3,1,0,0
+scin,Viral dermatological disorders,viral dermatological disorders,,3,1,0,0
+scin,Viral infection of skin,viral infection of skin,,3,1,0,0
+scin,Xanthoma,xanthoma,,2,1,0,0
+scin,deep fungal infection,deep fungal infection,,1,1,0,0
+scin,deep vein thrombosis,deep vein thrombosis,,3,1,0,0
+scin,digital myxoid cyst,digital myxoid cyst,,3,1,0,0
+scin,gouty tophi,gouty tophi,,3,1,0,0
+scin,granular parakeratosis,granular parakeratosis,,1,1,0,0
+scin,panniculitis of skin,panniculitis of skin,,3,1,0,0
+scin,post-sunburn peeling/superficial desquamation,post sunburn peeling superficial desquamation,,3,1,0,0
+scin,resolving dermatitis,resolving dermatitis,,2,1,0,0
+scin,scurvy,scurvy,,3,1,0,0
+scin,superficial hemorrhage,superficial hemorrhage,,3,1,0,0

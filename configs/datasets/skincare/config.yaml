@@ -1,0 +1,37 @@
+dataset:
+  id: skincare
+  version: 6c158a139c31c7ced7a1b1376930f340825577e0
+  name: SkinCaRe
+  task_type: captioning_and_diagnostic_reasoning
+  description: >
+    Combined SkinCAP and SkinCoT release with captions and hierarchical
+    diagnostic reasoning targets.
+  license_id: SKINCARE_GATED_AND_UPSTREAM_TERMS
+
+source:
+  format: mixed_image_text_collection
+  root: configs/datasets/skincare/data
+  components:
+    - id: skincap
+      metadata: configs/datasets/skincare/data/SkinCAP/skincap_v240623.csv
+      lineage: skincap
+    - id: skincot
+      root: configs/datasets/skincare/data/SkinCoT
+      label_format: broad_directory_category_and_free_text_reasoning
+
+normalization:
+  taxonomy: configs/taxonomies/diseases.yaml
+  unmapped_label_policy: canonicalize_report_and_exclude_from_benchmark
+  cautions:
+    - SkinCAP rows duplicate the separate SkinCAP and upstream image datasets.
+    - SkinCoT directory names are broad categories rather than fixed fine-grained diseases.
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/skincare_v1.parquet
+
+coverage:
+  role: excluded_from_disease_coverage
+  reason: >
+    The collection contains duplicate SkinCAP lineage and SkinCoT targets that
+    are not directly comparable to the closed-set disease taxonomy.

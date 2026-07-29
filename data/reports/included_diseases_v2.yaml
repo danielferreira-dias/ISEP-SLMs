@@ -1,0 +1,106 @@
+selection:
+  id: included_diseases_v2
+  status: provisional_pending_split_validation
+  description: Diseases that pass total-support and independent-dataset thresholds.
+    Final inclusion still requires group-safe split validation and duplicate analysis.
+  diseases:
+  - disease_id: D001
+    canonical_name: melanoma
+    unique_group_count: 303
+    image_count: 321
+    contributing_dataset_count: 3
+  - disease_id: D002
+    canonical_name: melanocytic_nevus
+    unique_group_count: 190
+    image_count: 257
+    contributing_dataset_count: 2
+  - disease_id: D003
+    canonical_name: psoriasis
+    unique_group_count: 643
+    image_count: 768
+    contributing_dataset_count: 2
+  - disease_id: D004
+    canonical_name: basal_cell_carcinoma
+    unique_group_count: 931
+    image_count: 1270
+    contributing_dataset_count: 3
+  - disease_id: D005
+    canonical_name: squamous_cell_carcinoma
+    unique_group_count: 513
+    image_count: 580
+    contributing_dataset_count: 3
+  - disease_id: D006
+    canonical_name: seborrheic_keratosis
+    unique_group_count: 229
+    image_count: 288
+    contributing_dataset_count: 2
+  - disease_id: D007
+    canonical_name: actinic_keratosis
+    unique_group_count: 679
+    image_count: 893
+    contributing_dataset_count: 3
+  - disease_id: D009
+    canonical_name: contact_dermatitis
+    unique_group_count: 623
+    image_count: 976
+    contributing_dataset_count: 2
+  - disease_id: D011
+    canonical_name: acne_vulgaris
+    unique_group_count: 481
+    image_count: 543
+    contributing_dataset_count: 2
+  - disease_id: D012
+    canonical_name: rosacea
+    unique_group_count: 108
+    image_count: 136
+    contributing_dataset_count: 2
+  - disease_id: D013
+    canonical_name: vitiligo
+    unique_group_count: 115
+    image_count: 117
+    contributing_dataset_count: 2
+  - disease_id: D014
+    canonical_name: eczema
+    unique_group_count: 664
+    image_count: 1255
+    contributing_dataset_count: 2
+  - disease_id: D015
+    canonical_name: seborrheic_dermatitis
+    unique_group_count: 127
+    image_count: 144
+    contributing_dataset_count: 2
+  - disease_id: D016
+    canonical_name: folliculitis
+    unique_group_count: 324
+    image_count: 488
+    contributing_dataset_count: 2
+  - disease_id: D017
+    canonical_name: urticaria
+    unique_group_count: 348
+    image_count: 576
+    contributing_dataset_count: 2
+  - disease_id: D018
+    canonical_name: scabies
+    unique_group_count: 224
+    image_count: 247
+    contributing_dataset_count: 2
+  - disease_id: D019
+    canonical_name: pityriasis_rosea
+    unique_group_count: 167
+    image_count: 216
+    contributing_dataset_count: 2
+  - disease_id: D022
+    canonical_name: prurigo_nodularis
+    unique_group_count: 103
+    image_count: 135
+    contributing_dataset_count: 2
+  - disease_id: D023
+    canonical_name: granuloma_annulare
+    unique_group_count: 157
+    image_count: 186
+    contributing_dataset_count: 2
+  - disease_id: D024
+    canonical_name: erythema_multiforme
+    unique_group_count: 161
+    image_count: 170
+    contributing_dataset_count: 2

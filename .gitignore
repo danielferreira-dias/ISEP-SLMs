@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+doc/
+
+# Virtual environments
+.venv
+doc/docs/
+
+# Local dataset payloads (documentation and manifests remain trackable)
+configs/datasets/*/data/
+
+# Generated dataset artifacts
+data/manifests/*.parquet
+data/combined/*.parquet
+data/benchmarks/**/*.parquet
+data/reports/*.parquet
+.env/

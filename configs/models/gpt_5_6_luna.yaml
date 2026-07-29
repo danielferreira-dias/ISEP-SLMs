@@ -1,0 +1,30 @@
+# Proprietary API reference-model candidate.
+
+schema_version: 1
+
+model:
+  id: gpt_5_6_luna
+  display_name: GPT-5.6 Luna
+  family: gpt
+  evaluation_role: teacher_candidate
+  training_stage: provider_managed
+  task_adaptation_stage: none
+
+capabilities:
+  modalities:
+    - text
+    - image
+  structured_output_modes:
+    - prompt_only
+    - json_schema
+
+source:
+  type: provider_api
+  provider: openai
+  model_name: gpt-5.6-luna
+
+backend:
+  provider: Azure
+  type: api
+  api_style: openai_responses
+  api_key_env: OPENAI_API_KEY

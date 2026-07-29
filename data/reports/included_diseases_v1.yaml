@@ -1,0 +1,61 @@
+selection:
+  id: included_diseases_v1
+  status: provisional_pending_split_validation
+  description: Diseases that pass total-support and independent-dataset thresholds.
+    Final inclusion still requires group-safe split validation and duplicate analysis.
+  diseases:
+  - disease_id: D001
+    canonical_name: melanoma
+    unique_group_count: 303
+    image_count: 321
+    contributing_dataset_count: 3
+  - disease_id: D002
+    canonical_name: melanocytic_nevus
+    unique_group_count: 190
+    image_count: 257
+    contributing_dataset_count: 2
+  - disease_id: D003
+    canonical_name: psoriasis
+    unique_group_count: 643
+    image_count: 768
+    contributing_dataset_count: 2
+  - disease_id: D004
+    canonical_name: basal_cell_carcinoma
+    unique_group_count: 931
+    image_count: 1270
+    contributing_dataset_count: 3
+  - disease_id: D005
+    canonical_name: squamous_cell_carcinoma
+    unique_group_count: 513
+    image_count: 580
+    contributing_dataset_count: 3
+  - disease_id: D006
+    canonical_name: seborrheic_keratosis
+    unique_group_count: 229
+    image_count: 288
+    contributing_dataset_count: 2
+  - disease_id: D007
+    canonical_name: actinic_keratosis
+    unique_group_count: 679
+    image_count: 893
+    contributing_dataset_count: 3
+  - disease_id: D009
+    canonical_name: contact_dermatitis
+    unique_group_count: 623
+    image_count: 976
+    contributing_dataset_count: 2
+  - disease_id: D011
+    canonical_name: acne_vulgaris
+    unique_group_count: 481
+    image_count: 543
+    contributing_dataset_count: 2
+  - disease_id: D012
+    canonical_name: rosacea
+    unique_group_count: 108
+    image_count: 136
+    contributing_dataset_count: 2
+  - disease_id: D013
+    canonical_name: vitiligo
+    unique_group_count: 115
+    image_count: 117
+    contributing_dataset_count: 2

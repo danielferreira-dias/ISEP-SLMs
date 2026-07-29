@@ -1,0 +1,224 @@
+# Shared normalized manifest contract for dermatology image datasets.
+
+manifest_schema:
+  id: dermatology_image_manifest
+  version: 1.1.0
+  language: en
+  row_unit: image
+  description: >
+    Defines the common fields produced when a source dataset is normalized.
+    One row represents one image. Images from the same patient, case, lesion,
+    or encounter must share a group identifier so they cannot cross splits.
+
+fields:
+  - name: schema_version
+    type: string
+    required: true
+    description: Version of this manifest schema used to create the row.
+
+  - name: sample_id
+    type: string
+    required: true
+    unique: true
+    description: Stable project-wide identifier for one normalized image.
+
+  - name: dataset_id
+    type: string
+    required: true
+    description: Stable identifier of the source dataset.
+
+  - name: dataset_version
+    type: string
+    required: true
+    description: Source release, revision, or version used to build the row.
+
+  - name: original_image_id
+    type: string
+    required: true
+    description: Image identifier or filename in the source dataset.
+
+  - name: original_case_id
+    type: string
+    nullable: true
+    description: Case, lesion, or encounter identifier supplied by the source.
+
+  - name: patient_id
+    type: string
+    nullable: true
+    description: Source patient identifier when the dataset provides one.
+
+  - name: group_id
+    type: string
+    required: true
+    description: >
+      Leakage-safe grouping key. All images belonging to the same patient
+      should share this value; otherwise use the strongest available case,
+      lesion, encounter, or source-level grouping key.
+
+  - name: image_uri
+    type: string
+    required: true
+    description: Local path or resolvable URI of the image used by evaluation.
+
+  - name: disease_original
+    type: string
+    nullable: true
+    description: Unmodified primary disease label from the source dataset.
+
+  - name: canonical_source_label
+    type: string
+    nullable: true
+    description: >
+      Countable canonical form of the primary source diagnosis. It is present
+      even when the diagnosis is outside the active benchmark taxonomy.
+
+  - name: disease_id
+    type: string
+    nullable: true
+    description: >
+      Stable normalized ID from configs/taxonomies/diseases.yaml. This is the
+      primary reference used by single-reference ranking metrics.
+
+  - name: reference_diagnoses
+    type: list
+    required: true
+    description: >
+      All normalized reference diagnoses supplied by the source, ordered from
+      strongest to weakest. A single-label dataset contains a one-item list.
+    item_fields:
+      - name: disease_original
+        type: string
+        required: true
+      - name: disease_id
+        type: string
+        nullable: true
+      - name: canonical_source_label
+        type: string
+        required: true
+      - name: mapping_status
+        type: string
+        required: true
+      - name: rank
+        type: integer
+        required: true
+      - name: weight
+        type: float
+        nullable: true
+      - name: source
+        type: string
+        required: true
+
+  - name: mapping_status
+    type: string
+    required: true
+    allowed_values:
+      - benchmark_mapped
+      - out_of_benchmark_scope
+      - missing_reference_diagnosis
+    description: >
+      Indicates whether the primary source diagnosis maps to an active
+      benchmark disease while preserving out-of-scope diagnoses for counting.
+
+  - name: diagnosis_basis
+    type: string
+    required: true
+    allowed_values:
+      - pathology
+      - clinical_consensus
+      - dermatologist_review
+      - dermatologist_differential
+      - atlas_label
+      - self_reported
+      - derived
+      - unknown
+    description: Evidence type supporting the disease label.
+
+  - name: diagnosis_gradable
+    type: boolean
+    required: true
+    description: Whether the source judged the image adequate for diagnosis.
+
+  - name: taxonomy_id
+    type: string
+    required: true
+    description: Identifier of the normalized disease taxonomy.
+
+  - name: taxonomy_version
+    type: string
+    required: true
+    description: Version of the normalized disease taxonomy.
+
+  - name: skin_tone_system
+    type: string
+    nullable: true
+    description: Skin-tone scale used for the normalized annotation.
+
+  - name: skin_tone
+    type: string
+    nullable: true
+    description: Normalized skin-tone value in the named scale.
+
+  - name: skin_tone_source
+    type: string
+    nullable: true
+    description: Whether the skin-tone value was self-reported or annotated.
+
+  - name: image_sha256
+    type: string
+    nullable: true
+    description: SHA-256 image digest used for exact duplicate detection.
+
+  - name: perceptual_hash
+    type: string
+    nullable: true
+    description: Perceptual image hash used to identify near duplicates.
+
+  - name: perceptual_hash_algorithm
+    type: string
+    nullable: true
+    description: Algorithm and settings used to compute perceptual_hash.
+
+  - name: license_id
+    type: string
+    required: true
+    description: Identifier of the licence or access agreement for this row.
+
+  - name: split
+    type: string
+    nullable: true
+    allowed_values:
+      - train
+      - validation
+      - test
+      - external_test
+    description: Assigned project split; null before splitting.
+
+  - name: split_version
+    type: string
+    nullable: true
+    description: Version of the split assignment policy.
+
+  - name: include
+    type: boolean
+    required: true
+    description: Whether the row is eligible for the configured downstream use.
+
+  - name: exclusion_reason
+    type: string
+    nullable: true
+    description: Machine-readable reason for excluding an ineligible row.
+
+  - name: source_metadata
+    type: string
+    required: true
+    description: >
+      JSON-encoded object containing dataset-specific fields retained for
+      auditability without changing the shared Parquet columns.
+
+invariants:
+  - sample_id must be unique across all normalized manifests.
+  - disease_id must be the first normalized item in reference_diagnoses.
+  - canonical_source_label and mapping_status must match the first reference diagnosis.
+  - rows without a normalized disease_id cannot enter the closed-set benchmark.
+  - all rows with the same group_id must receive the same split.
+  - exact and near duplicates must not cross train, validation, or test splits.

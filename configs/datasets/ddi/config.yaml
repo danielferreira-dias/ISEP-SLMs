@@ -1,0 +1,50 @@
+dataset:
+  id: ddi
+  version: official_656_image_release
+  name: Diverse Dermatology Images
+  task_type: disease_classification
+  description: >
+    Pathology-grounded clinical photographs intended for skin-tone-stratified
+    external evaluation.
+  license_id: DDI_RESEARCH_USE_AGREEMENT
+
+source:
+  format: csv_with_image_directory
+  metadata: configs/datasets/ddi/data/ddi_metadata.csv
+  image_root: configs/datasets/ddi/data/images
+  row_unit: image
+
+mapping:
+  original_image_id: DDI_ID
+  image_uri: DDI_file
+  group_id: DDI_ID
+  disease_original: disease
+  diagnosis_basis: pathology
+  malignant: malignant
+  skin_tone:
+    system: fitzpatrick_group
+    value: skin_tone
+    source: expert_annotated
+  ignored_columns:
+    - _unnamed_var
+
+normalization:
+  taxonomy: configs/taxonomies/diseases.yaml
+  mapping_order:
+    - canonical_name
+    - alias
+    - reviewed_manual_mapping
+  unmapped_label_policy: canonicalize_report_and_exclude_from_benchmark
+  cautions:
+    - The release does not provide a patient identifier, although it contains fewer patients than images.
+    - Resolve patient-level grouping before using multiple images in the same evaluation split.
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/ddi_v2.parquet
+
+coverage:
+  role: external_evaluation_only
+  reason: >
+    DDI is reserved for external evaluation, so its labels must not determine
+    which diseases are selected for the benchmark.

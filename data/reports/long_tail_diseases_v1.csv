@@ -1,0 +1,3 @@
+disease_id,canonical_name,dataset_id,unique_group_count,image_count,train_group_count,validation_group_count,test_group_count,contributing_dataset_count,eligibility_status,exclusion_reason
+D008,atopic_dermatitis,all_contributors,0,0,,,,0,long_tail,insufficient_unique_groups;insufficient_independent_datasets
+D010,tinea_corporis,all_contributors,0,0,,,,0,long_tail,insufficient_unique_groups;insufficient_independent_datasets

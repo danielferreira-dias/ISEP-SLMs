@@ -1,0 +1,65 @@
+# Reviewed mappings from normalized source labels to the candidate taxonomy.
+
+mapping:
+  id: dermatology_source_disease_mappings
+  version: 2.1.0
+  language: en
+  taxonomy: configs/taxonomies/diseases.yaml
+  description: >
+    Maps source-specific disease labels that are not already covered by an
+    exact canonical name or taxonomy alias. Every mapping should be clinically
+    reviewed before the benchmark taxonomy is frozen.
+
+global:
+  melanoma in situ: D001
+  malignant melanoma: D001
+  melanocytic nevi: D002
+  melanocytic nevus: D002
+  benign melanocytic nevus: D002
+  plaque psoriasis: D003
+  basal cell carcinoma: D004
+  squamous cell carcinoma in situ: D005
+  squamous cell carcinoma including bowen disease: D005
+  seborrheic keratoses: D006
+  irritated seborrheic keratosis: D006
+  actinic keratoses: D007
+  allergic contact dermatitis: D009
+  irritant contact dermatitis: D009
+  acne: D011
+  eczema unspecified: D014
+  eczematous dermatitis: D014
+  seborrhoeic dermatitis: D015
+  seborrheic eczema: D015
+  seborrhoeic eczema: D015
+  hives: D017
+
+dataset_specific:
+  pad_ufes_20:
+    ack: D007
+    bcc: D004
+    mel: D001
+    nev: D002
+    scc: D005
+    sek: D006
+
+  ddi:
+    melanocytic nevi: D002
+    melanoma in situ: D001
+    basal cell carcinoma: D004
+    squamous cell carcinoma in situ: D005
+    seborrheic keratosis irritated: D006
+
+  scin:
+    scc sccis: D005
+
+review:
+  status: preliminary
+  required_before_taxonomy_freeze: true
+  cautions:
+    - Broad-to-specific mappings must not be added automatically.
+    - Generic eczema maps only to the broad eczema benchmark class.
+    - Contact dermatitis remains separate from the broad eczema class when explicitly labelled.
+    - Atopic dermatitis and tinea corporis IDs are retired, not reassigned.
+    - Generic tinea remains outside the active benchmark taxonomy.
+    - Melanoma subtypes are grouped under the current candidate melanoma class.
+    - Squamous cell carcinoma in situ is grouped under the current candidate squamous cell carcinoma class.

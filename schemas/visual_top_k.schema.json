@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "visual_top_k.schema.json",
+  "title": "Visual Top-6 Disease Predictions",
+  "description": "Structured output for the closed-set dermatology image-ranking benchmark.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "predictions"
+  ],
+  "properties": {
+    "predictions": {
+      "type": "array",
+      "description": "Six disease predictions ordered from most to least plausible.",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rank",
+          "disease_id"
+        ],
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "description": "Prediction position, where 1 is the most plausible diagnosis.",
+            "minimum": 1,
+            "maximum": 6
+          },
+          "disease_id": {
+            "type": "string",
+            "description": "Disease identifier from the benchmark taxonomy.",
+            "enum": [
+              "D001",
+              "D002",
+              "D003",
+              "D004",
+              "D005",
+              "D006",
+              "D007",
+              "D009",
+              "D011",
+              "D012",
+              "D013",
+              "D014",
+              "D015",
+              "D016",
+              "D017",
+              "D018",
+              "D019",
+              "D022",
+              "D023",
+              "D024"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

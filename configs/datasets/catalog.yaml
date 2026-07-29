@@ -1,0 +1,45 @@
+# Registry of dermatology dataset configurations.
+
+catalog:
+  id: dermatology_datasets
+  version: 1.0.0
+  language: en
+  manifest_schema: configs/datasets/manifest_schema.yaml
+  disease_inclusion_policy: configs/datasets/disease_inclusion.yaml
+
+datasets:
+  - id: fitzpatrick17k_c
+    config: configs/datasets/fitzpatrick17k/config.yaml
+    role: taxonomy_contributor
+
+  - id: pad_ufes_20
+    config: configs/datasets/pad-ufes-20/config.yaml
+    role: taxonomy_contributor
+
+  - id: scin
+    config: configs/datasets/scin/config.yaml
+    role: taxonomy_contributor
+
+  - id: ddi
+    config: configs/datasets/ddi/config.yaml
+    role: external_evaluation_only
+
+  - id: skincon
+    config: configs/datasets/skincon/config.yaml
+    role: excluded_from_disease_coverage
+
+  - id: skincap
+    config: configs/datasets/skincap/config.yaml
+    role: excluded_from_disease_coverage
+
+  - id: skincare
+    config: configs/datasets/skincare/config.yaml
+    role: excluded_from_disease_coverage
+
+  - id: dermavqa
+    config: configs/datasets/dermavqa/config.yaml
+    role: excluded_from_disease_coverage
+
+  - id: dermnet_kaggle
+    config: configs/datasets/dermnet/config.yaml
+    role: excluded_from_disease_coverage

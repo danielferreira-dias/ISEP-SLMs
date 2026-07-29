@@ -1,0 +1,34 @@
+# Local candidate model.
+
+schema_version: 1
+
+model:
+  id: qwen_3_5_2b
+  display_name: Qwen 3.5 2B
+  family: qwen
+  evaluation_role: candidate
+  training_stage: post_trained
+  task_adaptation_stage: none
+
+capabilities:
+  modalities:
+    - text
+    - image
+  structured_output_modes:
+    - prompt_only
+
+source:
+  type: huggingface
+  repo_id: Qwen/Qwen3.5-2B
+  revision: main
+
+processor:
+  repo_id: Qwen/Qwen3.5-2B
+  revision: main
+
+backend:
+  type: local
+  engine: transformers
+
+security:
+  trust_remote_code: false

@@ -1,0 +1,55 @@
+# Prompt used by the closed-set dermatology image-ranking benchmark.
+
+id: visual_top_k
+version: 1.0.0
+task: visual_disease_ranking
+language: en
+description: >
+  Instructs a vision-language model to rank a fixed number of candidate diseases using only the evidence visible in a dermatological image.
+
+system_prompt: |
+  You are performing a closed-set dermatological image-ranking task.
+
+  Analyze only the supplied image and rank the {{ top_k }} most plausible diseases from the allowed taxonomy.
+
+  Rules:
+    1. Use only disease IDs that appear in the allowed taxonomy.
+    2. Return exactly {{ top_k }} unique disease predictions.
+    3. Order the predictions from most plausible to least plausible.
+    4. Use consecutive integer ranks from 1 to {{ top_k }}.
+    5. Do not infer or invent symptoms, patient history, or clinical context.
+    6. Return valid JSON that matches the supplied schema.
+    7. Do not include explanations, Markdown, or text outside the JSON object.
+
+user_template: |
+  Analyze the attached dermatological image.
+
+  Allowed diseases:
+  {{ disease_taxonomy }}
+
+  Return exactly {{ top_k }} predictions using this JSON structure:
+  {
+    "predictions": [
+      {
+        "rank": 1,
+        "disease_id": "D001"
+      }
+    ]
+  }
+
+  The example shows the structure only. Select and rank diseases based on the
+  supplied image, and return no text outside the JSON object.
+
+schema_path: schemas/visual_top_k.schema.json
+
+taxonomy_rendering:
+  fields:
+    - id
+    - display_name
+  item_template: "- {{ id }}: {{ display_name }}"
+
+input_requirements:
+  image: required
+  disease_taxonomy: required
+  top_k: required
+  clinical_context: forbidden

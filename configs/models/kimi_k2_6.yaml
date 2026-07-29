@@ -1,0 +1,30 @@
+# API reference-model candidate.
+
+schema_version: 1
+
+model:
+  id: kimi_k2_6
+  display_name: Kimi K2.6
+  family: kimi
+  evaluation_role: teacher_candidate
+  training_stage: provider_managed
+  task_adaptation_stage: none
+
+capabilities:
+  modalities:
+    - text
+    - image
+  structured_output_modes:
+    - prompt_only
+
+source:
+  type: provider_api
+  provider: moonshot
+  model_name: kimi-k2.6
+
+backend:
+  provider: Azure
+  type: api
+  api_style: openai_compatible
+  api_key_env: MOONSHOT_API_KEY
+  base_url_env: MOONSHOT_BASE_URL

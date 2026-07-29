@@ -1,0 +1,130 @@
+# Closed-set dermatology image-ranking benchmark.
+
+benchmark:
+  id: visual_top_k_closed_set
+  version: 2.0.0
+  task: visual_disease_ranking
+  description: >
+    Evaluates how accurately a vision-language model ranks dermatological diseases from a fixed taxonomy. The same configuration must be used for
+    the base-model and post-trained-model evaluations.
+  top_k: 6
+
+prompt:
+  path: prompts/benchmarks/top_k.yaml
+
+schema:
+  path: schemas/visual_top_k.schema.json
+
+taxonomy:
+  path: configs/taxonomies/diseases.yaml
+  id_field: id
+  label_field: display_name
+  expected_size: 20
+
+dataset:
+  manifest: data/benchmarks/visual_top_k_v2/internal_test.parquet
+  manifest_schema: configs/datasets/manifest_schema.yaml
+  dataset_catalog: configs/datasets/catalog.yaml
+  disease_inclusion_policy: configs/datasets/disease_inclusion.yaml
+  sample_id_column: sample_id
+  image_column: image_uri
+  group_column: group_id
+  source_dataset_column: dataset_id
+  label_column: disease_id
+  diagnosis_basis_column: diagnosis_basis
+  reference_diagnoses_column: reference_diagnoses
+  reference_label_format: single_label
+  description: >
+    Uses the normalized primary disease ID for ranking metrics while retaining
+    every source differential in reference_diagnoses for auditing. Only rows
+    that pass the disease-inclusion and leakage-prevention policies may enter
+    this generated test manifest.
+
+metrics:
+  - id: top_1_accuracy
+    description: >
+      The proportion of evaluated samples for which the first-ranked disease matches the reference disease. It measures primary diagnostic accuracy.
+    value: proportion
+    higher_is_better: true
+
+  - id: top_3_accuracy
+    description: >
+      The proportion of evaluated samples for which the reference disease appears within the first three ranked predictions. It measures whether
+      the correct diagnosis is present in a short differential diagnosis.
+    value: proportion
+    higher_is_better: true
+
+  - id: top_6_accuracy
+    description: >
+      The proportion of evaluated samples for which the reference disease appears anywhere in the six ranked predictions. It measures recall
+      within the complete requested differential diagnosis.
+    value: proportion
+    higher_is_better: true
+
+  - id: mean_reciprocal_rank
+    description: >
+      The mean of 1 divided by the rank of the reference disease. A sample receives zero when the reference disease is absent from the predictions.
+      It measures how highly the model ranks the correct diagnosis.
+    value: score_between_0_and_1
+    higher_is_better: true
+
+  - id: macro_f1_top_1
+    description: >
+      The unweighted mean of the per-disease F1 scores, using the first-ranked disease as the predicted class. It measures top-1 performance while
+      giving common and rare diseases equal importance.
+    value: score_between_0_and_1
+    higher_is_better: true
+
+  - id: json_validity_rate
+    description: >
+      The proportion of raw model responses that can be parsed as valid JSON. It measures basic machine readability independently of diagnostic correctness.
+    value: proportion
+    higher_is_better: true
+
+  - id: schema_compliance_rate
+    description: >
+      The proportion of parsed responses that satisfy the complete output schema and benchmark validation rules. It measures structural reliability, including required fields, 
+      prediction count, and ranks.
+    value: proportion
+    higher_is_better: true
+
+  - id: invalid_disease_id_rate
+    description: >
+      The proportion of evaluated samples containing at least one disease ID that is not present in the supplied taxonomy. It measures closed-set taxonomy adherence.
+    value: proportion
+    higher_is_better: false
+
+  - id: duplicate_prediction_rate
+    description: >
+      The proportion of evaluated samples containing the same disease ID more than once. It measures whether the model produces a valid and useful differential rather than repeating a 
+      diagnosis.
+    value: proportion
+    higher_is_better: false
+
+validation:
+  require_valid_json: true
+  reject_unknown_disease_ids: true
+  require_unique_disease_ids: true
+  required_prediction_count: 6
+  require_consecutive_ranks: true
+  invalid_output_policy: count_as_incorrect
+
+comparison:
+  stages:
+    - base_model
+    - post_trained_model
+  paired_by: sample_id
+  confidence_interval:
+    method: paired_bootstrap
+    confidence_level: 0.95
+    resamples: 10000
+
+execution:
+  batch_size: 8
+  resume: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  fail_fast_on_invalid_output: false
+
+output:
+  directory: outputs/benchmark_runs

@@ -1,0 +1,70 @@
+# Zero-shot comparison on the closed-set visual dermatology benchmark.
+
+schema_version: 1
+
+experiment:
+  id: zero_shot_visual_v1
+  version: 1.0.0
+  type: zero_shot_evaluation
+  description: >
+    Zero-shot comparison of small candidate models and potential reference
+    models on the closed-set visual dermatology benchmark. No teacher model has
+    been selected.
+
+benchmark:
+  config: configs/benchmarks/visual_top_k.yaml
+
+models:
+  - config: configs/models/qwen_3_6_27b.yaml
+    enabled: true
+
+  - config: configs/models/kimi_k2_6.yaml
+    enabled: true
+
+  - config: configs/models/gpt_5_6_luna.yaml
+    enabled: true
+
+  - config: configs/models/qwen_small_2b.yaml
+    enabled: true
+
+  - config: configs/models/qwen_small_4b.yaml
+    enabled: true
+
+teacher_selection:
+  status: pending
+  selected_model_id: null
+  selection_split: validation
+  candidate_model_ids:
+    - qwen_3_6_27b
+    - kimi_k2_6
+    - gpt_5_6_luna
+  criteria:
+    - diagnostic_accuracy
+    - structured_output_reliability
+    - latency
+    - evaluation_cost
+
+overrides:
+  generation:
+    temperature: 0.0
+    do_sample: false
+    max_output_tokens: 256
+
+  structured_output:
+    mode: prompt_only
+
+repetitions:
+  count: 1
+  seeds:
+    - 42
+
+tracking:
+  save_environment: true
+  save_git_commit: true
+  save_config_snapshot: true
+  save_model_revisions: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+
+output:
+  directory: outputs/experiments/zero_shot_visual_v1

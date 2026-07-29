@@ -1,0 +1,45 @@
+dataset:
+  id: skincap
+  version: 4119044b3e14085d7439f88016d93376d433da5f
+  name: SkinCAP
+  task_type: image_captioning_and_disease_classification
+  description: >
+    Dermatologist-authored captions and labels for images derived from
+    Fitzpatrick17k and DDI.
+  license_id: SKINCAP_GATED_AND_UPSTREAM_TERMS
+
+source:
+  format: csv_with_image_directory
+  metadata: configs/datasets/skincap/data/skincap_v240623.csv
+  image_root: configs/datasets/skincap/data/skincap
+  row_unit: image
+
+mapping:
+  original_image_id: id
+  image_uri: skincap_file_path
+  upstream_image_uri: ori_file_path
+  source_dataset: source
+  group_id: source_plus_ori_file_path
+  disease_original: disease
+  diagnosis_basis: derived
+  english_caption: caption_zh_polish_en
+
+normalization:
+  taxonomy: configs/taxonomies/diseases.yaml
+  mapping_order:
+    - canonical_name
+    - alias
+    - reviewed_manual_mapping
+  unmapped_label_policy: canonicalize_report_and_exclude_from_benchmark
+  exclude_directories:
+    - configs/datasets/skincap/data/skincap/not_include
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/skincap_v1.parquet
+
+coverage:
+  role: excluded_from_disease_coverage
+  reason: >
+    Every main image comes from Fitzpatrick17k or DDI, so counting SkinCAP
+    would duplicate upstream disease cases.

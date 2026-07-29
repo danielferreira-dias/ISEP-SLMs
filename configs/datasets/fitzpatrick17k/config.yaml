@@ -1,0 +1,48 @@
+dataset:
+  id: fitzpatrick17k_c
+  version: corrected_2024_release
+  name: Fitzpatrick17k-C
+  task_type: disease_classification
+  description: >
+    Corrected subset of Fitzpatrick17k with web-atlas disease labels and
+    source-provided partition and skin-tone annotations.
+  license_id: CC_BY_NC_SA_3_0
+
+source:
+  format: csv_with_zip_archive
+  metadata: configs/datasets/fitzpatrick17k/data/metadata/Fitzpatrick17k-C.csv
+  image_archive: configs/datasets/fitzpatrick17k/data/raw/fitzpatrick17k.zip
+  archive_member_template: data/finalfitz17k/{orig_img_name}
+  row_unit: image
+
+mapping:
+  original_image_id: md5hash
+  image_uri: orig_img_name
+  group_id: md5hash
+  disease_original: label
+  diagnosis_basis: atlas_label
+  source_split: partition
+  skin_tone:
+    system: fitzpatrick
+    value: fst
+    source: expert_or_crowd_annotated
+
+normalization:
+  taxonomy: configs/taxonomies/diseases.yaml
+  mapping_order:
+    - canonical_name
+    - alias
+    - diagnosis_mapping_workbook
+    - reviewed_manual_mapping
+  diagnosis_mapping_workbook: configs/datasets/fitzpatrick17k/data/metadata/Fitzpatrick17k_DiagnosisMapping.xlsx
+  unmapped_label_policy: canonicalize_report_and_exclude_from_benchmark
+  cautions:
+    - Use source URLs and perceptual hashes to detect related images that have different MD5 values.
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/fitzpatrick17k_c_v2.parquet
+
+coverage:
+  role: taxonomy_contributor
+  count_unit: group_id

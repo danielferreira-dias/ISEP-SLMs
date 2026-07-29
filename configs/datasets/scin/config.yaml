@@ -1,0 +1,55 @@
+dataset:
+  id: scin
+  version: 996257142f7517fb8991a28cfba46ec4e3f530a9
+  name: Skin Condition Image Network
+  task_type: ranked_disease_differential
+  description: >
+    Volunteer-contributed cases with up to three images and a retrospective
+    dermatologist differential. Labels are not confirmed in-person diagnoses.
+  license_id: SCIN_DATA_USE_LICENSE
+
+source:
+  format: parquet
+  files: configs/datasets/scin/data/data/train-*.parquet
+  row_unit: case
+  image_columns:
+    - image_1_path
+    - image_2_path
+    - image_3_path
+
+mapping:
+  original_case_id: case_id
+  group_id: case_id
+  disease_original: weighted_skin_condition_label
+  reference_diagnoses:
+    format: weighted_mapping
+    labels: weighted_skin_condition_label
+    reviewer_labels: dermatologist_skin_condition_on_label_name
+    reviewer_confidence: dermatologist_skin_condition_confidence
+  diagnosis_basis: dermatologist_differential
+  gradable_columns:
+    - dermatologist_gradable_for_skin_condition_1
+    - dermatologist_gradable_for_skin_condition_2
+    - dermatologist_gradable_for_skin_condition_3
+  skin_tone:
+    available_systems:
+      - self_reported_fitzpatrick
+      - dermatologist_fitzpatrick
+      - monk
+
+normalization:
+  expand_source_row_to_one_row_per_nonempty_image: true
+  taxonomy: configs/taxonomies/diseases.yaml
+  mapping_order:
+    - canonical_name
+    - alias
+    - reviewed_manual_mapping
+  unmapped_label_policy: canonicalize_report_and_exclude_from_benchmark
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/scin_v2.parquet
+
+coverage:
+  role: taxonomy_contributor
+  count_unit: group_id

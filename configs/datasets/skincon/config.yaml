@@ -1,0 +1,31 @@
+dataset:
+  id: skincon
+  version: local_public_release
+  name: SKINCON
+  task_type: morphology_annotation
+  description: >
+    Multi-label morphology annotations linked to Fitzpatrick17k and DDI
+    images. Morphology concepts are not disease labels.
+  license_id: UPSTREAM_IMAGE_LICENSE_APPLIES
+
+source:
+  format: csv_annotation_overlay
+  annotation_files:
+    fitzpatrick17k: configs/datasets/skincon/data/annotations/annotations_fitzpatrick17k.csv
+    ddi: configs/datasets/skincon/data/annotations/annotations_ddi.csv
+  image_id_column: ImageID
+  unusable_column: Do not consider this image
+
+normalization:
+  join_to_upstream_manifests: true
+  standalone_disease_manifest: false
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/skincon_v1.parquet
+
+coverage:
+  role: excluded_from_disease_coverage
+  reason: >
+    SKINCON adds morphology concepts to existing upstream images and does not
+    provide independent disease cases.

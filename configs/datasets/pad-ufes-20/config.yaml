@@ -1,0 +1,52 @@
+dataset:
+  id: pad_ufes_20
+  version: "1"
+  name: PAD-UFES-20
+  task_type: disease_classification
+  description: >
+    Smartphone images of skin lesions with patient, lesion, clinical, and
+    diagnostic metadata.
+  license_id: CC_BY_4_0
+
+source:
+  format: csv_with_zip_archives
+  metadata: configs/datasets/pad-ufes-20/data/raw/metadata.csv
+  image_archives:
+    - configs/datasets/pad-ufes-20/data/raw/imgs_part_1.zip
+    - configs/datasets/pad-ufes-20/data/raw/imgs_part_2.zip
+    - configs/datasets/pad-ufes-20/data/raw/imgs_part_3.zip
+  row_unit: image
+
+mapping:
+  original_image_id: img_id
+  original_case_id: lesion_id
+  patient_id: patient_id
+  group_id: patient_id
+  disease_original: diagnostic
+  diagnosis_basis:
+    value_from: biopsed
+    true: pathology
+    false: clinical_consensus
+  skin_tone:
+    system: fitzpatrick
+    value: fitspatrick
+    source: source_metadata
+
+normalization:
+  taxonomy: configs/taxonomies/diseases.yaml
+  code_mapping:
+    ACK: actinic_keratosis
+    BCC: basal_cell_carcinoma
+    MEL: melanoma
+    NEV: melanocytic_nevus
+    SCC: squamous_cell_carcinoma
+    SEK: seborrheic_keratosis
+  unmapped_label_policy: canonicalize_report_and_exclude_from_benchmark
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/pad_ufes_20_v2.parquet
+
+coverage:
+  role: taxonomy_contributor
+  count_unit: group_id

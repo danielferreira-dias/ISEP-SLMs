@@ -1,0 +1,89 @@
+# Provisional policy for selecting diseases for the closed-set benchmark.
+
+disease_inclusion:
+  id: core_disease_coverage_v2
+  version: 2.1.0
+  language: en
+  status: provisional
+  description: >
+    Selects diseases with enough independent cases for meaningful training and
+    evaluation. The thresholds must be reviewed after generating the first
+    coverage report; excluded labels remain visible as long-tail diseases.
+
+counting:
+  unit: unique_group_id
+  label_selection: primary_reference_only
+  description: >
+    Counts each patient or case group once per disease, even when the group has
+    multiple images. For ranked differentials, only the highest-weight
+    normalized diagnosis contributes to disease frequency.
+  require_gradable: true
+  require_normalized_disease_id: true
+  deduplicate_before_counting: true
+  duplicate_checks:
+    - image_sha256
+    - perceptual_hash
+    - source_lineage
+
+dataset_roles:
+  taxonomy_contributors:
+    - fitzpatrick17k_c
+    - pad_ufes_20
+    - scin
+  external_evaluation_only:
+    - ddi
+  excluded_from_coverage:
+    skincon: Morphology annotation overlay; it does not provide independent disease cases.
+    skincap: Derived from Fitzpatrick17k and DDI; counting it would duplicate upstream cases.
+    skincare: Contains derived SkinCAP data and incompatible SkinCoT targets.
+    dermavqa: Visual question answering data without a fixed fine-grained disease target.
+    dermnet_kaggle: Upstream rights are unresolved and its 23 directory labels combine multiple diseases.
+
+eligibility:
+  minimum_unique_groups_total: 100
+  minimum_unique_groups_per_split:
+    train: 50
+    validation: 20
+    test: 30
+  minimum_contributing_datasets: 2
+  description: >
+    A core disease must have at least 100 unique groups overall, enough groups
+    in every requested split, and representation in at least two independent
+    contributing datasets. These are starting values, not clinical constants.
+
+exceptions:
+  allow_manual_clinical_override: true
+  require_written_rationale: true
+  description: >
+    A clinically important disease may be retained below a threshold only when
+    the decision and the resulting statistical limitation are documented.
+
+split_policy:
+  group_by: group_id
+  stratify_by:
+    - disease_id
+    - dataset_id
+  prevent_duplicate_leakage: true
+  external_datasets_do_not_influence_taxonomy: true
+
+outputs:
+  source_label_inventory: data/reports/source_disease_inventory_v2.csv
+  all_source_disease_coverage: data/reports/all_source_disease_coverage_v2.csv
+  coverage_parquet: data/reports/disease_coverage_v2.parquet
+  coverage_csv: data/reports/disease_coverage_v2.csv
+  included_diseases: data/reports/included_diseases_v2.yaml
+  long_tail_diseases: data/reports/long_tail_diseases_v2.csv
+  out_of_scope_labels: data/reports/out_of_scope_source_labels_v2.csv
+
+report_columns:
+  - disease_id
+  - canonical_name
+  - dataset_id
+  - unique_group_count
+  - image_count
+  - train_group_count
+  - validation_group_count
+  - test_group_count
+  - contributing_dataset_count
+  - eligibility_status
+  - exclusion_reason

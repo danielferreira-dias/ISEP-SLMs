@@ -1,0 +1,35 @@
+dataset:
+  id: dermavqa
+  version: local_osf_release
+  name: DermaVQA
+  task_type: visual_question_answering
+  description: >
+    Multilingual consumer dermatology questions, images, and free-text answer
+    targets grouped by encounter.
+  license_id: CC_BY_4_0
+
+source:
+  format: json_csv_and_zip
+  root: configs/datasets/dermavqa/data/osf
+  components:
+    - id: iiyi
+      root: configs/datasets/dermavqa/data/osf/iiyi
+      group_id: encounter_id
+    - id: reddit
+      root: configs/datasets/dermavqa/data/osf/reddit
+      group_id: encounter_id
+
+normalization:
+  taxonomy: configs/taxonomies/diseases.yaml
+  fixed_disease_target_available: false
+  requires_separate_vqa_schema: true
+
+manifest:
+  schema: configs/datasets/manifest_schema.yaml
+  output: data/manifests/dermavqa_v1.parquet
+
+coverage:
+  role: excluded_from_disease_coverage
+  reason: >
+    DermaVQA uses free-text answers and does not expose a consistent
+    fine-grained disease label for closed-set coverage counting.

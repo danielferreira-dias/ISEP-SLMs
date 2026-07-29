@@ -1,0 +1,37 @@
+# Small local medical multimodal candidate model.
+
+schema_version: 1
+
+model:
+  id: medgemma_1_5_4b
+  display_name: MedGemma 1.5 4B IT
+  family: medgemma
+  evaluation_role: candidate
+  training_stage: post_trained
+  task_adaptation_stage: none
+  domain: medical
+
+capabilities:
+  modalities:
+    - text
+    - image
+  structured_output_modes:
+    - prompt_only
+
+source:
+  type: huggingface
+  repo_id: google/medgemma-1.5-4b-it
+  revision: main
+  access: gated
+  terms: health_ai_developer_foundations
+
+processor:
+  repo_id: google/medgemma-1.5-4b-it
+  revision: main
+
+backend:
+  type: local
+  engine: transformers
+
+security:
+  trust_remote_code: false
