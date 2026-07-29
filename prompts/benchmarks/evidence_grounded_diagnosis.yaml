@@ -1,7 +1,7 @@
 # Prompt used by the evidence-grounded dermatology diagnosis benchmark.
 
 id: evidence_grounded_diagnosis
-version: 1.0.0
+version: 1.1.0
 task: evidence_grounded_visual_diagnosis
 language: en
 description: >
@@ -40,10 +40,8 @@ system_prompt: |
          - low: below 0.40
          - moderate: 0.40 to below 0.75
          - high: 0.75 or above
-   13. Set needs_in_person_review to true when an image alone is insufficient
-       for definitive clinical management or further examination is warranted.
-   14. Return valid JSON matching the supplied schema.
-   15. Do not include explanations, Markdown, or any text
+   13. Return valid JSON matching the supplied schema.
+   14. Do not include explanations, Markdown, or any text
        outside the JSON object.
 
 user_template: |
@@ -78,8 +76,7 @@ user_template: |
         "supporting_finding_ids": ["F1", "F2"]
       }
     ],
-    "case_confidence": "moderate",
-    "needs_in_person_review": true
+    "case_confidence": "moderate"
   }
 
   The example demonstrates the structure only. Select findings and diseases
@@ -115,4 +112,3 @@ output_requirements:
   tests_or_management_in_description: forbidden
   diagnosis_count: 6
   evidence_links_required: true
-  review_recommendation_scoring: audit_only

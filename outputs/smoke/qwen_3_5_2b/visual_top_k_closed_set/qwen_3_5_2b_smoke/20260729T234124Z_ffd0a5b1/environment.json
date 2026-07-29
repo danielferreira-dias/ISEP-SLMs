@@ -1,0 +1,33 @@
+{
+  "credentials": {
+    "VLLM_BASE_URL": {
+      "configured": false
+    }
+  },
+  "git": {
+    "commit": "6d12257791ef3bbb829b15393dd2a50a5730a5a3",
+    "dirty": true
+  },
+  "gpu": {
+    "available": false,
+    "devices": []
+  },
+  "packages": {
+    "jsonschema": "4.26.0",
+    "openai": "2.50.0",
+    "pandas": "3.0.3",
+    "pyarrow": "24.0.0",
+    "pyyaml": "6.0.3",
+    "vllm": null
+  },
+  "platform": {
+    "machine": "arm64",
+    "release": "25.4.0",
+    "system": "Darwin"
+  },
+  "python": {
+    "executable": "/Users/danielfd98/Code/ISEP/.venv/bin/python3",
+    "implementation": "CPython",
+    "version": "3.12.11"
+  }
+}

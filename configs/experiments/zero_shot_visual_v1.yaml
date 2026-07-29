@@ -4,7 +4,7 @@ schema_version: 1
 
 experiment:
   id: zero_shot_visual_v1
-  version: 1.0.3
+  version: 1.1.0
   type: zero_shot_evaluation
   description: >
     Zero-shot comparison of small candidate models and potential reference
@@ -13,6 +13,7 @@ experiment:
 
 benchmark:
   config: configs/benchmarks/visual_top_k.yaml
+  evaluation_set: internal_benchmark_1000
 
 models:
   - config: configs/models/qwen_3_6_27b.yaml
@@ -56,13 +57,6 @@ teacher_selection:
     - structured_output_reliability
     - latency
     - evaluation_cost
-
-overrides:
-  generation:
-    max_output_tokens: 256
-
-  structured_output:
-    mode: prompt_only
 
 repetitions:
   count: 1

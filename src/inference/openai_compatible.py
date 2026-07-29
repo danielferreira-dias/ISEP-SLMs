@@ -1,0 +1,377 @@
+"""OpenAI-compatible chat-completions transport for multimodal models."""
+
+from __future__ import annotations
+
+import os
+from collections.abc import Mapping
+from dataclasses import asdict, is_dataclass
+from typing import Any
+
+from src.inference.base import (
+    InferenceBackend,
+    InferenceConfigurationError,
+    InferenceRequest,
+    InferenceResult,
+    InferenceTransportError,
+    ReasoningCaptureMode,
+    TokenUsage,
+    build_reasoning_trace,
+    extract_text,
+    image_data_url,
+    merge_generation,
+    read_field,
+    safe_optional_int,
+    validate_reasoning_capture,
+)
+
+
+class OpenAICompatibleChatBackend(InferenceBackend):
+    """Call a vLLM or provider-hosted chat-completions endpoint.
+
+    The OpenAI SDK is imported only when a client was not injected. This keeps
+    configuration inspection and unit tests usable on machines without the
+    optional inference dependencies.
+    """
+
+    def __init__(
+        self,
+        *,
+        model_id: str,
+        request_model: str | None = None,
+        base_url: str | None = None,
+        base_url_env: str | None = None,
+        api_key: str | None = None,
+        api_key_env: str | None = None,
+        client: Any | None = None,
+        generation: Any | None = None,
+        reasoning_capture: str = "none",
+        use_json_schema: bool = False,
+        chat_template_kwargs: Any | None = None,
+        supports_system_role: bool = True,
+        timeout_seconds: float = 300.0,
+    ) -> None:
+        self._model_id = model_id
+        self.request_model = request_model or model_id
+        self._base_url = base_url
+        self._base_url_env = base_url_env
+        self._api_key = api_key
+        self._api_key_env = api_key_env
+        self._client = client
+        self.default_generation = generation
+        self.reasoning_capture = validate_reasoning_capture(
+            reasoning_capture
+        )
+        self.use_json_schema = use_json_schema
+        self.chat_template_kwargs = _mapping_values(
+            chat_template_kwargs
+        )
+        self.supports_system_role = supports_system_role
+        self.timeout_seconds = timeout_seconds
+
+    @property
+    def model_id(self) -> str:
+        return self._model_id
+
+    @property
+    def client(self) -> Any:
+        """Return the injected client or lazily construct an OpenAI client."""
+
+        if self._client is None:
+            self._client = self._build_client()
+        return self._client
+
+    def complete(self, request: InferenceRequest) -> InferenceResult:
+        payload = self._build_payload(request)
+        try:
+            response = self.client.chat.completions.create(**payload)
+        except Exception:
+            # Provider SDK exceptions can contain headers or request details.
+            # Keep the public failure stable and deliberately sanitized.
+            raise InferenceTransportError(
+                f"Chat-completions request failed for model "
+                f"{self.model_id!r}"
+            ) from None
+        return self._parse_response(response, request)
+
+    def _build_client(self) -> Any:
+        base_url = self._resolve_value(
+            direct=self._base_url,
+            env_name=self._base_url_env,
+            label="base URL",
+        )
+        api_key = self._resolve_value(
+            direct=self._api_key,
+            env_name=self._api_key_env,
+            label="API key",
+        )
+        try:
+            from openai import OpenAI
+        except ImportError:
+            raise InferenceConfigurationError(
+                "The optional 'openai' package is required for "
+                "OpenAI-compatible inference"
+            ) from None
+        return OpenAI(
+            base_url=base_url,
+            api_key=api_key,
+            timeout=self.timeout_seconds,
+        )
+
+    def _resolve_value(
+        self,
+        *,
+        direct: str | None,
+        env_name: str | None,
+        label: str,
+    ) -> str:
+        value = direct
+        if value is None and env_name:
+            value = os.environ.get(env_name)
+        if value:
+            return value
+        if env_name:
+            raise InferenceConfigurationError(
+                f"Environment variable {env_name!r} is required for "
+                f"the {label}"
+            )
+        raise InferenceConfigurationError(
+            f"An inference {label} must be configured"
+        )
+
+    def _build_payload(
+        self,
+        request: InferenceRequest,
+    ) -> dict[str, Any]:
+        generation = merge_generation(
+            self.default_generation,
+            request.generation,
+        )
+        data_url = image_data_url(
+            request.image_bytes,
+            request.image_mime_type,
+        )
+        user_text = request.user_prompt
+        messages: list[dict[str, Any]] = []
+        if self.supports_system_role:
+            messages.append(
+                {
+                    "role": "system",
+                    "content": request.system_prompt,
+                }
+            )
+        else:
+            user_text = "\n\n".join(
+                part
+                for part in (
+                    request.system_prompt.strip(),
+                    request.user_prompt.strip(),
+                )
+                if part
+            )
+        messages.append(
+            {
+                "role": "user",
+                # Image-first ordering is compatible with Qwen and is
+                # explicitly recommended for Gemma 4.
+                "content": [
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": data_url},
+                    },
+                    {
+                        "type": "text",
+                        "text": user_text,
+                    },
+                ],
+            }
+        )
+        payload: dict[str, Any] = {
+            "model": self.request_model,
+            "messages": messages,
+        }
+        _apply_chat_generation(payload, generation)
+        extra_body = dict(payload.get("extra_body", {}))
+        template_kwargs = dict(self.chat_template_kwargs)
+        configured_template_kwargs = generation.get(
+            "chat_template_kwargs"
+        )
+        template_kwargs.update(
+            _mapping_values(configured_template_kwargs)
+        )
+        if template_kwargs:
+            extra_body["chat_template_kwargs"] = template_kwargs
+        if extra_body:
+            payload["extra_body"] = extra_body
+        if self.use_json_schema:
+            payload["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "benchmark_response",
+                    "strict": True,
+                    "schema": dict(request.schema),
+                },
+            }
+        return payload
+
+    def _parse_response(
+        self,
+        response: Any,
+        request: InferenceRequest,
+    ) -> InferenceResult:
+        choices = read_field(response, "choices", ())
+        if not choices:
+            raise InferenceTransportError(
+                f"Chat-completions response for model {self.model_id!r} "
+                "did not contain a choice"
+            )
+        choice = choices[0]
+        message = read_field(choice, "message")
+        final_text = extract_text(read_field(message, "content"))
+        if final_text is None:
+            final_text = ""
+
+        usage = _chat_usage(read_field(response, "usage"))
+        full_reasoning, full_source, summary, summary_source = (
+            _chat_reasoning(message)
+        )
+        reasoning = build_reasoning_trace(
+            mode=self.reasoning_capture,
+            full_text=full_reasoning,
+            summary_text=summary,
+            token_count=usage.reasoning_tokens,
+            full_source=full_source,
+            summary_source=summary_source,
+        )
+        provider_model = read_field(response, "model")
+        metadata: dict[str, Any] = {}
+        if isinstance(provider_model, str):
+            metadata["provider_model"] = provider_model
+
+        return InferenceResult(
+            model_id=self.model_id,
+            final_text=final_text,
+            reasoning=reasoning,
+            usage=usage,
+            request_id=request.request_id,
+            provider_response_id=_optional_string(
+                read_field(response, "id")
+            ),
+            finish_reason=_optional_string(
+                read_field(choice, "finish_reason")
+            ),
+            metadata=metadata,
+        )
+
+
+def _apply_chat_generation(
+    payload: dict[str, Any],
+    generation: dict[str, Any],
+) -> None:
+    direct_fields = (
+        "reasoning_effort",
+        "temperature",
+        "top_p",
+        "presence_penalty",
+        "frequency_penalty",
+        "seed",
+        "stop",
+    )
+    for field_name in direct_fields:
+        value = generation.get(field_name)
+        if value is not None:
+            payload[field_name] = value
+
+    max_tokens = generation.get("max_output_tokens")
+    if max_tokens is None:
+        max_tokens = generation.get("max_new_tokens")
+    if max_tokens is None:
+        max_tokens = generation.get("max_tokens")
+    if max_tokens is not None:
+        payload["max_tokens"] = max_tokens
+
+    extra_body: dict[str, Any] = {}
+    for field_name in ("top_k", "min_p", "repetition_penalty"):
+        value = generation.get(field_name)
+        if value is not None:
+            extra_body[field_name] = value
+    if extra_body:
+        payload["extra_body"] = extra_body
+
+
+def _chat_reasoning(
+    message: Any,
+) -> tuple[str | None, str | None, str | None, str | None]:
+    reasoning = read_field(message, "reasoning")
+    legacy = read_field(message, "reasoning_content")
+
+    full_text: str | None = None
+    full_source: str | None = None
+    summary_text: str | None = None
+    summary_source: str | None = None
+
+    if reasoning is not None:
+        if isinstance(reasoning, str):
+            full_text = extract_text(reasoning)
+        else:
+            full_text = extract_text(
+                read_field(reasoning, "content")
+                or read_field(reasoning, "text")
+            )
+            summary_text = extract_text(
+                read_field(reasoning, "summary")
+            )
+        if full_text:
+            full_source = "reasoning"
+        if summary_text:
+            summary_source = "reasoning.summary"
+
+    if full_text is None:
+        full_text = extract_text(legacy)
+        if full_text:
+            full_source = "reasoning_content"
+
+    direct_summary = extract_text(read_field(message, "reasoning_summary"))
+    if direct_summary:
+        summary_text = direct_summary
+        summary_source = "reasoning_summary"
+
+    return full_text, full_source, summary_text, summary_source
+
+
+def _chat_usage(value: Any) -> TokenUsage:
+    input_tokens = safe_optional_int(
+        read_field(value, "prompt_tokens")
+        or read_field(value, "input_tokens")
+    )
+    output_tokens = safe_optional_int(
+        read_field(value, "completion_tokens")
+        or read_field(value, "output_tokens")
+    )
+    total_tokens = safe_optional_int(read_field(value, "total_tokens"))
+    details = (
+        read_field(value, "completion_tokens_details")
+        or read_field(value, "output_tokens_details")
+    )
+    reasoning_tokens = safe_optional_int(
+        read_field(details, "reasoning_tokens")
+    )
+    return TokenUsage(
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        total_tokens=total_tokens,
+        reasoning_tokens=reasoning_tokens,
+    )
+
+
+def _optional_string(value: Any) -> str | None:
+    return value if isinstance(value, str) and value else None
+
+
+def _mapping_values(value: Any) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if isinstance(value, Mapping):
+        return dict(value)
+    if is_dataclass(value) and not isinstance(value, type):
+        return asdict(value)
+    return {}

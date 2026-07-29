@@ -2,9 +2,9 @@
 
 benchmark:
   id: evidence_grounded_diagnosis
-  version: 1.0.1
+  version: 1.1.0
   task: evidence_grounded_visual_diagnosis
-  status: dataset_ready
+  status: ready_for_execution
   description: >
     Evaluates whether a vision-language model identifies dermatologist-defined
     morphology concepts, expresses them as an observation-only clinical
@@ -127,6 +127,13 @@ taxonomy:
 
 dataset:
   manifest: data/benchmarks/evidence_grounded_diagnosis_v1/datasets/external/evidence_grounded_ddi.parquet
+  default_evaluation_set: external_ddi_evidence
+  evaluation_sets:
+    external_ddi_evidence:
+      manifest: data/benchmarks/evidence_grounded_diagnosis_v1/datasets/external/evidence_grounded_ddi.parquet
+      role: external
+      description: >
+        Frozen DDI cohort joined to SKINCON morphology and SkinCAP captions.
   release_manifest: data/benchmarks/evidence_grounded_diagnosis_v1/release/benchmark_release_v1.yaml
   evaluation_origin: external
   source_manifest: data/manifests/ddi_v3.parquet
@@ -258,6 +265,7 @@ metrics:
     - id: description_bertscore
       reference_field: caption_zh_polish_en
       role: secondary
+      implementation_status: deferred
       higher_is_better: true
       description: >
         Semantic similarity to the SkinCAP caption. Report separately because
@@ -349,14 +357,10 @@ semantic_validation:
   - moderate means a top-ranked confidence from 0.40 up to but not including 0.75.
   - high means a top-ranked confidence of at least 0.75.
 
-review_recommendation:
-  field: needs_in_person_review
-  evaluation: audit_only
-  reason: >
-    DDI and SKINCON do not provide case-level referral or urgency ground truth.
-    Do not treat malignancy as a complete proxy for clinical review urgency.
 
 subgroup_evaluation:
+  enabled: false
+  implementation_status: deferred
   metadata_usage: evaluation_only
   include_metadata_in_model_prompt: false
   minimum_subgroup_samples: 30
@@ -384,6 +388,8 @@ validation:
   unsupported_finding_policy: score_as_reference_absent_not_confirmed_hallucination
 
 comparison:
+  enabled: false
+  implementation_status: deferred
   stages:
     - base_model
     - post_trained_model
@@ -394,12 +400,16 @@ comparison:
     resamples: 10000
 
 execution:
-  implementation_status: not_implemented
+  implementation_status: ready
+  max_output_tokens: 8192
   batch_size: 8
   resume: true
   save_raw_responses: true
   save_rendered_prompts: true
   fail_fast_on_invalid_output: false
 
+structured_output:
+  mode: prompt_only
+
 output:
-  directory: outputs/benchmark_runs/evidence_grounded_diagnosis
+  directory: outputs/benchmark_runs

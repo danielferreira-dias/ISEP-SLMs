@@ -23,13 +23,13 @@ release:
   configuration:
     benchmark:
       path: configs/benchmarks/evidence_grounded_diagnosis.yaml
-      sha256: 9fd1c13a577e402bf13bc17710e713b89a659103071baaf8a6b4aac42329e32a
+      sha256: b417860533c4eb3be13607e0d0a0fd48bad019eb2068f0f263feb9a8a5ac537e
     prompt:
       path: prompts/benchmarks/evidence_grounded_diagnosis.yaml
-      sha256: bfb71109ca0aeed6fccc564b5246021219cee9fd85170db2eda8dda9b5e39f87
+      sha256: a4e8eec6ae70a8f9bee3ab50cbe8c4f381ed00ac77e76b1de436b29def33ce83
     output_schema:
       path: schemas/evidence_grounded_diagnosis.schema.json
-      sha256: 3e2e29da4cb4eb239e91b5ecd2ad3202e43712f689003cdea01d1bb2f6c6aafe
+      sha256: f6bd5035dfb0283070374f54ca4200ea77524243b0e4a510af3dbdf4a27fe54c
     disease_taxonomy:
       path: configs/taxonomies/diseases.yaml
       sha256: 46eee9e3af0bbf363b443cd17ede21e275a8eeb68c6a5aba4baf9b9c6be272a7

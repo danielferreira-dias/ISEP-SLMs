@@ -31,7 +31,7 @@ release:
       sha256: 46eee9e3af0bbf363b443cd17ede21e275a8eeb68c6a5aba4baf9b9c6be272a7
     benchmark:
       path: configs/benchmarks/visual_top_k.yaml
-      sha256: c24c2b0447351a52da730c48fe3c47e9f2bda6b9f7fa4dde1aefd7bcb421b422
+      sha256: 055d45cb3b38d58ad7bd3544667c75cc4adb9171e237e308e26c26dbcde294ff
     prompt:
       path: prompts/benchmarks/top_k.yaml
       sha256: be78dfe81a4c701e46547f9273cecc2d41ac722709936ce231c24eeb9d55006b

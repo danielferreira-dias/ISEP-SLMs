@@ -35,10 +35,18 @@ processor:
   revision: main
 
 backend:
-  type: local
-  engine: transformers
-  model_class: AutoModelForMultimodalLM
-  pipeline_task: image-text-to-text
+  default_profile: vllm
+  profiles:
+    vllm:
+      type: local
+      engine: vllm
+      device: cuda
+      dtype: bfloat16
+      max_model_len: 16384
+      gpu_memory_utilization: 0.9
+      limit_images_per_prompt: 1
+      managed: true
+      managed_allowed: true
 
 reasoning:
   enabled: true

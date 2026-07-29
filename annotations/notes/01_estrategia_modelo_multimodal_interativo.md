@@ -72,8 +72,7 @@ O segundo benchmark é mais exigente e avalia, na mesma execução:
 2. descrição clínica da imagem;
 3. diagnóstico diferencial;
 4. ligação explícita entre diagnósticos e achados;
-5. confiança;
-6. recomendação de avaliação presencial, apenas para auditoria.
+5. confiança.
 
 Um output esperado tem a forma:
 
@@ -100,8 +99,7 @@ Um output esperado tem a forma:
       "supporting_finding_ids": ["F1", "F2"]
     }
   ],
-  "case_confidence": "moderate",
-  "needs_in_person_review": true
+  "case_confidence": "moderate"
 }
 ```
 

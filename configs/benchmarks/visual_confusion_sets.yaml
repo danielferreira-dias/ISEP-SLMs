@@ -2,7 +2,7 @@
 
 benchmark:
   id: visual_disease_confusion_sets
-  version: 0.1.0
+  version: 0.2.0
   task: visual_disease_contrast_ranking
   status: provisional_pending_clinical_review
   description: >
@@ -34,6 +34,13 @@ taxonomy:
 dataset:
   source_manifest: data/benchmarks/visual_top_k_v1/datasets/internal/internal_benchmark_1000.parquet
   task_manifest: data/benchmarks/visual_confusion_sets_v1/datasets/internal/confusion_tasks.parquet
+  default_evaluation_set: paired_confusion_tasks
+  evaluation_sets:
+    paired_confusion_tasks:
+      manifest: data/benchmarks/visual_confusion_sets_v1/datasets/internal/confusion_tasks.parquet
+      role: internal_paired
+      description: >
+        Fixed paired low- and high-confusability tasks for 414 unique images.
   task_id_column: task_id
   pair_id_column: pair_id
   sample_id_column: sample_id
@@ -181,14 +188,18 @@ comparison:
     cluster: pair_id
 
 execution:
+  max_output_tokens: 4096
   batch_size: 8
   resume: true
   save_raw_responses: true
   save_rendered_prompts: true
   fail_fast_on_invalid_output: false
 
+structured_output:
+  mode: prompt_only
+
 output:
-  directory: outputs/benchmark_runs/visual_confusion_sets
+  directory: outputs/benchmark_runs
 
 release:
   id: visual_confusion_sets_dataset_v1

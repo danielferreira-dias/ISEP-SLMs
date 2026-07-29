@@ -2,7 +2,7 @@
 
 benchmark:
   id: visual_top_k_closed_set
-  version: 3.1.1
+  version: 3.2.0
   task: visual_disease_ranking
   description: >
     Evaluates how accurately a vision-language model ranks dermatological diseases from a fixed taxonomy. The same configuration must be used for
@@ -23,6 +23,7 @@ taxonomy:
 
 dataset:
   manifest: data/benchmarks/visual_top_k_v1/datasets/internal/internal_benchmark_1000.parquet
+  default_evaluation_set: internal_benchmark_1000
   split_config: configs/datasets/visual_top_k_split.yaml
   manifest_schema: configs/datasets/manifest_schema.yaml
   dataset_catalog: configs/datasets/catalog.yaml
@@ -173,11 +174,15 @@ comparison:
     resamples: 10000
 
 execution:
+  max_output_tokens: 4096
   batch_size: 8
   resume: true
   save_raw_responses: true
   save_rendered_prompts: true
   fail_fast_on_invalid_output: false
+
+structured_output:
+  mode: prompt_only
 
 output:
   directory: outputs/benchmark_runs

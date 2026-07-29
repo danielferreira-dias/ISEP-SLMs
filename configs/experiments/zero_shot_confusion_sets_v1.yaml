@@ -4,7 +4,7 @@ schema_version: 1
 
 experiment:
   id: zero_shot_confusion_sets_v1
-  version: 0.1.0
+  version: 0.2.0
   type: zero_shot_evaluation
   status: provisional_pending_clinical_review
   description: >
@@ -13,6 +13,7 @@ experiment:
 
 benchmark:
   config: configs/benchmarks/visual_confusion_sets.yaml
+  evaluation_set: paired_confusion_tasks
 
 models:
   - config: configs/models/qwen_3_6_27b.yaml
@@ -33,12 +34,6 @@ models:
     enabled: true
   - config: configs/models/medgemma_1_5_4b.yaml
     enabled: true
-
-overrides:
-  generation:
-    max_output_tokens: 128
-  structured_output:
-    mode: prompt_only
 
 repetitions:
   count: 1

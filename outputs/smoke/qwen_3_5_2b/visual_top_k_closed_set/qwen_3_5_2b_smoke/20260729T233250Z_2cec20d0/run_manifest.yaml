@@ -1,0 +1,53 @@
+schema_version: 1
+model:
+  id: qwen_3_5_2b_smoke
+  source: Qwen/Qwen3.5-2B
+benchmark:
+  id: visual_top_k_closed_set
+  version: 3.2.0
+  task: visual_disease_ranking
+backend:
+  profile: vllm
+  type: local
+  engine: vllm
+  api_style: null
+  server_mode: endpoint
+evaluation:
+  evaluation_set: internal_benchmark_1000
+  selected_units: 10
+  selected_tasks: 10
+  seed: 42
+  max_output_tokens: 4096
+  reasoning_capture: available
+  structured_output: prompt_only
+status: completed
+identity:
+  model_id: qwen_3_5_2b_smoke
+  model_config_sha256: 4d3f8b47f94ef9fe0e2f50d084b64cb674cd0389b57741faa17fbd26a059dee4
+  backend_profile: vllm
+  benchmark_id: visual_top_k_closed_set
+  benchmark_version: 3.2.0
+  benchmark_config_sha256: 055d45cb3b38d58ad7bd3544667c75cc4adb9171e237e308e26c26dbcde294ff
+  prompt_sha256: be78dfe81a4c701e46547f9273cecc2d41ac722709936ce231c24eeb9d55006b
+  schema_sha256: 587b65b8375a630bb87c81ef179e4e7aa5445e43e3e987199ce664160a8edc23
+  taxonomy_sha256: 9e6d249c1d03ba5b920deb683cb5a975503d293b2ee41a7be864d59bbfa8a1f8
+  evaluation_set: internal_benchmark_1000
+  manifest_sha256: 9c0b10c9419f4a85e6aebba1bd118cc028c24d475280ead0995468cfd26ea6aa
+  release_sha256: 9c0b10c9419f4a85e6aebba1bd118cc028c24d475280ead0995468cfd26ea6aa
+  selection_sha256: f794edd7ffe3d058adf753863c2a9b0bc7e43edcad35a44bcea5de43aacd3e10
+  seed: '42'
+  server_mode: endpoint
+  runtime_binding_sha256: 6bb040900f621a8ca7ed6b7e227dc43cc120185a4b806b5840831e4931cdb9b0
+  reasoning_capture: available
+  batch_size: '1'
+  max_output_tokens: '4096'
+  structured_output_mode: prompt_only
+started_at: '2026-07-29T23:32:50.434166+00:00'
+finished_at: '2026-07-29T23:32:55.834879+00:00'
+counts:
+  backend_error: 10
+  image_error: 0
+  invalid_output: 0
+  ok: 0
+  truncated_output: 0
+  total: 10

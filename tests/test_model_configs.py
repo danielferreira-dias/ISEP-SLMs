@@ -7,6 +7,13 @@ import unittest
 
 import yaml
 
+from src.config.models import (
+    AzureModelConfig,
+    LocalModelConfig,
+    list_model_configs,
+    load_model_config,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -84,20 +91,17 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
                 config["reasoning"]["exclude_from_structured_output"]
             )
 
-    def test_minicpm_uses_native_transformers_recipe(self) -> None:
+    def test_minicpm_uses_managed_vllm_profile(self) -> None:
         config = _load_model("minicpm_v_4_6.yaml")
         self.assertEqual(
             config["source"]["repo_id"],
             "openbmb/MiniCPM-V-4.6",
         )
-        self.assertEqual(
-            config["backend"]["model_class"],
-            "AutoModelForImageTextToText",
-        )
-        self.assertEqual(
-            config["backend"]["minimum_transformers_version"],
-            "5.7.0",
-        )
+        profile = config["backend"]["profiles"]["vllm"]
+        self.assertEqual(config["backend"]["default_profile"], "vllm")
+        self.assertEqual(profile["engine"], "vllm")
+        self.assertEqual(profile["max_model_len"], 16384)
+        self.assertEqual(profile["limit_images_per_prompt"], 1)
         self.assertFalse(config["security"]["trust_remote_code"])
         self.assertEqual(config["processor"]["image"]["downsample_mode"], "4x")
         self.assertEqual(
@@ -117,8 +121,8 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
         self.assertEqual(config["model"]["family"], "medgemma")
         self.assertEqual(config["model"]["domain"], "medical")
         self.assertEqual(
-            config["backend"]["model_class"],
-            "AutoModelForImageTextToText",
+            config["backend"]["profiles"]["vllm"]["engine"],
+            "vllm",
         )
         self.assertEqual(
             config["generation"],
@@ -148,20 +152,110 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
             experiment["teacher_selection"]["candidate_model_ids"],
         )
 
-    def test_gemma_e4b_uses_official_transformers_model(self) -> None:
+    def test_gemma_e4b_uses_official_hugging_face_model(self) -> None:
         config = _load_model("gemma_4_e4b_it.yaml")
         self.assertEqual(config["model"]["id"], "gemma_4_e4b_it")
         self.assertEqual(
             config["source"]["repo_id"],
             "google/gemma-4-E4B-it",
         )
-        self.assertEqual(config["backend"]["engine"], "transformers")
         self.assertEqual(
-            config["backend"]["model_class"],
-            "AutoModelForMultimodalLM",
+            config["backend"]["profiles"]["vllm"]["engine"],
+            "vllm",
         )
         self.assertNotIn("artifact", config)
         self.assertTrue(config["usage"]["fine_tuning"])
+
+
+class TypedModelConfigTests(unittest.TestCase):
+    def test_all_nine_models_load_into_frozen_typed_configs(self) -> None:
+        configs = list_model_configs(root=ROOT)
+
+        self.assertEqual(len(configs), 9)
+        self.assertEqual(len({item.model.id for item in configs}), 9)
+        local = [
+            item
+            for item in configs
+            if isinstance(item, LocalModelConfig)
+        ]
+        api = [
+            item
+            for item in configs
+            if isinstance(item, AzureModelConfig)
+        ]
+        self.assertEqual(len(local), 7)
+        self.assertEqual(len(api), 2)
+        for config in local:
+            profile = config.backend.active_profile
+            self.assertEqual(profile.engine, "vllm")
+            self.assertTrue(profile.managed)
+            self.assertEqual(profile.max_model_len, 16384)
+            self.assertEqual(profile.limit_images_per_prompt, 1)
+
+    def test_kimi_profiles_and_azure_credentials_are_independent(self) -> None:
+        kimi = load_model_config("kimi_k2_6", root=ROOT)
+        gpt = load_model_config("gpt_5_6_luna", root=ROOT)
+
+        self.assertEqual(
+            kimi.backend.active_profile.api_style,
+            "chat_completions",
+        )
+        self.assertEqual(
+            gpt.backend.active_profile.api_style,
+            "responses",
+        )
+        self.assertNotEqual(kimi.endpoint_env, gpt.endpoint_env)
+        self.assertNotEqual(kimi.api_key_env, gpt.api_key_env)
+        for config in (kimi, gpt):
+            self.assertEqual(config.generation.profile, "provider_default")
+            self.assertEqual(config.generation.reasoning_effort, "high")
+            self.assertIsNone(config.generation.do_sample)
+            self.assertIsNone(config.generation.temperature)
+            self.assertIsNone(config.generation.top_p)
+            self.assertIsNone(config.generation.seed)
+        endpoint = load_model_config(
+            "kimi_k2_6",
+            root=ROOT,
+            backend_profile="vllm_endpoint",
+        )
+        self.assertEqual(
+            endpoint.backend.active_profile.engine,
+            "vllm_endpoint",
+        )
+        self.assertEqual(
+            endpoint.backend.active_profile.api_style,
+            "chat_completions",
+        )
+
+    def test_model_can_be_loaded_by_repo_relative_path(self) -> None:
+        config = load_model_config(
+            "configs/models/qwen_small_4b.yaml",
+            root=ROOT,
+        )
+        self.assertEqual(config.model.id, "qwen_3_5_4b")
+
+    def test_qwen_2b_smoke_config_is_multimodal_and_not_shortlisted(
+        self,
+    ) -> None:
+        config = load_model_config(
+            "configs/models/smoke/qwen_3_5_2b.yaml",
+            root=ROOT,
+        )
+
+        self.assertEqual(config.model.id, "qwen_3_5_2b_smoke")
+        self.assertEqual(config.source.repo_id, "Qwen/Qwen3.5-2B")
+        self.assertIn("image", config.capabilities.modalities)
+        self.assertEqual(config.reasoning.parser, "qwen3")
+        self.assertTrue(
+            config.reasoning.chat_template_kwargs.enable_thinking
+        )
+        self.assertNotIn(
+            config.model.id,
+            {
+                item.model.id
+                for item in list_model_configs(root=ROOT)
+            },
+        )
 
 
 def _load_model(filename: str) -> dict:

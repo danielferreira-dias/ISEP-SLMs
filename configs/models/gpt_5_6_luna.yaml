@@ -9,6 +9,11 @@ model:
   evaluation_role: teacher_candidate
   training_stage: provider_managed
   task_adaptation_stage: none
+  domain: general
+
+usage:
+  benchmark: true
+  fine_tuning: false
 
 capabilities:
   modalities:
@@ -24,7 +29,20 @@ source:
   model_name: gpt-5.6-luna
 
 backend:
-  provider: Azure
-  type: api
-  api_style: openai_responses
-  api_key_env: OPENAI_API_KEY
+  default_profile: azure
+  profiles:
+    azure:
+      type: api
+      engine: azure_openai
+      api_style: responses
+      endpoint_env: GPT_5_6_LUNA_AZURE_ENDPOINT
+      api_key_env: GPT_5_6_LUNA_AZURE_API_KEY
+      deployment_env: GPT_5_6_LUNA_AZURE_DEPLOYMENT
+      api_version_env: GPT_5_6_LUNA_AZURE_API_VERSION
+
+generation:
+  profile: provider_default
+  reasoning_effort: high
+
+security:
+  trust_remote_code: false

@@ -2,15 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "evidence_grounded_diagnosis.schema.json",
   "title": "Evidence-Grounded Dermatology Diagnosis",
-  "description": "Structured morphology findings, an observation-only clinical description, six ranked diseases, evidence links, confidence, and an audit-only clinical review recommendation.",
+  "description": "Structured morphology findings, an observation-only clinical description, six ranked diseases, evidence links, and confidence.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "findings",
     "clinical_description",
     "differential",
-    "case_confidence",
-    "needs_in_person_review"
+    "case_confidence"
   ],
   "properties": {
     "findings": {
@@ -176,10 +175,6 @@
         "moderate",
         "high"
       ]
-    },
-    "needs_in_person_review": {
-      "type": "boolean",
-      "description": "Audit-only recommendation; no referral ground truth is available in benchmark v1."
     }
   }
 }

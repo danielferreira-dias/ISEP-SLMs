@@ -4,9 +4,9 @@ schema_version: 1
 
 experiment:
   id: zero_shot_evidence_grounded_v1
-  version: 1.0.0
+  version: 1.1.0
   type: zero_shot_evaluation
-  status: dataset_ready_execution_not_implemented
+  status: ready_for_execution
   description: >
     Compares candidate vision-language models on controlled morphology,
     observation-only clinical description, ranked diagnosis, evidence
@@ -65,13 +65,6 @@ cohorts:
   diagnosis:
     scoring_flag: score_diagnosis
     expected_samples: 294
-
-overrides:
-  generation:
-    max_output_tokens: 2048
-
-  structured_output:
-    mode: prompt_only
 
 repetitions:
   count: 1

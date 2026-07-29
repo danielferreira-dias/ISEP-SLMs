@@ -12,11 +12,11 @@ release:
       sha256: 9c0b10c9419f4a85e6aebba1bd118cc028c24d475280ead0995468cfd26ea6aa
     visual_top_k_release:
       path: data/benchmarks/visual_top_k_v1/release/benchmark_release_v1.yaml
-      sha256: e85d29e2486e6fd7fe579145e5b621b8fc0e9c0bf2352d834c3673b12591c34b
+      sha256: 18de5cc2e188c31083a29e62d0f82399981b6c7bce3c2af9ee11fc971ff8b6bd
   configuration:
     benchmark:
       path: configs/benchmarks/visual_confusion_sets.yaml
-      sha256: 08f396ec3bd39df86e038af44792fb5d28bdc26a9f96f1fe9a30796ea1894fa4
+      sha256: 1fa3d82096643c820bf3b5f58606dbe03160d64693f9b4e56ec4eb9ad57b0b70
     confusion_sets:
       path: configs/taxonomies/disease_confusion_sets.yaml
       sha256: c5bf39011b8d53b48751c0de734a69553a691898efcc1267694d637624287a03

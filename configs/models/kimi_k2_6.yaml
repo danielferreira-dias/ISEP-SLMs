@@ -9,6 +9,11 @@ model:
   evaluation_role: teacher_candidate
   training_stage: provider_managed
   task_adaptation_stage: none
+  domain: general
+
+usage:
+  benchmark: true
+  fine_tuning: false
 
 capabilities:
   modalities:
@@ -23,8 +28,27 @@ source:
   model_name: kimi-k2.6
 
 backend:
-  provider: Azure
-  type: api
-  api_style: openai_compatible
-  api_key_env: MOONSHOT_API_KEY
-  base_url_env: MOONSHOT_BASE_URL
+  default_profile: azure
+  profiles:
+    azure:
+      type: api
+      engine: azure_openai
+      api_style: chat_completions
+      endpoint_env: KIMI_K2_6_AZURE_ENDPOINT
+      api_key_env: KIMI_K2_6_AZURE_API_KEY
+      deployment_env: KIMI_K2_6_AZURE_DEPLOYMENT
+      api_version_env: KIMI_K2_6_AZURE_API_VERSION
+    vllm_endpoint:
+      type: api
+      engine: vllm_endpoint
+      api_style: chat_completions
+      base_url_env: KIMI_K2_6_VLLM_BASE_URL
+      api_key_env: KIMI_K2_6_VLLM_API_KEY
+      model_env: KIMI_K2_6_VLLM_MODEL
+
+generation:
+  profile: provider_default
+  reasoning_effort: high
+
+security:
+  trust_remote_code: false
