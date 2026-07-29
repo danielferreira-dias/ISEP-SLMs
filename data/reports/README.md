@@ -54,5 +54,7 @@ artifacts are intentionally calculated only from taxonomy contributors.
 
 Perceptual matches are candidates rather than confirmed duplicates. Pending
 rows already share a leakage group, so a candidate relationship cannot cross
-internal splits. The frozen release and final split validation are stored under
-`data/benchmarks/visual_top_k_v1/`.
+internal splits. The frozen release is stored under
+`data/benchmarks/visual_top_k_v1/`. Model-ready Parquet datasets,
+release-specific reports, and integrity metadata are separated into
+`datasets/`, `reports/`, and `release/`, respectively.

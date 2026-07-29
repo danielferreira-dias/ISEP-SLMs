@@ -1,4 +1,4 @@
-# Small local medical multimodal candidate model.
+# Small local medical multimodal fine-tuning candidate.
 
 schema_version: 1
 
@@ -11,18 +11,25 @@ model:
   task_adaptation_stage: none
   domain: medical
 
+usage:
+  benchmark: true
+  fine_tuning: true
+
 capabilities:
   modalities:
     - text
     - image
   structured_output_modes:
     - prompt_only
+  context_length_tokens: 131072
+  maximum_output_tokens: 8192
 
 source:
   type: huggingface
   repo_id: google/medgemma-1.5-4b-it
   revision: main
   access: gated
+  license: health-ai-developer-foundations
   terms: health_ai_developer_foundations
 
 processor:
@@ -32,6 +39,12 @@ processor:
 backend:
   type: local
   engine: transformers
+  model_class: AutoModelForImageTextToText
+  pipeline_task: image-text-to-text
+
+generation:
+  profile: official_greedy
+  do_sample: false  # Official default since 2026-01-23.
 
 security:
   trust_remote_code: false

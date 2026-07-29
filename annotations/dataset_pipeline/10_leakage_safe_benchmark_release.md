@@ -61,22 +61,24 @@ The release passed:
 
 ## Frozen release
 
-`data/benchmarks/visual_top_k_v1/benchmark_release_v1.yaml` stores SHA-256
-checksums for the source manifests, taxonomy, benchmark, prompt, schema,
-policies, review decisions, generated manifests, and reports. Validation fails
-if any referenced file changes without rebuilding the release.
+`data/benchmarks/visual_top_k_v1/release/benchmark_release_v1.yaml` stores
+SHA-256 checksums for the source manifests, taxonomy, benchmark, prompt,
+schema, policies, review decisions, generated manifests, and reports.
+Validation fails if any referenced file changes without rebuilding the
+release.
 
 ## Outputs
 
-- `train.parquet`, `validation.parquet`, and `internal_test.parquet`
-- `internal_benchmark_1000.parquet` and `internal_test_reserve.parquet`
-- `external_ddi.parquet` and `external_skindisnet.parquet`
-- `split_summary_v1.csv` and `subgroup_summary_v1.csv`
-- `benchmark_1000_balance_v1.csv`
-- `integrity_report_v1.yaml`
-- `benchmark_release_v1.yaml`
+- internal datasets under
+  `data/benchmarks/visual_top_k_v1/datasets/internal/`;
+- external datasets under
+  `data/benchmarks/visual_top_k_v1/datasets/external/`;
+- split and balance reports under
+  `data/benchmarks/visual_top_k_v1/reports/`;
+- integrity and release manifests under
+  `data/benchmarks/visual_top_k_v1/release/`.
 
-All outputs are under `data/benchmarks/visual_top_k_v1/`.
+The root `README.md` documents the purpose and correct use of every artifact.
 
 ## Reproduction
 

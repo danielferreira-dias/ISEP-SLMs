@@ -139,6 +139,9 @@ def build_benchmark_release(
     balance_path = output_directory / config["outputs"][
         "benchmark_1000_balance"
     ]
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    subgroup_path.parent.mkdir(parents=True, exist_ok=True)
+    balance_path.parent.mkdir(parents=True, exist_ok=True)
     summary.to_csv(summary_path, index=False)
     subgroup_summary.to_csv(subgroup_path, index=False)
     benchmark_balance.to_csv(balance_path, index=False)
@@ -890,6 +893,7 @@ def _file_sha256(path: Path) -> str:
 
 
 def _write_yaml(document: dict[str, Any], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
         yaml.safe_dump(
             document,

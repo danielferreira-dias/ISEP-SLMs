@@ -6,6 +6,12 @@ from typing import Literal
 @dataclass(frozen=True, slots=True)
 class GenerationConfig:
     temperature: float = 0.0
+    top_p: float = 1.0
+    top_k: int = 0
+    min_p: float = 0.0
+    presence_penalty: float = 0.0
+    repetition_penalty: float = 1.0
+    do_sample: bool = False
     max_new_tokens: int = 512
     seed: int | None = 42
 

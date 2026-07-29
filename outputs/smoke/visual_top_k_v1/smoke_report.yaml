@@ -2,7 +2,7 @@ smoke_test:
   status: passed
   benchmark_release:
     id: visual_top_k_dataset_v1
-    version: 1.0.0
+    version: 1.0.1
   sample_id: FITZPATRICK17K_C_00f1b7bb9581e91250a2bb224c3321b8
   model_id: deterministic_smoke_backend
   metrics:

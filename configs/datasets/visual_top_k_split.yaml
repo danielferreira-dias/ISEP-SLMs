@@ -4,7 +4,7 @@ schema_version: 1
 
 split:
   id: visual_top_k_split_v1
-  version: 1.0.0
+  version: 1.0.1
   release_date: "2026-07-29"
   seed: 42
   algorithm: greedy_multilabel_group_stratification_v1
@@ -48,22 +48,22 @@ split:
     secondary_feature_weight: 0.25
   outputs:
     directory: data/benchmarks/visual_top_k_v1
-    train: train.parquet
-    validation: validation.parquet
-    internal_test: internal_test.parquet
-    internal_benchmark_1000: internal_benchmark_1000.parquet
-    internal_test_reserve: internal_test_reserve.parquet
-    external_ddi: external_ddi.parquet
-    external_skindisnet: external_skindisnet.parquet
-    split_summary: split_summary_v1.csv
-    subgroup_summary: subgroup_summary_v1.csv
-    benchmark_1000_balance: benchmark_1000_balance_v1.csv
-    integrity_report: integrity_report_v1.yaml
-    release_manifest: benchmark_release_v1.yaml
+    train: datasets/internal/train.parquet
+    validation: datasets/internal/validation.parquet
+    internal_test: datasets/internal/internal_test.parquet
+    internal_benchmark_1000: datasets/internal/internal_benchmark_1000.parquet
+    internal_test_reserve: datasets/internal/internal_test_reserve.parquet
+    external_ddi: datasets/external/external_ddi.parquet
+    external_skindisnet: datasets/external/external_skindisnet.parquet
+    split_summary: reports/split_summary_v1.csv
+    subgroup_summary: reports/subgroup_summary_v1.csv
+    benchmark_1000_balance: reports/benchmark_1000_balance_v1.csv
+    integrity_report: release/integrity_report_v1.yaml
+    release_manifest: release/benchmark_release_v1.yaml
 
 release:
   id: visual_top_k_dataset_v1
-  version: 1.0.0
+  version: 1.0.1
   status: frozen
   taxonomy: configs/taxonomies/diseases.yaml
   benchmark: configs/benchmarks/visual_top_k.yaml

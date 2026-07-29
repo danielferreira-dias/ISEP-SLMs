@@ -10,6 +10,10 @@ model:
   training_stage: post_trained
   task_adaptation_stage: none
 
+usage:
+  benchmark: true
+  fine_tuning: false
+
 capabilities:
   modalities:
     - text
@@ -21,6 +25,8 @@ source:
   type: huggingface
   repo_id: Qwen/Qwen3.6-27B
   revision: main
+  access: public
+  license: apache-2.0
 
 processor:
   repo_id: Qwen/Qwen3.6-27B
@@ -29,6 +35,25 @@ processor:
 backend:
   type: local
   engine: transformers
+  model_class: AutoModelForMultimodalLM
+  pipeline_task: image-text-to-text
+
+reasoning:
+  enabled: true
+  parser: qwen3
+  exclude_from_structured_output: true
+  chat_template_kwargs:
+    enable_thinking: true
+
+generation:
+  profile: thinking_general_tasks
+  do_sample: true
+  temperature: 1.0
+  top_p: 0.95
+  top_k: 20
+  min_p: 0.0
+  presence_penalty: 0.0
+  repetition_penalty: 1.0  # Neutral; equivalent to disabled.
 
 security:
   trust_remote_code: false

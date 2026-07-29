@@ -4,7 +4,7 @@ schema_version: 1
 
 experiment:
   id: zero_shot_visual_v1
-  version: 1.0.0
+  version: 1.0.3
   type: zero_shot_evaluation
   description: >
     Zero-shot comparison of small candidate models and potential reference
@@ -24,10 +24,22 @@ models:
   - config: configs/models/gpt_5_6_luna.yaml
     enabled: true
 
-  - config: configs/models/qwen_small_2b.yaml
+  - config: configs/models/gemma_4_31b_it.yaml
+    enabled: true
+
+  - config: configs/models/qwen_small_9b.yaml
     enabled: true
 
   - config: configs/models/qwen_small_4b.yaml
+    enabled: true
+
+  - config: configs/models/gemma_4_e4b_it.yaml
+    enabled: true
+
+  - config: configs/models/minicpm_v_4_6.yaml
+    enabled: true
+
+  - config: configs/models/medgemma_1_5_4b.yaml
     enabled: true
 
 teacher_selection:
@@ -38,6 +50,7 @@ teacher_selection:
     - qwen_3_6_27b
     - kimi_k2_6
     - gpt_5_6_luna
+    - gemma_4_31b_it
   criteria:
     - diagnostic_accuracy
     - structured_output_reliability
@@ -46,8 +59,6 @@ teacher_selection:
 
 overrides:
   generation:
-    temperature: 0.0
-    do_sample: false
     max_output_tokens: 256
 
   structured_output:

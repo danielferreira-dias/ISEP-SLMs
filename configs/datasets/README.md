@@ -59,16 +59,18 @@ conservative candidates: they remain included but share a
 `leakage_group_id` until reviewed.
 
 The same command creates the frozen `visual_top_k_dataset_v1` release under
-`data/benchmarks/visual_top_k_v1/`. Its release manifest records checksums for
-the source manifests, configurations, review decisions, and generated
-artifacts.
+`data/benchmarks/visual_top_k_v1/`. Model-ready Parquet files are separated
+into `datasets/internal/` and `datasets/external/`; human-readable summaries
+are stored under `reports/`, and integrity metadata under `release/`. Its
+release manifest records checksums for the source manifests, configurations,
+review decisions, and generated artifacts.
 
 The primary paired pre-training/post-training evaluation uses
-`internal_benchmark_1000.parquet`: exactly 1,000 images from 1,000 distinct
-internal-test leakage groups. Age, sex/gender, skin tone, race/ethnicity,
-disease, dataset, and missingness distributions are audited in
-`benchmark_1000_balance_v1.csv`. Demographic values are never included in the
-model prompt.
+`datasets/internal/internal_benchmark_1000.parquet`: exactly 1,000 images from
+1,000 distinct internal-test leakage groups. Age, sex/gender, skin tone,
+race/ethnicity, disease, dataset, and missingness distributions are audited in
+`reports/benchmark_1000_balance_v1.csv`. Demographic values are never included
+in the model prompt.
 
 The combined development pool retains out-of-scope rows with their `include`
 and `exclusion_reason` fields. Every non-empty source diagnosis receives a

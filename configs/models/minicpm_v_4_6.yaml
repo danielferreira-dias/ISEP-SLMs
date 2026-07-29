@@ -1,4 +1,4 @@
-# Small local multimodal candidate model.
+# Small local multimodal fine-tuning candidate.
 
 schema_version: 1
 
@@ -10,6 +10,10 @@ model:
   training_stage: post_trained
   task_adaptation_stage: none
   domain: general
+
+usage:
+  benchmark: true
+  fine_tuning: true
 
 capabilities:
   modalities:
@@ -24,14 +28,30 @@ source:
   repo_id: openbmb/MiniCPM-V-4.6
   revision: main
   access: public
+  license: apache-2.0
 
 processor:
   repo_id: openbmb/MiniCPM-V-4.6
   revision: main
+  image:
+    profile: fine_detail
+    downsample_mode: 4x
+    max_slice_nums: 36
 
 backend:
   type: local
   engine: transformers
+  model_class: AutoModelForImageTextToText
+  pipeline_task: image-text-to-text
+  minimum_transformers_version: 5.7.0
+
+generation:
+  profile: official_default
+  do_sample: true
+  temperature: 0.7
+  top_p: 1.0
+  top_k: 0
+  repetition_penalty: 1.0
 
 security:
   trust_remote_code: false

@@ -1,6 +1,6 @@
 integrity:
   split_id: visual_top_k_split_v1
-  split_version: 1.0.0
+  split_version: 1.0.1
   algorithm: greedy_multilabel_group_stratification_v1
   seed: 42
   passed: true

@@ -1,35 +1,38 @@
-# Local benchmark candidate model.
+# Small local multimodal fine-tuning candidate.
 
 schema_version: 1
 
 model:
-  id: qwen_3_5_4b
-  display_name: Qwen 3.5 4B
-  family: qwen
+  id: gemma_4_e4b_it
+  display_name: Gemma 4 E4B IT
+  family: gemma
   evaluation_role: candidate
   training_stage: post_trained
   task_adaptation_stage: none
+  domain: general
 
 usage:
   benchmark: true
-  fine_tuning: false
+  fine_tuning: true
 
 capabilities:
   modalities:
     - text
     - image
+    - audio
   structured_output_modes:
     - prompt_only
+  context_length_tokens: 131072
 
 source:
   type: huggingface
-  repo_id: Qwen/Qwen3.5-4B
+  repo_id: google/gemma-4-E4B-it
   revision: main
   access: public
   license: apache-2.0
 
 processor:
-  repo_id: Qwen/Qwen3.5-4B
+  repo_id: google/gemma-4-E4B-it
   revision: main
 
 backend:
@@ -40,19 +43,17 @@ backend:
 
 reasoning:
   enabled: true
-  parser: qwen3
+  parser: gemma4
   exclude_from_structured_output: true
   chat_template_kwargs:
     enable_thinking: true
 
 generation:
-  profile: thinking_general_tasks
+  profile: gemma_4_recommended
   do_sample: true
   temperature: 1.0
   top_p: 0.95
-  top_k: 20
-  min_p: 0.0
-  presence_penalty: 1.5
+  top_k: 64
   repetition_penalty: 1.0  # Neutral; equivalent to disabled.
 
 security:

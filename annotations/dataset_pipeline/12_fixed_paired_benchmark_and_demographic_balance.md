@@ -19,10 +19,10 @@ The source is the sealed `internal_test` split:
 
 The selection creates:
 
-- `internal_benchmark_1000.parquet`: 1,000 images from 1,000 distinct leakage
-  groups;
-- `internal_test_reserve.parquet`: one representative image from each of the
-  remaining 63 groups.
+- `datasets/internal/internal_benchmark_1000.parquet`: 1,000 images from 1,000
+  distinct leakage groups;
+- `datasets/internal/internal_test_reserve.parquet`: one representative image
+  from each of the remaining 63 groups.
 
 The source internal test is retained unchanged for audit. The benchmark and
 reserve reconstruct all 1,063 internal-test groups without overlap.
@@ -108,8 +108,9 @@ missingness and avoid claims about the full benchmark population.
 
 ## Distribution audit
 
-`benchmark_1000_balance_v1.csv` compares the one-case-per-group internal test
-with the selected benchmark. Maximum absolute distribution drift is:
+`reports/benchmark_1000_balance_v1.csv` compares the one-case-per-group
+internal test with the selected benchmark. Maximum absolute distribution
+drift is:
 
 - dataset: 0.31 percentage points;
 - disease: 0.58 percentage points;

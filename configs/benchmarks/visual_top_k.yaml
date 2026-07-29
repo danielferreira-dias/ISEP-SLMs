@@ -2,7 +2,7 @@
 
 benchmark:
   id: visual_top_k_closed_set
-  version: 3.1.0
+  version: 3.1.1
   task: visual_disease_ranking
   description: >
     Evaluates how accurately a vision-language model ranks dermatological diseases from a fixed taxonomy. The same configuration must be used for
@@ -22,7 +22,7 @@ taxonomy:
   expected_size: 21
 
 dataset:
-  manifest: data/benchmarks/visual_top_k_v1/internal_benchmark_1000.parquet
+  manifest: data/benchmarks/visual_top_k_v1/datasets/internal/internal_benchmark_1000.parquet
   split_config: configs/datasets/visual_top_k_split.yaml
   manifest_schema: configs/datasets/manifest_schema.yaml
   dataset_catalog: configs/datasets/catalog.yaml
@@ -41,26 +41,26 @@ dataset:
     that pass the disease-inclusion and leakage-prevention policies may enter this generated test manifest.
   evaluation_sets:
     internal_benchmark_1000:
-      manifest: data/benchmarks/visual_top_k_v1/internal_benchmark_1000.parquet
+      manifest: data/benchmarks/visual_top_k_v1/datasets/internal/internal_benchmark_1000.parquet
       role: internal_primary
       description: >
         Fixed paired benchmark of 1,000 independent internal-test groups. The
         same samples are used for the pre-training and post-training model
         evaluations.
     internal_test:
-      manifest: data/benchmarks/visual_top_k_v1/internal_test.parquet
+      manifest: data/benchmarks/visual_top_k_v1/datasets/internal/internal_test.parquet
       role: internal_full_audit
       description: >
         Complete held-out internal-test split from which the fixed 1,000-case
         paired benchmark is selected.
     external_ddi:
-      manifest: data/benchmarks/visual_top_k_v1/external_ddi.parquet
+      manifest: data/benchmarks/visual_top_k_v1/datasets/external/external_ddi.parquet
       role: external
       description: >
         External evaluation on eligible DDI images using the same fixed
         taxonomy and prediction schema.
     external_skindisnet:
-      manifest: data/benchmarks/visual_top_k_v1/external_skindisnet.parquet
+      manifest: data/benchmarks/visual_top_k_v1/datasets/external/external_skindisnet.parquet
       role: external
       description: >
         External evaluation on eligible SkinDisNet images using the same fixed
