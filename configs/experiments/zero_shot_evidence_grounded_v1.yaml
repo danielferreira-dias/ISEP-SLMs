@@ -1,0 +1,90 @@
+# Zero-shot comparison on the evidence-grounded dermatology benchmark.
+
+schema_version: 1
+
+experiment:
+  id: zero_shot_evidence_grounded_v1
+  version: 1.0.0
+  type: zero_shot_evaluation
+  status: dataset_ready_execution_not_implemented
+  description: >
+    Compares candidate vision-language models on controlled morphology,
+    observation-only clinical description, ranked diagnosis, evidence
+    grounding, confidence calibration, and structured-output reliability.
+
+benchmark:
+  config: configs/benchmarks/evidence_grounded_diagnosis.yaml
+  evaluation_set: external_ddi_evidence
+
+models:
+  - config: configs/models/qwen_3_6_27b.yaml
+    enabled: true
+
+  - config: configs/models/kimi_k2_6.yaml
+    enabled: true
+
+  - config: configs/models/gpt_5_6_luna.yaml
+    enabled: true
+
+  - config: configs/models/gemma_4_31b_it.yaml
+    enabled: true
+
+  - config: configs/models/qwen_small_9b.yaml
+    enabled: true
+
+  - config: configs/models/qwen_small_4b.yaml
+    enabled: true
+
+  - config: configs/models/gemma_4_e4b_it.yaml
+    enabled: true
+
+  - config: configs/models/minicpm_v_4_6.yaml
+    enabled: true
+
+  - config: configs/models/medgemma_1_5_4b.yaml
+    enabled: true
+
+selection_policy:
+  evaluation_role: external_final_evaluation
+  teacher_selection_allowed: false
+  prompt_selection_allowed: false
+  checkpoint_selection_allowed: false
+  threshold_selection_allowed: false
+  reason: >
+    DDI is a held-out external evaluation dataset. Using its results to select
+    a teacher, prompt, checkpoint, or threshold would leak external-test
+    information into model development.
+
+cohorts:
+  morphology:
+    scoring_flag: score_morphology
+    expected_samples: 636
+  description:
+    scoring_flag: score_description
+    expected_samples: 635
+  diagnosis:
+    scoring_flag: score_diagnosis
+    expected_samples: 294
+
+overrides:
+  generation:
+    max_output_tokens: 2048
+
+  structured_output:
+    mode: prompt_only
+
+repetitions:
+  count: 1
+  seeds:
+    - 42
+
+tracking:
+  save_environment: true
+  save_git_commit: true
+  save_config_snapshot: true
+  save_model_revisions: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+
+output:
+  directory: outputs/experiments/zero_shot_evidence_grounded_v1
