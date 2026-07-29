@@ -18,10 +18,13 @@ The normalization and selection flow is:
    `manifest_schema.yaml`.
 3. Map source disease names to stable IDs in
    `configs/taxonomies/diseases.yaml`.
-4. Build the cross-dataset coverage report using
+4. Resolve every image, calculate exact and perceptual hashes, remove exact
+   redundancies, apply `duplicate_review.yaml`, and create leakage-safe
+   duplicate groups.
+5. Build the cross-dataset coverage report using
    `disease_inclusion.yaml`.
-5. Split eligible cases by `group_id` and produce the generated benchmark
-   manifest consumed by `configs/benchmarks/visual_top_k.yaml`.
+6. Split eligible cases by `leakage_group_id` and produce the generated
+   benchmark manifest consumed by `configs/benchmarks/visual_top_k.yaml`.
 
 `catalog.yaml` is the registry of all dataset configurations and records
 whether a dataset contributes to disease selection, is reserved for external
@@ -49,13 +52,41 @@ three taxonomy contributors into
 source-label inventory, demographic-availability report, subgroup-support
 report, and preliminary disease-coverage reports under `data/reports/`.
 
+The hashing stage calculates SHA-256 over encoded image bytes and a
+64-bit DCT perceptual hash over orientation-normalized grayscale pixels.
+Exact redundant rows are excluded automatically. Perceptual matches are
+conservative candidates: they remain included but share a
+`leakage_group_id` until reviewed.
+
+The same command creates the frozen `visual_top_k_dataset_v1` release under
+`data/benchmarks/visual_top_k_v1/`. Its release manifest records checksums for
+the source manifests, configurations, review decisions, and generated
+artifacts.
+
+The primary paired pre-training/post-training evaluation uses
+`internal_benchmark_1000.parquet`: exactly 1,000 images from 1,000 distinct
+internal-test leakage groups. Age, sex/gender, skin tone, race/ethnicity,
+disease, dataset, and missingness distributions are audited in
+`benchmark_1000_balance_v1.csv`. Demographic values are never included in the
+model prompt.
+
 The combined development pool retains out-of-scope rows with their `include`
 and `exclusion_reason` fields. Every non-empty source diagnosis receives a
 countable `canonical_source_label`, but only clinically reviewed labels map to
 one of the 21 active benchmark disease IDs. The pool is not a final training
 dataset.
-Final train, validation, and test splits must only be created after mapping
-review, duplicate analysis, and taxonomy approval.
+
+Validate the frozen release without rebuilding it:
+
+```bash
+.venv/bin/python -m src.data_pipeline.splitting --validate-only
+```
+
+Run the benchmark execution smoke test:
+
+```bash
+.venv/bin/python -m src.benchmark.smoke_test
+```
 
 Image bytes are not duplicated during normalization. Direct files use normal
 relative paths, images inside ZIP archives use `zip://` locators, and embedded
@@ -86,6 +117,8 @@ measurement systems rather than converted into a single scale.
 - These datasets contain sensitive or graphic medical images.
 - They are research data, not a substitute for clinical validation.
 - Keep patient, case, lesion, or encounter groups intact when creating splits.
+- Use `leakage_group_id`, which combines source grouping and duplicate
+  relationships, for every final split.
 - Treat SkinDisNet's augmented images as derivatives, not independent cases;
   benchmark only the preprocessed images and split them by patient.
 - Count unique groups when measuring disease support. Do not use raw image

@@ -25,8 +25,13 @@ mapping:
   group_id: Patient_id
   disease_original: Diagnosis
   diagnosis_basis: dermatologist_review
-  age: Age
-  sex_or_gender: Sex
+  demographics:
+    age_value: Age
+    age_unit: years
+    exact_age_years: integer_values_only
+    age_group_standardized: derived_from_age_value
+    sex_or_gender: Sex
+    sex_or_gender_system: source_gender
   anatomical_site: Leision_location
   folder_label: Folder_name
 
@@ -42,6 +47,8 @@ normalization:
     - Never split or count the 11,970 augmented derivatives as independent cases.
     - Split by Patient_id because each patient can contribute multiple images.
     - Atopic dermatitis and tinea corporis are outside the active taxonomy until separately reviewed.
+    - Fractional ages are preserved in source metadata and used only to derive an age band.
+    - The release does not provide race, ethnicity, or skin-tone annotations.
     - The released images were cropped, had their backgrounds removed, and were resized to 512 by 512 pixels.
 
 manifest:

@@ -16,8 +16,19 @@ from src.data_pipeline.adapters import (
     build_scin,
     build_skindisnet,
 )
-from src.data_pipeline.common import DiseaseMapper, load_yaml, write_manifest
+from src.data_pipeline.common import (
+    MANIFEST_ARROW_SCHEMA,
+    MANIFEST_SCHEMA_VERSION,
+    DiseaseMapper,
+    load_yaml,
+    write_manifest,
+)
+from src.data_pipeline.deduplication import deduplicate_manifests
 from src.data_pipeline.reporting import build_reports, write_combined_pool
+from src.data_pipeline.splitting import (
+    build_benchmark_release,
+    validate_benchmark_release,
+)
 
 
 SUPPORTED_BUILDERS: dict[
@@ -71,7 +82,24 @@ def build_pipeline(root: Path, selected_ids: list[str] | None = None) -> dict[st
         print(f"[{dataset_id}] Wrote {row_counts[dataset_id]} rows", flush=True)
 
     contributor_ids = policy["dataset_roles"]["taxonomy_contributors"]
+    deduplication = deduplicate_manifests(
+        manifest_paths=manifest_paths,
+        root=root,
+        policy=policy,
+        progress=_progress,
+    )
+    print(
+        "[deduplication] "
+        f"{deduplication['pair_count']} candidate pairs, "
+        f"{deduplication['group_count']} duplicate groups, "
+        f"{deduplication['exact_exclusion_count']} newly excluded rows",
+        flush=True,
+    )
+    for name, path in deduplication["paths"].items():
+        print(f"[deduplication] {name}: {path.relative_to(root)}", flush=True)
+
     reports: dict[str, Path] = {}
+    benchmark_release: dict[str, Any] | None = None
     combined_path = root / "data/combined/visual_top_k_development_pool_v3.parquet"
     combined_rows: int | None = None
     if all(dataset_id in manifest_paths for dataset_id in contributor_ids):
@@ -93,6 +121,39 @@ def build_pipeline(root: Path, selected_ids: list[str] | None = None) -> dict[st
         )
         for name, path in reports.items():
             print(f"[report] {name}: {path.relative_to(root)}", flush=True)
+        split_document = load_yaml(
+            root / "configs/datasets/visual_top_k_split.yaml"
+        )
+        required_release_ids = set(
+            split_document["split"]["internal"]["source_datasets"]
+        ) | set(split_document["split"]["external"]["datasets"])
+        if required_release_ids.issubset(manifest_paths):
+            benchmark_release = build_benchmark_release(
+                root=root,
+                manifest_paths=manifest_paths,
+            )
+            print(
+                "[benchmark-release] "
+                f"{len(benchmark_release['assignments'])} internal leakage "
+                "groups assigned",
+                flush=True,
+            )
+            for name, path in benchmark_release["paths"].items():
+                print(
+                    f"[benchmark-release] {name}: "
+                    f"{path.relative_to(root)}",
+                    flush=True,
+                )
+        else:
+            missing_release_ids = sorted(
+                required_release_ids - set(manifest_paths)
+            )
+            print(
+                "[benchmark-release] Skipped because manifests were not "
+                "rebuilt: "
+                + ", ".join(missing_release_ids),
+                flush=True,
+            )
     else:
         missing = sorted(set(contributor_ids) - set(manifest_paths))
         print(
@@ -104,9 +165,11 @@ def build_pipeline(root: Path, selected_ids: list[str] | None = None) -> dict[st
     return {
         "manifest_paths": manifest_paths,
         "row_counts": row_counts,
+        "deduplication": deduplication,
         "combined_path": combined_path if combined_rows is not None else None,
         "combined_rows": combined_rows,
         "reports": reports,
+        "benchmark_release": benchmark_release,
     }
 
 
@@ -124,19 +187,32 @@ def validate_outputs(root: Path) -> None:
             paths.append(path)
 
     sample_ids: set[str] = set()
+    duplicate_to_leakage_group: dict[str, str] = {}
     for path in paths:
         table = pq.read_table(path)
         frame = table.select(
             [
+                "schema_version",
                 "sample_id",
                 "group_id",
+                "leakage_group_id",
                 "canonical_source_label",
                 "disease_id",
                 "reference_diagnoses",
                 "mapping_status",
+                "image_sha256",
+                "perceptual_hash",
+                "perceptual_hash_algorithm",
+                "duplicate_group_id",
+                "deduplication_status",
                 "include",
+                "exclusion_reason",
             ]
         ).to_pandas()
+        if table.schema.names != MANIFEST_ARROW_SCHEMA.names:
+            raise ValueError(f"Manifest schema-column mismatch in {path}")
+        if not frame["schema_version"].eq(MANIFEST_SCHEMA_VERSION).all():
+            raise ValueError(f"Manifest schema-version mismatch in {path}")
         if frame["sample_id"].duplicated().any():
             raise ValueError(f"Duplicate sample_id values in {path}")
         overlap = sample_ids.intersection(frame["sample_id"])
@@ -145,6 +221,55 @@ def validate_outputs(root: Path) -> None:
         sample_ids.update(frame["sample_id"])
         if frame["group_id"].isna().any():
             raise ValueError(f"Null group_id values in {path}")
+        if frame["leakage_group_id"].isna().any():
+            raise ValueError(f"Null leakage_group_id values in {path}")
+        inconsistent_source_groups = (
+            frame.groupby("group_id")["leakage_group_id"].nunique() > 1
+        )
+        if inconsistent_source_groups.any():
+            raise ValueError(
+                f"Source group mapped to multiple leakage groups in {path}"
+            )
+        duplicate_rows = frame[frame["duplicate_group_id"].notna()]
+        inconsistent_duplicate_groups = (
+            duplicate_rows.groupby("duplicate_group_id")[
+                "leakage_group_id"
+            ].nunique()
+            > 1
+        )
+        if inconsistent_duplicate_groups.any():
+            raise ValueError(
+                f"Duplicate group mapped to multiple leakage groups in {path}"
+            )
+        for duplicate_group_id, leakage_group_id in (
+            duplicate_rows[
+                ["duplicate_group_id", "leakage_group_id"]
+            ]
+            .drop_duplicates()
+            .itertuples(index=False, name=None)
+        ):
+            previous = duplicate_to_leakage_group.setdefault(
+                duplicate_group_id,
+                leakage_group_id,
+            )
+            if previous != leakage_group_id:
+                raise ValueError(
+                    "Cross-manifest duplicate group mapped to multiple "
+                    f"leakage groups: {duplicate_group_id}"
+                )
+        if frame["image_sha256"].str.fullmatch(r"[0-9a-f]{64}").ne(True).any():
+            raise ValueError(f"Invalid or missing SHA-256 values in {path}")
+        if frame["perceptual_hash"].str.fullmatch(r"[0-9a-f]{16}").ne(True).any():
+            raise ValueError(f"Invalid or missing perceptual hashes in {path}")
+        if frame["perceptual_hash_algorithm"].isna().any():
+            raise ValueError(f"Missing perceptual-hash algorithm in {path}")
+        exact_exclusions = frame["deduplication_status"].isin(
+            ["redundant_exact", "exact_label_conflict"]
+        )
+        if frame.loc[exact_exclusions, "include"].any():
+            raise ValueError(f"Included exact duplicate exclusion in {path}")
+        if frame.loc[exact_exclusions, "exclusion_reason"].isna().any():
+            raise ValueError(f"Exact duplicate exclusion without reason in {path}")
         invalid_include = frame["include"] & frame["disease_id"].isna()
         if invalid_include.any():
             raise ValueError(f"Included rows without disease_id in {path}")
@@ -170,6 +295,21 @@ def validate_outputs(root: Path) -> None:
         print(f"[validate] {path.relative_to(root)}: {len(frame)} rows", flush=True)
 
     print(f"[validate] {len(sample_ids)} globally unique samples", flush=True)
+    split_document = load_yaml(
+        root / "configs/datasets/visual_top_k_split.yaml"
+    )
+    release_path = (
+        root
+        / split_document["split"]["outputs"]["directory"]
+        / split_document["split"]["outputs"]["release_manifest"]
+    )
+    if release_path.exists():
+        release = validate_benchmark_release(root)
+        print(
+            f"[validate] benchmark release {release['id']} "
+            f"version {release['version']}",
+            flush=True,
+        )
 
 
 def _progress(message: str) -> None:

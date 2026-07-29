@@ -1,0 +1,178 @@
+# Audited decisions for duplicate candidates in the dermatology manifests.
+
+schema_version: 1
+
+review:
+  id: dermatology_duplicate_review_v1
+  version: 1.0.0
+  language: en
+  reviewed_at: "2026-07-29"
+  reviewer: codex_assisted_dataset_audit
+  status: partial
+  description: >
+    Records evidence-based decisions for duplicate groups. Decisions resolve
+    image-to-metadata associations; they do not infer a new medical diagnosis
+    from image appearance.
+
+exact_conflict_decisions:
+  - duplicate_group_id: DUPLICATE_61a0781a5b02df36c762
+    status: resolved
+    action: keep_reviewed_canonical
+    canonical_sample_id: PAD_UFES_20_PAT_56_86_479
+    rejected_sample_ids:
+      - PAD_UFES_20_PAT_56_88_274
+    evidence:
+      method: same_lesion_image_comparison
+      supporting_sample_ids:
+        - PAD_UFES_20_PAT_56_86_802
+    rationale: >
+      An independent image assigned to lesion 86 depicts the same lesion as
+      the duplicated image. The lesion-86 SCC association is therefore kept.
+
+  - duplicate_group_id: DUPLICATE_b3cfdff165a42df79ed8
+    status: resolved
+    action: keep_reviewed_canonical
+    canonical_sample_id: PAD_UFES_20_PAT_202_307_424
+    rejected_sample_ids:
+      - PAD_UFES_20_PAT_202_308_721
+    evidence:
+      method: same_lesion_image_comparison
+      supporting_sample_ids:
+        - PAD_UFES_20_PAT_202_307_927
+    rationale: >
+      An independent image assigned to lesion 307 is another view of the same
+      lesion. The lesion-307 BCC association is therefore kept.
+
+  - duplicate_group_id: DUPLICATE_0bef8fdbdaf06af43c49
+    status: resolved
+    action: keep_reviewed_canonical
+    canonical_sample_id: PAD_UFES_20_PAT_691_1311_2
+    rejected_sample_ids:
+      - PAD_UFES_20_PAT_691_3994_671
+    evidence:
+      method: same_lesion_image_comparison
+      supporting_sample_ids:
+        - PAD_UFES_20_PAT_691_1311_686
+    rationale: >
+      The additional lesion-1311 image supports the BCC image-to-lesion
+      association. The conflicting lesion-3994 association is rejected.
+
+  - duplicate_group_id: DUPLICATE_73ea76724f060d722acd
+    status: resolved
+    action: keep_reviewed_canonical
+    canonical_sample_id: PAD_UFES_20_PAT_691_1311_890
+    rejected_sample_ids:
+      - PAD_UFES_20_PAT_691_3994_791
+    evidence:
+      method: same_lesion_image_comparison
+      supporting_sample_ids:
+        - PAD_UFES_20_PAT_691_1311_686
+    rationale: >
+      The additional lesion-1311 image supports the BCC image-to-lesion
+      association. The conflicting lesion-3994 association is rejected.
+
+  - duplicate_group_id: DUPLICATE_088e8cb021d14b00aee2
+    status: unresolved
+    action: exclude_all
+    rationale: >
+      The image is linked to two biopsy-proven lesions with different labels,
+      and no independent evidence identifies the correct association.
+
+  - duplicate_group_id: DUPLICATE_10f165b44c126ee2ab74
+    status: unresolved
+    action: exclude_all
+    rationale: >
+      The candidate lesions have only cross-assigned duplicate images.
+      Anatomical-site appearance is insufficient to resolve the association.
+
+  - duplicate_group_id: DUPLICATE_217a20a3c1286797d9de
+    status: unresolved
+    action: exclude_all
+    rationale: >
+      No independent image or source record resolves the conflicting
+      actinic-keratosis and SCC associations.
+
+  - duplicate_group_id: DUPLICATE_476873e68dc148a35da8
+    status: unresolved
+    action: exclude_all
+    rationale: >
+      The image is linked to different biopsy-proven lesions and the available
+      evidence cannot distinguish the BCC and nevus associations reliably.
+
+  - duplicate_group_id: DUPLICATE_8f18d17748c23a0857bf
+    status: unresolved
+    action: exclude_all
+    rationale: >
+      The candidate lesions have only cross-assigned duplicate images.
+      Anatomical-site appearance is insufficient to resolve the association.
+
+  - duplicate_group_id: DUPLICATE_a8c235f882ccfa741e2a
+    status: unresolved
+    action: exclude_all
+    rationale: >
+      Both source rows are biopsy-proven facial lesions and no independent
+      image identifies the correct BCC or SCC association.
+
+  - duplicate_group_id: DUPLICATE_b178eebe1282808fa594
+    status: unresolved
+    action: exclude_all
+    rationale: >
+      No independent image or source record resolves the conflicting BCC and
+      SCC associations.
+
+  - duplicate_group_id: DUPLICATE_efefaea1d565f85f12bb
+    status: unresolved
+    action: exclude_all
+    rationale: >
+      The image is linked to two biopsy-proven lesions with different labels,
+      and no independent evidence identifies the correct association.
+
+perceptual_decisions:
+  - duplicate_group_id: DUPLICATE_46ee76662defceb7fb41
+    status: resolved
+    action: reject_candidate
+    reviewed_sample_ids:
+      - PAD_UFES_20_PAT_380_1540_959
+      - PAD_UFES_20_PAT_380_773_362
+    rationale: >
+      The full-resolution images are visibly different photographs. Their
+      identical perceptual hashes are a false positive caused by similar
+      low-frequency colour and composition.
+
+  - duplicate_group_id: DUPLICATE_f09dd313d26db233ddbf
+    status: resolved
+    action: reject_candidate
+    reviewed_sample_ids:
+      - SKINDISNET_3a4ee601fb565525fa67
+      - SKINDISNET_5e99b02959b07ff0ec4b
+      - SKINDISNET_f07ae0d837233b26d014
+    rationale: >
+      The three cropped images contain visibly different lesions and body
+      regions. Background removal and low-frequency similarity caused the
+      perceptual-hash collision.
+
+  - duplicate_group_id: DUPLICATE_832e94cee721e93fcd1d
+    status: resolved
+    action: reject_candidate
+    reviewed_sample_ids:
+      - FITZPATRICK17K_C_ed00c74f31d27200397604acf50ca753
+      - SKINDISNET_309c63335d30a40729f4
+    rationale: >
+      The source photographs are visibly different. The match is a
+      low-frequency perceptual-hash collision and not an internal-to-external
+      duplicate.
+
+  - duplicate_group_id: DUPLICATE_bb2476ce092c6efe64ed
+    status: resolved
+    action: reject_candidate
+    reviewed_sample_ids:
+      - SCIN_5546612363630401960_IMAGE_3
+      - SKINDISNET_fccbc283c603c303e4e2
+    rationale: >
+      The source photographs show different body regions and image
+      compositions. The match is a perceptual-hash false positive.
+
+review_policy:
+  unlisted_exact_label_conflict: exclude_all
+  unlisted_perceptual_candidate: keep_grouped_pending_review
+  require_all_resolved_sample_ids_to_exist: true

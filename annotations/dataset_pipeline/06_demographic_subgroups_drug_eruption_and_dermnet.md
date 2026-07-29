@@ -1,5 +1,8 @@
 # Demographic subgroups, drug eruption, and Dermnet audit integration
 
+> Historical stage note: this document records the five-manifest version 3
+> state. SkinDisNet is added as a sixth, external-only manifest in stage 7.
+
 ## Objective
 
 This stage extended the normalized data layer in three related ways:

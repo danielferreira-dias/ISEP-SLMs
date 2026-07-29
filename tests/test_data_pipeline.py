@@ -79,6 +79,27 @@ class DiseaseMappingTests(unittest.TestCase):
             "two_or_more_races",
         )
 
+    def test_skindisnet_active_labels_map_without_broadening(self) -> None:
+        expected = {
+            "Contact Dermatitis": "D009",
+            "Eczema": "D014",
+            "Seborrheic Dermatitis": "D015",
+            "Scabies": "D018",
+        }
+        self.assertEqual(
+            {
+                label: self.mapper.map("skindisnet", label)
+                for label in expected
+            },
+            expected,
+        )
+        self.assertIsNone(
+            self.mapper.map("skindisnet", "Atopic Dermatitis")
+        )
+        self.assertIsNone(
+            self.mapper.map("skindisnet", "Tinea Corporis")
+        )
+
 
 class CoverageTests(unittest.TestCase):
     def test_support_passes_preliminary_thresholds(self) -> None:
@@ -149,6 +170,26 @@ class TaxonomyContractTests(unittest.TestCase):
         self.assertEqual(active_ids, schema_ids)
         self.assertFalse(set(active_ids) & retired_ids)
         self.assertEqual(benchmark["taxonomy"]["expected_size"], 21)
+
+    def test_skindisnet_is_external_and_cannot_select_taxonomy(self) -> None:
+        catalog = yaml.safe_load(
+            (ROOT / "configs/datasets/catalog.yaml").read_text()
+        )
+        policy = yaml.safe_load(
+            (ROOT / "configs/datasets/disease_inclusion.yaml").read_text()
+        )
+        catalog_roles = {
+            item["id"]: item["role"]
+            for item in catalog["datasets"]
+        }
+        roles = policy["dataset_roles"]
+
+        self.assertEqual(
+            catalog_roles["skindisnet"],
+            "external_evaluation_only",
+        )
+        self.assertIn("skindisnet", roles["external_evaluation_only"])
+        self.assertNotIn("skindisnet", roles["taxonomy_contributors"])
 
 
 if __name__ == "__main__":

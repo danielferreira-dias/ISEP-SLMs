@@ -17,8 +17,11 @@ The test command is:
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Fourteen tests pass, including a contract test that keeps the 21 active taxonomy
+Nineteen tests pass, including a contract test that keeps the 21 active taxonomy
 IDs, retired IDs, benchmark configuration, and JSON output schema synchronized.
+The tests also enforce the SkinDisNet mapping boundaries and its external-only
+dataset role. New tests cover encoding-stable perceptual hashing, exact
+canonical selection, and exact-label-conflict exclusion.
 
 The manifest validator additionally checks:
 
@@ -29,9 +32,9 @@ The manifest validator additionally checks:
 - consecutive reference ranks;
 - exact alignment between the YAML manifest field list and Parquet columns.
 
-All five manifests pass validation. They contain 44,313 globally unique image
-samples, including the separately held-out DDI manifest and the audit-only
-Dermnet Kaggle manifest.
+All six manifests pass validation. They contain 46,023 globally unique image
+samples, including the separately held-out DDI and SkinDisNet manifests and
+the audit-only Dermnet Kaggle manifest.
 
 All configuration YAML files parse successfully, source archive members and
 direct image paths are checked during normalization, and the dependency
@@ -39,22 +42,25 @@ lockfile is synchronized.
 
 ## Current limitations
 
-### No image-content deduplication
+### Perceptual candidates require review
 
-The first-stage manifests do not calculate SHA-256 or perceptual hashes.
-Fitzpatrick17k-C is already a corrected release, but cross-dataset duplicates,
-near duplicates, and known SCIN duplicates have not yet been removed.
+All six manifests now contain encoded-byte SHA-256 values, 64-bit DCT
+perceptual hashes, duplicate decisions, and leakage-safe group IDs. Exact
+redundancies are removed automatically, and exact label conflicts are
+excluded.
 
-The current coverage result is therefore preliminary. Final splits must not be
-created until exact, perceptual, and source-lineage duplicate analysis is
-complete.
+Perceptual hashing is intentionally conservative and produces candidates, not
+clinical proof that two photographs are the same observation. The 1,020
+duplicate components marked `requires_review` must be inspected before final
+splits are frozen. Candidates already share a leakage group, preventing them
+from crossing splits if review is incomplete.
 
 ### Incomplete patient grouping
 
-PAD-UFES-20 and SCIN have suitable patient or case groups. Fitzpatrick17k-C has
-no patient identifier, and the local DDI metadata does not expose the
-documented patient grouping. Image-level fallback groups are used for those
-datasets.
+PAD-UFES-20, SCIN, and SkinDisNet have suitable patient or case groups.
+Fitzpatrick17k-C has no patient identifier, and the local DDI metadata does not
+expose the documented patient grouping. Image-level fallback groups are used
+for those datasets.
 
 This may overestimate the number of independent cases. DDI remains a single
 external evaluation set, but repeated-patient effects should still be reported
@@ -68,6 +74,8 @@ The sources do not provide equivalent ground truth:
 - PAD-UFES-20 mixes pathology and clinical consensus.
 - SCIN provides retrospective dermatologist differentials.
 - Fitzpatrick17k-C inherits noisy web-atlas labels.
+- SkinDisNet provides clinically reviewed labels but not pathology-confirmed
+  diagnoses.
 
 Metrics must therefore be reported by source dataset and diagnosis basis in
 addition to any combined result.
@@ -90,20 +98,20 @@ The following artifacts do not yet exist:
 - final train and validation manifests;
 - `internal_test.parquet`;
 - `ddi_external_test.parquet`;
+- `skindisnet_external_test.parquet`;
 - decoded-image resolver used by model inference.
 
-These are intentionally deferred until mapping review and duplicate analysis
-are complete.
+These are intentionally deferred until perceptual-candidate review and final
+taxonomy approval are complete.
 
 ## Next decision gate
 
 The next stage should:
 
-1. review the out-of-benchmark-scope label inventory;
-2. approve or revise clinical grouping mappings;
-3. decide whether the two unsupported candidate classes remain;
-4. compute exact and perceptual duplicate groups;
-5. recalculate unique-case coverage;
-6. freeze the benchmark taxonomy;
-7. create group-safe train, validation, internal-test, and DDI external-test
-   manifests.
+1. review perceptual duplicate candidates, prioritizing cross-dataset and
+   label-conflicting groups;
+2. approve or reject candidate edges and rebuild leakage groups;
+3. complete clinical approval of the candidate taxonomy;
+4. freeze the benchmark taxonomy;
+5. create group-safe train, validation, internal-test, DDI external-test, and
+   SkinDisNet external-test manifests.

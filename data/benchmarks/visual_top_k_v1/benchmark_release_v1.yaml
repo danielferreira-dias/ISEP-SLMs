@@ -1,0 +1,80 @@
+release:
+  id: visual_top_k_dataset_v1
+  version: 1.0.0
+  status: frozen
+  release_date: '2026-07-29'
+  split_algorithm: greedy_multilabel_group_stratification_v1
+  seed: 42
+  integrity_passed: true
+  source_manifests:
+    ddi:
+      path: data/manifests/ddi_v3.parquet
+      sha256: 47de6c25a54cfd7331f8d183d0797bf49a15037786f81737d793b2d361df570f
+    fitzpatrick17k_c:
+      path: data/manifests/fitzpatrick17k_c_v3.parquet
+      sha256: da64da9c940a0e947d809e4836292b99c501dbdbdc2bbcd2d3c5bc2f225e99d0
+    pad_ufes_20:
+      path: data/manifests/pad_ufes_20_v3.parquet
+      sha256: e5fa2a2802f294a067da353d00a42d321bd4c3f01b8a6e055891fda488a3a383
+    scin:
+      path: data/manifests/scin_v3.parquet
+      sha256: 3c74bb66fe7a003feb3fd3d2247f073f9bf4555cd7f6b52cdc789485cc5e637f
+    skindisnet:
+      path: data/manifests/skindisnet_v3.parquet
+      sha256: 421f4eaf56043d702abf26466a322d07ff8311a2080cfc6365a35b49b884ff3f
+  configuration:
+    split_config:
+      path: configs/datasets/visual_top_k_split.yaml
+      sha256: b246cd7ec8cb7bd36a41db4fbfa1a23a10d4455eb731608cf81315fb63db8e0a
+    taxonomy:
+      path: configs/taxonomies/diseases.yaml
+      sha256: 46eee9e3af0bbf363b443cd17ede21e275a8eeb68c6a5aba4baf9b9c6be272a7
+    benchmark:
+      path: configs/benchmarks/visual_top_k.yaml
+      sha256: 34321a25d3b82f2f4516bc85d324828411b25934ac0990042387aff0beb6cf9d
+    prompt:
+      path: prompts/benchmarks/top_k.yaml
+      sha256: be78dfe81a4c701e46547f9273cecc2d41ac722709936ce231c24eeb9d55006b
+    output_schema:
+      path: schemas/visual_top_k.schema.json
+      sha256: 587b65b8375a630bb87c81ef179e4e7aa5445e43e3e987199ce664160a8edc23
+    disease_policy:
+      path: configs/datasets/disease_inclusion.yaml
+      sha256: a93ac0761416caf5ac063b7a29387c9217df3c057385015d71c4fb517a83bec8
+    duplicate_review:
+      path: configs/datasets/duplicate_review.yaml
+      sha256: 2ba0fd784def6bd7587d406a3f86c947c23c9e064af696af529859c57afb9485
+  artifacts:
+    train:
+      path: data/benchmarks/visual_top_k_v1/train.parquet
+      sha256: 481ee22fa6ae45ed9968b330f97c3455d534d7daf27cb5606a50c031365ef659
+    validation:
+      path: data/benchmarks/visual_top_k_v1/validation.parquet
+      sha256: 30a5396ed1fa100ac9023bce6b3a5218acfe9c1603e9e0da4bc241e657851591
+    internal_test:
+      path: data/benchmarks/visual_top_k_v1/internal_test.parquet
+      sha256: 301fdf5e784d9e9f631edfb190bdad52b89f0ce64583e79e06b18bda669d4bdb
+    internal_benchmark_1000:
+      path: data/benchmarks/visual_top_k_v1/internal_benchmark_1000.parquet
+      sha256: ed46ebff2c2414fea724bcba73bdced8116e1fe3fbc116dcd4120d9d42669046
+    internal_test_reserve:
+      path: data/benchmarks/visual_top_k_v1/internal_test_reserve.parquet
+      sha256: 972c0efd6e08ab8a28d2d9aabc561b2897de66ce5d5e63401355dcda0f72af29
+    external_ddi:
+      path: data/benchmarks/visual_top_k_v1/external_ddi.parquet
+      sha256: 159541a868f36fefef10796bfc9b5c57754fdbc46835969d22955b75cab94c19
+    external_skindisnet:
+      path: data/benchmarks/visual_top_k_v1/external_skindisnet.parquet
+      sha256: f50c211bd4fd00242bfb0445579b8ca7db8601085943ae938ac064cd9062d77c
+    split_summary:
+      path: data/benchmarks/visual_top_k_v1/split_summary_v1.csv
+      sha256: 7156018f3fe9f1821b9aaf943305d92fb34698d67fdb527ed0e311e68831082a
+    subgroup_summary:
+      path: data/benchmarks/visual_top_k_v1/subgroup_summary_v1.csv
+      sha256: bf073eb8a034d4b0b291f99daf07bf16436681eea7221d583edd9f809ba95356
+    benchmark_1000_balance:
+      path: data/benchmarks/visual_top_k_v1/benchmark_1000_balance_v1.csv
+      sha256: a0d37b7ba3fc450c4c77f19cefa683a1b64819f8a8e9dd166f6a4f5e1387bd85
+    integrity_report:
+      path: data/benchmarks/visual_top_k_v1/integrity_report_v1.yaml
+      sha256: 3a89b9065c29892fb84747ef29ff18bfe6dd5fe7cd3c37e21f69d8a399e800fc

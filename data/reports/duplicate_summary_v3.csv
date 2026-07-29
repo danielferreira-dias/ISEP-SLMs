@@ -1,0 +1,8 @@
+dataset_id,sample_count,source_group_count,leakage_group_count,hashed_sample_count,duplicate_sample_count,exact_canonical_count,exact_redundant_count,exact_label_conflict_count,perceptual_candidate_count,source_lineage_candidate_count,excluded_by_deduplication_count,duplicate_group_count,cross_dataset_duplicate_sample_count
+ddi,656,656,652,656,8,0,0,0,8,0,0,4,0
+dermnet_kaggle,19559,19559,18025,19559,3530,1188,1257,0,1085,0,0,1996,796
+fitzpatrick17k_c,11394,11394,11367,11394,731,0,0,0,731,0,0,704,691
+pad_ufes_20,2298,1373,1371,2298,34,7,7,16,4,0,23,17,4
+scin,10406,5033,5010,10406,72,15,27,0,30,0,7,28,0
+skindisnet,1710,416,416,1710,66,0,0,0,66,0,0,32,0
+all_datasets,46023,38431,36155,46023,4441,1210,1291,16,1924,0,30,2095,1491

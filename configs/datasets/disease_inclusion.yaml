@@ -2,7 +2,7 @@
 
 disease_inclusion:
   id: core_disease_coverage_v3
-  version: 3.0.0
+  version: 3.1.0
   language: en
   status: provisional
   description: >
@@ -60,12 +60,41 @@ exceptions:
     the decision and the resulting statistical limitation are documented.
 
 split_policy:
-  group_by: group_id
+  source_group_by: group_id
+  group_by: leakage_group_id
   stratify_by:
     - disease_id
     - dataset_id
   prevent_duplicate_leakage: true
   external_datasets_do_not_influence_taxonomy: true
+
+deduplication:
+  review:
+    decisions: configs/datasets/duplicate_review.yaml
+  exact_hash:
+    algorithm: sha256
+    input: encoded_image_bytes
+  perceptual_hash:
+    algorithm: phash_dct
+    resize: 32
+    low_frequency_size: 8
+    bits: 64
+    hamming_distance_threshold: 4
+  source_lineage_keys:
+    - source_url
+    - upstream_image_uri
+  exact_duplicate_policy: keep_one_canonical_matching_label
+  exact_label_conflict_policy: apply_review_decision_or_exclude_all
+  perceptual_candidate_policy: group_for_split_and_require_review
+  outputs:
+    duplicate_pairs: data/reports/duplicate_pairs_v3.csv
+    duplicate_groups: data/reports/duplicate_groups_v3.csv
+    duplicate_summary: data/reports/duplicate_summary_v3.csv
+    perceptual_review_queue: data/reports/perceptual_review_queue_v3.csv
+  description: >
+    Computes exact and perceptual fingerprints for every normalized image.
+    Exact redundant rows are excluded automatically. Perceptual and source-
+    lineage candidates share a leakage group but remain included until review.
 
 subgroup_reporting:
   metadata_usage: evaluation_only

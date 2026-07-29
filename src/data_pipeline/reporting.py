@@ -149,12 +149,13 @@ def _source_inventory(
             manifest_path,
             columns=[
                 "sample_id",
-                "group_id",
+                "leakage_group_id",
                 "disease_original",
                 "disease_id",
                 "reference_diagnoses",
             ],
         ).to_pandas()
+        frame["group_id"] = frame["leakage_group_id"]
         for row in frame.to_dict(orient="records"):
             for reference in row["reference_diagnoses"]:
                 records.append(
@@ -244,10 +245,11 @@ def _all_source_coverage(
             manifest_path,
             columns=[
                 "sample_id",
-                "group_id",
+                "leakage_group_id",
                 "reference_diagnoses",
             ],
         ).to_pandas()
+        frame["group_id"] = frame["leakage_group_id"]
         for row in frame.to_dict(orient="records"):
             for reference in row["reference_diagnoses"]:
                 records.append(
@@ -348,13 +350,17 @@ def _coverage_table(
             manifest_paths[dataset_id],
             columns=[
                 "sample_id",
-                "group_id",
+                "leakage_group_id",
                 "disease_id",
                 "diagnosis_gradable",
+                "include",
             ],
         ).to_pandas()
+        frame["group_id"] = frame["leakage_group_id"]
         frames[dataset_id] = frame[
-            frame["diagnosis_gradable"] & frame["disease_id"].notna()
+            frame["diagnosis_gradable"]
+            & frame["disease_id"].notna()
+            & frame["include"]
         ]
 
     minimum_groups = int(policy["eligibility"]["minimum_unique_groups_total"])
@@ -452,7 +458,7 @@ def _demographic_availability(
             path,
             columns=[
                 "sample_id",
-                "group_id",
+                "leakage_group_id",
                 "include",
                 "age_years",
                 "age_group_standardized",
@@ -461,6 +467,7 @@ def _demographic_availability(
                 "race_ethnicity",
             ],
         ).to_pandas()
+        frame["group_id"] = frame["leakage_group_id"]
         for scope, scoped in [
             ("all_source_rows", frame),
             ("benchmark_mapped_rows", frame[frame["include"]]),
@@ -540,7 +547,7 @@ def _subgroup_coverage(
             path,
             columns=[
                 "sample_id",
-                "group_id",
+                "leakage_group_id",
                 "include",
                 "disease_id",
                 "age_group_standardized",
@@ -552,6 +559,7 @@ def _subgroup_coverage(
                 "race_ethnicity",
             ],
         ).to_pandas()
+        frame["group_id"] = frame["leakage_group_id"]
         manifest_frames[dataset_id] = frame[frame["include"]].copy()
 
     contributor_ids = policy["dataset_roles"]["taxonomy_contributors"]

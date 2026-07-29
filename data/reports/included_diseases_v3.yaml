@@ -11,8 +11,8 @@ selection:
     contributing_dataset_count: 3
   - disease_id: D002
     canonical_name: melanocytic_nevus
-    unique_group_count: 190
-    image_count: 257
+    unique_group_count: 188
+    image_count: 256
     contributing_dataset_count: 2
   - disease_id: D003
     canonical_name: psoriasis
@@ -21,38 +21,38 @@ selection:
     contributing_dataset_count: 2
   - disease_id: D004
     canonical_name: basal_cell_carcinoma
-    unique_group_count: 931
-    image_count: 1270
+    unique_group_count: 926
+    image_count: 1262
     contributing_dataset_count: 3
   - disease_id: D005
     canonical_name: squamous_cell_carcinoma
-    unique_group_count: 513
-    image_count: 580
+    unique_group_count: 508
+    image_count: 574
     contributing_dataset_count: 3
   - disease_id: D006
     canonical_name: seborrheic_keratosis
     unique_group_count: 229
-    image_count: 288
+    image_count: 287
     contributing_dataset_count: 2
   - disease_id: D007
     canonical_name: actinic_keratosis
-    unique_group_count: 679
-    image_count: 893
+    unique_group_count: 676
+    image_count: 886
     contributing_dataset_count: 3
   - disease_id: D009
     canonical_name: contact_dermatitis
-    unique_group_count: 623
-    image_count: 976
+    unique_group_count: 622
+    image_count: 974
     contributing_dataset_count: 2
   - disease_id: D011
     canonical_name: acne_vulgaris
-    unique_group_count: 481
-    image_count: 543
+    unique_group_count: 479
+    image_count: 541
     contributing_dataset_count: 2
   - disease_id: D012
     canonical_name: rosacea
-    unique_group_count: 108
-    image_count: 136
+    unique_group_count: 107
+    image_count: 135
     contributing_dataset_count: 2
   - disease_id: D013
     canonical_name: vitiligo
@@ -71,8 +71,8 @@ selection:
     contributing_dataset_count: 2
   - disease_id: D016
     canonical_name: folliculitis
-    unique_group_count: 324
-    image_count: 488
+    unique_group_count: 312
+    image_count: 486
     contributing_dataset_count: 2
   - disease_id: D017
     canonical_name: urticaria

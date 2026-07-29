@@ -1,0 +1,401 @@
+# Evidence-grounded dermatology diagnosis benchmark.
+
+benchmark:
+  id: evidence_grounded_diagnosis
+  version: 1.0.0
+  task: evidence_grounded_visual_diagnosis
+  status: declarative_specification
+  description: >
+    Evaluates whether a vision-language model identifies dermatologist-defined
+    morphology concepts, expresses them as an observation-only clinical
+    description, ranks diseases from the fixed project taxonomy, and links
+    every diagnosis to findings that are visible in the image.
+  top_k: 6
+
+prompt:
+  path: prompts/benchmarks/evidence_grounded_diagnosis.yaml
+
+schema:
+  path: schemas/evidence_grounded_diagnosis.schema.json
+
+taxonomy:
+  disease:
+    path: configs/taxonomies/diseases.yaml
+    id_field: id
+    label_field: display_name
+    expected_size: 21
+  morphology:
+    source: SKINCON
+    expected_size: 48
+    concepts:
+      - id: vesicle
+        display_name: Vesicle
+      - id: papule
+        display_name: Papule
+      - id: macule
+        display_name: Macule
+      - id: plaque
+        display_name: Plaque
+      - id: abscess
+        display_name: Abscess
+      - id: pustule
+        display_name: Pustule
+      - id: bulla
+        display_name: Bulla
+      - id: patch
+        display_name: Patch
+      - id: nodule
+        display_name: Nodule
+      - id: ulcer
+        display_name: Ulcer
+      - id: crust
+        display_name: Crust
+      - id: erosion
+        display_name: Erosion
+      - id: excoriation
+        display_name: Excoriation
+      - id: atrophy
+        display_name: Atrophy
+      - id: exudate
+        display_name: Exudate
+      - id: purpura_petechiae
+        display_name: Purpura/Petechiae
+      - id: fissure
+        display_name: Fissure
+      - id: induration
+        display_name: Induration
+      - id: xerosis
+        display_name: Xerosis
+      - id: telangiectasia
+        display_name: Telangiectasia
+      - id: scale
+        display_name: Scale
+      - id: scar
+        display_name: Scar
+      - id: friable
+        display_name: Friable
+      - id: sclerosis
+        display_name: Sclerosis
+      - id: pedunculated
+        display_name: Pedunculated
+      - id: exophytic_fungating
+        display_name: Exophytic/Fungating
+      - id: warty_papillomatous
+        display_name: Warty/Papillomatous
+      - id: dome_shaped
+        display_name: Dome-shaped
+      - id: flat_topped
+        display_name: Flat topped
+      - id: brown_hyperpigmentation
+        display_name: Brown (Hyperpigmentation)
+      - id: translucent
+        display_name: Translucent
+      - id: white_hypopigmentation
+        display_name: White (Hypopigmentation)
+      - id: purple
+        display_name: Purple
+      - id: yellow
+        display_name: Yellow
+      - id: black
+        display_name: Black
+      - id: erythema
+        display_name: Erythema
+      - id: comedo
+        display_name: Comedo
+      - id: lichenification
+        display_name: Lichenification
+      - id: blue
+        display_name: Blue
+      - id: umbilicated
+        display_name: Umbilicated
+      - id: poikiloderma
+        display_name: Poikiloderma
+      - id: salmon
+        display_name: Salmon
+      - id: wheal
+        display_name: Wheal
+      - id: acuminate
+        display_name: Acuminate
+      - id: burrow
+        display_name: Burrow
+      - id: gray
+        display_name: Gray
+      - id: pigmented
+        display_name: Pigmented
+      - id: cyst
+        display_name: Cyst
+
+dataset:
+  source_manifest: data/manifests/ddi_v3.parquet
+  morphology_annotations: configs/datasets/skincon/data/annotations/annotations_ddi.csv
+  caption_metadata: configs/datasets/skincap/data/skincap_v240623.csv
+  image_column: image_uri
+  sample_id_column: sample_id
+  group_column: leakage_group_id
+  disease_label_column: disease_id
+  disease_eligibility_column: include
+  skin_tone_column: skin_tone
+  annotation_image_id_column: ImageID
+  annotation_exclusion_column: Do not consider this image
+  caption_image_id_column: ori_file_path
+  caption_source_column: source
+  caption_text_column: caption_zh_polish_en
+  joins:
+    morphology:
+      manifest_key: basename(image_uri)
+      annotation_key: ImageID
+      cardinality: one_to_one
+      require_match: true
+    caption:
+      manifest_key: basename(image_uri)
+      caption_key: ori_file_path
+      caption_filter: source == "ddi"
+      cardinality: zero_or_one
+  filters:
+    morphology:
+      - Do not consider this image != 1
+    description:
+      - Do not consider this image != 1
+      - source == "ddi"
+      - caption_zh_polish_en is not null
+    diagnosis:
+      - Do not consider this image != 1
+      - include == true
+      - disease_id is not null
+  expected_counts:
+    morphology_cohort: 636
+    description_cohort: 635
+    diagnosis_cohort: 294
+  reference_policy:
+    morphology: positive SKINCON binary concept columns
+    description: SkinCAP caption_zh_polish_en
+    diagnosis: normalized DDI pathology diagnosis
+    caption_caution: >
+      SkinCAP captions may contain diagnostic interpretation, differential
+      diagnoses, recommended tests, or management language. Treat semantic
+      caption similarity as secondary to concept factuality.
+  leakage_policy:
+    ddi_reserved_for_external_evaluation: true
+    forbid_ddi_derived_skincap_training_examples: true
+
+metric_cohorts:
+  morphology:
+    expected_samples: 636
+    scored_fields:
+      - findings
+  description:
+    expected_samples: 635
+    scored_fields:
+      - findings
+      - clinical_description
+  diagnosis:
+    expected_samples: 294
+    scored_fields:
+      - findings
+      - differential
+      - case_confidence
+    note: >
+      Out-of-taxonomy cases remain in the morphology cohort but do not
+      contribute to diagnosis, grounding, or calibration metrics.
+
+metrics:
+  morphology:
+    - id: finding_precision
+      unit: sample
+      higher_is_better: true
+      description: Fraction of predicted concepts present in the SKINCON reference set.
+    - id: finding_recall
+      unit: sample
+      higher_is_better: true
+      description: Fraction of positive SKINCON concepts recovered by the model.
+    - id: finding_f1
+      unit: sample
+      higher_is_better: true
+      description: Harmonic mean of per-sample finding precision and recall.
+    - id: micro_f1_all_concepts
+      concept_count: 48
+      higher_is_better: true
+    - id: macro_f1_supported_concepts
+      minimum_positive_cases_per_concept: 20
+      expected_supported_concepts: 12
+      higher_is_better: true
+    - id: unsupported_finding_rate
+      higher_is_better: false
+      description: >
+        Fraction of predicted concepts absent from the image-level reference.
+        This is an annotation-overlap proxy and not a clinician-confirmed
+        hallucination rate.
+
+  description:
+    - id: description_concept_precision
+      higher_is_better: true
+      description: >
+        Fraction of controlled morphology concepts extracted from the
+        generated description that are positive in the SKINCON reference.
+    - id: description_concept_recall
+      higher_is_better: true
+      description: >
+        Fraction of positive SKINCON concepts recovered in the generated
+        description.
+    - id: description_concept_f1
+      higher_is_better: true
+      description: Harmonic mean of description concept precision and recall.
+    - id: description_findings_consistency
+      higher_is_better: true
+      description: >
+        Agreement between controlled concepts extracted from the description
+        and concept_id values declared in findings.
+    - id: description_unsupported_concept_rate
+      higher_is_better: false
+      description: >
+        Fraction of controlled concepts expressed in the description but
+        absent from the SKINCON reference. This is an annotation-overlap proxy,
+        not a clinician-confirmed hallucination rate.
+    - id: description_bertscore
+      reference_field: caption_zh_polish_en
+      role: secondary
+      higher_is_better: true
+      description: >
+        Semantic similarity to the SkinCAP caption. Report separately because
+        the references are not consistently observation-only.
+
+  diagnosis:
+    - id: top_1_accuracy
+      higher_is_better: true
+    - id: top_3_accuracy
+      higher_is_better: true
+    - id: top_6_accuracy
+      higher_is_better: true
+    - id: mean_reciprocal_rank
+      absent_reference_score: 0
+      higher_is_better: true
+    - id: macro_f1_top_1
+      higher_is_better: true
+
+  grounding:
+    - id: visible_evidence_precision
+      higher_is_better: true
+      description: >
+        Fraction of evidence-linked predicted concepts that are positive in
+        the SKINCON reference for the image.
+    - id: valid_evidence_link_rate
+      higher_is_better: true
+      description: >
+        Fraction of supporting_finding_ids that resolve to findings declared
+        in the same response.
+    - id: grounded_top_1_success
+      higher_is_better: true
+      description: >
+        A case succeeds only when the top-ranked disease is correct, it cites
+        at least one declared finding, every cited top-rank finding is visible
+        in the SKINCON reference, and the response has no semantic validation
+        error.
+    - id: correct_diagnosis_unsupported_evidence_rate
+      higher_is_better: false
+      description: >
+        Fraction of correct top-ranked diagnoses whose cited findings are all
+        absent from the SKINCON reference.
+
+  calibration:
+    - id: top_1_expected_calibration_error
+      bins: 10
+      confidence_field: differential[0].confidence
+      higher_is_better: false
+    - id: top_1_brier_score
+      confidence_field: differential[0].confidence
+      outcome: top_1_correct
+      higher_is_better: false
+
+  structure:
+    - id: json_validity_rate
+      higher_is_better: true
+    - id: schema_compliance_rate
+      higher_is_better: true
+    - id: semantic_compliance_rate
+      higher_is_better: true
+    - id: invalid_disease_id_rate
+      higher_is_better: false
+    - id: invalid_concept_id_rate
+      higher_is_better: false
+    - id: broken_evidence_reference_rate
+      higher_is_better: false
+    - id: duplicate_prediction_rate
+      higher_is_better: false
+    - id: duplicate_finding_rate
+      higher_is_better: false
+    - id: forbidden_description_content_rate
+      higher_is_better: false
+      description: >
+        Fraction of descriptions containing disease names, management advice,
+        recommended tests, or claims not limited to visible findings.
+
+semantic_validation:
+  - finding_id values must be unique and consecutive from F1.
+  - concept_id values must be unique within a response.
+  - differential disease_id values must be unique.
+  - differential ranks must be consecutive integers from 1 through 6.
+  - differential confidence values must be non-increasing by rank.
+  - every supporting_finding_id must resolve to a declared finding_id.
+  - every differential item must cite at least one supporting finding.
+  - clinical_description must contain observation-only image findings.
+  - clinical_description must not contain disease names, differential diagnoses, tests, treatment, or management recommendations.
+  - controlled morphology concepts extracted from clinical_description must be consistent with the declared findings.
+  - case_confidence must match the top-ranked confidence band.
+  - low means a top-ranked confidence below 0.40.
+  - moderate means a top-ranked confidence from 0.40 up to but not including 0.75.
+  - high means a top-ranked confidence of at least 0.75.
+
+review_recommendation:
+  field: needs_in_person_review
+  evaluation: audit_only
+  reason: >
+    DDI and SKINCON do not provide case-level referral or urgency ground truth.
+    Do not treat malignancy as a complete proxy for clinical review urgency.
+
+subgroup_evaluation:
+  metadata_usage: evaluation_only
+  include_metadata_in_model_prompt: false
+  minimum_subgroup_samples: 30
+  minimum_per_disease_samples: 10
+  dimensions:
+    - skin_tone
+    - disease_id
+  metrics:
+    - finding_f1
+    - description_concept_f1
+    - top_1_accuracy
+    - top_3_accuracy
+    - grounded_top_1_success
+  reporting:
+    include_sample_count: true
+    include_missingness: true
+    include_confidence_intervals: true
+    include_worst_group_metric: true
+
+validation:
+  require_valid_json: true
+  require_schema_compliance: true
+  require_semantic_compliance: true
+  invalid_output_policy: count_as_incorrect
+  unsupported_finding_policy: score_as_reference_absent_not_confirmed_hallucination
+
+comparison:
+  stages:
+    - base_model
+    - post_trained_model
+  paired_by: sample_id
+  confidence_interval:
+    method: paired_bootstrap
+    confidence_level: 0.95
+    resamples: 10000
+
+execution:
+  implementation_status: not_implemented
+  batch_size: 8
+  resume: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  fail_fast_on_invalid_output: false
+
+output:
+  directory: outputs/benchmark_runs/evidence_grounded_diagnosis

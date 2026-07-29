@@ -14,7 +14,7 @@ import pyarrow.parquet as pq
 import yaml
 
 
-MANIFEST_SCHEMA_VERSION = "1.2.0"
+MANIFEST_SCHEMA_VERSION = "1.3.0"
 
 REFERENCE_DIAGNOSIS_TYPE = pa.struct(
     [
@@ -67,6 +67,10 @@ MANIFEST_ARROW_SCHEMA = pa.schema(
         pa.field("image_sha256", pa.string()),
         pa.field("perceptual_hash", pa.string()),
         pa.field("perceptual_hash_algorithm", pa.string()),
+        pa.field("duplicate_group_id", pa.string()),
+        pa.field("duplicate_match_type", pa.string()),
+        pa.field("deduplication_status", pa.string(), nullable=False),
+        pa.field("leakage_group_id", pa.string(), nullable=False),
         pa.field("license_id", pa.string(), nullable=False),
         pa.field("split", pa.string()),
         pa.field("split_version", pa.string()),
@@ -354,6 +358,10 @@ def make_manifest_row(
         "image_sha256": None,
         "perceptual_hash": None,
         "perceptual_hash_algorithm": None,
+        "duplicate_group_id": None,
+        "duplicate_match_type": None,
+        "deduplication_status": "unique",
+        "leakage_group_id": group_id,
         "license_id": license_id,
         "split": None,
         "split_version": None,

@@ -1,0 +1,73 @@
+# Reproducible split and release policy for the visual top-k benchmark.
+
+schema_version: 1
+
+split:
+  id: visual_top_k_split_v1
+  version: 1.0.0
+  release_date: "2026-07-29"
+  seed: 42
+  algorithm: greedy_multilabel_group_stratification_v1
+  group_column: leakage_group_id
+  source_group_column: group_id
+  eligibility:
+    require_include: true
+    require_diagnosis_gradable: true
+    require_mapped_disease: true
+  internal:
+    source_datasets:
+      - fitzpatrick17k_c
+      - pad_ufes_20
+      - scin
+    ratios:
+      train: 0.70
+      validation: 0.15
+      internal_test: 0.15
+    paired_benchmark:
+      source_split: internal_test
+      sample_count: 1000
+      maximum_images_per_leakage_group: 1
+      seed: 1042
+      selection: stratified_group_sample_v1
+  external:
+    datasets:
+      - ddi
+      - skindisnet
+    split_name: external_test
+    overlap_policy: fail
+  stratification:
+    primary_features:
+      - disease_id
+      - dataset_id
+      - disease_id_and_dataset_id
+    secondary_features:
+      - age_group_standardized
+      - skin_tone_system_and_value
+      - sex_or_gender_system_and_value
+      - race_ethnicity
+    secondary_feature_weight: 0.25
+  outputs:
+    directory: data/benchmarks/visual_top_k_v1
+    train: train.parquet
+    validation: validation.parquet
+    internal_test: internal_test.parquet
+    internal_benchmark_1000: internal_benchmark_1000.parquet
+    internal_test_reserve: internal_test_reserve.parquet
+    external_ddi: external_ddi.parquet
+    external_skindisnet: external_skindisnet.parquet
+    split_summary: split_summary_v1.csv
+    subgroup_summary: subgroup_summary_v1.csv
+    benchmark_1000_balance: benchmark_1000_balance_v1.csv
+    integrity_report: integrity_report_v1.yaml
+    release_manifest: benchmark_release_v1.yaml
+
+release:
+  id: visual_top_k_dataset_v1
+  version: 1.0.0
+  status: frozen
+  taxonomy: configs/taxonomies/diseases.yaml
+  benchmark: configs/benchmarks/visual_top_k.yaml
+  prompt: prompts/benchmarks/top_k.yaml
+  output_schema: schemas/visual_top_k.schema.json
+  disease_policy: configs/datasets/disease_inclusion.yaml
+  duplicate_review: configs/datasets/duplicate_review.yaml

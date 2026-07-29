@@ -2,7 +2,7 @@
 
 manifest_schema:
   id: dermatology_image_manifest
-  version: 1.2.0
+  version: 1.3.0
   language: en
   row_unit: image
   description: >
@@ -235,6 +235,46 @@ fields:
     nullable: true
     description: Algorithm and settings used to compute perceptual_hash.
 
+  - name: duplicate_group_id
+    type: string
+    nullable: true
+    description: >
+      Stable connected-component ID for images linked by an exact duplicate
+      or a perceptual or source-lineage duplicate candidate.
+
+  - name: duplicate_match_type
+    type: string
+    nullable: true
+    allowed_values:
+      - exact
+      - perceptual
+      - source_lineage
+      - mixed
+    description: Strongest or combined evidence represented by duplicate_group_id.
+
+  - name: deduplication_status
+    type: string
+    required: true
+    allowed_values:
+      - unique
+      - canonical
+      - redundant_exact
+      - exact_label_conflict
+      - perceptual_candidate
+      - source_lineage_candidate
+    description: >
+      Per-image decision after duplicate analysis. Perceptual and lineage
+      candidates are grouped for leakage prevention but are not removed
+      automatically.
+
+  - name: leakage_group_id
+    type: string
+    required: true
+    description: >
+      Final split-grouping key formed from source group_id and reviewed or
+      candidate duplicate relationships. This field, not sample_id, must be
+      used when creating train, validation, and test splits.
+
   - name: license_id
     type: string
     required: true
@@ -278,5 +318,6 @@ invariants:
   - canonical_source_label and mapping_status must match the first reference diagnosis.
   - rows without a normalized disease_id cannot enter the closed-set benchmark.
   - all rows with the same group_id must receive the same split.
+  - all rows with the same leakage_group_id must receive the same split.
   - exact and near duplicates must not cross train, validation, or test splits.
   - demographic metadata is used for evaluation slicing and is not included in the image-only model prompt.
