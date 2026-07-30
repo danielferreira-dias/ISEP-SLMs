@@ -348,10 +348,8 @@ def _responses_final_text(output: Any) -> str | None:
 def _responses_reasoning(
     response: Any,
 ) -> tuple[str | None, str | None]:
-    direct_reasoning = read_field(response, "reasoning")
-    summary = extract_text(read_field(direct_reasoning, "summary"))
-    summary_source = "reasoning.summary" if summary else None
-
+    summary: str | None = None
+    summary_source: str | None = None
     output = read_field(response, "output", ())
     if isinstance(output, Sequence) and not isinstance(
         output,
@@ -361,9 +359,22 @@ def _responses_reasoning(
             if read_field(item, "type") != "reasoning":
                 continue
             item_summary = extract_text(read_field(item, "summary"))
-            if summary is None and item_summary:
+            if item_summary:
                 summary = item_summary
                 summary_source = "output.reasoning.summary"
+                break
+
+    # The top-level response.reasoning.summary field describes the requested
+    # summary mode (for example, "detailed"). It is not the generated
+    # reasoning summary. Some provider variants may expose a structured
+    # summary object here, so accept only non-string content as a fallback.
+    if summary is None:
+        direct_reasoning = read_field(response, "reasoning")
+        direct_summary = read_field(direct_reasoning, "summary")
+        if not isinstance(direct_summary, str):
+            summary = extract_text(direct_summary)
+            if summary:
+                summary_source = "reasoning.summary"
 
     return summary, summary_source
 

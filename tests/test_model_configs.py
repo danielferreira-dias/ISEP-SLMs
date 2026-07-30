@@ -206,9 +206,10 @@ class TypedModelConfigTests(unittest.TestCase):
         )
         self.assertNotEqual(kimi.endpoint_env, gpt.endpoint_env)
         self.assertNotEqual(kimi.api_key_env, gpt.api_key_env)
+        self.assertEqual(kimi.generation.reasoning_effort, "medium")
+        self.assertEqual(gpt.generation.reasoning_effort, "high")
         for config in (kimi, gpt):
             self.assertEqual(config.generation.profile, "provider_default")
-            self.assertEqual(config.generation.reasoning_effort, "high")
             self.assertIsNone(config.generation.do_sample)
             self.assertIsNone(config.generation.temperature)
             self.assertIsNone(config.generation.top_p)

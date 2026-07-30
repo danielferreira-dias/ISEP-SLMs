@@ -45,6 +45,28 @@ rather than inside one provider backend, prevents API and local models from
 receiving different pixels. The profile and its parameters are retained in
 the benchmark config snapshot for every run.
 
+## Browse generated answers
+
+Every completed CLI run automatically creates a self-contained `report.html`
+next to `predictions.jsonl`. Open it in any browser; it does not need a
+Jupyter kernel or a running web server. The report provides:
+
+- search and filters for status, reference disease, and source dataset;
+- paginated cases with an embedded image thumbnail;
+- the final answer and provider-returned reasoning in separate panes;
+- parsed output, validation errors, token usage, prompts, and metadata.
+
+`predictions.jsonl` remains the authoritative machine-readable artifact. The
+HTML file is a read-only derived view and can be regenerated at any time:
+
+```bash
+uv run python -m src.benchmark.report \
+  outputs/benchmark_runs/<benchmark>/<model>/<run>
+```
+
+Use `--no-images` for a smaller report or `--output PATH` to choose another
+destination.
+
 ## Runtime architecture
 
 ```text
@@ -301,10 +323,12 @@ uv run python -m src.benchmark.cli run \
 ```
 
 Provider-managed sampling fields are omitted for Kimi and GPT. Their YAML
-files do not invent local-model temperature or penalty values.
-Both provider configurations explicitly freeze `reasoning_effort: high`.
-The runtime sends it as `reasoning_effort="high"` to Kimi Chat Completions
-and as `reasoning.effort="high"` to GPT Responses.
+files do not invent local-model temperature or penalty values. Kimi uses
+`reasoning_effort: medium` to balance diagnostic quality, latency, and the
+length of its provider-exposed reasoning trace. GPT uses
+`reasoning_effort: high`. The runtime sends these values as
+`reasoning_effort` to Kimi Chat Completions and as `reasoning.effort` to GPT
+Responses.
 
 ## Reasoning capture
 
@@ -322,6 +346,12 @@ The explicit alternatives are `full`, `summary`, `tokens_only`, and `none`.
 “Full” never means hidden chain of thought: it means only a reasoning field
 deliberately returned by the endpoint. Azure Responses is downgraded to its
 official summary because raw chain of thought is not part of that API.
+
+Requesting an Azure Responses summary does not guarantee that its
+`output[*].summary` array will contain text for every response. When the
+provider returns an empty summary array but reports reasoning-token usage,
+the run records `availability: tokens_only`; it does not fabricate a summary
+or mistake the requested summary mode for generated text.
 
 Reasoning is stored at:
 

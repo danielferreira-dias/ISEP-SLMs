@@ -307,6 +307,10 @@ class ResponsesBackendTests(unittest.TestCase):
         response = SimpleNamespace(
             id="resp_123",
             model="deployment",
+            reasoning=SimpleNamespace(
+                effort="high",
+                summary="detailed",
+            ),
             status="incomplete",
             incomplete_details=SimpleNamespace(
                 reason="max_output_tokens"
@@ -368,6 +372,10 @@ class ResponsesBackendTests(unittest.TestCase):
         self.assertEqual(
             result.reasoning.text,
             "Compared visible findings.",
+        )
+        self.assertEqual(
+            result.reasoning.source_field,
+            "output.reasoning.summary",
         )
         self.assertNotIn("Raw chain", result.reasoning.text)
         self.assertEqual(result.reasoning.token_count, 21)

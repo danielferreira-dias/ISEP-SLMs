@@ -20,7 +20,7 @@ completion = client.chat.completions.create(
             "content": "What is seborrheic dermatitis?",
         }
     ],
-    reasoning_effort="high",
+    reasoning_effort="medium",
 )
 
 print(completion.choices[0].message)

@@ -48,7 +48,7 @@ backend:
 
 generation:
   profile: provider_default
-  reasoning_effort: high
+  reasoning_effort: medium
 
 security:
   trust_remote_code: false

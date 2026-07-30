@@ -22,6 +22,7 @@ from src.benchmark.executor import (
     ExecutionConfig,
 )
 from src.benchmark.images import prepare_benchmark_image
+from src.benchmark.report import generate_run_report
 from src.benchmark.results import (
     RunPaths,
     RunWriter,
@@ -349,19 +350,26 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         finally:
             if server is not None:
                 server.stop()
+        try:
+            report_path = generate_run_report(
+                paths.directory,
+                image_loader=resolver.read_bytes,
+            )
+            report_error = None
+        except Exception as exc:
+            report_path = None
+            report_error = f"{type(exc).__name__}: {exc}"
 
-    print(
-        json.dumps(
-            {
-                "status": "completed",
-                "run_directory": str(paths.directory),
-                "counts": summary.counts,
-                "metrics_path": str(paths.metrics),
-            },
-            indent=2,
-            sort_keys=True,
-        )
-    )
+    output = {
+        "status": "completed",
+        "run_directory": str(paths.directory),
+        "counts": summary.counts,
+        "metrics_path": str(paths.metrics),
+        "report_path": str(report_path) if report_path else None,
+    }
+    if report_error:
+        output["report_error"] = report_error
+    print(json.dumps(output, indent=2, sort_keys=True))
     return 0
 
 

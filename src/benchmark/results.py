@@ -50,6 +50,7 @@ class RunPaths:
     selection: Path
     predictions: Path
     metrics: Path
+    report: Path
     environment: Path
     rendered_prompts: Path
     server_log: Path
@@ -63,6 +64,7 @@ class RunPaths:
             selection=directory / "selection.json",
             predictions=directory / "predictions.jsonl",
             metrics=directory / "metrics.json",
+            report=directory / "report.html",
             environment=directory / "environment.json",
             rendered_prompts=directory / "rendered_prompts.jsonl",
             server_log=directory / "vllm_server.log",

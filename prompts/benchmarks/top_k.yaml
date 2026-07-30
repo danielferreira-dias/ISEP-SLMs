@@ -1,7 +1,7 @@
 # Prompt used by the closed-set dermatology image-ranking benchmark.
 
 id: visual_top_k
-version: 1.0.0
+version: 1.1.0
 task: visual_disease_ranking
 language: en
 description: >
@@ -20,6 +20,10 @@ system_prompt: |
     5. Do not infer or invent symptoms, patient history, or clinical context.
     6. Return valid JSON that matches the supplied schema.
     7. Do not include explanations, Markdown, or text outside the JSON object.
+    8. Do not wrap the JSON object in a Markdown code fence. A response that
+       starts with three backticks followed by "json" and ends with three
+       backticks is invalid, even when the enclosed JSON is otherwise correct.
+    9. Start the response directly with "{" and end it directly with "}".
 
 user_template: |
   Analyze the attached dermatological image.
@@ -39,6 +43,11 @@ user_template: |
 
   The example shows the structure only. Select and rank diseases based on the
   supplied image, and return no text outside the JSON object.
+
+  Output-format reminder:
+    WRONG: wrap the JSON object between ```json and ``` Markdown fences.
+    CORRECT: return the raw JSON object directly, beginning with { and ending
+    with }.
 
 schema_path: schemas/visual_top_k.schema.json
 
