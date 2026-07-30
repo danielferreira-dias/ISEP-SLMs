@@ -2,7 +2,7 @@
 
 benchmark:
   id: visual_top_k_closed_set
-  version: 3.2.0
+  version: 3.4.0
   task: visual_disease_ranking
   description: >
     Evaluates how accurately a vision-language model ranks dermatological diseases from a fixed taxonomy. The same configuration must be used for
@@ -173,8 +173,16 @@ comparison:
     confidence_level: 0.95
     resamples: 10000
 
+image_preprocessing:
+  profile: dermatology_api_safe_rgb_jpeg_v1
+  max_edge_pixels: 768
+  max_encoded_bytes: 45000
+  jpeg_quality: 85
+  minimum_jpeg_quality: 40
+  minimum_edge_pixels: 224
+
 execution:
-  max_output_tokens: 4096
+  max_output_tokens: 8192
   batch_size: 8
   resume: true
   save_raw_responses: true

@@ -13,8 +13,8 @@ or patient-care decisions.
 
 | Benchmark ID | Purpose | Default evaluation set | Output cap |
 | --- | --- | --- | ---: |
-| `visual_top_k_closed_set` | Rank six diseases from the fixed 21-class taxonomy | `internal_benchmark_1000` | 4,096 |
-| `visual_disease_confusion_sets` | Rank three candidates under paired low/high-confusability conditions | `paired_confusion_tasks` | 4,096 |
+| `visual_top_k_closed_set` | Rank six diseases from the fixed 21-class taxonomy | `internal_benchmark_1000` | 8,192 |
+| `visual_disease_confusion_sets` | Rank three candidates under paired low/high-confusability conditions | `paired_confusion_tasks` | 8,192 |
 | `evidence_grounded_diagnosis` | Findings, observation-only description, six diagnoses, confidence, and evidence links | `external_ddi_evidence` | 8,192 |
 
 All three protocols use `prompt_only` structured output. A provider is not
@@ -28,6 +28,22 @@ freezing a final experiment, run a pilot and confirm that `truncated_output`
 is effectively absent. A cap hit is recorded as an invalid, truncated case;
 the pipeline does not repair it, continue it, or give that model another
 attempt.
+
+## Image normalization
+
+Every benchmark model receives the same deterministic image representation.
+The `image_preprocessing` section in each benchmark YAML corrects EXIF
+orientation, converts the image to RGB, limits the longest edge to 768 pixels,
+and encodes it as JPEG. Encoding starts at quality 85 and is reduced in
+five-point steps; resolution is reduced only when needed to keep the encoded
+image at or below 45,000 bytes.
+
+The byte budget is required because some OpenAI-compatible Azure gateways
+limit base64 data URLs to approximately 64 KB. A 45,000-byte image becomes a
+data URL below that transport limit. Applying the profile at benchmark level,
+rather than inside one provider backend, prevents API and local models from
+receiving different pixels. The profile and its parameters are retained in
+the benchmark config snapshot for every run.
 
 ## Runtime architecture
 

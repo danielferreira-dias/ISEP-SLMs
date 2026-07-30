@@ -47,13 +47,13 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
         )
         self.assertEqual(
             by_id["visual_top_k_closed_set"].max_output_tokens,
-            4096,
+            8192,
         )
         self.assertEqual(
             by_id[
                 "visual_disease_confusion_sets"
             ].max_output_tokens,
-            4096,
+            8192,
         )
         self.assertEqual(
             by_id["evidence_grounded_diagnosis"].max_output_tokens,
@@ -61,6 +61,14 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
         )
         for config in configs:
             self.assertEqual(config.structured_output.mode, "prompt_only")
+            self.assertEqual(
+                config.image_preprocessing.profile,
+                "dermatology_api_safe_rgb_jpeg_v1",
+            )
+            self.assertEqual(
+                config.image_preprocessing.max_encoded_bytes,
+                45_000,
+            )
             self.assertTrue(config.dataset.default.manifest.is_file())
             self.assertEqual(
                 config.output_directory,

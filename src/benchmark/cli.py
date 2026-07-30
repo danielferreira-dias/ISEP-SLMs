@@ -8,7 +8,7 @@ import json
 import os
 from pathlib import Path
 import sys
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 
 import yaml
 
@@ -21,6 +21,7 @@ from src.benchmark.executor import (
     BenchmarkExecutor,
     ExecutionConfig,
 )
+from src.benchmark.images import prepare_benchmark_image
 from src.benchmark.results import (
     RunPaths,
     RunWriter,
@@ -268,8 +269,14 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         reasoning_capture=args.reasoning_capture,
     )
     with ImageResolver(root) as resolver:
+        def image_loader(image_uri: str) -> bytes:
+            return prepare_benchmark_image(
+                resolver.read_bytes(image_uri),
+                benchmark.image_preprocessing,
+            )
+
         if args.dry_run:
-            _validate_selected_images(dataset, resolver)
+            _validate_selected_images(dataset, image_loader)
             print(json.dumps(dry_run_summary, indent=2, sort_keys=True))
             return 0
 
@@ -331,7 +338,7 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
             summary = BenchmarkExecutor(
                 backend=backend,
                 adapter=adapter,
-                image_loader=resolver.read_bytes,
+                image_loader=image_loader,
                 writer=writer,
                 execution=execution,
                 generation=model.generation,
@@ -483,15 +490,15 @@ def _validate_runtime_options(
 
 def _validate_selected_images(
     dataset: LoadedBenchmarkDataset,
-    resolver: ImageResolver,
+    image_loader: Callable[[str], bytes],
 ) -> None:
-    """Prove that every selected image can be read before model execution."""
+    """Prove that every selected image can be prepared before execution."""
 
     seen: set[str] = set()
     for sample in dataset.samples:
         if sample.image_uri in seen:
             continue
-        image_bytes = resolver.read_bytes(sample.image_uri)
+        image_bytes = image_loader(sample.image_uri)
         if not image_bytes:
             raise ValueError(
                 f"Selected image is empty: {sample.image_uri!r}"

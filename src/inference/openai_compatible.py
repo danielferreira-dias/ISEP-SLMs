@@ -84,12 +84,11 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         payload = self._build_payload(request)
         try:
             response = self.client.chat.completions.create(**payload)
-        except Exception:
-            # Provider SDK exceptions can contain headers or request details.
-            # Keep the public failure stable and deliberately sanitized.
+        except Exception as error:
+            provider_detail = _provider_error_detail(error)
             raise InferenceTransportError(
                 f"Chat-completions request failed for model "
-                f"{self.model_id!r}"
+                f"{self.model_id!r} ({provider_detail})"
             ) from None
         return self._parse_response(response, request)
 
@@ -365,6 +364,47 @@ def _chat_usage(value: Any) -> TokenUsage:
 
 def _optional_string(value: Any) -> str | None:
     return value if isinstance(value, str) and value else None
+
+
+def _provider_error_detail(error: Exception) -> str:
+    """Return safe provider fields without headers or request objects."""
+
+    details = [f"type={type(error).__name__}"]
+    status_code = getattr(error, "status_code", None)
+    if isinstance(status_code, int):
+        details.append(f"status={status_code}")
+
+    body = getattr(error, "body", None)
+    if isinstance(body, dict):
+        provider_error = body.get("error", body)
+        if isinstance(provider_error, dict):
+            code = provider_error.get("code")
+            if isinstance(code, str) and code:
+                details.append(f"code={_compact_error_field(code)}")
+            message = provider_error.get("message")
+            if isinstance(message, str) and message:
+                details.append(
+                    f"message={_compact_error_field(message)}"
+                )
+
+    if len(details) == 1:
+        message = getattr(error, "message", None)
+        if isinstance(message, str) and message:
+            details.append(f"message={_compact_error_field(message)}")
+
+    cause = error.__cause__
+    if cause is not None:
+        details.append(f"cause={type(cause).__name__}")
+        cause_message = str(cause)
+        if cause_message:
+            details.append(
+                f"cause_message={_compact_error_field(cause_message)}"
+            )
+    return "; ".join(details)
+
+
+def _compact_error_field(value: str, *, limit: int = 500) -> str:
+    return " ".join(value.split())[:limit]
 
 
 def _mapping_values(value: Any) -> dict[str, Any]:

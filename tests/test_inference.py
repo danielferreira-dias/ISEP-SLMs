@@ -410,6 +410,39 @@ class ResponsesBackendTests(unittest.TestCase):
         self.assertEqual(text_format["type"], "json_schema")
         self.assertTrue(text_format["strict"])
 
+    def test_responses_transport_exposes_only_structured_error_detail(
+        self,
+    ) -> None:
+        class ProviderError(RuntimeError):
+            status_code = 400
+            body = {
+                "error": {
+                    "code": "invalid_value",
+                    "message": "Unsupported image format.",
+                }
+            }
+
+        secret = "super-secret-api-key"
+        backend = AzureResponsesBackend(
+            model_id="gpt",
+            client=_FakeClient(error=ProviderError(secret)),
+        )
+
+        with self.assertRaises(InferenceTransportError) as context:
+            backend.generate_result(
+                system_prompt="System",
+                user_prompt="User",
+                image_bytes=b"image",
+                schema={},
+            )
+
+        message = str(context.exception)
+        self.assertIn("type=ProviderError", message)
+        self.assertIn("status=400", message)
+        self.assertIn("code=invalid_value", message)
+        self.assertIn("Unsupported image format.", message)
+        self.assertNotIn(secret, message)
+
 
 class VllmBackendTests(unittest.TestCase):
     def test_preflight_checks_health_and_exact_served_model(self) -> None:

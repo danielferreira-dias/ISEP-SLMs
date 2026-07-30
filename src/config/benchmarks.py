@@ -109,6 +109,18 @@ class BenchmarkExecutionConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class ImagePreprocessingConfig:
+    """Deterministic image normalization shared by every benchmark model."""
+
+    profile: str
+    max_edge_pixels: int
+    max_encoded_bytes: int
+    jpeg_quality: int
+    minimum_jpeg_quality: int
+    minimum_edge_pixels: int
+
+
+@dataclass(frozen=True, slots=True)
 class StructuredOutputConfig:
     """Structured-output enforcement mode."""
 
@@ -124,6 +136,7 @@ class BenchmarkConfig:
     schema_path: Path
     taxonomy: TaxonomyConfig
     dataset: BenchmarkDatasetConfig
+    image_preprocessing: ImagePreprocessingConfig
     execution: BenchmarkExecutionConfig
     structured_output: StructuredOutputConfig
     output_directory: Path
@@ -154,6 +167,7 @@ _TOP_LEVEL_KEYS = {
     "subgroup_evaluation",
     "validation",
     "comparison",
+    "image_preprocessing",
     "execution",
     "structured_output",
     "output",
@@ -179,6 +193,14 @@ _EXECUTION_KEYS = {
     "save_raw_responses",
     "save_rendered_prompts",
     "fail_fast_on_invalid_output",
+}
+_IMAGE_PREPROCESSING_KEYS = {
+    "profile",
+    "max_edge_pixels",
+    "max_encoded_bytes",
+    "jpeg_quality",
+    "minimum_jpeg_quality",
+    "minimum_edge_pixels",
 }
 _STRUCTURED_OUTPUT_KEYS = {"mode"}
 _OUTPUT_KEYS = {"directory"}
@@ -282,6 +304,7 @@ def load_benchmark_config(
             "schema",
             "taxonomy",
             "dataset",
+            "image_preprocessing",
             "execution",
             "structured_output",
             "output",
@@ -313,6 +336,12 @@ def load_benchmark_config(
         _mapping(document["dataset"], "dataset"),
         root=project_root,
         task=benchmark.task,
+    )
+    image_preprocessing = _parse_image_preprocessing(
+        _mapping(
+            document["image_preprocessing"],
+            "image_preprocessing",
+        )
     )
     execution = _parse_execution(
         _mapping(document["execution"], "execution")
@@ -358,6 +387,7 @@ def load_benchmark_config(
         schema_path=schema_path,
         taxonomy=taxonomy,
         dataset=dataset,
+        image_preprocessing=image_preprocessing,
         execution=execution,
         structured_output=structured_output,
         output_directory=output_directory,
@@ -675,6 +705,65 @@ def _parse_execution(value: dict[str, Any]) -> BenchmarkExecutionConfig:
     )
 
 
+def _parse_image_preprocessing(
+    value: dict[str, Any],
+) -> ImagePreprocessingConfig:
+    _reject_unknown(
+        value,
+        _IMAGE_PREPROCESSING_KEYS,
+        "image_preprocessing",
+    )
+    _require_keys(
+        value,
+        _IMAGE_PREPROCESSING_KEYS,
+        "image_preprocessing",
+    )
+    jpeg_quality = _bounded_integer(
+        value["jpeg_quality"],
+        "image_preprocessing.jpeg_quality",
+        minimum=1,
+        maximum=95,
+    )
+    minimum_jpeg_quality = _bounded_integer(
+        value["minimum_jpeg_quality"],
+        "image_preprocessing.minimum_jpeg_quality",
+        minimum=1,
+        maximum=95,
+    )
+    if minimum_jpeg_quality > jpeg_quality:
+        raise BenchmarkConfigError(
+            "image_preprocessing.minimum_jpeg_quality must not exceed "
+            "image_preprocessing.jpeg_quality"
+        )
+    max_edge_pixels = _positive_integer(
+        value["max_edge_pixels"],
+        "image_preprocessing.max_edge_pixels",
+    )
+    minimum_edge_pixels = _positive_integer(
+        value["minimum_edge_pixels"],
+        "image_preprocessing.minimum_edge_pixels",
+    )
+    if minimum_edge_pixels > max_edge_pixels:
+        raise BenchmarkConfigError(
+            "image_preprocessing.minimum_edge_pixels must not exceed "
+            "image_preprocessing.max_edge_pixels"
+        )
+    return ImagePreprocessingConfig(
+        profile=_text(
+            value["profile"],
+            "image_preprocessing.profile",
+        ),
+        max_edge_pixels=max_edge_pixels,
+        max_encoded_bytes=_positive_integer(
+            value["max_encoded_bytes"],
+            "image_preprocessing.max_encoded_bytes",
+        ),
+        jpeg_quality=jpeg_quality,
+        minimum_jpeg_quality=minimum_jpeg_quality,
+        minimum_edge_pixels=minimum_edge_pixels,
+    )
+
+
 def _parse_structured_output(
     value: dict[str, Any],
 ) -> StructuredOutputConfig:
@@ -816,6 +905,24 @@ def _boolean(value: Any, path: str) -> bool:
 def _positive_integer(value: Any, path: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
         raise BenchmarkConfigError(f"{path} must be a positive integer")
+    return value
+
+
+def _bounded_integer(
+    value: Any,
+    path: str,
+    *,
+    minimum: int,
+    maximum: int,
+) -> int:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, int)
+        or not minimum <= value <= maximum
+    ):
+        raise BenchmarkConfigError(
+            f"{path} must be an integer between {minimum} and {maximum}"
+        )
     return value
 
 

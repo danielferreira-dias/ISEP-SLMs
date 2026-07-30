@@ -149,7 +149,12 @@ class TransformersBackend(InferenceBackend):
             messages.append(
                 {
                     "role": "system",
-                    "content": request.system_prompt,
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": request.system_prompt,
+                        }
+                    ],
                 }
             )
         messages.append(

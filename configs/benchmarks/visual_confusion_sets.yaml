@@ -2,7 +2,7 @@
 
 benchmark:
   id: visual_disease_confusion_sets
-  version: 0.2.0
+  version: 0.4.0
   task: visual_disease_contrast_ranking
   status: provisional_pending_clinical_review
   description: >
@@ -187,8 +187,16 @@ comparison:
     seed: 42
     cluster: pair_id
 
+image_preprocessing:
+  profile: dermatology_api_safe_rgb_jpeg_v1
+  max_edge_pixels: 768
+  max_encoded_bytes: 45000
+  jpeg_quality: 85
+  minimum_jpeg_quality: 40
+  minimum_edge_pixels: 224
+
 execution:
-  max_output_tokens: 4096
+  max_output_tokens: 8192
   batch_size: 8
   resume: true
   save_raw_responses: true
