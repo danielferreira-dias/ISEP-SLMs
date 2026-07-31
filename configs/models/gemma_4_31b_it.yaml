@@ -45,15 +45,16 @@ backend:
       max_model_len: 16384
       gpu_memory_utilization: 0.9
       limit_images_per_prompt: 1
+      request_timeout_seconds: 1200
       managed: true
       managed_allowed: true
 
 reasoning:
-  enabled: true
+  enabled: false
   parser: gemma4
   exclude_from_structured_output: true
   chat_template_kwargs:
-    enable_thinking: true
+    enable_thinking: false
 
 generation:
   profile: gemma_4_recommended

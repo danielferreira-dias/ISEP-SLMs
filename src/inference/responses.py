@@ -11,12 +11,17 @@ from src.inference.base import (
     InferenceConfigurationError,
     InferenceRequest,
     InferenceResult,
+    InferenceSafetyRefusal,
     InferenceTransportError,
     TokenUsage,
     build_reasoning_trace,
     extract_text,
     image_data_url,
+    is_safety_refusal,
     merge_generation,
+    provider_error_details,
+    provider_error_summary,
+    provider_json_schema,
     read_field,
     safe_optional_int,
     validate_reasoning_capture,
@@ -78,10 +83,17 @@ class AzureResponsesBackend(InferenceBackend):
         try:
             response = self.client.responses.create(**payload)
         except Exception as error:
-            provider_detail = _provider_error_detail(error)
+            details = provider_error_details(error)
+            provider_detail = provider_error_summary(details)
             detail_suffix = (
                 f" ({provider_detail})" if provider_detail else ""
             )
+            if is_safety_refusal(details):
+                raise InferenceSafetyRefusal(
+                    f"Responses API safety refusal for model "
+                    f"{self.model_id!r}{detail_suffix}",
+                    details=details,
+                ) from None
             raise InferenceTransportError(
                 f"Responses API request failed for model "
                 f"{self.model_id!r}{detail_suffix}"
@@ -199,7 +211,7 @@ class AzureResponsesBackend(InferenceBackend):
                     "type": "json_schema",
                     "name": "benchmark_response",
                     "strict": True,
-                    "schema": dict(request.schema),
+                    "schema": provider_json_schema(request.schema),
                 }
             }
         reasoning_options: dict[str, Any] = {}

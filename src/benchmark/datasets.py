@@ -254,6 +254,13 @@ def _python_scalar(value: Any) -> Any:
             return value.item()
         except (TypeError, ValueError):
             pass
-    if isinstance(value, tuple):
-        return list(value)
+    if isinstance(value, (list, tuple, set)):
+        return [_python_scalar(item) for item in value]
+    if hasattr(value, "tolist"):
+        try:
+            converted = value.tolist()
+        except (TypeError, ValueError):
+            pass
+        else:
+            return _python_scalar(converted)
     return value

@@ -51,7 +51,8 @@ Every completed CLI run automatically creates a self-contained `report.html`
 next to `predictions.jsonl`. Open it in any browser; it does not need a
 Jupyter kernel or a running web server. The report provides:
 
-- search and filters for status, reference disease, and source dataset;
+- search and filters for status, reference disease, source dataset, and skin
+  tone;
 - paginated cases with an embedded image thumbnail;
 - the final answer and provider-returned reasoning in separate panes;
 - parsed output, validation errors, token usage, prompts, and metadata.
@@ -66,6 +67,27 @@ uv run python -m src.benchmark.report \
 
 Use `--no-images` for a smaller report or `--output PATH` to choose another
 destination.
+
+### Skin-tone performance in visual Top-K
+
+The `visual_top_k_closed_set` scorer reports both exact and prespecified
+aggregate skin-tone results. Exact labels are scale-qualified, for example
+`fitzpatrick:FST_3` and `monk:MST_3`; values from Fitzpatrick and Monk are
+never merged merely because their numbers match. Aggregate reporting uses
+`FST_1-2`, `FST_3-4`, `FST_5-6` and `MST_1-3`, `MST_4-6`, `MST_7-10`.
+
+Each row in the `by_skin_tone` and `by_skin_tone_aggregate` report tables
+contains the image and independent-group counts, Top-1/3/6 accuracy with
+95% Wilson intervals, mean reciprocal rank, and a disease-adjusted Top-1
+summary where enough per-disease groups exist. Missing annotations remain in
+the global score and appear separately as `unknown`.
+
+`statistically_supported` is true only when the subgroup reaches the
+configured minimum number of unique leakage groups. The worst-group accuracy
+and best-to-worst gap exclude `unknown` and unsupported exact groups. These
+descriptive fairness metrics must always be interpreted with their sample
+counts and intervals; the report does not treat the skin-tone annotation as a
+measured biological attribute.
 
 ## Runtime architecture
 
@@ -211,8 +233,9 @@ uv run python -m src.benchmark.cli run \
 ```
 
 An explicit `--base-url` overrides `VLLM_BASE_URL`. The executor sends
-concurrent HTTP requests according to the benchmark batch size so vLLM can
-perform continuous batching.
+asynchronous HTTP requests through `AsyncOpenAI`, limited by the benchmark
+batch size, so vLLM can perform continuous batching. Results are consumed
+with `asyncio.as_completed` and persisted as each request finishes.
 
 ## Start a managed vLLM server
 
@@ -246,8 +269,8 @@ Validate everything except model inference:
 uv run src/test_qwen.py --dry-run
 ```
 
-Run direct inference on Apple MPS while preserving
-`enable_thinking: true`:
+Run direct inference on Apple MPS with thinking disabled while preserving the
+configured general-task sampling parameters:
 
 ```bash
 uv run src/test_qwen.py --transformers --limit 10
@@ -322,13 +345,19 @@ uv run python -m src.benchmark.cli run \
   --limit 100
 ```
 
-Provider-managed sampling fields are omitted for Kimi and GPT. Their YAML
-files do not invent local-model temperature or penalty values. Kimi uses
-`reasoning_effort: medium` to balance diagnostic quality, latency, and the
-length of its provider-exposed reasoning trace. GPT uses
-`reasoning_effort: high`. The runtime sends these values as
-`reasoning_effort` to Kimi Chat Completions and as `reasoning.effort` to GPT
-Responses.
+Kimi K2.6 runs without extended thinking, with temperature `0.6` and top-p
+`0.95`. Moonshot's API uses `thinking: {type: disabled}`, but the tested
+Direct-from-Azure gateway rejects that field and accepts
+`reasoning_effort: none`; the model YAML records this profile-specific
+mapping. Its vLLM endpoint maps disabled thinking to
+`chat_template_kwargs.thinking: false`. GPT uses `reasoning_effort: high`,
+sent as `reasoning.effort` to Responses.
+
+Use `--structured-output json_schema` for a separate constrained-output Luna
+run. This does not alter the default prompt-only comparison track. The
+provider schema copy omits `uniqueItems`, which Azure Structured Outputs does
+not accept; deterministic post-generation validation still applies the full
+project contract.
 
 ## Reasoning capture
 
@@ -369,6 +398,12 @@ as the benchmark schema and never contributes to a metric. Keep the same
 capture setting across compared runs, because requesting a provider summary
 can change cost or latency.
 
+For MedGemma, a configured model-specific parser separates content enclosed
+by `<unused94>` and `<unused95>` before benchmark validation. The extracted
+text is retained under `response.reasoning`; only text outside that complete
+block is eligible to become the final JSON answer. Reasoning is never used to
+repair or infer a missing diagnosis.
+
 Use `--reasoning-capture none` if the output may contain sensitive material.
 Run outputs are ignored by Git by default.
 
@@ -389,9 +424,34 @@ outputs/benchmark_runs/<benchmark_id>/<model_id>/<timestamp>_<hash>/
 ```
 
 Every case is appended and flushed as soon as it reaches a terminal status:
-`ok`, `invalid_output`, `truncated_output`, `backend_error`, or
-`image_error`. A backend or image failure affects that case rather than
-silently removing it from the denominator.
+`ok`, `format_invalid`, `schema_invalid`, `semantic_noncompliant`,
+`truncated_output`, `safety_refusal`, `backend_error`, or `image_error`.
+The precedence is truncation, strict JSON format, schema, semantic contract,
+and finally `ok`. `invalid_output` remains readable only for compatibility
+with older artifacts; reports map it to the corresponding granular layer. A
+backend or image failure affects that case rather than silently removing it
+from the denominator.
+
+`json_validity_rate` is the strict prompt-contract metric.
+`recoverable_json_validity_rate` additionally recognizes exactly one complete
+Markdown JSON fence with no surrounding prose. Recovery is reported for
+production diagnostics but does not turn the strict benchmark case into
+`ok`. Provider content-policy blocks use `safety_refusal` and retain only
+safe category, severity, code, and request-ID metadata when available.
+
+Ranked-list benchmarks also expose a separate canonical view for transparent
+post-processing analysis. A JSON array of disease IDs is deterministically
+projected to the requested `{rank, disease_id}` objects because array order
+fully determines rank. This produces `response.canonical_output`,
+`response.canonicalization_rules`, and `canonical_*` metrics while leaving
+the strict status and strict metrics unchanged. The canonicalizer never
+extracts labels from prose or reasoning.
+
+Evidence-grounded clinical metrics use recoverable, individually valid fields
+from the parsed response. They are not zeroed merely because another contract
+layer failed. For example, a correct Top-1 diagnosis still counts when
+`case_confidence` uses the wrong band, while
+`semantic_compliance_rate` records that inconsistency separately.
 
 Resume an interrupted or failed run with its exact directory:
 

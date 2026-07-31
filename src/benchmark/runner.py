@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 import json
 from typing import Any, Iterable, Protocol
 
+from src.benchmark.json_parsing import parse_json_output
+
 
 class ModelBackend(Protocol):
     """Minimal backend contract shared by local and API model adapters."""
@@ -33,6 +35,10 @@ class ModelResponse:
     parsed_output: dict[str, Any] | None
     json_valid: bool
     schema_valid: bool
+    recoverable_json_valid: bool = False
+    canonical_output: dict[str, Any] | None = None
+    canonical_schema_valid: bool = False
+    canonicalization_rules: list[str] = field(default_factory=list)
     validation_errors: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -192,19 +198,22 @@ def parse_and_validate_response(
 ) -> ModelResponse:
     """Parse JSON and enforce benchmark rules not expressible as basic types."""
 
-    try:
-        parsed = json.loads(raw_text)
-    except (TypeError, json.JSONDecodeError) as exc:
+    parse_result = parse_json_output(raw_text)
+    if not parse_result.recoverable_valid:
         return ModelResponse(
             model_id=model_id,
             raw_text=raw_text,
             parsed_output=None,
             json_valid=False,
             schema_valid=False,
-            validation_errors=[f"invalid_json:{exc}"],
+            recoverable_json_valid=False,
+            validation_errors=[f"invalid_json:{parse_result.error}"],
         )
+    parsed = parse_result.decoded
 
     errors: list[str] = []
+    if not parse_result.raw_valid:
+        errors.append(f"invalid_json:{parse_result.error}")
     if not isinstance(parsed, dict):
         errors.append("root_must_be_object")
         predictions: Any = None
@@ -244,14 +253,94 @@ def parse_and_validate_response(
     if len(disease_ids) != len(set(disease_ids)):
         errors.append("disease_ids_must_be_unique")
 
+    (
+        canonical_output,
+        canonical_errors,
+        canonicalization_rules,
+    ) = _canonicalize_ranked_output(
+        parsed,
+        allowed_disease_ids=allowed_disease_ids,
+        top_k=top_k,
+    )
+    if parse_result.recovery is not None:
+        canonicalization_rules.insert(0, parse_result.recovery)
+
     return ModelResponse(
         model_id=model_id,
         raw_text=raw_text,
         parsed_output=parsed,
-        json_valid=True,
+        json_valid=parse_result.raw_valid,
         schema_valid=not errors,
+        recoverable_json_valid=parse_result.recoverable_valid,
+        canonical_output=canonical_output,
+        canonical_schema_valid=not canonical_errors,
+        canonicalization_rules=canonicalization_rules,
         validation_errors=errors,
+        metadata={"json_recovery": parse_result.recovery},
     )
+
+
+def _canonicalize_ranked_output(
+    parsed: Any,
+    *,
+    allowed_disease_ids: set[str],
+    top_k: int,
+) -> tuple[dict[str, Any] | None, list[str], list[str]]:
+    """Project equivalent ranked-list forms into the benchmark schema.
+
+    This projection is deliberately narrow. It accepts the requested object
+    representation or a JSON array of disease IDs whose order unambiguously
+    defines rank. It never extracts diagnoses from prose or reasoning.
+    """
+
+    rules: list[str] = []
+    if not isinstance(parsed, dict) or set(parsed) != {"predictions"}:
+        return None, ["canonical_root_invalid"], rules
+    predictions = parsed.get("predictions")
+    if not isinstance(predictions, list):
+        return None, ["canonical_predictions_invalid"], rules
+
+    if predictions and all(
+        isinstance(item, str) for item in predictions
+    ):
+        canonical_predictions = [
+            {"rank": rank, "disease_id": disease_id}
+            for rank, disease_id in enumerate(predictions, start=1)
+        ]
+        rules.append("ranked_disease_id_list_to_objects")
+    else:
+        canonical_predictions = predictions
+
+    errors: list[str] = []
+    if len(canonical_predictions) != top_k:
+        errors.append(f"prediction_count_must_equal_{top_k}")
+    ranks: list[int] = []
+    disease_ids: list[str] = []
+    for index, prediction in enumerate(canonical_predictions):
+        if not isinstance(prediction, dict):
+            errors.append(f"prediction_{index}_must_be_object")
+            continue
+        if set(prediction) != {"rank", "disease_id"}:
+            errors.append(f"prediction_{index}_fields_invalid")
+        rank = prediction.get("rank")
+        disease_id = prediction.get("disease_id")
+        if not isinstance(rank, int) or isinstance(rank, bool):
+            errors.append(f"prediction_{index}_rank_invalid")
+        else:
+            ranks.append(rank)
+        if not isinstance(disease_id, str):
+            errors.append(f"prediction_{index}_disease_id_invalid")
+        else:
+            disease_ids.append(disease_id)
+            if disease_id not in allowed_disease_ids:
+                errors.append(f"prediction_{index}_disease_id_unknown")
+    if ranks != list(range(1, top_k + 1)):
+        errors.append("ranks_must_be_consecutive")
+    if len(disease_ids) != len(set(disease_ids)):
+        errors.append("disease_ids_must_be_unique")
+    if errors:
+        return None, errors, rules
+    return {"predictions": canonical_predictions}, [], rules
 
 
 def _render_template(template: str, **values: Any) -> str:

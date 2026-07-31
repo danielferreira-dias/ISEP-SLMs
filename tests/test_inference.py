@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -11,6 +12,7 @@ import unittest
 from src.inference.base import (
     InferenceConfigurationError,
     InferenceRequest,
+    InferenceSafetyRefusal,
     InferenceTransportError,
 )
 from src.inference.azure import AzureBackend
@@ -20,6 +22,7 @@ from src.inference.openai_compatible import (
     OpenAICompatibleChatBackend,
 )
 from src.inference.responses import AzureResponsesBackend
+from src.inference.reasoning_parsing import separate_embedded_reasoning
 from src.inference.vllm import (
     ManagedVllmServer,
     VllmBackend,
@@ -73,7 +76,237 @@ class _FakeClient:
         )
 
 
+class _AsyncCreateEndpoint:
+    def __init__(self, response=None, error: Exception | None = None) -> None:
+        self.response = response
+        self.error = error
+        self.payload = None
+
+    async def create(self, **kwargs):
+        self.payload = kwargs
+        if self.error is not None:
+            raise self.error
+        return self.response
+
+
+class _FakeAsyncClient:
+    def __init__(self, *, chat_response=None, error=None) -> None:
+        self.chat_create = _AsyncCreateEndpoint(chat_response, error)
+        self.chat = SimpleNamespace(completions=self.chat_create)
+
+
+class _AsyncStream:
+    def __init__(self, chunks) -> None:
+        self._chunks = iter(chunks)
+        self.closed = False
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        try:
+            return next(self._chunks)
+        except StopIteration:
+            raise StopAsyncIteration from None
+
+    async def close(self) -> None:
+        self.closed = True
+
+
 class OpenAICompatibleBackendTests(unittest.TestCase):
+    def test_async_chat_transport_uses_native_async_client(self) -> None:
+        response = SimpleNamespace(
+            id="chat_async",
+            model="served-model",
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content='{"result":"ok"}'),
+                )
+            ],
+            usage=SimpleNamespace(
+                prompt_tokens=10,
+                completion_tokens=5,
+                total_tokens=15,
+            ),
+        )
+        async_client = _FakeAsyncClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="model",
+            request_model="served-model",
+            async_client=async_client,
+        )
+        request = InferenceRequest(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        result = asyncio.run(backend.acomplete(request))
+
+        self.assertEqual(result.final_text, '{"result":"ok"}')
+        self.assertEqual(result.usage.total_tokens, 15)
+        self.assertEqual(
+            async_client.chat_create.payload["model"],
+            "served-model",
+        )
+
+    def test_async_stream_preserves_content_reasoning_and_usage(self) -> None:
+        stream = _AsyncStream(
+            [
+                SimpleNamespace(
+                    id="stream_async",
+                    model="served-model",
+                    choices=[
+                        SimpleNamespace(
+                            finish_reason=None,
+                            delta=SimpleNamespace(
+                                content=None,
+                                reasoning_content="Inspect ",
+                            ),
+                        )
+                    ],
+                    usage=None,
+                ),
+                SimpleNamespace(
+                    id="stream_async",
+                    model="served-model",
+                    choices=[
+                        SimpleNamespace(
+                            finish_reason="stop",
+                            delta=SimpleNamespace(
+                                content='{"ok":true}',
+                                reasoning_content="image.",
+                            ),
+                        )
+                    ],
+                    usage=SimpleNamespace(
+                        prompt_tokens=10,
+                        completion_tokens=7,
+                        total_tokens=17,
+                        completion_tokens_details=SimpleNamespace(
+                            reasoning_tokens=2
+                        ),
+                    ),
+                ),
+            ]
+        )
+        backend = OpenAICompatibleChatBackend(
+            model_id="model",
+            async_client=_FakeAsyncClient(chat_response=stream),
+            reasoning_capture="full",
+            stream_responses=True,
+        )
+
+        result = asyncio.run(
+            backend.acomplete(
+                InferenceRequest(
+                    system_prompt="System",
+                    user_prompt="User",
+                    image_bytes=b"image",
+                    schema={},
+                )
+            )
+        )
+
+        self.assertEqual(result.final_text, '{"ok":true}')
+        self.assertEqual(result.reasoning.text, "Inspect image.")
+        self.assertEqual(result.usage.reasoning_tokens, 2)
+        self.assertTrue(result.metadata["async_transport"])
+        self.assertTrue(stream.closed)
+
+    def test_kimi_instant_mode_uses_official_thinking_control(self) -> None:
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content="{}"),
+                )
+            ],
+            usage=None,
+        )
+        client = _FakeClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="kimi",
+            client=client,
+            generation={"thinking_mode": "disabled"},
+            thinking_control="kimi_api",
+        )
+
+        backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        self.assertEqual(
+            client.chat_create.payload["extra_body"]["thinking"],
+            {"type": "disabled"},
+        )
+        self.assertNotIn("reasoning_effort", client.chat_create.payload)
+
+    def test_vllm_thinking_control_uses_chat_template_kwargs(self) -> None:
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content="{}"),
+                )
+            ],
+            usage=None,
+        )
+        client = _FakeClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="kimi",
+            client=client,
+            generation={"thinking_mode": "disabled"},
+            thinking_control="chat_template",
+        )
+
+        backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        self.assertFalse(
+            client.chat_create.payload["extra_body"]
+            ["chat_template_kwargs"]["thinking"]
+        )
+
+    def test_azure_fallback_maps_disabled_thinking_to_no_effort(self) -> None:
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content="{}"),
+                )
+            ],
+            usage=None,
+        )
+        client = _FakeClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="kimi",
+            client=client,
+            generation={"thinking_mode": "disabled"},
+            thinking_control="reasoning_effort",
+        )
+
+        backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        self.assertEqual(
+            client.chat_create.payload["reasoning_effort"],
+            "none",
+        )
+
     def test_chat_transport_separates_final_text_and_reasoning(self) -> None:
         response = SimpleNamespace(
             id="chat_123",
@@ -301,6 +534,47 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
 
 
 class ResponsesBackendTests(unittest.TestCase):
+    def test_content_policy_error_becomes_structured_safety_refusal(
+        self,
+    ) -> None:
+        class ProviderError(RuntimeError):
+            status_code = 400
+            body = {
+                "error": {
+                    "code": "content_policy_violation",
+                    "message": "Image processing blocked.",
+                    "innererror": {
+                        "content_filter_result": {
+                            "violence": {
+                                "filtered": True,
+                                "severity": "medium",
+                            }
+                        }
+                    },
+                }
+            }
+
+        backend = AzureResponsesBackend(
+            model_id="gpt",
+            client=_FakeClient(error=ProviderError("secret")),
+        )
+
+        with self.assertRaises(InferenceSafetyRefusal) as context:
+            backend.generate_result(
+                system_prompt="System",
+                user_prompt="User",
+                image_bytes=b"image",
+                schema={},
+            )
+
+        self.assertEqual(
+            context.exception.details["code"],
+            "content_policy_violation",
+        )
+        self.assertTrue(
+            context.exception.details["content_filter"]["innererror"]
+            ["content_filter_result"]["violence"]["filtered"]
+        )
     def test_responses_requests_official_summary_and_marks_truncation(
         self,
     ) -> None:
@@ -411,12 +685,24 @@ class ResponsesBackendTests(unittest.TestCase):
             system_prompt="System",
             user_prompt="User",
             image_bytes=b"image",
-            schema={"type": "object"},
+            schema={
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "uniqueItems": True,
+                    }
+                },
+            },
         )
 
         text_format = client.responses_create.payload["text"]["format"]
         self.assertEqual(text_format["type"], "json_schema")
         self.assertTrue(text_format["strict"])
+        self.assertNotIn(
+            "uniqueItems",
+            text_format["schema"]["properties"]["items"],
+        )
 
     def test_responses_transport_exposes_only_structured_error_detail(
         self,
@@ -453,6 +739,163 @@ class ResponsesBackendTests(unittest.TestCase):
 
 
 class VllmBackendTests(unittest.TestCase):
+    def test_medgemma_reasoning_without_final_answer_stays_empty(self) -> None:
+        separated = separate_embedded_reasoning(
+            "<unused94>thought\nRank D003 first.<unused95>",
+            parser="medgemma_special_tokens",
+        )
+
+        self.assertEqual(separated.reasoning_text, "Rank D003 first.")
+        self.assertEqual(separated.final_text, "")
+        self.assertTrue(separated.complete_block)
+
+    def test_medgemma_stream_separates_embedded_reasoning(self) -> None:
+        chunks = [
+            SimpleNamespace(
+                id="medgemma_stream",
+                model="google/medgemma-1.5-4b-it",
+                choices=[
+                    SimpleNamespace(
+                        finish_reason=None,
+                        delta=SimpleNamespace(
+                            content="<unused94>thought\nInspect nails.",
+                        ),
+                    )
+                ],
+                usage=None,
+            ),
+            SimpleNamespace(
+                id="medgemma_stream",
+                model="google/medgemma-1.5-4b-it",
+                choices=[
+                    SimpleNamespace(
+                        finish_reason="stop",
+                        delta=SimpleNamespace(
+                            content=(
+                                "<unused95>"
+                                '{"predictions":["D003"]}'
+                            ),
+                        ),
+                    )
+                ],
+                usage=None,
+            ),
+        ]
+
+        class StreamingEndpoint:
+            def create(self, **kwargs):
+                return iter(chunks)
+
+        client = _FakeClient()
+        client.chat.completions = StreamingEndpoint()
+        backend = VllmBackend(
+            model_id="medgemma",
+            client=client,
+            reasoning_capture="full",
+            embedded_reasoning_parser="medgemma_special_tokens",
+        )
+
+        result = backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        self.assertEqual(
+            result.final_text,
+            '{"predictions":["D003"]}',
+        )
+        self.assertEqual(result.reasoning.text, "Inspect nails.")
+        self.assertEqual(
+            result.reasoning.source_field,
+            "content.medgemma_special_tokens",
+        )
+        self.assertTrue(
+            result.metadata["embedded_reasoning_block_complete"]
+        )
+
+    def test_completion_streams_content_reasoning_and_usage(self) -> None:
+        chunks = [
+            SimpleNamespace(
+                id="chat_stream",
+                model="Qwen/Qwen3.6-27B",
+                choices=[
+                    SimpleNamespace(
+                        finish_reason=None,
+                        delta=SimpleNamespace(
+                            content=None,
+                            reasoning_content="Inspect ",
+                        ),
+                    )
+                ],
+                usage=None,
+            ),
+            SimpleNamespace(
+                id="chat_stream",
+                model="Qwen/Qwen3.6-27B",
+                choices=[
+                    SimpleNamespace(
+                        finish_reason="stop",
+                        delta=SimpleNamespace(
+                            content='{"predictions":[]}',
+                            reasoning_content="morphology.",
+                        ),
+                    )
+                ],
+                usage=None,
+            ),
+            SimpleNamespace(
+                id="chat_stream",
+                model="Qwen/Qwen3.6-27B",
+                choices=[],
+                usage=SimpleNamespace(
+                    prompt_tokens=20,
+                    completion_tokens=12,
+                    total_tokens=32,
+                    completion_tokens_details=SimpleNamespace(
+                        reasoning_tokens=7,
+                    ),
+                ),
+            ),
+        ]
+
+        class StreamingEndpoint:
+            def __init__(self) -> None:
+                self.payload = None
+
+            def create(self, **kwargs):
+                self.payload = kwargs
+                return iter(chunks)
+
+        client = _FakeClient()
+        endpoint = StreamingEndpoint()
+        client.chat.completions = endpoint
+        backend = VllmBackend(
+            model_id="qwen",
+            request_model="Qwen/Qwen3.6-27B",
+            client=client,
+            reasoning_capture="full",
+        )
+
+        result = backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        self.assertTrue(endpoint.payload["stream"])
+        self.assertEqual(
+            endpoint.payload["stream_options"],
+            {"include_usage": True},
+        )
+        self.assertEqual(result.final_text, '{"predictions":[]}')
+        self.assertEqual(result.reasoning.text, "Inspect morphology.")
+        self.assertEqual(result.reasoning.token_count, 7)
+        self.assertEqual(result.finish_reason, "stop")
+        self.assertTrue(result.metadata["streamed"])
+
     def test_preflight_checks_health_and_exact_served_model(self) -> None:
         backend = VllmBackend(
             model_id="qwen",

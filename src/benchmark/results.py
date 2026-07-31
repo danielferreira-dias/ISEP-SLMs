@@ -15,9 +15,14 @@ import yaml
 
 TERMINAL_RECORD_STATUSES = {
     "ok",
+    # Legacy aggregate status retained for older run artifacts.
     "invalid_output",
+    "format_invalid",
+    "schema_invalid",
+    "semantic_noncompliant",
     "truncated_output",
     "backend_error",
+    "safety_refusal",
     "image_error",
 }
 

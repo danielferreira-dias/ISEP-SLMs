@@ -20,7 +20,18 @@ completion = client.chat.completions.create(
             "content": "What is seborrheic dermatitis?",
         }
     ],
-    reasoning_effort="medium",
+    temperature=0.6,
+    top_p=0.95,
+    # The Direct-from-Azure gateway rejects Moonshot's official
+    # `thinking: {type: disabled}` object. Its accepted no-reasoning
+    # compatibility control is reasoning_effort="none".
+    reasoning_effort="none",
 )
 
-print(completion.choices[0].message)
+message = completion.choices[0].message
+print("answer:", message.content)
+print(
+    "reasoning:",
+    getattr(message, "reasoning", None)
+    or getattr(message, "reasoning_content", None),
+)

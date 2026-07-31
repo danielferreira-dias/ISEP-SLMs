@@ -121,6 +121,12 @@ class VllmBackend(OpenAICompatibleChatBackend):
         health_timeout_seconds: float = 2.0,
         **kwargs: Any,
     ) -> None:
+        # A timed-out generation is still expensive server-side. Do not let
+        # the OpenAI SDK silently duplicate local vLLM requests.
+        kwargs.setdefault("max_retries", 0)
+        # Long thinking generations can leave reverse proxies idle for
+        # minutes. Stream vLLM deltas so the connection remains active.
+        kwargs.setdefault("stream_responses", True)
         resolved_api_key = api_key
         resolved_api_key_env = api_key_env
         if (

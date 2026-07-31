@@ -10,7 +10,11 @@ import pandas as pd
 import yaml
 
 from src.benchmark.datasets import load_benchmark_dataset
-from src.benchmark.executor import BenchmarkExecutor, ExecutionConfig
+from src.benchmark.executor import (
+    BenchmarkExecutor,
+    ExecutionConfig,
+    _classify_response_status,
+)
 from src.benchmark.results import (
     RunPaths,
     RunWriter,
@@ -19,6 +23,7 @@ from src.benchmark.results import (
 )
 from src.benchmark.runner import (
     BenchmarkSample,
+    ModelResponse,
     parse_and_validate_response,
 )
 from src.benchmark.selection import select_units, task_seed
@@ -177,6 +182,42 @@ class RunWriterTests(unittest.TestCase):
 
 
 class BenchmarkExecutorTests(unittest.TestCase):
+    def test_output_statuses_identify_the_failed_contract_layer(self) -> None:
+        response = ModelResponse(
+            model_id="test",
+            raw_text="",
+            parsed_output={},
+            json_valid=False,
+            schema_valid=False,
+            metadata={"semantic_valid": False},
+        )
+        self.assertEqual(
+            _classify_response_status(response, truncated=False),
+            "format_invalid",
+        )
+
+        response.json_valid = True
+        self.assertEqual(
+            _classify_response_status(response, truncated=False),
+            "schema_invalid",
+        )
+
+        response.schema_valid = True
+        self.assertEqual(
+            _classify_response_status(response, truncated=False),
+            "semantic_noncompliant",
+        )
+
+        response.metadata["semantic_valid"] = True
+        self.assertEqual(
+            _classify_response_status(response, truncated=False),
+            "ok",
+        )
+        self.assertEqual(
+            _classify_response_status(response, truncated=True),
+            "truncated_output",
+        )
+
     def test_reasoning_is_saved_but_only_final_text_is_parsed(self) -> None:
         class Prepared:
             system_prompt = "system"
@@ -210,6 +251,12 @@ class BenchmarkExecutorTests(unittest.TestCase):
             model_id = "test"
 
             def complete(self, request: InferenceRequest) -> InferenceResult:
+                raise AssertionError("executor must use acomplete")
+
+            async def acomplete(
+                self,
+                request: InferenceRequest,
+            ) -> InferenceResult:
                 return InferenceResult(
                     model_id=self.model_id,
                     final_text=(

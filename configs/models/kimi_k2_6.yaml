@@ -34,21 +34,26 @@ backend:
       type: api
       engine: azure_openai
       api_style: chat_completions
+      # Direct-from-Azure rejects Moonshot's `thinking` request object.
+      # Its OpenAI-compatible gateway exposes the generic effort control.
+      thinking_control: reasoning_effort
       endpoint_env: KIMI_K2_6_AZURE_ENDPOINT
       api_key_env: KIMI_K2_6_AZURE_API_KEY
       deployment_env: KIMI_K2_6_AZURE_DEPLOYMENT
-      api_version_env: KIMI_K2_6_AZURE_API_VERSION
     vllm_endpoint:
       type: api
       engine: vllm_endpoint
       api_style: chat_completions
+      thinking_control: chat_template
       base_url_env: KIMI_K2_6_VLLM_BASE_URL
       api_key_env: KIMI_K2_6_VLLM_API_KEY
       model_env: KIMI_K2_6_VLLM_MODEL
 
 generation:
-  profile: provider_default
-  reasoning_effort: medium
+  profile: kimi_instant
+  thinking_mode: disabled
+  temperature: 0.6
+  top_p: 0.95
 
 security:
   trust_remote_code: false

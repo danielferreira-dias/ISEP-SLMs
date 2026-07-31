@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 from dataclasses import replace
 import json
 import os
@@ -165,6 +166,15 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     run_parser.add_argument(
+        "--structured-output",
+        choices=("benchmark", "prompt_only", "json_schema"),
+        default="benchmark",
+        help=(
+            "Use the benchmark-declared mode or explicitly opt into prompt "
+            "only / strict JSON Schema output (default: benchmark)."
+        ),
+    )
+    run_parser.add_argument(
         "--batch-size",
         type=_positive_integer,
         help="Override only the runtime request concurrency.",
@@ -227,6 +237,11 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         backend_profile=args.backend_profile,
     )
     benchmark = load_benchmark_config(args.benchmark, root=root)
+    args.structured_output = (
+        benchmark.structured_output.mode
+        if args.structured_output == "benchmark"
+        else args.structured_output
+    )
     raw_model = _load_yaml(model.config_path)
     raw_benchmark = _load_yaml(benchmark.config_path)
     prompt = _load_yaml(benchmark.prompt_path)
@@ -238,7 +253,11 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
             "Disease taxonomy must contain a top-level 'diseases' list"
         )
 
-    _validate_compatibility(model=model, benchmark=benchmark)
+    _validate_compatibility(
+        model=model,
+        benchmark=benchmark,
+        structured_output_mode=args.structured_output,
+    )
     _validate_runtime_options(args=args, model=model)
     adapter = build_task_adapter(
         benchmark_config=raw_benchmark,
@@ -268,6 +287,7 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         environment=environment,
         server_mode=args.server_mode,
         reasoning_capture=args.reasoning_capture,
+        structured_output_mode=args.structured_output,
     )
     with ImageResolver(root) as resolver:
         def image_loader(image_uri: str) -> bytes:
@@ -318,6 +338,7 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         )
 
         server: ManagedVllmServer | None = None
+        backend: Any | None = None
         try:
             backend, server = _create_runtime_backend(
                 model=model,
@@ -336,20 +357,36 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
                     benchmark.execution.save_rendered_prompts
                 ),
             )
-            summary = BenchmarkExecutor(
+            executor = BenchmarkExecutor(
                 backend=backend,
                 adapter=adapter,
                 image_loader=image_loader,
                 writer=writer,
                 execution=execution,
                 generation=model.generation,
-            ).run(dataset.samples)
+            )
+            try:
+                summary = asyncio.run(
+                    _execute_and_close_backend(
+                        executor=executor,
+                        samples=dataset.samples,
+                        backend=backend,
+                    )
+                )
+            finally:
+                # The async client must be closed on the same event loop that
+                # executed its requests. Do not close it again below.
+                backend = None
         except BaseException as exc:
             _finalize_failed_run(writer, exc)
             raise
         finally:
-            if server is not None:
-                server.stop()
+            try:
+                if backend is not None:
+                    asyncio.run(backend.aclose())
+            finally:
+                if server is not None:
+                    server.stop()
         try:
             report_path = generate_run_report(
                 paths.directory,
@@ -371,6 +408,20 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         output["report_error"] = report_error
     print(json.dumps(output, indent=2, sort_keys=True))
     return 0
+
+
+async def _execute_and_close_backend(
+    *,
+    executor: BenchmarkExecutor,
+    samples: Sequence[Any],
+    backend: Any,
+) -> Any:
+    """Execute requests and close the async client on the same event loop."""
+
+    try:
+        return await executor.arun(samples)
+    finally:
+        await backend.aclose()
 
 
 def _create_runtime_backend(
@@ -406,6 +457,7 @@ def _create_runtime_backend(
                 model,
                 base_url=server_config.base_url,
                 reasoning_capture=args.reasoning_capture,
+                use_json_schema=args.structured_output == "json_schema",
             )
             backend.require_ready()
             return backend, server
@@ -422,11 +474,13 @@ def _create_runtime_backend(
             model,
             base_url=args.base_url,
             reasoning_capture=args.reasoning_capture,
+            use_json_schema=args.structured_output == "json_schema",
         )
     else:
         backend = create_backend(
             model,
             reasoning_capture=args.reasoning_capture,
+            use_json_schema=args.structured_output == "json_schema",
         )
     if profile.type == "local" and hasattr(backend, "require_ready"):
         backend.require_ready()
@@ -437,18 +491,19 @@ def _validate_compatibility(
     *,
     model: ModelConfig,
     benchmark: BenchmarkConfig,
+    structured_output_mode: str,
 ) -> None:
     if not model.usage.benchmark:
         raise ValueError(f"Model {model.model.id!r} is not enabled for benchmarks")
     if "image" not in model.capabilities.modalities:
         raise ValueError(f"Model {model.model.id!r} does not support images")
     if (
-        benchmark.structured_output.mode
+        structured_output_mode
         not in model.capabilities.structured_output_modes
     ):
         raise ValueError(
             f"Model {model.model.id!r} does not support structured-output "
-            f"mode {benchmark.structured_output.mode!r}"
+            f"mode {structured_output_mode!r}"
         )
     cap = benchmark.execution.max_output_tokens
     maximum_output = model.capabilities.maximum_output_tokens
@@ -571,7 +626,8 @@ def _run_identity(
         "reasoning_capture": args.reasoning_capture,
         "batch_size": str(effective_batch_size),
         "max_output_tokens": str(benchmark.execution.max_output_tokens),
-        "structured_output_mode": benchmark.structured_output.mode,
+        "structured_output_mode": args.structured_output,
+        "execution_transport": "asyncio_v1",
     }
 
 
@@ -641,6 +697,7 @@ def _run_manifest(
             "engine": profile.engine,
             "api_style": profile.api_style,
             "server_mode": args.server_mode,
+            "execution_transport": "asyncio_v1",
         },
         "evaluation": {
             "evaluation_set": dataset.evaluation_set,
@@ -649,7 +706,7 @@ def _run_manifest(
             "seed": args.seed,
             "max_output_tokens": benchmark.execution.max_output_tokens,
             "reasoning_capture": args.reasoning_capture,
-            "structured_output": benchmark.structured_output.mode,
+            "structured_output": args.structured_output,
         },
     }
 
@@ -662,6 +719,7 @@ def _dry_run_summary(
     environment: dict[str, Any],
     server_mode: str,
     reasoning_capture: str,
+    structured_output_mode: str,
 ) -> dict[str, Any]:
     profile = model.backend.active_profile
     return {
@@ -681,6 +739,8 @@ def _dry_run_summary(
             "server_mode": server_mode,
         },
         "reasoning_capture": reasoning_capture,
+        "execution_transport": "asyncio_v1",
+        "structured_output": structured_output_mode,
         "max_output_tokens": benchmark.execution.max_output_tokens,
         "gpu_available": environment["gpu"]["available"],
         "credential_environment": environment["credentials"],

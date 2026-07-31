@@ -2,7 +2,7 @@
 
 benchmark:
   id: visual_top_k_closed_set
-  version: 3.4.1
+  version: 3.5.0
   task: visual_disease_ranking
   description: >
     Evaluates how accurately a vision-language model ranks dermatological diseases from a fixed taxonomy. The same configuration must be used for
@@ -90,6 +90,18 @@ subgroup_evaluation:
     include_worst_group_metric: true
     report_by_dataset: true
     report_by_disease_when_supported: true
+    exact_skin_tone_group_format: "<skin_tone_system>:<skin_tone>"
+    aggregate_skin_tone_bands:
+      fitzpatrick:
+        - FST_1-2
+        - FST_3-4
+        - FST_5-6
+      monk:
+        - MST_1-3
+        - MST_4-6
+        - MST_7-10
+    missing_skin_tone_group: unknown
+    confidence_interval_method: wilson
 
 metrics:
   - id: top_1_accuracy

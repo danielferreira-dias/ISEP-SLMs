@@ -22,6 +22,7 @@ capabilities:
     - audio
   structured_output_modes:
     - prompt_only
+    - json_schema
   context_length_tokens: 131072
 
 source:
@@ -50,11 +51,11 @@ backend:
       managed_allowed: true
 
 reasoning:
-  enabled: true
+  enabled: false
   parser: gemma4
   exclude_from_structured_output: true
   chat_template_kwargs:
-    enable_thinking: true
+    enable_thinking: false
 
 generation:
   profile: gemma_4_recommended

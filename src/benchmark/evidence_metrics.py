@@ -25,9 +25,10 @@ def compute_evidence_grounded_metrics(
 
     Cohorts are selected by the ``score_morphology``, ``score_description``,
     and ``score_diagnosis`` fields stored in each prediction's metadata.
-    Structurally or semantically invalid final answers count as incorrect for
-    task-performance metrics, while their parseable fields still contribute to
-    explicit structure and evidence-link audit rates.
+    Task-performance metrics use recoverable, individually valid fields even
+    when another output-contract layer fails. JSON, schema, semantic, and
+    evidence-link compliance remain separate metrics, so a confidence-band
+    mismatch does not automatically turn a correct diagnosis into an error.
     """
 
     rows = list(predictions)
@@ -150,8 +151,6 @@ def _morphology_metrics(
         )
         predicted = (
             _declared_concepts(row.response) & allowed_concept_id_set
-            if _fully_valid(row.response)
-            else set()
         )
         precision, recall, f1 = _set_scores(predicted, reference)
         sample_precision.append(precision)
@@ -225,18 +224,14 @@ def _description_metrics(
             row,
             allowed_concept_id_set=allowed_concept_id_set,
         )
-        if _fully_valid(row.response):
-            described = _description_concepts(
-                row.response,
-                allowed_concept_id_set=allowed_concept_id_set,
-            )
-            declared = (
-                _declared_concepts(row.response) & allowed_concept_id_set
-            )
-            consistency = _set_scores(described, declared)[2]
-        else:
-            described = set()
-            consistency = 0.0
+        described = _description_concepts(
+            row.response,
+            allowed_concept_id_set=allowed_concept_id_set,
+        )
+        declared = (
+            _declared_concepts(row.response) & allowed_concept_id_set
+        )
+        consistency = _set_scores(described, declared)[2]
         precision, recall, f1 = _set_scores(described, reference)
         precision_scores.append(precision)
         recall_scores.append(recall)
@@ -276,15 +271,11 @@ def _diagnosis_metrics(
     top_one_predictions: list[str | None] = []
     truths: list[str] = []
     for row in rows:
-        ranked = (
-            [
-                disease_id
-                for disease_id in _ranked_disease_ids(row.response)
-                if disease_id in allowed_disease_id_set
-            ]
-            if _fully_valid(row.response)
-            else []
-        )
+        ranked = [
+            disease_id
+            for disease_id in _ranked_disease_ids(row.response)
+            if disease_id in allowed_disease_id_set
+        ]
         truth = row.ground_truth_disease_id
         truths.append(truth)
         top_one_predictions.append(ranked[0] if ranked else None)
@@ -330,7 +321,7 @@ def _grounding_metrics(
     resolved_links = 0
     resolved_visible_links = 0
     grounded_top_one = 0
-    structurally_correct_top_one = 0
+    correct_top_one = 0
     unsupported_correct_top_one = 0
     for row in rows:
         reference = _reference_concepts(
@@ -357,13 +348,9 @@ def _grounding_metrics(
             for support_id in top_support_ids
             if support_id in finding_map
         ]
-        structurally_correct = (
-            row.response.json_valid
-            and row.response.schema_valid
-            and top_disease == row.ground_truth_disease_id
-        )
-        if structurally_correct:
-            structurally_correct_top_one += 1
+        top_one_correct = top_disease == row.ground_truth_disease_id
+        if top_one_correct:
+            correct_top_one += 1
             unsupported_correct_top_one += int(
                 not top_concepts
                 or all(
@@ -372,8 +359,7 @@ def _grounding_metrics(
                 )
             )
         grounded_top_one += int(
-            _fully_valid(row.response)
-            and top_disease == row.ground_truth_disease_id
+            top_disease == row.ground_truth_disease_id
             and bool(top_support_ids)
             and len(top_concepts) == len(top_support_ids)
             and all(concept_id in reference for concept_id in top_concepts)
@@ -389,8 +375,8 @@ def _grounding_metrics(
         ),
         "grounded_top_1_success": grounded_top_one / len(rows),
         "correct_diagnosis_unsupported_evidence_rate": (
-            unsupported_correct_top_one / structurally_correct_top_one
-            if structurally_correct_top_one
+            unsupported_correct_top_one / correct_top_one
+            if correct_top_one
             else 0.0
         ),
     }
@@ -405,8 +391,6 @@ def _calibration_metrics(
     confidence_outcomes: list[tuple[float, int]] = []
     for row in rows:
         differential = _differential(row.response)
-        if not row.response.json_valid:
-            continue
         if not differential or not isinstance(differential[0], dict):
             continue
         top = differential[0]
@@ -415,8 +399,7 @@ def _calibration_metrics(
             continue
         disease_id = top.get("disease_id")
         correct = int(
-            _fully_valid(row.response)
-            and disease_id in allowed_disease_id_set
+            disease_id in allowed_disease_id_set
             and disease_id == row.ground_truth_disease_id
         )
         confidence_outcomes.append((float(confidence), correct))
@@ -462,6 +445,7 @@ def _structure_metrics(
 ) -> dict[str, float]:
     count = len(rows)
     json_valid = 0
+    recoverable_json_valid = 0
     schema_valid = 0
     semantic_valid = 0
     audit_counts = Counter(
@@ -477,11 +461,12 @@ def _structure_metrics(
     for row in rows:
         response = row.response
         json_valid += int(response.json_valid)
-        schema_valid += int(response.schema_valid)
+        recoverable_json_valid += int(
+            response.recoverable_json_valid
+        )
+        schema_valid += int(_independent_schema_valid(response))
         semantic_valid += int(
-            response.json_valid
-            and response.schema_valid
-            and bool(response.metadata.get("semantic_valid", False))
+            bool(response.metadata.get("semantic_valid", False))
         )
         audit = response.metadata.get("audit")
         fallback = _audit_response(response)
@@ -494,6 +479,9 @@ def _structure_metrics(
             audit_counts[key] += int(bool(value))
     return {
         "json_validity_rate": json_valid / count,
+        "recoverable_json_validity_rate": (
+            recoverable_json_valid / count
+        ),
         "schema_compliance_rate": schema_valid / count,
         "semantic_compliance_rate": semantic_valid / count,
         "invalid_disease_id_rate": (
@@ -515,6 +503,18 @@ def _structure_metrics(
             audit_counts["forbidden_description_content"] / count
         ),
     }
+
+
+def _independent_schema_valid(response: ModelResponse) -> bool:
+    """Recover independent schema validity from current or legacy records."""
+
+    schema_errors = response.metadata.get("schema_errors")
+    if isinstance(schema_errors, (list, tuple)):
+        return (
+            isinstance(response.parsed_output, dict)
+            and len(schema_errors) == 0
+        )
+    return response.schema_valid
 
 
 def _audit_response(response: ModelResponse) -> dict[str, bool]:
@@ -575,14 +575,6 @@ def _cohort_enabled(
     fallback: bool,
 ) -> bool:
     return bool(metadata[key]) if key in metadata else fallback
-
-
-def _fully_valid(response: ModelResponse) -> bool:
-    return (
-        response.json_valid
-        and response.schema_valid
-        and bool(response.metadata.get("semantic_valid", False))
-    )
 
 
 def _reference_concepts(

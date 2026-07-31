@@ -27,10 +27,20 @@ print(result.reasoning)
 print(result.usage)
 ```
 
+The benchmark executor uses the asynchronous contract:
+
+```python
+result = await backend.acomplete(request)
+```
+
+OpenAI-compatible chat and vLLM backends implement this natively with
+`AsyncOpenAI`. Synchronous-only transports use `asyncio.to_thread` as a
+compatibility fallback. `generate_batch_async(...)` is also available for
+direct callers.
+
 `generate(...)` remains available for older benchmark code and returns only
-`final_text`. `generate_batch(...)` currently runs a stable sequential loop;
-the method is intentionally part of the interface so a concurrent
-implementation can be added without changing the benchmark executor.
+`final_text`, while `generate_batch(...)` retains its stable sequential
+compatibility behavior.
 
 Local image bytes are sent as base64 `data:` URLs. JPEG, PNG, GIF, WebP, and
 BMP signatures are recognized automatically.
@@ -38,7 +48,11 @@ BMP signatures are recognized automatically.
 ## Transports
 
 - `VllmBackend` uses vLLM's OpenAI-compatible chat-completions server and adds
-  `/health` plus `/v1/models` preflight checks.
+  `/health` plus `/v1/models` preflight checks. Responses are streamed so long
+  reasoning generations do not leave cloud proxy connections idle, and SDK
+  retries are disabled to avoid duplicating expensive generations. Benchmark
+  requests use `AsyncOpenAI`; the async HTTP client is closed before a
+  managed server is stopped.
 - `OpenAICompatibleChatBackend` also supports provider-hosted chat endpoints,
   including Kimi-compatible deployments.
 - `AzureResponsesBackend` uses the Responses API. It supports the Azure
@@ -47,9 +61,32 @@ BMP signatures are recognized automatically.
 - `LocalBackend` and `AzureBackend` adapt normalized model configuration to
   these transports.
 
-The checked-in benchmark mode is `prompt_only`. JSON Schema response
-constraints are therefore disabled by default and must be explicitly enabled
-by a future constrained-decoding experiment.
+The checked-in benchmark mode is `prompt_only`. JSON Schema constraints stay
+disabled by default so cross-model comparisons remain prompt-only. For a
+separate production-reliability run on a compatible model, select
+`--structured-output json_schema`.
+
+In `json_schema` mode, the OpenAI-compatible backend sends the benchmark's
+task-specific schema through `response_format`:
+
+```python
+{
+    "type": "json_schema",
+    "json_schema": {
+        "name": "benchmark_response",
+        "strict": True,
+        "schema": task_schema,
+    },
+}
+```
+
+This is equivalent to supplying `BaseModel.model_json_schema()` in an
+application with a fixed Pydantic model. The benchmark schemas are loaded
+dynamically from the benchmark configuration, so validation remains in the
+benchmark validators instead of requiring one hard-coded Pydantic class per
+task. Keep `prompt_only` and `json_schema` as distinct experiment conditions:
+the former measures instruction following, while the latter measures
+diagnostic performance with constrained serialization.
 
 ## Reasoning capture
 
@@ -74,6 +111,12 @@ and never attempts to extract raw chain of thought.
 MedGemma requests do not use a separate system role. The system instructions
 are prepended to the first user text block while preserving image-first
 ordering, as required by that model's chat-template contract.
+MedGemma can also place a reasoning block directly in message content between
+`<unused94>` and `<unused95>`. Its model configuration enables a deterministic
+content parser that stores this block in `result.reasoning` and exposes only
+the content outside the block as `result.final_text`. If no final content
+exists after the closing token, the answer remains empty and invalid; the
+pipeline never derives a diagnosis from hidden reasoning.
 
 ## Managed vLLM process
 

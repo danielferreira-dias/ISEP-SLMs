@@ -56,6 +56,22 @@ class EvidenceResponseValidationTests(unittest.TestCase):
         self.assertFalse(response.json_valid)
         self.assertFalse(response.metadata["semantic_valid"])
 
+    def test_json_fence_is_format_invalid_but_semantically_compliant(
+        self,
+    ) -> None:
+        response = parse_and_validate_evidence_response(
+            model_id="test-model",
+            raw_text=f"```json\n{json.dumps(_valid_output())}\n```",
+            allowed_disease_ids=self.allowed_diseases,
+            allowed_concept_ids=self.allowed_concepts,
+            top_k=2,
+        )
+
+        self.assertFalse(response.json_valid)
+        self.assertTrue(response.recoverable_json_valid)
+        self.assertTrue(response.schema_valid)
+        self.assertTrue(response.metadata["semantic_valid"])
+
     def test_forbidden_description_is_a_semantic_not_schema_error(
         self,
     ) -> None:
@@ -109,6 +125,41 @@ class EvidenceResponseValidationTests(unittest.TestCase):
             allowed_concept_ids=self.allowed_concepts,
         )
         self.assertEqual(concepts, {"erythema", "plaque"})
+
+    def test_color_on_measuring_device_is_not_a_lesion_finding(self) -> None:
+        concepts = extract_morphology_concepts(
+            "A salmon-pink erythematous macule is partially obscured by a "
+            "white measuring device.",
+            allowed_concept_ids={
+                "salmon",
+                "erythema",
+                "macule",
+                "white_hypopigmentation",
+            },
+        )
+        self.assertEqual(concepts, {"salmon", "erythema", "macule"})
+
+    def test_color_attached_to_crust_is_a_lesion_finding(self) -> None:
+        concepts = extract_morphology_concepts(
+            "An erythematous plaque with scale and yellow crust.",
+            allowed_concept_ids={"erythema", "plaque", "scale", "yellow"},
+        )
+        self.assertEqual(
+            concepts,
+            {"erythema", "plaque", "scale", "yellow"},
+        )
+
+    def test_white_scale_is_not_misread_as_hypopigmentation(self) -> None:
+        concepts = extract_morphology_concepts(
+            "An erythematous plaque with adherent white scale.",
+            allowed_concept_ids={
+                "erythema",
+                "plaque",
+                "scale",
+                "white_hypopigmentation",
+            },
+        )
+        self.assertEqual(concepts, {"erythema", "plaque", "scale"})
 
     def test_nonstandard_json_number_is_rejected(self) -> None:
         raw = json.dumps(_valid_output()).replace("0.91", "NaN", 1)

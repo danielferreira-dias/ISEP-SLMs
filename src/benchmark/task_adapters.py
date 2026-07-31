@@ -82,6 +82,9 @@ class VisualTopKTaskAdapter:
         schema: Mapping[str, Any],
         disease_taxonomy_items: Sequence[Mapping[str, Any]],
         top_k: int,
+        minimum_subgroup_unique_groups: int = 30,
+        minimum_per_disease_unique_groups: int = 10,
+        subgroup_confidence_level: float = 0.95,
     ) -> None:
         self._benchmark_id = benchmark_id
         self.system_prompt_template = system_prompt_template
@@ -92,6 +95,13 @@ class VisualTopKTaskAdapter:
             taxonomy_name="disease",
         )
         self.top_k = top_k
+        self.minimum_subgroup_unique_groups = (
+            minimum_subgroup_unique_groups
+        )
+        self.minimum_per_disease_unique_groups = (
+            minimum_per_disease_unique_groups
+        )
+        self.subgroup_confidence_level = subgroup_confidence_level
         if top_k <= 0:
             raise ValueError("top_k must be positive")
         if top_k > len(self.disease_taxonomy_items):
@@ -162,6 +172,13 @@ class VisualTopKTaskAdapter:
         return compute_metrics(
             predictions,
             allowed_disease_ids=list(self._taxonomy_by_id),
+            minimum_subgroup_unique_groups=(
+                self.minimum_subgroup_unique_groups
+            ),
+            minimum_per_disease_unique_groups=(
+                self.minimum_per_disease_unique_groups
+            ),
+            confidence_level=self.subgroup_confidence_level,
         )
 
     def _candidate_ids(self, sample: BenchmarkSample) -> list[str]:
@@ -380,9 +397,24 @@ def build_task_adapter(
         "disease_taxonomy_items": disease_taxonomy_items,
     }
     if task == "visual_disease_ranking":
+        subgroup = benchmark_config.get("subgroup_evaluation", {})
+        subgroup = subgroup if isinstance(subgroup, Mapping) else {}
+        comparison = benchmark_config.get("comparison", {})
+        comparison = comparison if isinstance(comparison, Mapping) else {}
+        interval = comparison.get("confidence_interval", {})
+        interval = interval if isinstance(interval, Mapping) else {}
         return VisualTopKTaskAdapter(
             **common,
             top_k=int(benchmark["top_k"]),
+            minimum_subgroup_unique_groups=int(
+                subgroup.get("minimum_subgroup_unique_groups", 30)
+            ),
+            minimum_per_disease_unique_groups=int(
+                subgroup.get("minimum_per_disease_unique_groups", 10)
+            ),
+            subgroup_confidence_level=float(
+                interval.get("confidence_level", 0.95)
+            ),
         )
     if task == "visual_disease_contrast_ranking":
         comparison = benchmark_config.get("comparison", {})

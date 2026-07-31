@@ -100,6 +100,38 @@ class EvidenceGroundedMetricTests(unittest.TestCase):
         self.assertAlmostEqual(metrics["schema_compliance_rate"], 1.0)
         self.assertAlmostEqual(metrics["semantic_compliance_rate"], 1.0)
 
+    def test_clinical_scores_do_not_require_semantic_compliance(self) -> None:
+        prediction = _prediction(
+            sample_id="S1",
+            truth="D001",
+            reference_concepts=["erythema", "plaque"],
+            findings=["erythema", "plaque"],
+            description="An erythematous plaque.",
+            ranked=[
+                ("D001", 0.8, ["F1"]),
+                ("D002", 0.4, ["F2"]),
+            ],
+            diseases=["D001", "D002"],
+            concepts=["erythema", "plaque"],
+        )
+        prediction.response.metadata["semantic_valid"] = False
+        prediction.response.validation_errors.append(
+            "semantic:case_confidence_must_match_top_confidence"
+        )
+
+        metrics = compute_evidence_grounded_metrics(
+            [prediction],
+            allowed_disease_ids=["D001", "D002"],
+            allowed_concept_ids=["erythema", "plaque"],
+            minimum_positive_cases_per_concept=1,
+        )
+
+        self.assertEqual(metrics["semantic_compliance_rate"], 0.0)
+        self.assertEqual(metrics["top_1_accuracy"], 1.0)
+        self.assertEqual(metrics["finding_f1"], 1.0)
+        self.assertEqual(metrics["description_concept_f1"], 1.0)
+        self.assertEqual(metrics["grounded_top_1_success"], 1.0)
+
 
 def _prediction(
     *,

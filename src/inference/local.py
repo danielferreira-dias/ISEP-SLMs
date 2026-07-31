@@ -30,6 +30,7 @@ class LocalBackend(InferenceBackend):
         base_url: str | None = None,
         health_probe: Any | None = None,
         reasoning_capture: str = "available",
+        use_json_schema: bool = False,
     ) -> None:
         self.config = config
         profile = _active_profile(config)
@@ -89,14 +90,24 @@ class LocalBackend(InferenceBackend):
             health_probe=health_probe,
             generation=config.generation,
             reasoning_capture=configured_capture,
-            use_json_schema=bool(
-                _optional_attr(
-                    config,
-                    "use_json_schema",
-                    default=False,
-                )
+            embedded_reasoning_parser=_optional_attr(
+                reasoning,
+                "content_parser",
             ),
+            use_json_schema=use_json_schema,
             chat_template_kwargs=chat_template_kwargs,
+            thinking_control=_optional_attr(
+                profile,
+                "thinking_control",
+            ),
+            timeout_seconds=(
+                _optional_attr(
+                    profile,
+                    "request_timeout_seconds",
+                    default=300.0,
+                )
+                or 300.0
+            ),
             supports_system_role=(
                 _nested_attr(
                     config,
@@ -118,6 +129,15 @@ class LocalBackend(InferenceBackend):
 
     def complete(self, request: InferenceRequest) -> InferenceResult:
         return self._backend.complete(request)
+
+    async def acomplete(
+        self,
+        request: InferenceRequest,
+    ) -> InferenceResult:
+        return await self._backend.acomplete(request)
+
+    async def aclose(self) -> None:
+        await self._backend.aclose()
 
     def preflight(self) -> PreflightResult:
         return self._backend.preflight()

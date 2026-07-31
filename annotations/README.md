@@ -32,3 +32,9 @@ Each annotation should identify:
 ## Benchmarks
 
 1. [Paired visual disease confusion sets](benchmarks/01_visual_disease_confusion_sets.md)
+
+## Notes
+
+1. [Interactive multimodal dermatology model strategy](notes/01_estrategia_modelo_multimodal_interativo.md)
+2. [Teacher thinking and small-model distillation](notes/02_thinking_teacher_e_distillation.md)
+3. [Output limitations, parsing, and metric policy](notes/03_limitacoes_output_parsing_e_metricas.md)

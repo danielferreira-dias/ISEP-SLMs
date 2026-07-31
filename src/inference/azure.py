@@ -32,6 +32,7 @@ class AzureBackend(InferenceBackend):
         client: Any | None = None,
         *,
         reasoning_capture: str = "available",
+        use_json_schema: bool = False,
     ) -> None:
         self.config = config
         profile = _active_profile(config)
@@ -91,10 +92,6 @@ class AzureBackend(InferenceBackend):
             or _attr(_attr(config, "source"), "model_name")
             or config.model_id
         )
-        use_json_schema = bool(
-            _attr(config, "use_json_schema", default=False)
-        )
-
         if (
             api_style == "openai_compatible"
             or engine == "vllm_endpoint"
@@ -114,6 +111,10 @@ class AzureBackend(InferenceBackend):
                     chat_template_kwargs=_attr(
                         config,
                         "chat_template_kwargs",
+                    ),
+                    thinking_control=_attr(
+                        profile,
+                        "thinking_control",
                     ),
                 )
             )
@@ -165,6 +166,15 @@ class AzureBackend(InferenceBackend):
 
     def complete(self, request: InferenceRequest) -> InferenceResult:
         return self._backend.complete(request)
+
+    async def acomplete(
+        self,
+        request: InferenceRequest,
+    ) -> InferenceResult:
+        return await self._backend.acomplete(request)
+
+    async def aclose(self) -> None:
+        await self._backend.aclose()
 
 
 def _attr(

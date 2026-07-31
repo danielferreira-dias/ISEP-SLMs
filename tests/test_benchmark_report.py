@@ -35,6 +35,11 @@ class BenchmarkReportTests(unittest.TestCase):
                 "response": {
                     "final_text": malicious,
                     "parsed_output": {"predictions": []},
+                    "canonical_output": {"predictions": []},
+                    "canonical_schema_valid": True,
+                    "canonicalization_rules": [
+                        "ranked_disease_id_list_to_objects"
+                    ],
                     "json_valid": True,
                     "schema_valid": True,
                     "validation_errors": [],
@@ -61,8 +66,12 @@ class BenchmarkReportTests(unittest.TestCase):
                 {
                     "task_id": "task-2",
                     "sample_id": "sample-2",
+                    "status": "invalid_output",
                 }
             )
+            legacy_prediction["response"]["metadata"] = {
+                "semantic_valid": False,
+            }
             legacy_prediction["response"]["reasoning"].update(
                 {
                     "availability": "summary",
@@ -93,7 +102,22 @@ class BenchmarkReportTests(unittest.TestCase):
                 encoding="utf-8",
             )
             (run_directory / "metrics.json").write_text(
-                json.dumps({"top_1_accuracy": 1.0}),
+                json.dumps(
+                    {
+                        "top_1_accuracy": 1.0,
+                        "by_condition_top_1_accuracy": {
+                            "low_confusability": 1.0,
+                            "high_confusability": 0.5,
+                        },
+                        "by_skin_tone": {
+                            "fitzpatrick:FST_3": {
+                                "sample_count": 1,
+                                "top_1_accuracy": 1.0,
+                                "statistically_supported": False,
+                            }
+                        },
+                    }
+                ),
                 encoding="utf-8",
             )
             (run_directory / "run_manifest.yaml").write_text(
@@ -137,8 +161,30 @@ class BenchmarkReportTests(unittest.TestCase):
             self.assertEqual(report_path.name, "report.html")
             self.assertIn("sample-1", content)
             self.assertIn("Clinical reasoning", content)
+            self.assertIn("Canonical output", content)
+            self.assertIn(
+                "ranked_disease_id_list_to_objects",
+                content,
+            )
             self.assertIn("Melanoma", content)
             self.assertIn("data:image/jpeg;base64,", content)
+            self.assertIn('"value":"100.0%"', content)
+            self.assertIn('"label":"by condition top 1 accuracy"', content)
+            self.assertIn(
+                '"label":"low confusability","values":["100.0%"]',
+                content,
+            )
+            self.assertIn(
+                '"label":"fitzpatrick:FST_3",'
+                '"values":["1","100.0%","no"]',
+                content,
+            )
+            self.assertNotIn("[object Object]", content)
+            self.assertIn(
+                '"name":"semantic_noncompliant",'
+                '"label":"semantic noncompliant","value":"1"',
+                content,
+            )
             self.assertIn(
                 "Legacy run: the provider's requested summary mode",
                 content,

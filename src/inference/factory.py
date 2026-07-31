@@ -19,6 +19,7 @@ def create_backend(
     *,
     client: Any | None = None,
     reasoning_capture: str = "available",
+    use_json_schema: bool = False,
 ) -> InferenceBackend:
     """Create a lazy inference backend without importing provider SDKs."""
 
@@ -29,6 +30,7 @@ def create_backend(
             config,
             client=client,
             reasoning_capture=reasoning_capture,
+            use_json_schema=use_json_schema,
         )
     if engine == "transformers":
         return TransformersBackend(
@@ -40,6 +42,7 @@ def create_backend(
             config,
             client=client,
             reasoning_capture=reasoning_capture,
+            use_json_schema=use_json_schema,
         )
 
     backend_type = _attr(config, "backend_type")
@@ -48,12 +51,14 @@ def create_backend(
             config,
             client=client,
             reasoning_capture=reasoning_capture,
+            use_json_schema=use_json_schema,
         )
     if backend_type in {"azure", "api"}:
         return AzureBackend(
             config,
             client=client,
             reasoning_capture=reasoning_capture,
+            use_json_schema=use_json_schema,
         )
     raise ValueError(
         f"Unsupported inference backend engine: {engine or backend_type}"

@@ -59,6 +59,8 @@ def generate_run_report(
         "run_directory": str(paths.directory),
         "manifest": manifest,
         "metrics": metrics,
+        "metric_cards": _metric_cards(report_records, metrics),
+        "metric_breakdowns": _metric_breakdowns(metrics),
         "records": report_records,
     }
     encoded_payload = json.dumps(
@@ -130,11 +132,15 @@ def _report_record(
             "only reasoning token usage and no textual summary for this "
             "multimodal request."
         )
+    status = _report_status(
+        _text(record.get("status")),
+        response=response,
+    )
     return {
         "task_id": task_id,
         "sample_id": _text(record.get("sample_id")),
         "model_id": _text(record.get("model_id")),
-        "status": _text(record.get("status")),
+        "status": status,
         "image_uri": image_uri,
         "thumbnail": thumbnail,
         "thumbnail_error": thumbnail_error,
@@ -144,12 +150,29 @@ def _report_record(
             ground_truth_id,
         ),
         "dataset_id": _text(metadata.get("dataset_id")),
+        "skin_tone_system": _text(metadata.get("skin_tone_system")),
         "skin_tone": _text(metadata.get("skin_tone")),
         "diagnosis_basis": _text(metadata.get("diagnosis_basis")),
         "final_text": _text(response.get("final_text")),
         "parsed_output": response.get("parsed_output"),
+        "canonical_output": response.get("canonical_output"),
         "json_valid": bool(response.get("json_valid")),
-        "schema_valid": bool(response.get("schema_valid")),
+        "recoverable_json_valid": bool(
+            response.get(
+                "recoverable_json_valid",
+                response.get("json_valid"),
+            )
+        ),
+        "schema_valid": _report_schema_valid(response),
+        "canonical_schema_valid": bool(
+            response.get(
+                "canonical_schema_valid",
+                response.get("schema_valid"),
+            )
+        ),
+        "canonicalization_rules": _string_list(
+            response.get("canonicalization_rules")
+        ),
         "validation_errors": _string_list(
             response.get("validation_errors")
         ),
@@ -254,6 +277,152 @@ def _json_compatible(value: Any) -> Any:
     return str(value)
 
 
+def _metric_cards(
+    records: list[dict[str, Any]],
+    metrics: dict[str, Any],
+) -> list[dict[str, str]]:
+    status_cards = {
+        "total": len(records),
+        "ok": sum(record.get("status") == "ok" for record in records),
+        "format_invalid": sum(
+            record.get("status") == "format_invalid" for record in records
+        ),
+        "schema_invalid": sum(
+            record.get("status") == "schema_invalid" for record in records
+        ),
+        "semantic_noncompliant": sum(
+            record.get("status") == "semantic_noncompliant"
+            for record in records
+        ),
+        "truncated": sum(
+            record.get("status") == "truncated_output"
+            for record in records
+        ),
+        "safety_refusals": sum(
+            record.get("status") == "safety_refusal"
+            for record in records
+        ),
+    }
+    scalar_metrics = {
+        str(name): value
+        for name, value in metrics.items()
+        if not isinstance(value, (dict, list, tuple))
+    }
+    return [
+        {
+            "name": name,
+            "label": name.replace("_", " "),
+            "value": _format_metric_value(value),
+        }
+        for name, value in {**status_cards, **scalar_metrics}.items()
+    ]
+
+
+def _report_status(
+    status: str,
+    *,
+    response: dict[str, Any],
+) -> str:
+    """Map a legacy aggregate invalid status to its failed contract layer."""
+
+    if status != "invalid_output":
+        return status
+    if not bool(response.get("json_valid")):
+        return "format_invalid"
+    if not _report_schema_valid(response):
+        return "schema_invalid"
+    metadata = _mapping(response.get("metadata"))
+    if metadata.get("semantic_valid", True) is False:
+        return "semantic_noncompliant"
+    return status
+
+
+def _report_schema_valid(response: dict[str, Any]) -> bool:
+    """Expose schema validity independently for current and legacy runs."""
+
+    metadata = _mapping(response.get("metadata"))
+    schema_errors = metadata.get("schema_errors")
+    if isinstance(schema_errors, (list, tuple)):
+        return (
+            isinstance(response.get("parsed_output"), dict)
+            and len(schema_errors) == 0
+        )
+    return bool(response.get("schema_valid"))
+
+
+def _metric_breakdowns(
+    metrics: dict[str, Any],
+) -> list[dict[str, Any]]:
+    sections: list[dict[str, Any]] = []
+    for name, value in metrics.items():
+        if not isinstance(value, dict):
+            continue
+        nested = bool(value) and all(
+            isinstance(item_value, dict)
+            for item_value in value.values()
+        )
+        if nested:
+            columns = list(
+                dict.fromkeys(
+                    str(column)
+                    for item_value in value.values()
+                    for column in item_value
+                )
+            )
+            items = [
+                {
+                    "label": _metric_item_label(item_name),
+                    "values": [
+                        _format_metric_value(item_value.get(column))
+                        for column in columns
+                    ],
+                }
+                for item_name, item_value in value.items()
+            ]
+        else:
+            columns = ["value"]
+            items = [
+                {
+                    "label": _metric_item_label(item_name),
+                    "values": [_format_metric_value(item_value)],
+                }
+                for item_name, item_value in value.items()
+            ]
+        sections.append(
+            {
+                "name": str(name),
+                "label": str(name).replace("_", " "),
+                "columns": [
+                    column.replace("_", " ")
+                    for column in columns
+                ],
+                "items": items,
+            }
+        )
+    return sections
+
+
+def _metric_item_label(value: Any) -> str:
+    text = str(value)
+    return text if ":" in text else text.replace("_", " ")
+
+
+def _format_metric_value(value: Any) -> str:
+    if isinstance(value, bool):
+        return "yes" if value else "no"
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return "—"
+        if 0.0 <= value <= 1.0:
+            return f"{value * 100:.1f}%"
+        return f"{value:.4g}"
+    if value is None:
+        return "—"
+    return str(value)
+
+
 def _atomic_write(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
@@ -302,6 +471,42 @@ def _html_document(payload: str) -> str:
       gap: 12px;
       margin-bottom: 20px;
     }}
+    .metric-breakdowns {{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }}
+    .metric-breakdown {{
+      overflow-x: auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(28, 39, 49, .05);
+    }}
+    .metric-breakdown h2 {{
+      padding: 12px 14px;
+      background: #f7f9fa;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px;
+    }}
+    .metric-breakdown table {{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }}
+    .metric-breakdown th, .metric-breakdown td {{
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }}
+    .metric-breakdown tr:last-child th,
+    .metric-breakdown tr:last-child td {{ border-bottom: 0; }}
+    .metric-breakdown td {{
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }}
     .metric, .toolbar, .case {{
       background: var(--panel);
       border: 1px solid var(--line);
@@ -315,7 +520,7 @@ def _html_document(payload: str) -> str:
       top: 0;
       z-index: 2;
       display: grid;
-      grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(130px, 1fr));
+      grid-template-columns: minmax(220px, 2fr) repeat(4, minmax(130px, 1fr));
       gap: 10px;
       padding: 14px;
       margin-bottom: 18px;
@@ -369,10 +574,12 @@ def _html_document(payload: str) -> str:
       font-weight: 700;
     }}
     .badge.ok {{ background: #e6f4ea; color: var(--ok); }}
-    .badge.invalid_output, .badge.truncated_output {{
+    .badge.invalid_output, .badge.format_invalid,
+    .badge.schema_invalid, .badge.semantic_noncompliant,
+    .badge.truncated_output {{
       background: #fff2d6; color: var(--warning);
     }}
-    .badge.backend_error, .badge.image_error {{
+    .badge.backend_error, .badge.image_error, .badge.safety_refusal {{
       background: #fde8e8; color: var(--danger);
     }}
     .case-body {{
@@ -448,12 +655,14 @@ def _html_document(payload: str) -> str:
   </header>
   <main>
     <section class="metrics" id="metrics"></section>
+    <section class="metric-breakdowns" id="metric-breakdowns"></section>
     <section class="toolbar" aria-label="Report filters">
       <input id="search" type="search"
         placeholder="Search answer, reasoning, sample or task ID">
       <select id="status-filter" aria-label="Filter by status"></select>
       <select id="disease-filter" aria-label="Filter by disease"></select>
       <select id="dataset-filter" aria-label="Filter by dataset"></select>
+      <select id="skin-tone-filter" aria-label="Filter by skin tone"></select>
     </section>
     <div class="result-line">
       <strong id="result-count"></strong>
@@ -493,21 +702,30 @@ def _html_document(payload: str) -> str:
     document.getElementById("run-meta").textContent =
       `${{manifest.status || "unknown"}} · ${{records.length}} cases · ${{DATA.run_directory}}`;
 
-    const metricValues = {{
-      total: records.length,
-      ok: records.filter(row => row.status === "ok").length,
-      invalid: records.filter(row => row.status === "invalid_output").length,
-      truncated: records.filter(row => row.status === "truncated_output").length,
-      ...(DATA.metrics || {{}})
-    }};
     const metricRoot = document.getElementById("metrics");
-    Object.entries(metricValues).slice(0, 14).forEach(([name, value]) => {{
-      const shown = typeof value === "number" && value >= 0 && value <= 1 &&
-        !Number.isInteger(value) ? `${{(value * 100).toFixed(1)}}%` : String(value);
+    (DATA.metric_cards || []).forEach(metric => {{
       metricRoot.insertAdjacentHTML(
         "beforeend",
-        `<div class="metric"><span class="subtle">${{esc(name.replaceAll("_", " "))}}</span>` +
-        `<strong>${{esc(shown)}}</strong></div>`
+        `<div class="metric"><span class="subtle">${{esc(metric.label)}}</span>` +
+        `<strong>${{esc(metric.value)}}</strong></div>`
+      );
+    }});
+    const breakdownRoot = document.getElementById("metric-breakdowns");
+    (DATA.metric_breakdowns || []).forEach(section => {{
+      const columns = section.columns || ["value"];
+      const head = `<thead><tr><th>group</th>${{
+        columns.map(column => `<th>${{esc(column)}}</th>`).join("")
+      }}</tr></thead>`;
+      const rows = (section.items || []).map(item => {{
+        const values = item.values || [item.value];
+        return `<tr><th>${{esc(item.label)}}</th>${{
+          values.map(value => `<td>${{esc(value)}}</td>`).join("")
+        }}</tr>`;
+      }}).join("");
+      breakdownRoot.insertAdjacentHTML(
+        "beforeend",
+        `<section class="metric-breakdown"><h2>${{esc(section.label)}}</h2>` +
+        `<table>${{head}}<tbody>${{rows}}</tbody></table></section>`
       );
     }});
 
@@ -524,20 +742,26 @@ def _html_document(payload: str) -> str:
     const datasetFilter = document.getElementById("dataset-filter");
     datasetFilter.innerHTML = option("", "All datasets") +
       unique("dataset_id").map(value => option(value, value)).join("");
+    const skinToneFilter = document.getElementById("skin-tone-filter");
+    skinToneFilter.innerHTML = option("", "All skin tones") +
+      unique("skin_tone").map(value => option(value, value)).join("");
 
     function filteredRecords() {{
       const query = document.getElementById("search").value.trim().toLowerCase();
       const status = statusFilter.value;
       const disease = diseaseFilter.value;
       const dataset = datasetFilter.value;
+      const skinTone = skinToneFilter.value;
       return records.filter(row => {{
         if (status && row.status !== status) return false;
         if (disease && row.ground_truth_id !== disease) return false;
         if (dataset && row.dataset_id !== dataset) return false;
+        if (skinTone && row.skin_tone !== skinTone) return false;
         if (!query) return true;
         return [
           row.task_id, row.sample_id, row.final_text,
-          row.reasoning?.text, row.ground_truth_name, row.dataset_id
+          row.reasoning?.text, row.ground_truth_name, row.dataset_id,
+          row.skin_tone_system, row.skin_tone
         ].join(" ").toLowerCase().includes(query);
       }});
     }}
@@ -600,6 +824,11 @@ def _html_document(payload: str) -> str:
           <summary>Parsed output, validation and token usage</summary>
           <div class="details-grid">
             ${{pane("Parsed output", pretty(row.parsed_output))}}
+            ${{pane("Canonical output", pretty(row.canonical_output))}}
+            ${{pane(
+              "Canonicalization rules",
+              row.canonicalization_rules.join("\\n") || "None"
+            )}}
             ${{pane("Validation errors", errors || "None", errors ? "errors" : "")}}
             ${{pane("Usage", pretty(usage))}}
             ${{pane("Reasoning metadata", pretty({{
@@ -640,7 +869,10 @@ def _html_document(payload: str) -> str:
         : `<div class="empty">No cases match the selected filters.</div>`;
     }}
 
-    ["search", "status-filter", "disease-filter", "dataset-filter"].forEach(id => {{
+    [
+      "search", "status-filter", "disease-filter", "dataset-filter",
+      "skin-tone-filter"
+    ].forEach(id => {{
       document.getElementById(id).addEventListener("input", () => {{
         state.page = 1;
         render();

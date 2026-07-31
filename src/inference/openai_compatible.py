@@ -2,27 +2,35 @@
 
 from __future__ import annotations
 
+import inspect
 import os
 from collections.abc import Mapping
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict, is_dataclass, replace
 from typing import Any
 
 from src.inference.base import (
     InferenceBackend,
     InferenceConfigurationError,
     InferenceRequest,
+    InferenceRequestError,
     InferenceResult,
+    InferenceSafetyRefusal,
     InferenceTransportError,
     ReasoningCaptureMode,
     TokenUsage,
     build_reasoning_trace,
     extract_text,
     image_data_url,
+    is_safety_refusal,
     merge_generation,
+    provider_error_details,
+    provider_error_summary,
+    provider_json_schema,
     read_field,
     safe_optional_int,
     validate_reasoning_capture,
 )
+from src.inference.reasoning_parsing import separate_embedded_reasoning
 
 
 class OpenAICompatibleChatBackend(InferenceBackend):
@@ -43,12 +51,17 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         api_key: str | None = None,
         api_key_env: str | None = None,
         client: Any | None = None,
+        async_client: Any | None = None,
         generation: Any | None = None,
         reasoning_capture: str = "none",
+        embedded_reasoning_parser: str | None = None,
         use_json_schema: bool = False,
         chat_template_kwargs: Any | None = None,
+        thinking_control: str | None = None,
         supports_system_role: bool = True,
         timeout_seconds: float = 300.0,
+        max_retries: int = 2,
+        stream_responses: bool = False,
     ) -> None:
         self._model_id = model_id
         self.request_model = request_model or model_id
@@ -57,16 +70,31 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         self._api_key = api_key
         self._api_key_env = api_key_env
         self._client = client
+        self._async_client = async_client
         self.default_generation = generation
         self.reasoning_capture = validate_reasoning_capture(
             reasoning_capture
         )
+        self.embedded_reasoning_parser = embedded_reasoning_parser
         self.use_json_schema = use_json_schema
         self.chat_template_kwargs = _mapping_values(
             chat_template_kwargs
         )
+        if thinking_control not in {
+            None,
+            "kimi_api",
+            "chat_template",
+            "reasoning_effort",
+        }:
+            raise InferenceConfigurationError(
+                "thinking_control must be 'kimi_api', 'chat_template', "
+                "or 'reasoning_effort'"
+            )
+        self.thinking_control = thinking_control
         self.supports_system_role = supports_system_role
         self.timeout_seconds = timeout_seconds
+        self.max_retries = max_retries
+        self.stream_responses = stream_responses
 
     @property
     def model_id(self) -> str:
@@ -80,17 +108,88 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             self._client = self._build_client()
         return self._client
 
+    @property
+    def async_client(self) -> Any:
+        """Return the injected client or lazily construct an AsyncOpenAI client."""
+
+        if self._async_client is None:
+            self._async_client = self._build_async_client()
+        return self._async_client
+
     def complete(self, request: InferenceRequest) -> InferenceResult:
         payload = self._build_payload(request)
+        if self.stream_responses:
+            payload["stream"] = True
+            payload["stream_options"] = {"include_usage": True}
         try:
             response = self.client.chat.completions.create(**payload)
         except Exception as error:
-            provider_detail = _provider_error_detail(error)
+            details = provider_error_details(error)
+            provider_detail = provider_error_summary(details)
+            if is_safety_refusal(details):
+                raise InferenceSafetyRefusal(
+                    f"Chat-completions safety refusal for model "
+                    f"{self.model_id!r} ({provider_detail})",
+                    details=details,
+                ) from None
             raise InferenceTransportError(
                 f"Chat-completions request failed for model "
                 f"{self.model_id!r} ({provider_detail})"
             ) from None
+        if self.stream_responses:
+            return self._parse_stream_response(response, request)
         return self._parse_response(response, request)
+
+    async def acomplete(
+        self,
+        request: InferenceRequest,
+    ) -> InferenceResult:
+        """Run chat completion with the native asynchronous OpenAI client."""
+
+        payload = self._build_payload(request)
+        if self.stream_responses:
+            payload["stream"] = True
+            payload["stream_options"] = {"include_usage": True}
+        try:
+            response = await self.async_client.chat.completions.create(
+                **payload
+            )
+        except Exception as error:
+            details = provider_error_details(error)
+            provider_detail = provider_error_summary(details)
+            if is_safety_refusal(details):
+                raise InferenceSafetyRefusal(
+                    f"Chat-completions safety refusal for model "
+                    f"{self.model_id!r} ({provider_detail})",
+                    details=details,
+                ) from None
+            raise InferenceTransportError(
+                f"Chat-completions request failed for model "
+                f"{self.model_id!r} ({provider_detail})"
+            ) from None
+        if self.stream_responses:
+            return await self._parse_async_stream_response(
+                response,
+                request,
+            )
+        result = self._parse_response(response, request)
+        return replace(
+            result,
+            metadata={
+                **dict(result.metadata),
+                "async_transport": True,
+            },
+        )
+
+    async def aclose(self) -> None:
+        client = self._async_client
+        if client is None:
+            return
+        close = getattr(client, "close", None)
+        if callable(close):
+            close_result = close()
+            if inspect.isawaitable(close_result):
+                await close_result
 
     def _build_client(self) -> Any:
         base_url = self._resolve_value(
@@ -114,6 +213,32 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             base_url=base_url,
             api_key=api_key,
             timeout=self.timeout_seconds,
+            max_retries=self.max_retries,
+        )
+
+    def _build_async_client(self) -> Any:
+        base_url = self._resolve_value(
+            direct=self._base_url,
+            env_name=self._base_url_env,
+            label="base URL",
+        )
+        api_key = self._resolve_value(
+            direct=self._api_key,
+            env_name=self._api_key_env,
+            label="API key",
+        )
+        try:
+            from openai import AsyncOpenAI
+        except ImportError:
+            raise InferenceConfigurationError(
+                "The optional 'openai' package is required for "
+                "asynchronous OpenAI-compatible inference"
+            ) from None
+        return AsyncOpenAI(
+            base_url=base_url,
+            api_key=api_key,
+            timeout=self.timeout_seconds,
+            max_retries=self.max_retries,
         )
 
     def _resolve_value(
@@ -197,6 +322,25 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         template_kwargs.update(
             _mapping_values(configured_template_kwargs)
         )
+        thinking_mode = generation.get("thinking_mode")
+        if thinking_mode not in {None, "enabled", "disabled"}:
+            raise InferenceRequestError(
+                "thinking_mode must be 'enabled' or 'disabled'"
+            )
+        if thinking_mode is not None and self.thinking_control == "kimi_api":
+            extra_body["thinking"] = {"type": thinking_mode}
+        elif (
+            thinking_mode is not None
+            and self.thinking_control == "chat_template"
+        ):
+            template_kwargs["thinking"] = thinking_mode == "enabled"
+        elif (
+            thinking_mode is not None
+            and self.thinking_control == "reasoning_effort"
+        ):
+            payload["reasoning_effort"] = (
+                "high" if thinking_mode == "enabled" else "none"
+            )
         if template_kwargs:
             extra_body["chat_template_kwargs"] = template_kwargs
         if extra_body:
@@ -207,7 +351,7 @@ class OpenAICompatibleChatBackend(InferenceBackend):
                 "json_schema": {
                     "name": "benchmark_response",
                     "strict": True,
-                    "schema": dict(request.schema),
+                    "schema": provider_json_schema(request.schema),
                 },
             }
         return payload
@@ -233,6 +377,14 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         full_reasoning, full_source, summary, summary_source = (
             _chat_reasoning(message)
         )
+        embedded = separate_embedded_reasoning(
+            final_text,
+            parser=self.embedded_reasoning_parser,
+        )
+        final_text = embedded.final_text
+        if full_reasoning is None and embedded.reasoning_text is not None:
+            full_reasoning = embedded.reasoning_text
+            full_source = embedded.reasoning_source
         reasoning = build_reasoning_trace(
             mode=self.reasoning_capture,
             full_text=full_reasoning,
@@ -245,6 +397,11 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         metadata: dict[str, Any] = {}
         if isinstance(provider_model, str):
             metadata["provider_model"] = provider_model
+        if embedded.parser is not None:
+            metadata["embedded_reasoning_parser"] = embedded.parser
+            metadata["embedded_reasoning_block_complete"] = (
+                embedded.complete_block
+            )
 
         return InferenceResult(
             model_id=self.model_id,
@@ -258,6 +415,241 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             finish_reason=_optional_string(
                 read_field(choice, "finish_reason")
             ),
+            metadata=metadata,
+        )
+
+    def _parse_stream_response(
+        self,
+        response: Any,
+        request: InferenceRequest,
+    ) -> InferenceResult:
+        """Collect an OpenAI-compatible stream into one normalized result."""
+
+        content_parts: list[str] = []
+        reasoning_parts: list[str] = []
+        summary_parts: list[str] = []
+        usage = TokenUsage()
+        finish_reason: str | None = None
+        provider_response_id: str | None = None
+        provider_model: str | None = None
+        close = getattr(response, "close", None)
+        try:
+            for chunk in response:
+                provider_response_id = (
+                    provider_response_id
+                    or _optional_string(read_field(chunk, "id"))
+                )
+                provider_model = (
+                    provider_model
+                    or _optional_string(read_field(chunk, "model"))
+                )
+                chunk_usage = read_field(chunk, "usage")
+                if chunk_usage is not None:
+                    usage = _chat_usage(chunk_usage)
+                choices = read_field(chunk, "choices", ())
+                if not choices:
+                    continue
+                choice = choices[0]
+                current_finish = _optional_string(
+                    read_field(choice, "finish_reason")
+                )
+                if current_finish is not None:
+                    finish_reason = current_finish
+                delta = read_field(choice, "delta")
+                content = _stream_text(read_field(delta, "content"))
+                if content is not None:
+                    content_parts.append(content)
+                reasoning = _stream_text(
+                    read_field(delta, "reasoning")
+                    or read_field(delta, "reasoning_content")
+                )
+                summary = _stream_text(
+                    read_field(delta, "reasoning_summary")
+                )
+                if reasoning is not None:
+                    reasoning_parts.append(reasoning)
+                if summary is not None:
+                    summary_parts.append(summary)
+        except Exception as error:
+            details = provider_error_details(error)
+            provider_detail = provider_error_summary(details)
+            if is_safety_refusal(details):
+                raise InferenceSafetyRefusal(
+                    f"Chat-completions stream safety refusal for model "
+                    f"{self.model_id!r} ({provider_detail})",
+                    details=details,
+                ) from None
+            raise InferenceTransportError(
+                f"Chat-completions stream failed for model "
+                f"{self.model_id!r} ({provider_detail})"
+            ) from None
+        finally:
+            if callable(close):
+                close()
+
+        final_text = "".join(content_parts)
+        embedded = separate_embedded_reasoning(
+            final_text,
+            parser=self.embedded_reasoning_parser,
+        )
+        final_text = embedded.final_text
+        full_reasoning = "".join(reasoning_parts) or None
+        if full_reasoning is None and embedded.reasoning_text is not None:
+            full_reasoning = embedded.reasoning_text
+        full_source = (
+            "stream.delta.reasoning"
+            if reasoning_parts
+            else embedded.reasoning_source
+        )
+        summary = "".join(summary_parts) or None
+        reasoning = build_reasoning_trace(
+            mode=self.reasoning_capture,
+            full_text=full_reasoning,
+            summary_text=summary,
+            token_count=usage.reasoning_tokens,
+            full_source=full_source,
+            summary_source=(
+                "stream.delta.reasoning_summary"
+                if summary is not None
+                else None
+            ),
+        )
+        metadata: dict[str, Any] = {"streamed": True}
+        if provider_model is not None:
+            metadata["provider_model"] = provider_model
+        if embedded.parser is not None:
+            metadata["embedded_reasoning_parser"] = embedded.parser
+            metadata["embedded_reasoning_block_complete"] = (
+                embedded.complete_block
+            )
+        return InferenceResult(
+            model_id=self.model_id,
+            final_text=final_text,
+            reasoning=reasoning,
+            usage=usage,
+            request_id=request.request_id,
+            provider_response_id=provider_response_id,
+            finish_reason=finish_reason,
+            metadata=metadata,
+        )
+
+    async def _parse_async_stream_response(
+        self,
+        response: Any,
+        request: InferenceRequest,
+    ) -> InferenceResult:
+        """Collect an AsyncOpenAI stream into one normalized result."""
+
+        content_parts: list[str] = []
+        reasoning_parts: list[str] = []
+        summary_parts: list[str] = []
+        usage = TokenUsage()
+        finish_reason: str | None = None
+        provider_response_id: str | None = None
+        provider_model: str | None = None
+        close = getattr(response, "close", None)
+        try:
+            async for chunk in response:
+                provider_response_id = (
+                    provider_response_id
+                    or _optional_string(read_field(chunk, "id"))
+                )
+                provider_model = (
+                    provider_model
+                    or _optional_string(read_field(chunk, "model"))
+                )
+                chunk_usage = read_field(chunk, "usage")
+                if chunk_usage is not None:
+                    usage = _chat_usage(chunk_usage)
+                choices = read_field(chunk, "choices", ())
+                if not choices:
+                    continue
+                choice = choices[0]
+                current_finish = _optional_string(
+                    read_field(choice, "finish_reason")
+                )
+                if current_finish is not None:
+                    finish_reason = current_finish
+                delta = read_field(choice, "delta")
+                content = _stream_text(read_field(delta, "content"))
+                if content is not None:
+                    content_parts.append(content)
+                reasoning = _stream_text(
+                    read_field(delta, "reasoning")
+                    or read_field(delta, "reasoning_content")
+                )
+                summary = _stream_text(
+                    read_field(delta, "reasoning_summary")
+                )
+                if reasoning is not None:
+                    reasoning_parts.append(reasoning)
+                if summary is not None:
+                    summary_parts.append(summary)
+        except Exception as error:
+            details = provider_error_details(error)
+            provider_detail = provider_error_summary(details)
+            if is_safety_refusal(details):
+                raise InferenceSafetyRefusal(
+                    f"Chat-completions stream safety refusal for model "
+                    f"{self.model_id!r} ({provider_detail})",
+                    details=details,
+                ) from None
+            raise InferenceTransportError(
+                f"Chat-completions stream failed for model "
+                f"{self.model_id!r} ({provider_detail})"
+            ) from None
+        finally:
+            if callable(close):
+                close_result = close()
+                if inspect.isawaitable(close_result):
+                    await close_result
+
+        final_text = "".join(content_parts)
+        embedded = separate_embedded_reasoning(
+            final_text,
+            parser=self.embedded_reasoning_parser,
+        )
+        final_text = embedded.final_text
+        full_reasoning = "".join(reasoning_parts) or None
+        if full_reasoning is None and embedded.reasoning_text is not None:
+            full_reasoning = embedded.reasoning_text
+        full_source = (
+            "stream.delta.reasoning"
+            if reasoning_parts
+            else embedded.reasoning_source
+        )
+        summary = "".join(summary_parts) or None
+        reasoning = build_reasoning_trace(
+            mode=self.reasoning_capture,
+            full_text=full_reasoning,
+            summary_text=summary,
+            token_count=usage.reasoning_tokens,
+            full_source=full_source,
+            summary_source=(
+                "stream.delta.reasoning_summary"
+                if summary is not None
+                else None
+            ),
+        )
+        metadata: dict[str, Any] = {
+            "streamed": True,
+            "async_transport": True,
+        }
+        if provider_model is not None:
+            metadata["provider_model"] = provider_model
+        if embedded.parser is not None:
+            metadata["embedded_reasoning_parser"] = embedded.parser
+            metadata["embedded_reasoning_block_complete"] = (
+                embedded.complete_block
+            )
+        return InferenceResult(
+            model_id=self.model_id,
+            final_text=final_text,
+            reasoning=reasoning,
+            usage=usage,
+            request_id=request.request_id,
+            provider_response_id=provider_response_id,
+            finish_reason=finish_reason,
             metadata=metadata,
         )
 
@@ -364,6 +756,14 @@ def _chat_usage(value: Any) -> TokenUsage:
 
 def _optional_string(value: Any) -> str | None:
     return value if isinstance(value, str) and value else None
+
+
+def _stream_text(value: Any) -> str | None:
+    """Retain whitespace in string deltas while normalizing rich content."""
+
+    if isinstance(value, str):
+        return value
+    return extract_text(value)
 
 
 def _provider_error_detail(error: Exception) -> str:

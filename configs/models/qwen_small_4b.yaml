@@ -20,6 +20,7 @@ capabilities:
     - image
   structured_output_modes:
     - prompt_only
+    - json_schema
 
 source:
   type: huggingface
@@ -47,11 +48,11 @@ backend:
       managed_allowed: true
 
 reasoning:
-  enabled: true
+  enabled: false
   parser: qwen3
   exclude_from_structured_output: true
   chat_template_kwargs:
-    enable_thinking: true
+    enable_thinking: false
 
 generation:
   profile: thinking_general_tasks

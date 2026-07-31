@@ -21,6 +21,7 @@ from types import MappingProxyType
 from typing import Any
 
 from src.benchmark.runner import ModelResponse
+from src.benchmark.json_parsing import parse_json_output
 
 
 # These aliases are intentionally conservative. They support deterministic
@@ -200,6 +201,40 @@ _NEGATION_PATTERN = re.compile(
     r"(?:\s+\w+){0,3}\s*$",
     flags=re.IGNORECASE,
 )
+_AMBIGUOUS_COLOR_ALIASES = {
+    "black",
+    "blackish",
+    "blue",
+    "bluish",
+    "brown",
+    "gray",
+    "grayish",
+    "grey",
+    "greyish",
+    "purple",
+    "salmon",
+    "salmon colored",
+    "salmon coloured",
+    "white",
+    "yellow",
+    "yellowish",
+}
+_NON_LESION_OBJECT_PATTERN = re.compile(
+    r"^\W*(?:\w+\W+){0,2}(?:background|device|gauge|glove|label|"
+    r"marker|measuring|ruler|scale bar|tape)\b",
+    flags=re.IGNORECASE,
+)
+_WHITE_SURFACE_MATERIAL_PATTERN = re.compile(
+    r"^\W*(?:\w+\W+){0,2}(?:crust|exudate|scale)\b",
+    flags=re.IGNORECASE,
+)
+_LESION_COLOR_CONTEXT_PATTERN = re.compile(
+    r"\b(?:area|discoloration|lesion|pigmentation|skin|surface|"
+    r"abscess|bulla|crust|cyst|erosion|erythema|erythematous|"
+    r"exudate|fissure|macule|nodule|papule|patch|plaque|pustule|"
+    r"scale|scar|ulcer|vesicle|wheal)\b",
+    flags=re.IGNORECASE,
+)
 
 
 def extract_morphology_concepts(
@@ -233,9 +268,40 @@ def extract_morphology_concepts(
             prefix = normalized[max(0, match.start() - 60) : match.start()]
             if _NEGATION_PATTERN.search(prefix):
                 continue
+            if (
+                alias in _AMBIGUOUS_COLOR_ALIASES
+                and not _color_has_lesion_context(
+                    normalized,
+                    match,
+                    concept_id=concept_id,
+                )
+            ):
+                continue
             extracted.add(concept_id)
             break
     return extracted
+
+
+def _color_has_lesion_context(
+    description: str,
+    match: re.Match[str],
+    *,
+    concept_id: str,
+) -> bool:
+    """Reject colors belonging to rulers, devices, or the image background."""
+
+    suffix = description[match.end() : match.end() + 50]
+    if _NON_LESION_OBJECT_PATTERN.search(suffix):
+        return False
+    if (
+        concept_id == "white_hypopigmentation"
+        and _WHITE_SURFACE_MATERIAL_PATTERN.search(suffix)
+    ):
+        return False
+    context = description[
+        max(0, match.start() - 55) : min(len(description), match.end() + 55)
+    ]
+    return bool(_LESION_COLOR_CONTEXT_PATTERN.search(context))
 
 
 def find_forbidden_description_content(
@@ -291,20 +357,20 @@ def parse_and_validate_evidence_response(
     """
 
     del reasoning_text
-    try:
-        decoded = json.loads(
-            raw_text,
-            parse_constant=_reject_json_constant,
-            object_pairs_hook=_unique_object,
-        )
-    except (TypeError, ValueError) as exc:
+    parse_result = parse_json_output(
+        raw_text,
+        parse_constant=_reject_json_constant,
+        object_pairs_hook=_unique_object,
+    )
+    if not parse_result.recoverable_valid:
         return ModelResponse(
             model_id=model_id,
             raw_text=raw_text,
             parsed_output=None,
             json_valid=False,
             schema_valid=False,
-            validation_errors=[f"invalid_json:{exc}"],
+            recoverable_json_valid=False,
+            validation_errors=[f"invalid_json:{parse_result.error}"],
             metadata={
                 "semantic_valid": False,
                 "schema_errors": (),
@@ -313,15 +379,24 @@ def parse_and_validate_evidence_response(
                 "audit": _empty_audit(),
             },
         )
+    decoded = parse_result.decoded
 
     if not isinstance(decoded, dict):
         return ModelResponse(
             model_id=model_id,
             raw_text=raw_text,
             parsed_output=None,
-            json_valid=True,
+            json_valid=parse_result.raw_valid,
             schema_valid=False,
-            validation_errors=["schema:root_must_be_object"],
+            recoverable_json_valid=parse_result.recoverable_valid,
+            validation_errors=[
+                *(
+                    [f"invalid_json:{parse_result.error}"]
+                    if not parse_result.raw_valid
+                    else []
+                ),
+                "schema:root_must_be_object",
+            ],
             metadata={
                 "semantic_valid": False,
                 "schema_errors": ("root_must_be_object",),
@@ -355,7 +430,9 @@ def parse_and_validate_evidence_response(
         forbidden=forbidden,
     )
     schema_valid = not schema_errors
-    semantic_valid = schema_valid and not semantic_errors
+    # Report semantic compliance independently from JSON format and schema.
+    # The executor applies a deterministic precedence across these layers.
+    semantic_valid = not semantic_errors
     audit = {
         "invalid_disease_id": bool(facts["invalid_disease_ids"]),
         "invalid_concept_id": bool(facts["invalid_concept_ids"]),
@@ -376,6 +453,11 @@ def parse_and_validate_evidence_response(
         "forbidden_description_categories": tuple(sorted(forbidden)),
     }
     errors = [
+        *(
+            [f"invalid_json:{parse_result.error}"]
+            if not parse_result.raw_valid
+            else []
+        ),
         *(f"schema:{error}" for error in schema_errors),
         *(f"semantic:{error}" for error in semantic_errors),
     ]
@@ -383,11 +465,13 @@ def parse_and_validate_evidence_response(
         model_id=model_id,
         raw_text=raw_text,
         parsed_output=decoded,
-        json_valid=True,
+        json_valid=parse_result.raw_valid,
         schema_valid=schema_valid,
+        recoverable_json_valid=parse_result.recoverable_valid,
         validation_errors=errors,
         metadata={
             "semantic_valid": semantic_valid,
+            "json_recovery": parse_result.recovery,
             "schema_errors": tuple(schema_errors),
             "semantic_errors": tuple(semantic_errors),
             "description_concept_ids": tuple(sorted(description_concepts)),

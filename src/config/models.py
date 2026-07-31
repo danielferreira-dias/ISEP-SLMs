@@ -17,6 +17,7 @@ ModelEngine = Literal[
     "vllm_endpoint",
 ]
 ApiStyle = Literal["chat_completions", "responses"]
+ThinkingControl = Literal["kimi_api", "chat_template", "reasoning_effort"]
 
 
 class ModelConfigError(ValueError):
@@ -29,6 +30,7 @@ class GenerationConfig:
 
     profile: str = "default"
     reasoning_effort: str | None = None
+    thinking_mode: Literal["enabled", "disabled"] | None = None
     do_sample: bool | None = None
     temperature: float | None = None
     top_p: float | None = None
@@ -115,6 +117,7 @@ class ReasoningConfig:
 
     enabled: bool = False
     parser: str | None = None
+    content_parser: str | None = None
     exclude_from_structured_output: bool = True
     chat_template_kwargs: ChatTemplateConfig = ChatTemplateConfig()
 
@@ -134,12 +137,14 @@ class BackendProfileConfig:
     type: ModelBackendType
     engine: ModelEngine
     api_style: ApiStyle | None = None
+    thinking_control: ThinkingControl | None = None
     device: str | None = None
     dtype: str | None = None
     tensor_parallel_size: int | None = None
     max_model_len: int | None = None
     gpu_memory_utilization: float | None = None
     limit_images_per_prompt: int | None = None
+    request_timeout_seconds: float | None = None
     managed: bool | None = None
     managed_allowed: bool | None = None
     endpoint_env: str | None = None
@@ -307,12 +312,14 @@ _PROFILE_KEYS = {
     "type",
     "engine",
     "api_style",
+    "thinking_control",
     "device",
     "dtype",
     "tensor_parallel_size",
     "max_model_len",
     "gpu_memory_utilization",
     "limit_images_per_prompt",
+    "request_timeout_seconds",
     "managed",
     "managed_allowed",
     "endpoint_env",
@@ -325,6 +332,7 @@ _PROFILE_KEYS = {
 _REASONING_KEYS = {
     "enabled",
     "parser",
+    "content_parser",
     "exclude_from_structured_output",
     "chat_template_kwargs",
 }
@@ -332,6 +340,7 @@ _CHAT_TEMPLATE_KEYS = {"enable_thinking"}
 _GENERATION_KEYS = {
     "profile",
     "reasoning_effort",
+    "thinking_mode",
     "do_sample",
     "temperature",
     "top_p",
@@ -682,6 +691,22 @@ def _parse_backend_profile(
         if api_style_value is not None
         else None
     )
+    thinking_control_value = value.get("thinking_control")
+    thinking_control = (
+        _text(thinking_control_value, f"{section}.thinking_control")
+        if thinking_control_value is not None
+        else None
+    )
+    if thinking_control not in {
+        None,
+        "kimi_api",
+        "chat_template",
+        "reasoning_effort",
+    }:
+        raise ModelConfigError(
+            f"{section}.thinking_control must be 'kimi_api', "
+            "'chat_template', or 'reasoning_effort'"
+        )
     if backend_type == "local":
         if engine not in {"vllm", "transformers"}:
             raise ModelConfigError(
@@ -730,6 +755,10 @@ def _parse_backend_profile(
         value.get("limit_images_per_prompt"),
         f"{section}.limit_images_per_prompt",
     )
+    request_timeout_seconds = _optional_positive_number(
+        value.get("request_timeout_seconds"),
+        f"{section}.request_timeout_seconds",
+    )
     managed = _optional_boolean(
         value.get("managed"), f"{section}.managed"
     )
@@ -758,6 +787,7 @@ def _parse_backend_profile(
         type=backend_type,
         engine=engine,
         api_style=api_style,
+        thinking_control=thinking_control,
         device=_optional_text(
             value.get("device"), f"{section}.device"
         ),
@@ -766,6 +796,7 @@ def _parse_backend_profile(
         max_model_len=max_model_len,
         gpu_memory_utilization=gpu_memory_utilization,
         limit_images_per_prompt=limit_images_per_prompt,
+        request_timeout_seconds=request_timeout_seconds,
         managed=managed,
         managed_allowed=managed_allowed,
         endpoint_env=_optional_text(
@@ -810,6 +841,10 @@ def _parse_reasoning(value: dict[str, Any]) -> ReasoningConfig:
     return ReasoningConfig(
         enabled=enabled,
         parser=parser,
+        content_parser=_optional_text(
+            value.get("content_parser"),
+            "reasoning.content_parser",
+        ),
         exclude_from_structured_output=_boolean(
             value.get("exclude_from_structured_output", True),
             "reasoning.exclude_from_structured_output",
@@ -826,12 +861,21 @@ def _parse_reasoning(value: dict[str, Any]) -> ReasoningConfig:
 def _parse_generation(value: dict[str, Any]) -> GenerationConfig:
     _reject_unknown(value, _GENERATION_KEYS, "generation")
     _require_keys(value, {"profile"}, "generation")
+    thinking_mode = _optional_text(
+        value.get("thinking_mode"),
+        "generation.thinking_mode",
+    )
+    if thinking_mode not in {None, "enabled", "disabled"}:
+        raise ModelConfigError(
+            "generation.thinking_mode must be 'enabled' or 'disabled'"
+        )
     return GenerationConfig(
         profile=_text(value["profile"], "generation.profile"),
         reasoning_effort=_optional_text(
             value.get("reasoning_effort"),
             "generation.reasoning_effort",
         ),
+        thinking_mode=thinking_mode,
         do_sample=_optional_boolean(
             value.get("do_sample"), "generation.do_sample"
         ),
@@ -993,6 +1037,15 @@ def _optional_positive_integer(value: Any, path: str) -> int | None:
     if value is None:
         return None
     return _positive_integer(value, path)
+
+
+def _optional_positive_number(value: Any, path: str) -> float | None:
+    if value is None:
+        return None
+    result = _number(value, path)
+    if result <= 0:
+        raise ModelConfigError(f"{path} must be positive")
+    return result
 
 
 def _optional_boolean(value: Any, path: str) -> bool | None:

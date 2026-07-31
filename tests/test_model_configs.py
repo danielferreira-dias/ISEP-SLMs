@@ -19,7 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class QwenModelConfigTests(unittest.TestCase):
-    def test_qwen_3_5_general_thinking_profile(self) -> None:
+    def test_qwen_3_5_disables_thinking_but_keeps_general_sampling(
+        self,
+    ) -> None:
         for filename, expected_id in [
             ("qwen_small_4b.yaml", "qwen_3_5_4b"),
             ("qwen_small_9b.yaml", "qwen_3_5_9b"),
@@ -30,8 +32,8 @@ class QwenModelConfigTests(unittest.TestCase):
                 config["source"]["repo_id"],
                 f"Qwen/Qwen3.5-{expected_id.rsplit('_', 1)[-1].upper()}",
             )
-            self.assertTrue(config["reasoning"]["enabled"])
-            self.assertTrue(
+            self.assertFalse(config["reasoning"]["enabled"])
+            self.assertFalse(
                 config["reasoning"]["chat_template_kwargs"][
                     "enable_thinking"
                 ]
@@ -50,10 +52,24 @@ class QwenModelConfigTests(unittest.TestCase):
                 },
             )
 
-    def test_qwen_3_6_uses_its_current_presence_penalty(self) -> None:
+    def test_qwen_3_6_disables_thinking_but_keeps_general_sampling(
+        self,
+    ) -> None:
         config = _load_model("qwen_3_6_27b.yaml")
+        self.assertFalse(config["reasoning"]["enabled"])
+        self.assertFalse(
+            config["reasoning"]["chat_template_kwargs"][
+                "enable_thinking"
+            ]
+        )
         self.assertEqual(config["generation"]["presence_penalty"], 0.0)
         self.assertEqual(config["generation"]["repetition_penalty"], 1.0)
+        self.assertEqual(
+            config["backend"]["profiles"]["vllm"][
+                "request_timeout_seconds"
+            ],
+            1200,
+        )
 
     def test_zero_shot_experiment_replaces_2b_with_9b(self) -> None:
         experiment = yaml.safe_load(
@@ -86,7 +102,19 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
                     "repetition_penalty": 1.0,
                 },
             )
-            self.assertTrue(config["reasoning"]["enabled"])
+            if filename == "gemma_4_31b_it.yaml":
+                self.assertEqual(
+                    config["backend"]["profiles"]["vllm"][
+                        "request_timeout_seconds"
+                    ],
+                    1200,
+                )
+            self.assertFalse(config["reasoning"]["enabled"])
+            self.assertFalse(
+                config["reasoning"]["chat_template_kwargs"][
+                    "enable_thinking"
+                ]
+            )
             self.assertTrue(
                 config["reasoning"]["exclude_from_structured_output"]
             )
@@ -121,8 +149,16 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
         self.assertEqual(config["model"]["family"], "medgemma")
         self.assertEqual(config["model"]["domain"], "medical")
         self.assertEqual(
+            config["capabilities"]["structured_output_modes"],
+            ["prompt_only"],
+        )
+        self.assertEqual(
             config["backend"]["profiles"]["vllm"]["engine"],
             "vllm",
+        )
+        self.assertEqual(
+            config["reasoning"]["content_parser"],
+            "medgemma_special_tokens",
         )
         self.assertEqual(
             config["generation"],
@@ -188,9 +224,22 @@ class TypedModelConfigTests(unittest.TestCase):
         for config in local:
             profile = config.backend.active_profile
             self.assertEqual(profile.engine, "vllm")
-            self.assertTrue(profile.managed)
-            self.assertEqual(profile.max_model_len, 16384)
-            self.assertEqual(profile.limit_images_per_prompt, 1)
+        self.assertTrue(profile.managed)
+        self.assertEqual(profile.max_model_len, 16384)
+        self.assertEqual(profile.limit_images_per_prompt, 1)
+
+    def test_small_modal_models_support_vllm_json_schema_mode(self) -> None:
+        for config_id in (
+            "minicpm_v_4_6",
+            "gemma_4_e4b_it",
+            "qwen_3_5_4b",
+        ):
+            with self.subTest(config_id=config_id):
+                model = load_model_config(config_id, root=ROOT)
+                self.assertIn(
+                    "json_schema",
+                    model.capabilities.structured_output_modes,
+                )
 
     def test_kimi_profiles_and_azure_credentials_are_independent(self) -> None:
         kimi = load_model_config("kimi_k2_6", root=ROOT)
@@ -206,14 +255,24 @@ class TypedModelConfigTests(unittest.TestCase):
         )
         self.assertNotEqual(kimi.endpoint_env, gpt.endpoint_env)
         self.assertNotEqual(kimi.api_key_env, gpt.api_key_env)
-        self.assertEqual(kimi.generation.reasoning_effort, "medium")
+        self.assertIsNone(kimi.backend.active_profile.api_version_env)
+        self.assertIsNone(gpt.backend.active_profile.api_version_env)
+        self.assertIsNone(kimi.generation.reasoning_effort)
+        self.assertEqual(kimi.generation.thinking_mode, "disabled")
+        self.assertEqual(
+            kimi.backend.profile("azure").thinking_control,
+            "reasoning_effort",
+        )
+        self.assertEqual(kimi.generation.profile, "kimi_instant")
+        self.assertEqual(kimi.generation.temperature, 0.6)
+        self.assertEqual(kimi.generation.top_p, 0.95)
         self.assertEqual(gpt.generation.reasoning_effort, "high")
+        self.assertEqual(gpt.generation.profile, "provider_default")
         for config in (kimi, gpt):
-            self.assertEqual(config.generation.profile, "provider_default")
             self.assertIsNone(config.generation.do_sample)
-            self.assertIsNone(config.generation.temperature)
-            self.assertIsNone(config.generation.top_p)
             self.assertIsNone(config.generation.seed)
+        self.assertIsNone(gpt.generation.temperature)
+        self.assertIsNone(gpt.generation.top_p)
         endpoint = load_model_config(
             "kimi_k2_6",
             root=ROOT,
@@ -247,7 +306,7 @@ class TypedModelConfigTests(unittest.TestCase):
         self.assertEqual(config.source.repo_id, "Qwen/Qwen3.5-2B")
         self.assertIn("image", config.capabilities.modalities)
         self.assertEqual(config.reasoning.parser, "qwen3")
-        self.assertTrue(
+        self.assertFalse(
             config.reasoning.chat_template_kwargs.enable_thinking
         )
         self.assertNotIn(

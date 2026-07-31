@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from concurrent.futures import Future, ThreadPoolExecutor
+import asyncio
 from dataclasses import asdict, dataclass, is_dataclass
 from pathlib import Path
 import time
@@ -23,6 +23,7 @@ from src.inference.base import (
     InferenceBackend,
     InferenceRequest,
     InferenceResult,
+    InferenceSafetyRefusal,
     ReasoningTrace,
     TokenUsage,
 )
@@ -111,7 +112,15 @@ class BenchmarkExecutor:
         self,
         samples: Iterable[BenchmarkSample],
     ) -> ExecutionSummary:
-        """Run pending samples, resume prior records, and compute final metrics."""
+        """Synchronous CLI wrapper around :meth:`arun`."""
+
+        return asyncio.run(self.arun(samples))
+
+    async def arun(
+        self,
+        samples: Iterable[BenchmarkSample],
+    ) -> ExecutionSummary:
+        """Run pending samples asynchronously and compute final metrics."""
 
         selected = list(samples)
         completed_ids = self.writer.completed_task_ids()
@@ -121,8 +130,7 @@ class BenchmarkExecutor:
             if _task_id(sample) not in completed_ids
         ]
         try:
-            for batch in _batches(pending, self.execution.batch_size):
-                self._run_batch(batch)
+            await self._run_pending(pending)
         except KeyboardInterrupt:
             records = read_jsonl(self.writer.paths.predictions)
             self.writer.finalize(
@@ -151,7 +159,17 @@ class BenchmarkExecutor:
             predictions=predictions,
         )
 
-    def _run_batch(self, samples: list[BenchmarkSample]) -> None:
+    async def _run_pending(
+        self,
+        pending: list[BenchmarkSample],
+    ) -> None:
+        for batch in _batches(pending, self.execution.batch_size):
+            await self._run_batch(batch)
+
+    async def _run_batch(
+        self,
+        samples: list[BenchmarkSample],
+    ) -> None:
         prepared: list[_PreparedRequest] = []
         for sample in samples:
             try:
@@ -200,33 +218,54 @@ class BenchmarkExecutor:
 
         if not prepared:
             return
-        # HTTP inference is I/O-bound. Sending one request per worker lets the
-        # vLLM server perform continuous batching while retaining per-case
-        # failure isolation for provider APIs.
-        with ThreadPoolExecutor(
-            max_workers=min(self.execution.batch_size, len(prepared))
-        ) as pool:
-            futures: list[
-                tuple[_PreparedRequest, Future[InferenceResult]]
-            ] = [
-                (item, pool.submit(self.backend.complete, item.request))
-                for item in prepared
-            ]
-            for item, future in futures:
-                if self.execution.save_rendered_prompts:
-                    self.writer.append_rendered_prompt(
-                        item.rendered_prompt_record
-                    )
-                try:
-                    result = future.result()
-                except Exception as exc:
-                    self._write_failure(
-                        sample=item.sample,
-                        status="backend_error",
-                        error=f"{type(exc).__name__}: {exc}",
-                    )
-                    continue
+        for item in prepared:
+            if self.execution.save_rendered_prompts:
+                self.writer.append_rendered_prompt(
+                    item.rendered_prompt_record
+                )
+
+        semaphore = asyncio.Semaphore(
+            min(self.execution.batch_size, len(prepared))
+        )
+        tasks = [
+            asyncio.create_task(self._complete_one(item, semaphore))
+            for item in prepared
+        ]
+        for completed in asyncio.as_completed(tasks):
+            item, result, error = await completed
+            if isinstance(error, InferenceSafetyRefusal):
+                self._write_failure(
+                    sample=item.sample,
+                    status="safety_refusal",
+                    error=f"{type(error).__name__}: {error}",
+                    response_metadata={
+                        "safety_refusal": dict(error.details),
+                    },
+                )
+            elif error is not None:
+                self._write_failure(
+                    sample=item.sample,
+                    status="backend_error",
+                    error=f"{type(error).__name__}: {error}",
+                )
+            elif result is not None:
                 self._write_result(item.sample, item.task, result)
+
+    async def _complete_one(
+        self,
+        item: _PreparedRequest,
+        semaphore: asyncio.Semaphore,
+    ) -> tuple[
+        _PreparedRequest,
+        InferenceResult | None,
+        Exception | None,
+    ]:
+        async with semaphore:
+            try:
+                result = await self.backend.acomplete(item.request)
+            except Exception as exc:
+                return item, None, exc
+            return item, result, None
 
     def _write_result(
         self,
@@ -248,15 +287,9 @@ class BenchmarkExecutor:
                 response.metadata["semantic_valid"] = False
             if "truncated_output" not in response.validation_errors:
                 response.validation_errors.append("truncated_output")
-        status = (
-            "truncated_output"
-            if truncated
-            else "ok"
-            if (
-                response.is_valid
-                and response.metadata.get("semantic_valid", True) is not False
-            )
-            else "invalid_output"
+        status = _classify_response_status(
+            response,
+            truncated=truncated,
         )
         prediction = BenchmarkPrediction(
             task_id=_task_id(sample),
@@ -281,6 +314,7 @@ class BenchmarkExecutor:
         sample: BenchmarkSample,
         status: str,
         error: str,
+        response_metadata: dict[str, Any] | None = None,
     ) -> None:
         response = ModelResponse(
             model_id=self.backend.model_id,
@@ -288,7 +322,9 @@ class BenchmarkExecutor:
             parsed_output=None,
             json_valid=False,
             schema_valid=False,
+            recoverable_json_valid=False,
             validation_errors=[f"{status}:{error}"],
+            metadata=dict(response_metadata or {}),
         )
         prediction = BenchmarkPrediction(
             task_id=_task_id(sample),
@@ -327,8 +363,12 @@ def _prediction_to_record(
         "response": {
             "final_text": response.raw_text,
             "parsed_output": response.parsed_output,
+            "canonical_output": response.canonical_output,
             "json_valid": response.json_valid,
+            "recoverable_json_valid": response.recoverable_json_valid,
             "schema_valid": response.schema_valid,
+            "canonical_schema_valid": response.canonical_schema_valid,
+            "canonicalization_rules": response.canonicalization_rules,
             "validation_errors": response.validation_errors,
             "metadata": response.metadata,
         },
@@ -370,8 +410,32 @@ def _record_to_prediction(record: dict[str, Any]) -> BenchmarkPrediction:
             if isinstance(response_value.get("parsed_output"), dict)
             else None
         ),
+        canonical_output=(
+            response_value.get("canonical_output")
+            if isinstance(response_value.get("canonical_output"), dict)
+            else None
+        ),
         json_valid=bool(response_value.get("json_valid")),
+        recoverable_json_valid=bool(
+            response_value.get(
+                "recoverable_json_valid",
+                response_value.get("json_valid"),
+            )
+        ),
         schema_valid=bool(response_value.get("schema_valid")),
+        canonical_schema_valid=bool(
+            response_value.get(
+                "canonical_schema_valid",
+                response_value.get("schema_valid"),
+            )
+        ),
+        canonicalization_rules=[
+            str(value)
+            for value in response_value.get(
+                "canonicalization_rules",
+                [],
+            )
+        ],
         validation_errors=[
             str(value)
             for value in response_value.get("validation_errors", [])
@@ -434,6 +498,24 @@ def _is_truncated(result: InferenceResult) -> bool:
         isinstance(incomplete_reason, str)
         and incomplete_reason.casefold() == "max_output_tokens"
     )
+
+
+def _classify_response_status(
+    response: ModelResponse,
+    *,
+    truncated: bool,
+) -> str:
+    """Return the most fundamental failed output-contract layer."""
+
+    if truncated:
+        return "truncated_output"
+    if not response.json_valid:
+        return "format_invalid"
+    if not response.schema_valid:
+        return "schema_invalid"
+    if response.metadata.get("semantic_valid", True) is False:
+        return "semantic_noncompliant"
+    return "ok"
 
 
 def _reasoning_dict(value: ReasoningTrace) -> dict[str, Any]:

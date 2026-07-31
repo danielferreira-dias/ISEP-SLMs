@@ -8,8 +8,10 @@ wrapper while making reasoning, usage, and request identity explicit.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+import asyncio
 import base64
 from collections.abc import Mapping, Sequence
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field, is_dataclass
 from typing import Any, Literal
 
@@ -43,6 +45,19 @@ class InferenceRequestError(InferenceError):
 
 class InferenceTransportError(InferenceError):
     """Raised when a provider call fails without exposing provider secrets."""
+
+
+class InferenceSafetyRefusal(InferenceTransportError):
+    """Raised when a provider safety system blocks an otherwise valid call."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        details: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.details = dict(details or {})
 
 
 class InferencePreflightError(InferenceError):
@@ -136,6 +151,21 @@ class InferenceBackend(ABC):
     def complete(self, request: InferenceRequest) -> InferenceResult:
         """Run one normalized request."""
 
+    async def acomplete(
+        self,
+        request: InferenceRequest,
+    ) -> InferenceResult:
+        """Run one request asynchronously.
+
+        Synchronous-only providers use a worker thread by default. Native
+        asynchronous transports override this method.
+        """
+
+        return await asyncio.to_thread(self.complete, request)
+
+    async def aclose(self) -> None:
+        """Release asynchronous transport resources, when any exist."""
+
     def generate_result(
         self,
         *,
@@ -191,6 +221,18 @@ class InferenceBackend(ABC):
         """
 
         return [self.complete(request) for request in requests]
+
+    async def generate_batch_async(
+        self,
+        requests: Sequence[InferenceRequest],
+    ) -> list[InferenceResult]:
+        """Execute a batch concurrently through the asynchronous contract."""
+
+        return list(
+            await asyncio.gather(
+                *(self.acomplete(request) for request in requests)
+            )
+        )
 
 
 def validate_reasoning_capture(
@@ -274,6 +316,8 @@ def generation_values(config: Any | None) -> dict[str, Any]:
         "seed",
         "stop",
         "chat_template_kwargs",
+        "reasoning_effort",
+        "thinking_mode",
     ):
         value = getattr(config, key, None)
         if value is not None:
@@ -363,6 +407,130 @@ def safe_optional_int(value: Any) -> int | None:
     if isinstance(value, int) and not isinstance(value, bool):
         return value
     return None
+
+
+def provider_error_details(error: Exception) -> dict[str, Any]:
+    """Extract only safe diagnostic fields from a provider SDK exception."""
+
+    details: dict[str, Any] = {"type": type(error).__name__}
+    status_code = getattr(error, "status_code", None)
+    if isinstance(status_code, int):
+        details["status_code"] = status_code
+
+    body = getattr(error, "body", None)
+    provider_error = body.get("error", body) if isinstance(body, dict) else {}
+    if isinstance(provider_error, Mapping):
+        for key in ("code", "message", "source_type"):
+            value = provider_error.get(key)
+            if isinstance(value, str) and value:
+                details[key] = _compact_provider_text(value)
+        safety = _safe_filter_tree(provider_error)
+        if safety:
+            details["content_filter"] = safety
+
+    if "message" not in details:
+        message = getattr(error, "message", None)
+        if isinstance(message, str) and message:
+            details["message"] = _compact_provider_text(message)
+
+    response = getattr(error, "response", None)
+    headers = getattr(response, "headers", None)
+    if isinstance(headers, Mapping):
+        for header in ("x-request-id", "apim-request-id"):
+            value = headers.get(header)
+            if isinstance(value, str) and value:
+                details["request_id"] = _compact_provider_text(value)
+                break
+    return details
+
+
+def provider_json_schema(schema: Mapping[str, Any]) -> dict[str, Any]:
+    """Adapt the project schema to the provider Structured Outputs subset.
+
+    Azure/OpenAI Structured Outputs rejects ``uniqueItems``. The benchmark's
+    deterministic validator still enforces its complete local contract after
+    generation, so removing this generation-time keyword does not weaken
+    scoring.
+    """
+
+    normalized = deepcopy(dict(schema))
+
+    def visit(value: Any) -> None:
+        if isinstance(value, dict):
+            value.pop("uniqueItems", None)
+            for nested in value.values():
+                visit(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                visit(nested)
+
+    visit(normalized)
+    return normalized
+
+
+def provider_error_summary(details: Mapping[str, Any]) -> str:
+    """Render safe provider error fields as a concise diagnostic string."""
+
+    fields = []
+    for key in ("type", "status_code", "code", "message", "request_id"):
+        value = details.get(key)
+        if value is not None:
+            label = "status" if key == "status_code" else key
+            fields.append(f"{label}={value}")
+    return "; ".join(fields)
+
+
+def is_safety_refusal(details: Mapping[str, Any]) -> bool:
+    """Identify provider content-filter and policy refusals."""
+
+    code = str(details.get("code", "")).casefold()
+    if any(
+        token in code
+        for token in ("content_filter", "content_policy", "safety")
+    ):
+        return True
+    return bool(details.get("content_filter"))
+
+
+def _safe_filter_tree(value: Mapping[str, Any]) -> dict[str, Any]:
+    """Retain category/severity decisions while dropping arbitrary metadata."""
+
+    result: dict[str, Any] = {}
+    scalar_keys = {
+        "blocked",
+        "detected",
+        "filtered",
+        "severity",
+        "source_type",
+    }
+    nested_keys = {
+        "content_filter_result",
+        "content_filter_results",
+        "inner_error",
+        "innererror",
+        "hate",
+        "jailbreak",
+        "protected_material_code",
+        "protected_material_text",
+        "self_harm",
+        "sexual",
+        "violence",
+    }
+    for key, nested in value.items():
+        normalized_key = str(key).casefold()
+        if normalized_key in scalar_keys and isinstance(
+            nested, (str, bool, int, float)
+        ):
+            result[str(key)] = nested
+        elif normalized_key in nested_keys and isinstance(nested, Mapping):
+            safe_nested = _safe_filter_tree(nested)
+            if safe_nested:
+                result[str(key)] = safe_nested
+    return result
+
+
+def _compact_provider_text(value: str, *, limit: int = 500) -> str:
+    return " ".join(value.split())[:limit]
 
 
 def _clean_optional_text(value: str | None) -> str | None:
