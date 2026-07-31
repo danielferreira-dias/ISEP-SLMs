@@ -22,6 +22,7 @@ capabilities:
     - video
   structured_output_modes:
     - prompt_only
+    - json_schema
 
 source:
   type: huggingface

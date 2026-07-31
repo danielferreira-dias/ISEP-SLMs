@@ -1,0 +1,103 @@
+# DermoBench is a derived, gated evaluation suite. It ships annotations and
+# image references, not an independent collection of image payloads.
+dataset:
+  id: dermobench
+  version: hub_release_2026_07
+  name: DermoBench
+  task_type: multimodal_dermatology_evaluation
+  description: >
+    Gated dermatology VLM evaluation suite covering lesion description,
+    morphology, multiple-choice diagnosis, diagnostic reasoning, and a
+    DDI-based fairness evaluation.
+  license_id: CC_BY_NC_4_0
+
+source:
+  format: json_and_jsonl_annotation_suite
+  hub_repo: mendicant04/DermoBench
+  gated: true
+  local_root: configs/datasets/dermobench/data
+  images_included: false
+  image_resolution: >
+    Resolve each relative image path against its original upstream dataset;
+    do not treat DermoBench annotation records as a new image source.
+
+normalization:
+  standalone_disease_manifest: false
+  requires_task_specific_adapter: true
+  preserve_original_mcq_options: true
+  preserve_original_prompt_and_reference: true
+
+coverage:
+  role: external_evaluation_only
+  reason: >
+    DermoBench is a derived benchmark that reuses source datasets, including
+    DDI and SKINCON-linked cases. It must not contribute to disease coverage,
+    taxonomy selection, training, or claims of source-independent evaluation.
+
+evaluation:
+  tasks:
+    - id: task_1_1_description_without_morphology
+      path: task1/1_1_description_wo_morph/task1_1_final.jsonl
+      sample_count: 900
+      scoring: llm_as_a_judge
+      judge_required: true
+    - id: task_1_2_description_with_morphology
+      path: task1/1_2_description_w_morph/task1_2_final.jsonl
+      sample_count: 900
+      scoring: llm_as_a_judge
+      judge_required: true
+    - id: task_1_3_derm7pt_morphology_mcq
+      path: task1/1_3_mcq_derm7pt/derm7pt_test_mcq.json
+      sample_count: 5530
+      scoring: exact_choice_match
+      judge_required: false
+    - id: task_1_4_skincon_morphology_mcq
+      path: task1/1_4_mcq_skincon/skincon_all_mcq.json
+      sample_count: 11682
+      scoring: exact_choice_match
+      judge_required: false
+    - id: task_2_1_diagnosis_mcq_25_choices
+      path: task2/2_1_mcq/25_choices/task2.1_25choices_test_2k_non_uniform_sample_final.json
+      sample_count: 2000
+      scoring: exact_choice_match
+      judge_required: false
+    - id: task_2_1_diagnosis_mcq_4_choices
+      path: task2/2_1_mcq/4_choices/task2.1_test_2k_non_uniform_sample_final.json
+      sample_count: 2000
+      scoring: exact_choice_match
+      judge_required: false
+    - id: task_2_1_ddi_diagnosis_mcq
+      path: task2/2_1_mcq/ddi/task2.1_ddi_4choices.json
+      sample_count: 656
+      scoring: exact_choice_match
+      judge_required: false
+    - id: task_2_1_derm1m_edu_diagnosis_mcq
+      path: task2/2_1_mcq/derm1m_edu/task2.1_derm1m_edu_final.json
+      sample_count: 3615
+      scoring: exact_choice_match
+      judge_required: false
+    - id: task_2_1_derm7pt_diagnosis_mcq
+      path: task2/2_1_mcq/derm7pt/task2.1_derm7pt_4choices.json
+      sample_count: 2022
+      scoring: exact_choice_match
+      judge_required: false
+    - id: task_2_1_snu134_diagnosis_mcq
+      path: task2/2_1_mcq/snu134/task2.1_snu134_4choices.json
+      sample_count: 240
+      scoring: exact_choice_match
+      judge_required: false
+    - id: task_3_1_diagnostic_reasoning_without_morphology
+      path: task3/3_1/task3_1_final.jsonl
+      sample_count: 900
+      scoring: llm_as_a_judge
+      judge_required: true
+    - id: task_3_2_diagnostic_reasoning_with_morphology
+      path: task3/3_2/task3_2_final.jsonl
+      sample_count: 900
+      scoring: llm_as_a_judge
+      judge_required: true
+    - id: task_4_ddi_fairness_mcq
+      path: task4/ddi_4choices_final.jsonl
+      sample_count: 654
+      scoring: exact_choice_match
+      judge_required: false

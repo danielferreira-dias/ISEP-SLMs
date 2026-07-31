@@ -38,7 +38,6 @@ backend:
       endpoint_env: GPT_5_6_LUNA_AZURE_ENDPOINT
       api_key_env: GPT_5_6_LUNA_AZURE_API_KEY
       deployment_env: GPT_5_6_LUNA_AZURE_DEPLOYMENT
-      api_version_env: GPT_5_6_LUNA_AZURE_API_VERSION
 
 generation:
   profile: provider_default

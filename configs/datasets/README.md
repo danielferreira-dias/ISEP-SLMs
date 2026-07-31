@@ -126,6 +126,7 @@ measurement systems rather than converted into a single scale.
 | `skincap/` | SkinCAP | Complete gated Hugging Face snapshot for the locally authenticated account |
 | `skincare/` | SkinCaRe | Complete gated Hugging Face snapshot for the locally authenticated account |
 | `dermavqa/` | DermaVQA | Public OSF files, including the IIYI image archive and Reddit answer annotations |
+| `dermobench/` | DermoBench | Gated task annotations; images must be obtained from the original providers |
 | `dermnet/` | Dermnet Kaggle mirror | Complete 19,559-image archive; excluded pending upstream-rights and label-quality review |
 
 ## Important constraints

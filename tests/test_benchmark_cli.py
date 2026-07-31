@@ -3,18 +3,46 @@
 from __future__ import annotations
 
 from contextlib import redirect_stderr, redirect_stdout
+import asyncio
 from io import StringIO
 import json
 from pathlib import Path
 import unittest
 
-from src.benchmark.cli import main
+from src.benchmark.cli import _execute_and_close_backend, main
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class BenchmarkCliTests(unittest.TestCase):
+    def test_async_backend_closes_on_request_event_loop(self) -> None:
+        class Executor:
+            loop = None
+
+            async def arun(self, samples):
+                self.loop = asyncio.get_running_loop()
+                return list(samples)
+
+        class Backend:
+            loop = None
+
+            async def aclose(self):
+                self.loop = asyncio.get_running_loop()
+
+        executor = Executor()
+        backend = Backend()
+        result = asyncio.run(
+            _execute_and_close_backend(
+                executor=executor,
+                samples=["sample"],
+                backend=backend,
+            )
+        )
+
+        self.assertEqual(result, ["sample"])
+        self.assertIs(executor.loop, backend.loop)
+
     def test_list_commands_load_all_typed_configs(self) -> None:
         stdout = StringIO()
         with redirect_stdout(stdout):

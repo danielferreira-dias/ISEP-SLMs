@@ -33,6 +33,7 @@ dataset_roles:
   external_evaluation_only:
     - ddi
     - skindisnet
+    - dermobench
   excluded_from_coverage:
     skincon: Morphology annotation overlay; it does not provide independent disease cases.
     skincap: Derived from Fitzpatrick17k and DDI; counting it would duplicate upstream cases.

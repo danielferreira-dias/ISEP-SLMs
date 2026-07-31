@@ -50,6 +50,11 @@ backend:
       managed: true
       managed_allowed: true
 
+reasoning:
+  # MedGemma may emit reasoning inside its content using these special tokens.
+  # The client separates it from the final answer before benchmark validation.
+  content_parser: medgemma_special_tokens
+
 generation:
   profile: official_greedy
   do_sample: false  # Official default since 2026-01-23.
