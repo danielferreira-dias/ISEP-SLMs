@@ -141,8 +141,9 @@ the newly materialized sealed internal evidence cohort, and external DDI.
 Free-text, image-only clinical assessment with an explicitly ranked Top-3
 differential and concise visible-evidence rationale. The evaluated model sees
 no disease taxonomy, candidate IDs, gold label, SKINCON concepts, SkinCAP
-description, or JSON schema. A separate single-judge stage uses GPT-5.6 Luna
-and the isolated reference configuration.
+description, or JSON schema. A separate stage uses GPT-5.6 Luna as the primary
+judge and may use Qwen 3.7 Flash only when Luna returns a content-policy
+violation. Each response still receives one final judgment; there is no voting.
 
 ## Input schema
 

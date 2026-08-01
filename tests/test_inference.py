@@ -247,6 +247,46 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         )
         self.assertNotIn("reasoning_effort", client.chat_create.payload)
 
+    def test_openrouter_uses_unified_reasoning_and_text_first(self) -> None:
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content="{}"),
+                )
+            ],
+            usage=None,
+        )
+        client = _FakeClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="luna",
+            request_model="openai/gpt-5.6-luna-pro",
+            client=client,
+            generation={"reasoning_effort": "high"},
+            thinking_control="openrouter_reasoning",
+            image_first=False,
+            include_extended_sampling=False,
+        )
+
+        backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        payload = client.chat_create.payload
+        self.assertNotIn("reasoning_effort", payload)
+        self.assertEqual(
+            payload["extra_body"]["reasoning"],
+            {"effort": "high", "exclude": False},
+        )
+        self.assertEqual(
+            payload["messages"][-1]["content"][0]["type"],
+            "text",
+        )
+        self.assertNotIn("top_k", payload["extra_body"])
+
     def test_vllm_thinking_control_uses_chat_template_kwargs(self) -> None:
         response = SimpleNamespace(
             choices=[

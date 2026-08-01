@@ -470,7 +470,7 @@
       {
         "path": "artifacts/judges/open_ended_diagnosis_judge.yaml",
         "source": "src/benchmark/resources/open_ended_diagnosis/judge_prompt.yaml",
-        "sha256": "7b9b48fd4180c7ae3137d9511a4ac058d0d2e3b31dc9d9693ee50a480ecd583d"
+        "sha256": "5563b6c2fcc4805259fff9345b9090029da524e09d16016d65806498eded3cea"
       },
       {
         "path": "artifacts/schemas/open_ended_diagnosis_judge.schema.json",

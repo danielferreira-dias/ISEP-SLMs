@@ -28,14 +28,51 @@ def smoke_runs(
     limit: int,
     all_benchmarks: bool,
     evidence_and_top_k: bool = False,
+    validation_suite: bool = False,
 ) -> tuple[SmokeRun, ...]:
     """Resolve a single run or one of the fixed benchmark smoke suites."""
 
     if limit <= 0:
         raise ValueError("limit must be positive")
-    if all_benchmarks and evidence_and_top_k:
+    selected_suites = sum(
+        (all_benchmarks, evidence_and_top_k, validation_suite)
+    )
+    if selected_suites > 1:
         raise ValueError(
-            "all_benchmarks and evidence_and_top_k are mutually exclusive"
+            "all_benchmarks, evidence_and_top_k, and validation_suite are "
+            "mutually exclusive"
+        )
+    if validation_suite:
+        if limit % 2:
+            raise ValueError(
+                "The validation-suite task limit must be even because the "
+                "confusion benchmark evaluates complete two-task pairs"
+            )
+        return (
+            SmokeRun(
+                benchmark="visual_top_k_closed_set",
+                evaluation_set="validation",
+                selection_limit=limit,
+                expected_task_count=limit,
+            ),
+            SmokeRun(
+                benchmark="visual_disease_confusion_sets",
+                evaluation_set="validation",
+                selection_limit=limit // 2,
+                expected_task_count=limit,
+            ),
+            SmokeRun(
+                benchmark="evidence_grounded_diagnosis",
+                evaluation_set="validation",
+                selection_limit=limit,
+                expected_task_count=limit,
+            ),
+            SmokeRun(
+                benchmark="open_ended_diagnosis",
+                evaluation_set="validation",
+                selection_limit=limit,
+                expected_task_count=limit,
+            ),
         )
     if evidence_and_top_k:
         return (

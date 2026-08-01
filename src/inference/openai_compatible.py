@@ -62,6 +62,8 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         timeout_seconds: float = 300.0,
         max_retries: int = 2,
         stream_responses: bool = False,
+        image_first: bool = True,
+        include_extended_sampling: bool = True,
     ) -> None:
         self._model_id = model_id
         self.request_model = request_model or model_id
@@ -85,16 +87,19 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             "kimi_api",
             "chat_template",
             "reasoning_effort",
+            "openrouter_reasoning",
         }:
             raise InferenceConfigurationError(
                 "thinking_control must be 'kimi_api', 'chat_template', "
-                "or 'reasoning_effort'"
+                "'reasoning_effort', or 'openrouter_reasoning'"
             )
         self.thinking_control = thinking_control
         self.supports_system_role = supports_system_role
         self.timeout_seconds = timeout_seconds
         self.max_retries = max_retries
         self.stream_responses = stream_responses
+        self.image_first = image_first
+        self.include_extended_sampling = include_extended_sampling
 
     @property
     def model_id(self) -> str:
@@ -292,28 +297,36 @@ class OpenAICompatibleChatBackend(InferenceBackend):
                 )
                 if part
             )
+        user_content = [
+            {
+                "type": "image_url",
+                "image_url": {"url": data_url},
+            },
+            {
+                "type": "text",
+                "text": user_text,
+            },
+        ]
+        if not self.image_first:
+            user_content.reverse()
         messages.append(
             {
                 "role": "user",
-                # Image-first ordering is compatible with Qwen and is
-                # explicitly recommended for Gemma 4.
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": data_url},
-                    },
-                    {
-                        "type": "text",
-                        "text": user_text,
-                    },
-                ],
+                "content": user_content,
             }
         )
         payload: dict[str, Any] = {
             "model": self.request_model,
             "messages": messages,
         }
-        _apply_chat_generation(payload, generation)
+        _apply_chat_generation(
+            payload,
+            generation,
+            include_reasoning_effort=(
+                self.thinking_control != "openrouter_reasoning"
+            ),
+            include_extended_sampling=self.include_extended_sampling,
+        )
         extra_body = dict(payload.get("extra_body", {}))
         template_kwargs = dict(self.chat_template_kwargs)
         configured_template_kwargs = generation.get(
@@ -341,6 +354,16 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             payload["reasoning_effort"] = (
                 "high" if thinking_mode == "enabled" else "none"
             )
+        if self.thinking_control == "openrouter_reasoning":
+            reasoning: dict[str, Any] = {}
+            reasoning_effort = generation.get("reasoning_effort")
+            if reasoning_effort is not None:
+                reasoning["effort"] = reasoning_effort
+            if thinking_mode is not None:
+                reasoning["enabled"] = thinking_mode == "enabled"
+            if reasoning:
+                reasoning["exclude"] = False
+                extra_body["reasoning"] = reasoning
         if template_kwargs:
             extra_body["chat_template_kwargs"] = template_kwargs
         if extra_body:
@@ -657,9 +680,11 @@ class OpenAICompatibleChatBackend(InferenceBackend):
 def _apply_chat_generation(
     payload: dict[str, Any],
     generation: dict[str, Any],
+    *,
+    include_reasoning_effort: bool = True,
+    include_extended_sampling: bool = True,
 ) -> None:
     direct_fields = (
-        "reasoning_effort",
         "temperature",
         "top_p",
         "presence_penalty",
@@ -667,6 +692,8 @@ def _apply_chat_generation(
         "seed",
         "stop",
     )
+    if include_reasoning_effort:
+        direct_fields = ("reasoning_effort", *direct_fields)
     for field_name in direct_fields:
         value = generation.get(field_name)
         if value is not None:
@@ -681,10 +708,11 @@ def _apply_chat_generation(
         payload["max_tokens"] = max_tokens
 
     extra_body: dict[str, Any] = {}
-    for field_name in ("top_k", "min_p", "repetition_penalty"):
-        value = generation.get(field_name)
-        if value is not None:
-            extra_body[field_name] = value
+    if include_extended_sampling:
+        for field_name in ("top_k", "min_p", "repetition_penalty"):
+            value = generation.get(field_name)
+            if value is not None:
+                extra_body[field_name] = value
     if extra_body:
         payload["extra_body"] = extra_body
 

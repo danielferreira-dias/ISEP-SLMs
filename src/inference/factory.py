@@ -37,7 +37,7 @@ def create_backend(
             config,
             reasoning_capture=reasoning_capture,
         )
-    if engine in {"azure_openai", "vllm_endpoint"}:
+    if engine in {"azure_openai", "openrouter", "vllm_endpoint"}:
         return AzureBackend(
             config,
             client=client,

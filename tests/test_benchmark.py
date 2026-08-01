@@ -384,6 +384,51 @@ class BenchmarkValidationTests(unittest.TestCase):
             1.0,
         )
 
+    def test_confusion_metrics_accept_release_condition_metadata(self) -> None:
+        def prediction(*, condition: str) -> BenchmarkPrediction:
+            response = parse_and_validate_response(
+                model_id="test",
+                raw_text=json.dumps(
+                    {
+                        "predictions": [
+                            {"rank": 1, "disease_id": "D001"},
+                            {"rank": 2, "disease_id": "D002"},
+                            {"rank": 3, "disease_id": "D003"},
+                        ]
+                    }
+                ),
+                allowed_disease_ids={"D001", "D002", "D003"},
+                top_k=3,
+            )
+            return BenchmarkPrediction(
+                task_id=f"PAIR_1::{condition}",
+                sample_id="SAMPLE_1",
+                model_id="test",
+                ground_truth_disease_id="D001",
+                response=response,
+                metadata={
+                    "pair_id": "PAIR_1",
+                    "condition": condition,
+                    "confusion_set_id": "lesions",
+                    "candidate_disease_ids": ["D001", "D002", "D003"],
+                },
+            )
+
+        metrics = compute_confusion_set_metrics(
+            [
+                prediction(condition="low_confusability"),
+                prediction(condition="high_confusability"),
+            ],
+            allowed_disease_ids=["D001", "D002", "D003"],
+            bootstrap_resamples=10,
+        )
+
+        self.assertEqual(metrics["pair_count"], 1)
+        self.assertEqual(metrics["by_condition_top_1_accuracy"], {
+            "high_confusability": 1.0,
+            "low_confusability": 1.0,
+        })
+
     def test_confusion_metrics_support_legacy_string_candidates(self) -> None:
         response = parse_and_validate_response(
             model_id="test",

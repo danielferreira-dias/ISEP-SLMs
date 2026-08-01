@@ -498,7 +498,10 @@ def compute_confusion_set_metrics(
             {
                 "pair_id": str(row.metadata.get("pair_id", "")),
                 "difficulty": str(
-                    row.metadata.get("difficulty", "")
+                    row.metadata.get(
+                        "difficulty",
+                        row.metadata.get("condition", ""),
+                    )
                 ),
                 "confusion_set_id": str(
                     row.metadata.get("confusion_set_id", "")

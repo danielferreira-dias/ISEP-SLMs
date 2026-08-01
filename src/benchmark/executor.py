@@ -63,12 +63,15 @@ class ExecutionConfig:
     max_output_tokens: int
     run_seed: int = 42
     save_rendered_prompts: bool = True
+    request_interval_seconds: float = 0.0
 
     def __post_init__(self) -> None:
         if self.batch_size <= 0:
             raise ValueError("batch_size must be positive")
         if self.max_output_tokens <= 0:
             raise ValueError("max_output_tokens must be positive")
+        if self.request_interval_seconds < 0:
+            raise ValueError("request_interval_seconds cannot be negative")
 
 
 @dataclass(frozen=True, slots=True)
@@ -107,6 +110,8 @@ class BenchmarkExecutor:
         self.writer = writer
         self.execution = execution
         self.generation = generation
+        self._request_pacing_lock = asyncio.Lock()
+        self._last_request_started: float | None = None
 
     def run(
         self,
@@ -266,10 +271,24 @@ class BenchmarkExecutor:
     ]:
         async with semaphore:
             try:
+                await self._pace_request()
                 result = await self.backend.acomplete(item.request)
             except Exception as exc:
                 return item, None, exc
             return item, result, None
+
+    async def _pace_request(self) -> None:
+        interval = self.execution.request_interval_seconds
+        if interval <= 0:
+            return
+        async with self._request_pacing_lock:
+            clock = asyncio.get_running_loop().time
+            now = clock()
+            if self._last_request_started is not None:
+                remaining = interval - (now - self._last_request_started)
+                if remaining > 0:
+                    await asyncio.sleep(remaining)
+            self._last_request_started = clock()
 
     def _write_result(
         self,

@@ -37,8 +37,12 @@ judge or scored.
 
 ## Judge protocol
 
-There is exactly one judge: `gpt_5_6_luna`, configured with high reasoning
-effort. Each model response is judged independently. The judge receives:
+Each response receives exactly one final judgment. The primary judge is
+`gpt_5_6_luna`, configured with high reasoning effort. If and only if Luna
+returns a provider content-policy violation, `qwen_3_7_flash_openrouter` may
+evaluate that case as a coverage fallback. Qwen is not asked for a second
+opinion on cases successfully judged by Luna, and there is no voting or
+arbitration between judges. The active judge receives:
 
 - the same benchmark image;
 - the correct diagnosis and ID;
@@ -64,6 +68,40 @@ unsupported-claim rate/count, model failures, and verdict distribution.
 These are judge-dependent measurements. Comparisons are valid only when the
 judge model revision, prompt, schema, reasoning setting, and benchmark release
 remain frozen.
+
+The judgment is also checked for internal semantic consistency. In particular,
+rank 0 cannot coexist with diagnosis correctness 4 or verdict `correct`, and
+rank 1 cannot coexist with a diagnosis score below 3. Invalid JSON or
+contradictory scores are retried with corrective instructions; persistently
+invalid judgments are excluded and reported as `judge_invalid`.
+
+Every case records `primary_judge`, `judge_used`, `fallback_used`, and
+`fallback_reason`. Reports expose fallback frequency, judge usage, remaining
+safety refusals, invalid judgments, and score summaries by judge. This is
+necessary because a mixed-provider result must disclose which cases were
+scored by the fallback.
+
+## Calibration gate before the sealed benchmark
+
+Before using the 300-case Internal Benchmark, run the same deterministic
+50-case Validation subset with `--limit 50 --seed 42`. In the current frozen
+release this subset covers all 21 diseases, Fitzpatrick skin types 1–6, and
+all three internal image sources represented in open-ended Validation. It is
+large enough to expose prompt, ranking, safety, and parser failures without
+spending the full Validation or sealed benchmark budget.
+
+The protocol can be frozen when:
+
+- there are no contradictory accepted judgments;
+- `judge_invalid_count` is zero or explicitly investigated;
+- every fallback has `fallback_reason: content_policy_violation`;
+- judge usage and fallback rate are visible in the report;
+- Top-1/Top-3 agree with the case-level rank and judge summary;
+- the same task IDs are used for every evaluated model.
+
+The 50 cases are for judge/prompt calibration, not a final reported model
+comparison. After the gate passes, the prompt, schema, judge configs, seed,
+and release hashes are frozen before any Internal Benchmark execution.
 
 ## Artifacts and execution
 
@@ -93,8 +131,10 @@ part of ISEPDermaBench.
 
 ## Limitations
 
-One judge avoids voting ambiguity and cost multiplication but leaves results
-sensitive to that judge's errors and preferences. No second judge or human
-adjudication is used by design. The benchmark therefore reports a reproducible
-single-judge protocol, not an independent clinical gold standard for prose
-quality.
+One final judgment per case avoids voting ambiguity and cost multiplication,
+but results remain sensitive to judge-specific errors and preferences. The
+Qwen fallback improves coverage while introducing a small provider-dependent
+measurement difference that must be reported. No second opinion, voting, or
+human adjudication is used. The benchmark therefore reports a reproducible
+primary-judge-with-safety-fallback protocol, not an independent clinical gold
+standard for prose quality.

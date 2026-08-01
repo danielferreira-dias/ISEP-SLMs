@@ -53,6 +53,8 @@ class AzureBackend(InferenceBackend):
             or _attr(config, "endpoint_env")
         )
         endpoint = os.environ.get(endpoint_env) if endpoint_env else None
+        if engine == "openrouter" and endpoint is None:
+            endpoint = "https://openrouter.ai/api/v1"
         api_key_env = (
             _attr(profile, "api_key_env")
             or _attr(config, "api_key_env")
@@ -81,7 +83,8 @@ class AzureBackend(InferenceBackend):
             # raw chain of thought. Reflect the level that can be retained.
             configured_capture = "summary"
         request_model = (
-            _value_from_env(_attr(profile, "deployment_env"))
+            _attr(profile, "request_model")
+            or _value_from_env(_attr(profile, "deployment_env"))
             or _value_from_env(_attr(profile, "model_env"))
             or (
                 _attr(config, "deployment_name")
@@ -115,6 +118,11 @@ class AzureBackend(InferenceBackend):
                     thinking_control=_attr(
                         profile,
                         "thinking_control",
+                    ),
+                    image_first=engine != "openrouter",
+                    include_extended_sampling=engine != "openrouter",
+                    timeout_seconds=(
+                        _attr(profile, "request_timeout_seconds") or 300.0
                     ),
                 )
             )

@@ -258,7 +258,7 @@ uv run python -m src.benchmark.cli run \
 ```
 
 Then judge the completed run directory. A dry-run validates all task,
-reference, prompt, and judge-schema joins without calling Luna:
+reference, prompt, and judge-schema joins without calling the selected judge:
 
 ```bash
 uv run python -m src.benchmark.cli judge \
@@ -277,6 +277,54 @@ clinical-rationale quality, and differential quality. Unsupported claims and
 the overall-verdict distribution are also reported. These metrics depend on
 the fixed judge and prompt; they must be reported as judge-based estimates,
 not deterministic ground truth.
+
+Luna remains the default judge. An alternative judge candidate can be tested
+without overwriting Luna's artifacts:
+
+```bash
+uv run python -m src.benchmark.cli judge \
+  --run outputs/benchmark_runs/open_ended_diagnosis/qwen_3_5_4b/<run> \
+  --judge-model qwen_3_7_flash_openrouter
+```
+
+Alternative outputs are isolated under
+`judges/<judge_model_id>/`. Judge comparisons are a protocol-development
+experiment: select one judge and freeze its model, prompt, schema, and decoding
+settings before reporting final benchmark results.
+
+For the frozen primary-judge protocol, Qwen 3.7 Flash can be enabled only as a
+content-policy fallback for Luna:
+
+```bash
+uv run python -m src.benchmark.cli judge \
+  --run outputs/benchmark_runs/open_ended_diagnosis/qwen_3_5_4b/<run> \
+  --judge-model gpt_5_6_luna \
+  --fallback-judge-model qwen_3_7_flash_openrouter
+```
+
+The fallback is not used for ordinary transport errors, timeouts, invalid JSON,
+or a clinical disagreement. Those conditions remain attributable to the
+primary judge. Combined artifacts are isolated under
+`judges/gpt_5_6_luna__fallback_qwen_3_7_flash_openrouter/`. Each judgment stores
+the primary and effective judge plus the fallback reason. The metrics and HTML
+report include judge usage, fallback rate, invalid-judgment count, and score
+summaries separated by effective judge.
+
+Before the sealed run, use the deterministic 50-case calibration subset for
+every candidate model:
+
+```bash
+uv run python -m src.benchmark.cli run \
+  --model <candidate_model> \
+  --benchmark open_ended_diagnosis \
+  --evaluation-set validation \
+  --limit 50 \
+  --seed 42
+```
+
+Then run the primary/fallback judge command above on each completed directory.
+The selected 50-case subset covers all 21 diseases in the frozen local release.
+Do not change the seed between models.
 
 ## Run against an existing vLLM server
 
@@ -420,6 +468,55 @@ run. This does not alter the default prompt-only comparison track. The
 provider schema copy omits `uniqueItems`, which Azure Structured Outputs does
 not accept; deterministic post-generation validation still applies the full
 project contract.
+
+### OpenRouter profiles
+
+`gpt_5_6_luna` and `gemma_4_31b_it` also define optional `openrouter`
+profiles. Both use the OpenAI-compatible Chat Completions endpoint and require:
+
+```text
+OPENROUTER_API_KEY
+```
+
+The profiles pin the provider model slugs rather than relying on environment
+defaults:
+
+```text
+openai/gpt-5.6-luna-pro
+google/gemma-4-31b-it:free
+```
+
+OpenRouter receives text before the base64 image, its unified
+`reasoning` object is used instead of provider-specific thinking fields, and
+unsupported extended sampling fields such as `top_k` are omitted. Gemma uses
+temperature `1.0`, top-p `0.95`, and reasoning disabled. Luna Pro maps the
+configured high effort to `reasoning: {effort: high}`.
+
+Reproduce an image-level provider refusal with the frozen benchmark task:
+
+```bash
+uv run python -m src.test_openrouter_image \
+  --model gpt_5_6_luna \
+  --reasoning-effort none
+```
+
+Run the free Gemma endpoint conservatively because its shared upstream pool
+can return HTTP 429 even when the OpenRouter account itself has quota:
+
+```bash
+uv run python -m src.benchmark.cli run \
+  --model gemma_4_31b_it \
+  --backend-profile openrouter \
+  --benchmark visual_top_k_closed_set \
+  --evaluation-set validation \
+  --limit 10 \
+  --batch-size 1 \
+  --request-interval-seconds 6
+```
+
+`--request-interval-seconds` spaces request starts and is included in the
+immutable run identity. It controls client-side pacing but cannot eliminate a
+429 caused by exhaustion of OpenRouter's shared upstream free-provider pool.
 
 ## Reasoning capture
 

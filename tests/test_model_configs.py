@@ -296,6 +296,40 @@ class TypedModelConfigTests(unittest.TestCase):
             "chat_completions",
         )
 
+    def test_openrouter_profiles_use_explicit_provider_model_slugs(self) -> None:
+        expected = {
+            "gpt_5_6_luna": "openai/gpt-5.6-luna-pro",
+            "gemma_4_31b_it": "google/gemma-4-31b-it:free",
+        }
+        for model_id, request_model in expected.items():
+            with self.subTest(model_id=model_id):
+                config = load_model_config(
+                    model_id,
+                    root=ROOT,
+                    backend_profile="openrouter",
+                )
+                profile = config.backend.active_profile
+                self.assertEqual(profile.engine, "openrouter")
+                self.assertEqual(profile.request_model, request_model)
+                self.assertEqual(
+                    profile.thinking_control,
+                    "openrouter_reasoning",
+                )
+                self.assertEqual(profile.api_key_env, "OPENROUTER_API_KEY")
+
+        judge = load_model_config(
+            "qwen_3_7_flash_openrouter",
+            root=ROOT,
+        )
+        self.assertEqual(
+            judge.backend.active_profile.request_model,
+            "qwen/qwen3.7-flash",
+        )
+        self.assertIn(
+            "json_schema",
+            judge.capabilities.structured_output_modes,
+        )
+
     def test_model_can_be_loaded_by_repo_relative_path(self) -> None:
         config = load_model_config(
             "configs/models/qwen_small_4b.yaml",

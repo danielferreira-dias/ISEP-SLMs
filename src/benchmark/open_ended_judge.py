@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import base64
 from collections import Counter
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict, is_dataclass, replace
 from datetime import datetime, timezone
 from io import BytesIO
 import json
@@ -22,11 +22,16 @@ import yaml
 from src.benchmark.json_parsing import parse_json_output
 from src.benchmark.results import canonical_hash, file_sha256, read_jsonl
 from src.config import load_model_config
-from src.inference.base import InferenceBackend, InferenceRequest
+from src.inference.base import (
+    InferenceBackend,
+    InferenceRequest,
+    InferenceSafetyRefusal,
+)
 from src.inference.factory import create_backend
 
 
 JUDGE_MODEL_ID = "gpt_5_6_luna"
+FALLBACK_JUDGE_MODEL_ID = "qwen_3_7_flash_openrouter"
 JUDGE_MAX_OUTPUT_TOKENS = 2048
 JUDGE_RETRIES = 3
 BENCHMARK_ID = "open_ended_diagnosis"
@@ -80,16 +85,32 @@ def _render(template: str, values: dict[str, str]) -> str:
     return rendered
 
 
-def _judge_paths(run_directory: Path) -> dict[str, Path]:
+def _judge_paths(
+    run_directory: Path,
+    judge_model_id: str = JUDGE_MODEL_ID,
+    fallback_judge_model_id: str | None = None,
+) -> dict[str, Path]:
+    if fallback_judge_model_id:
+        protocol_id = (
+            f"{judge_model_id}__fallback_{fallback_judge_model_id}"
+        )
+        directory = run_directory / "judges" / protocol_id
+    else:
+        directory = (
+            run_directory
+            if judge_model_id == JUDGE_MODEL_ID
+            else run_directory / "judges" / judge_model_id
+        )
     return {
-        "manifest": run_directory / "judge_manifest.yaml",
-        "judgments": run_directory / "judgments.jsonl",
-        "metrics": run_directory / "judge_metrics.json",
-        "report": run_directory / "judge_report.html",
+        "manifest": directory / "judge_manifest.yaml",
+        "judgments": directory / "judgments.jsonl",
+        "metrics": directory / "judge_metrics.json",
+        "report": directory / "judge_report.html",
     }
 
 
 def _atomic_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
     temporary.write_text(
         json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
@@ -99,6 +120,7 @@ def _atomic_json(path: Path, value: Any) -> None:
 
 
 def _atomic_yaml(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
     temporary.write_text(
         yaml.safe_dump(value, sort_keys=False, allow_unicode=True),
@@ -166,6 +188,46 @@ def _judge_request(
     )
 
 
+def _validate_judgment_semantics(judgment: dict[str, Any]) -> None:
+    """Reject internally contradictory judge outputs before scoring them."""
+
+    rank = int(judgment["reference_diagnosis_rank"])
+    diagnosis_score = int(judgment["diagnosis_correctness"])
+    verdict = str(judgment["overall_verdict"])
+    unsupported_count = int(judgment["unsupported_claim_count"])
+    unsupported_examples = list(judgment["unsupported_claim_examples"])
+    errors: list[str] = []
+
+    if rank == 0 and diagnosis_score == 4:
+        errors.append(
+            "rank 0 cannot be combined with diagnosis_correctness 4"
+        )
+    if rank == 0 and verdict == "correct":
+        errors.append("rank 0 cannot be combined with verdict 'correct'")
+    if rank == 1 and diagnosis_score < 3:
+        errors.append(
+            "rank 1 requires diagnosis_correctness of at least 3"
+        )
+    if rank == 1 and verdict in {"partially_correct", "incorrect"}:
+        errors.append(
+            "rank 1 cannot be combined with a partially_correct or "
+            "incorrect verdict"
+        )
+    if unsupported_count == 0 and unsupported_examples:
+        errors.append(
+            "unsupported_claim_examples must be empty when the count is 0"
+        )
+    if unsupported_count > 0 and not unsupported_examples:
+        errors.append(
+            "at least one unsupported claim example is required when the "
+            "count is positive"
+        )
+    if errors:
+        raise ValueError(
+            "Judge semantic validation failed: " + "; ".join(errors)
+        )
+
+
 def _parse_judgment(raw_text: str, schema: dict[str, Any]) -> dict[str, Any]:
     parsed = parse_json_output(raw_text)
     if not parsed.raw_valid or not isinstance(parsed.decoded, dict):
@@ -177,7 +239,27 @@ def _parse_judgment(raw_text: str, schema: dict[str, Any]) -> dict[str, Any]:
     if errors:
         detail = "; ".join(error.message for error in errors[:5])
         raise ValueError(f"Judge schema validation failed: {detail}")
-    return dict(parsed.decoded)
+    judgment = dict(parsed.decoded)
+    _validate_judgment_semantics(judgment)
+    return judgment
+
+
+def _correction_request(
+    request: InferenceRequest,
+    error: Exception,
+) -> InferenceRequest:
+    return replace(
+        request,
+        user_prompt=(
+            request.user_prompt
+            + "\n\nYour previous JSON judgment was invalid: "
+            + str(error)
+            + "\nRe-evaluate the original assistant response and return a "
+            "fresh, internally consistent JSON object. In particular, rank "
+            "0 means that the reference diagnosis is absent from the explicit "
+            "top three; rank 1 means it is the primary diagnosis."
+        ),
+    )
 
 
 async def _judge_one(
@@ -188,10 +270,11 @@ async def _judge_one(
     semaphore: asyncio.Semaphore,
 ) -> dict[str, Any]:
     last_error: Exception | None = None
+    request_for_attempt = request
     for attempt in range(1, JUDGE_RETRIES + 1):
         try:
             async with semaphore:
-                result = await backend.acomplete(request)
+                result = await backend.acomplete(request_for_attempt)
             judgment = _parse_judgment(result.final_text, schema)
             return {
                 "status": "ok",
@@ -204,13 +287,37 @@ async def _judge_one(
                     "usage": asdict(result.usage),
                 },
             }
+        except InferenceSafetyRefusal as exc:
+            return {
+                "status": "judge_safety_refusal",
+                "attempts": attempt,
+                "error": f"{type(exc).__name__}: {exc}",
+                "safety_code": exc.details.get("code"),
+                "safety_details": dict(exc.details),
+            }
+        except ValueError as exc:
+            last_error = exc
+            request_for_attempt = _correction_request(request, exc)
         except Exception as exc:
             last_error = exc
+    if isinstance(last_error, ValueError):
+        return {
+            "status": "judge_invalid",
+            "attempts": JUDGE_RETRIES,
+            "error": f"{type(last_error).__name__}: {last_error}",
+        }
     return {
         "status": "judge_error",
         "attempts": JUDGE_RETRIES,
         "error": f"{type(last_error).__name__}: {last_error}",
     }
+
+
+def _is_content_policy_violation(result: dict[str, Any]) -> bool:
+    code = str(result.get("safety_code") or "").casefold()
+    return any(
+        token in code for token in ("content_policy", "content_filter")
+    )
 
 
 def _model_failure_judgment(prediction: dict[str, Any]) -> dict[str, Any]:
@@ -220,6 +327,10 @@ def _model_failure_judgment(prediction: dict[str, Any]) -> dict[str, Any]:
         "status": "model_failure",
         "target_status": prediction.get("status"),
         "attempts": 0,
+        "primary_judge": None,
+        "judge_used": None,
+        "fallback_used": False,
+        "fallback_reason": None,
         "judgment": {
             "reference_diagnosis_rank": 0,
             "diagnosis_correctness": 0,
@@ -237,11 +348,24 @@ def _model_failure_judgment(prediction: dict[str, Any]) -> dict[str, Any]:
 
 def compute_judge_metrics(
     judgments: list[dict[str, Any]],
+    *,
+    judge_model_id: str = JUDGE_MODEL_ID,
+    fallback_judge_model_id: str | None = None,
 ) -> dict[str, Any]:
     latest = list(_latest_by_task(judgments).values())
-    valid = [item for item in latest if item.get("status") in {"ok", "model_failure"}]
-    if len(valid) != len(latest):
+    terminal_statuses = {
+        "ok",
+        "model_failure",
+        "judge_safety_refusal",
+        "judge_invalid",
+    }
+    if any(item.get("status") not in terminal_statuses for item in latest):
         raise ValueError("Judge metrics require every task to have a terminal judgment")
+    valid = [item for item in latest if item.get("status") in {"ok", "model_failure"}]
+    unavailable = [
+        item for item in latest
+        if item.get("status") in {"judge_safety_refusal", "judge_invalid"}
+    ]
     payloads = [dict(item["judgment"]) for item in valid]
     ranks = [int(item["reference_diagnosis_rank"]) for item in payloads]
     total = len(payloads)
@@ -253,9 +377,86 @@ def compute_judge_metrics(
         "differential_quality",
     )
     verdicts = Counter(str(item["overall_verdict"]) for item in payloads)
+    judge_usage = Counter(
+        str(item["judge_used"])
+        for item in valid
+        if item.get("status") == "ok" and item.get("judge_used")
+    )
+    fallback_reasons = Counter(
+        str(item["fallback_reason"])
+        for item in latest
+        if item.get("fallback_used") and item.get("fallback_reason")
+    )
+    fallback_used_count = sum(
+        bool(item.get("fallback_used")) for item in latest
+    )
+    metrics_by_judge: dict[str, dict[str, Any]] = {}
+    for used_judge in sorted(judge_usage):
+        judge_payloads = [
+            dict(item["judgment"])
+            for item in valid
+            if item.get("status") == "ok"
+            and item.get("judge_used") == used_judge
+        ]
+        judge_ranks = [
+            int(item["reference_diagnosis_rank"])
+            for item in judge_payloads
+        ]
+        judge_total = len(judge_payloads)
+        metrics_by_judge[used_judge] = {
+            "evaluated_total": judge_total,
+            "top_1_accuracy": (
+                sum(rank == 1 for rank in judge_ranks) / judge_total
+                if judge_total
+                else 0.0
+            ),
+            "top_3_accuracy": (
+                sum(rank in {1, 2, 3} for rank in judge_ranks)
+                / judge_total
+                if judge_total
+                else 0.0
+            ),
+            **{
+                f"mean_{field}": (
+                    sum(float(item[field]) for item in judge_payloads)
+                    / judge_total
+                    if judge_total
+                    else 0.0
+                )
+                for field in score_fields
+            },
+            "unsupported_claim_rate": (
+                sum(
+                    int(item["unsupported_claim_count"]) > 0
+                    for item in judge_payloads
+                )
+                / judge_total
+                if judge_total
+                else 0.0
+            ),
+        }
     return {
-        "total": total,
-        "judge_model_id": JUDGE_MODEL_ID,
+        "total": len(latest),
+        "evaluated_total": total,
+        "judge_coverage": total / len(latest) if latest else 0.0,
+        "judge_safety_refusal_count": sum(
+            item.get("status") == "judge_safety_refusal"
+            for item in unavailable
+        ),
+        "judge_invalid_count": sum(
+            item.get("status") == "judge_invalid" for item in unavailable
+        ),
+        "judge_model_id": judge_model_id,
+        "fallback_judge_model_id": fallback_judge_model_id,
+        "fallback_used_count": fallback_used_count,
+        "fallback_used_rate": (
+            fallback_used_count / len(latest) if latest else 0.0
+        ),
+        "judge_usage_distribution": dict(sorted(judge_usage.items())),
+        "metrics_by_judge": metrics_by_judge,
+        "fallback_reason_distribution": dict(
+            sorted(fallback_reasons.items())
+        ),
         "judge_top_1_accuracy": sum(rank == 1 for rank in ranks) / total if total else 0.0,
         "judge_top_3_accuracy": sum(rank in {1, 2, 3} for rank in ranks) / total if total else 0.0,
         "judge_mean_reciprocal_rank": sum((1 / rank) if rank else 0.0 for rank in ranks) / total if total else 0.0,
@@ -287,21 +488,33 @@ def _write_report(
     predictions: dict[str, dict[str, Any]],
     tasks: dict[str, dict[str, Any]],
     references: dict[str, dict[str, Any]],
+    judge_model_id: str = JUDGE_MODEL_ID,
+    fallback_judge_model_id: str | None = None,
 ) -> None:
+    import html
+
     latest = _latest_by_task(judgments)
     cards = "".join(
-        f"<div><strong>{key.replace('_', ' ')}</strong><span>{value}</span></div>"
+        "<div>"
+        f"<strong>{html.escape(key.replace('_', ' '))}</strong>"
+        f"<span>{html.escape(json.dumps(value, ensure_ascii=False) if isinstance(value, dict) else str(value))}</span>"
+        "</div>"
         for key, value in metrics.items()
-        if not isinstance(value, dict)
     )
     rows: list[str] = []
-    import html
     for task_id in sorted(latest):
         item = latest[task_id]
         prediction = predictions[task_id]
         reference = references[task_id]
         response = prediction.get("response", {})
         judgment = item.get("judgment", {})
+        provenance = {
+            "primary_judge": item.get("primary_judge"),
+            "judge_used": item.get("judge_used"),
+            "fallback_used": item.get("fallback_used", False),
+            "fallback_reason": item.get("fallback_reason"),
+            "status": item.get("status"),
+        }
         rows.append(
             "<article>"
             f"<img src='{_thumbnail(tasks[task_id]['image'])}' alt='benchmark image'>"
@@ -309,7 +522,8 @@ def _write_report(
             f"<h2>{html.escape(str(task_id))}</h2>"
             f"<p><b>Reference:</b> {html.escape(str(reference['reference_disease_name']))}</p>"
             f"<h3>Model response</h3><pre>{html.escape(str(response.get('final_text', '')))}</pre>"
-            f"<h3>Judge</h3><pre>{html.escape(json.dumps(judgment, ensure_ascii=False, indent=2))}</pre>"
+            f"<h3>Judge provenance</h3><pre>{html.escape(json.dumps(provenance, ensure_ascii=False, indent=2))}</pre>"
+            f"<h3>Judgment</h3><pre>{html.escape(json.dumps(judgment, ensure_ascii=False, indent=2))}</pre>"
             "</section></article>"
         )
     document = f"""<!doctype html><html lang='en'><head><meta charset='utf-8'>
@@ -317,7 +531,7 @@ def _write_report(
 body{{font:14px system-ui;margin:0;background:#f4f6f8;color:#17212b}}header,main{{padding:24px;max-width:1400px;margin:auto}}
 .metrics{{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}}.metrics div,article{{background:white;border:1px solid #dce2e7;border-radius:10px;padding:14px}}
 .metrics strong,.metrics span{{display:block}}.metrics span{{font-size:20px;margin-top:6px}}article{{display:grid;grid-template-columns:240px 1fr;gap:18px;margin:16px 0}}img{{width:240px;height:180px;object-fit:contain;background:#eee}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f9fa;padding:12px;border-radius:8px}}@media(max-width:700px){{article{{grid-template-columns:1fr}}}}
-</style></head><body><header><h1>Open-ended diagnosis — single Luna judge</h1><div class='metrics'>{cards}</div></header><main>{''.join(rows)}</main></body></html>"""
+</style></head><body><header><h1>Open-ended diagnosis — {html.escape(judge_model_id)}{html.escape(f' with {fallback_judge_model_id} safety fallback' if fallback_judge_model_id else ' single judge')}</h1><div class='metrics'>{cards}</div></header><main>{''.join(rows)}</main></body></html>"""
     temporary = path.with_name(f".{path.name}.tmp")
     temporary.write_text(document, encoding="utf-8")
     os.replace(temporary, path)
@@ -330,10 +544,19 @@ async def judge_run(
     batch_size: int = 8,
     backend: InferenceBackend | None = None,
     dry_run: bool = False,
+    judge_model_id: str = JUDGE_MODEL_ID,
+    judge_backend_profile: str | None = None,
+    fallback_judge_model_id: str | None = None,
+    fallback_judge_backend_profile: str | None = None,
+    fallback_backend: InferenceBackend | None = None,
 ) -> dict[str, Any]:
     root = root.resolve()
     run_directory = run_directory.resolve()
-    paths = _judge_paths(run_directory)
+    paths = _judge_paths(
+        run_directory,
+        judge_model_id,
+        fallback_judge_model_id,
+    )
     run_manifest = _load_yaml(run_directory / "run_manifest.yaml")
     benchmark = run_manifest.get("benchmark", {})
     if not isinstance(benchmark, dict) or benchmark.get("id") != BENCHMARK_ID:
@@ -358,10 +581,35 @@ async def judge_run(
     schema_path = release / "artifacts/schemas/open_ended_diagnosis_judge.schema.json"
     prompt = _load_yaml(prompt_path)
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
-    model = load_model_config(JUDGE_MODEL_ID, root=root)
+    model = load_model_config(
+        judge_model_id,
+        root=root,
+        backend_profile=judge_backend_profile,
+    )
+    fallback_model = (
+        load_model_config(
+            fallback_judge_model_id,
+            root=root,
+            backend_profile=fallback_judge_backend_profile,
+        )
+        if fallback_judge_model_id
+        else None
+    )
     identity = {
-        "judge_model_id": JUDGE_MODEL_ID,
+        "judge_model_id": judge_model_id,
+        "judge_backend_profile": model.backend.active_profile.name,
         "judge_model_config_sha256": file_sha256(model.config_path),
+        "fallback_judge_model_id": fallback_judge_model_id,
+        "fallback_judge_backend_profile": (
+            fallback_model.backend.active_profile.name
+            if fallback_model
+            else None
+        ),
+        "fallback_judge_model_config_sha256": (
+            file_sha256(fallback_model.config_path)
+            if fallback_model
+            else None
+        ),
         "judge_prompt_sha256": file_sha256(prompt_path),
         "judge_schema_sha256": file_sha256(schema_path),
         "target_predictions_sha256": file_sha256(run_directory / "predictions.jsonl"),
@@ -372,7 +620,22 @@ async def judge_run(
     manifest_document = {
         "schema_version": 1,
         "status": "dry_run" if dry_run else "running",
-        "judge": {"model_id": JUDGE_MODEL_ID, "single_judge": True},
+        "judge": {
+            "model_id": judge_model_id,
+            "backend_profile": model.backend.active_profile.name,
+            "fallback_model_id": fallback_judge_model_id,
+            "fallback_backend_profile": (
+                fallback_model.backend.active_profile.name
+                if fallback_model
+                else None
+            ),
+            "fallback_trigger": (
+                "content_policy_violation"
+                if fallback_model
+                else None
+            ),
+            "single_judge": fallback_model is None,
+        },
         "target_run": str(run_directory),
         "identity": identity,
         "identity_sha256": canonical_hash(identity),
@@ -386,7 +649,8 @@ async def judge_run(
     if dry_run:
         return {
             "status": "dry_run_valid",
-            "judge_model_id": JUDGE_MODEL_ID,
+            "judge_model_id": judge_model_id,
+            "fallback_judge_model_id": fallback_judge_model_id,
             "evaluation_set": split,
             "responses": len(predictions),
             "network_or_model_called": False,
@@ -399,7 +663,12 @@ async def judge_run(
     completed = {
         task_id
         for task_id, item in prior.items()
-        if item.get("status") in {"ok", "model_failure"}
+        if item.get("status") in {
+            "ok",
+            "model_failure",
+            "judge_safety_refusal",
+            "judge_invalid",
+        }
     }
     generation = _generation(model)
     owns_backend = backend is None
@@ -407,6 +676,24 @@ async def judge_run(
         model,
         reasoning_capture="none",
         use_json_schema=True,
+    )
+    owns_fallback_backend = (
+        fallback_model is not None and fallback_backend is None
+    )
+    active_fallback_backend = (
+        fallback_backend
+        or (
+            create_backend(
+                fallback_model,
+                reasoning_capture="none",
+                use_json_schema=True,
+            )
+            if fallback_model
+            else None
+        )
+    )
+    fallback_generation = (
+        _generation(fallback_model) if fallback_model else None
     )
     semaphore = asyncio.Semaphore(batch_size)
     pending_tasks: list[asyncio.Task[tuple[str, dict[str, Any]]]] = []
@@ -420,19 +707,59 @@ async def judge_run(
             schema=schema,
             generation=generation,
         )
-        return task_id, await _judge_one(
+        primary_result = await _judge_one(
             backend=judge_backend,
             request=request,
             schema=schema,
             semaphore=semaphore,
         )
+        if (
+            primary_result.get("status") == "judge_safety_refusal"
+            and _is_content_policy_violation(primary_result)
+            and active_fallback_backend is not None
+            and fallback_judge_model_id is not None
+        ):
+            fallback_result = await _judge_one(
+                backend=active_fallback_backend,
+                request=replace(
+                    request,
+                    generation=fallback_generation,
+                ),
+                schema=schema,
+                semaphore=semaphore,
+            )
+            return task_id, {
+                **fallback_result,
+                "attempts": int(primary_result.get("attempts", 0))
+                + int(fallback_result.get("attempts", 0)),
+                "primary_attempts": primary_result.get("attempts", 0),
+                "fallback_attempts": fallback_result.get("attempts", 0),
+                "primary_judge": judge_model_id,
+                "judge_used": fallback_judge_model_id,
+                "fallback_used": True,
+                "fallback_reason": "content_policy_violation",
+                "primary_judge_error": primary_result.get("error"),
+            }
+        return task_id, {
+            **primary_result,
+            "primary_attempts": primary_result.get("attempts", 0),
+            "fallback_attempts": 0,
+            "primary_judge": judge_model_id,
+            "judge_used": judge_model_id,
+            "fallback_used": False,
+            "fallback_reason": None,
+        }
 
     try:
         for task_id, prediction in predictions.items():
             if task_id in completed:
                 continue
             response = prediction.get("response", {})
-            final_text = response.get("final_text", "") if isinstance(response, dict) else ""
+            final_text = (
+                response.get("final_text", "")
+                if isinstance(response, dict)
+                else ""
+            )
             if prediction.get("status") != "ok" or not str(final_text).strip():
                 _append_jsonl(paths["judgments"], _model_failure_judgment(prediction))
             else:
@@ -451,6 +778,8 @@ async def judge_run(
     finally:
         if owns_backend:
             await judge_backend.aclose()
+        if owns_fallback_backend and active_fallback_backend is not None:
+            await active_fallback_backend.aclose()
 
     judgments = read_jsonl(paths["judgments"])
     latest = _latest_by_task(judgments)
@@ -465,7 +794,11 @@ async def judge_run(
             f"Judging incomplete: {len(failed)} judge errors; rerun the command to resume"
         )
 
-    metrics = compute_judge_metrics(judgments)
+    metrics = compute_judge_metrics(
+        judgments,
+        judge_model_id=judge_model_id,
+        fallback_judge_model_id=fallback_judge_model_id,
+    )
     _atomic_json(paths["metrics"], metrics)
     _write_report(
         path=paths["report"],
@@ -474,15 +807,20 @@ async def judge_run(
         predictions=predictions,
         tasks=tasks,
         references=references,
+        judge_model_id=judge_model_id,
+        fallback_judge_model_id=fallback_judge_model_id,
     )
     document = _load_yaml(paths["manifest"])
     document["status"] = "completed"
     document["finished_at"] = datetime.now(timezone.utc).isoformat()
-    document["counts"] = {"total": len(latest), "ok": len(latest)}
+    document["counts"] = dict(
+        Counter(str(item.get("status")) for item in latest.values())
+    ) | {"total": len(latest)}
     _atomic_yaml(paths["manifest"], document)
     return {
         "status": "completed",
-        "judge_model_id": JUDGE_MODEL_ID,
+        "judge_model_id": judge_model_id,
+        "fallback_judge_model_id": fallback_judge_model_id,
         "judgments_path": str(paths["judgments"]),
         "metrics_path": str(paths["metrics"]),
         "report_path": str(paths["report"]),

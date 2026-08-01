@@ -140,6 +140,7 @@ def main(
     output_root: str | None = None,
     all_benchmarks: bool = False,
     evidence_and_top_k: bool = False,
+    validation_suite: bool = False,
     dry_run: bool = False,
     startup_timeout: int = STARTUP_TIMEOUT_SECONDS,
 ) -> None:
@@ -152,6 +153,7 @@ def main(
         limit=limit,
         all_benchmarks=all_benchmarks,
         evidence_and_top_k=evidence_and_top_k,
+        validation_suite=validation_suite,
     )
     modes = structured_output_modes(structured_output)
     if batch_size <= 0:

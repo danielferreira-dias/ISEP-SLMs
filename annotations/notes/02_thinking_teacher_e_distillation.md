@@ -22,11 +22,10 @@ Existem dois objetivos experimentais diferentes:
 1. selecionar o melhor teacher;
 2. decidir como esse teacher deve gerar supervisão sintética.
 
-### 2.1 Benchmark principal sem thinking
+### 2.1 Baseline sem thinking e perfil nativo
 
-O benchmark principal deve ser executado com thinking desativado porque esta
-condição representa melhor o comportamento eficiente pretendido para o
-sistema final:
+Uma condição sem thinking deve ser executada como baseline porque representa
+melhor o comportamento eficiente pretendido para o sistema final:
 
 - menor latência;
 - menor custo de inferência;
@@ -35,9 +34,12 @@ sistema final:
 - maior previsibilidade do JSON;
 - comparação direta do resultado clinicamente observável.
 
-Todos os candidatos devem ser comparados nas mesmas partições e o teacher deve
-ser selecionado apenas com a Validation. O Internal Test e os conjuntos
-externos permanecem selados.
+Esta baseline não deve, contudo, substituir automaticamente o perfil nativo ou
+oficialmente recomendado de um modelo reasoning-first. Para cada candidato,
+devem distinguir-se o perfil nativo/recomendado e uma condição controlada sem
+thinking. Todos os candidatos recebem as mesmas partições e o efeito do modo
+de reasoning é decidido apenas com Validation. O Internal Benchmark e os
+conjuntos externos permanecem selados.
 
 ### 2.2 Ablation com thinking
 
@@ -243,9 +245,9 @@ rationales separadamente das respostas finais.
 
 ## 9. Sequência recomendada
 
-1. correr todos os modelos sem thinking;
+1. correr o baseline sem thinking e o perfil nativo dos modelos prioritários;
 2. selecionar os dois ou três melhores na Validation;
-3. repetir esses candidatos com thinking;
+3. completar a ablation emparelhada thinking/non-thinking desses candidatos;
 4. medir qualidade, schema, custo, tokens, latência e loops;
 5. escolher o modo do teacher com base nessa comparação;
 6. gerar supervisão sintética apenas sobre Train;
@@ -294,3 +296,55 @@ devem ser reportados separadamente. Não se deve remover globalmente os filtros
 de segurança; deve primeiro testar-se uma configuração Azure menos restritiva
 aprovada para contexto clínico e manter uma análise de sensibilidade com o
 filtro original.
+
+## 12. Evidência sobre overthinking visual e decisão de 1 de agosto de 2026
+
+A evidência recente não permite assumir que mais test-time reasoning melhora
+automaticamente o diagnóstico dermatológico multimodal:
+
+- *On Test-Time Scaling for Vision-Language Models* encontrou ganhos
+  importantes em alguns VLMs pequenos, mas também perda de foco quando é
+  atribuído compute excessivo. A contribuição dos tokens visuais diminui ao
+  longo da cadeia, que passa a ser dominada por texto:
+  <https://arxiv.org/abs/2606.28864>.
+- *Addressing Overthinking in Large Vision-Language Models* mostra que slow
+  thinking pode ser ineficiente e degradar accuracy. Muitos erros começam na
+  perceção visual e não são corrigidos apenas com mais deliberação:
+  <https://arxiv.org/abs/2601.04442>.
+- *Revisiting the Necessity of Lengthy Chain-of-Thought in Vision-centric
+  Reasoning Generalization* encontrou melhor generalização com reasoning
+  conciso que preserva apenas grounding essencial do que com CoT longo:
+  <https://arxiv.org/abs/2511.22586>.
+- Em tarefas knowledge-intensive, thinking pode ser superior à resposta
+  direta, mas aumentar test-time compute não melhora accuracy de forma
+  consistente e pode aumentar hallucinations e confirmation bias:
+  <https://arxiv.org/abs/2509.06861>.
+- O M3CoTBench médico evidencia limitações atuais na correção, eficiência,
+  impacto e consistência de cadeias de raciocínio sobre imagens clínicas:
+  <https://arxiv.org/abs/2601.08758>.
+
+Estes trabalhos são preprints e não constituem prova específica para a
+taxonomia dermatológica do projeto. Servem para justificar uma ablation
+controlada em vez de uma escolha a priori.
+
+### Condições iniciais
+
+- Qwen 3.5 4B: `enable_thinking: false` como baseline controlada, mantendo os
+  parâmetros general-task já configurados; comparar posteriormente com
+  `enable_thinking: true` e o perfil oficial correspondente.
+- GPT-5.6 Luna: `reasoning_effort: high` como condição nativa atual de teacher;
+  comparar com `low` se ambos os níveis forem suportados pelo deployment.
+- O dry-run técnico não gera tokens e não mede thinking. Apenas valida configs,
+  seleção, imagens, prompts, schemas e referências.
+
+A ablation deve utilizar exatamente os mesmos casos, bytes de imagem, prompts,
+seed, output mode e parser. As principais medidas são Top-K accuracy,
+morphology grounding, evidence grounding, clinical-rationale quality,
+unsupported claims, outputs inválidos, truncamentos, reasoning/output tokens,
+latência e custo. O efeito deve ser analisado prioritariamente em
+`evidence_grounded_diagnosis` e `open_ended_diagnosis`, onde existe uma tarefa
+de raciocínio clínico explícita, e separadamente dos benchmarks closed-set.
+
+Os dry-runs iniciais de 10 respostas por task passaram para Luna e Qwen. Os
+selection hashes foram iguais entre modelos, confirmando seleção emparelhada.
+Nenhuma chamada ao modelo foi feita nessa etapa.

@@ -48,6 +48,14 @@ backend:
       request_timeout_seconds: 1200
       managed: true
       managed_allowed: true
+    openrouter:
+      type: api
+      engine: openrouter
+      api_style: chat_completions
+      api_key_env: OPENROUTER_API_KEY
+      request_model: google/gemma-4-31b-it:free
+      thinking_control: openrouter_reasoning
+      request_timeout_seconds: 600
 
 reasoning:
   enabled: false
@@ -59,6 +67,7 @@ reasoning:
 generation:
   profile: gemma_4_recommended
   do_sample: true
+  thinking_mode: disabled
   temperature: 1.0
   top_p: 0.95
   top_k: 64

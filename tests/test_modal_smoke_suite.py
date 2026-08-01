@@ -14,6 +14,34 @@ from src.modal._shared import (
 
 
 class ModalSmokeSuiteTests(unittest.TestCase):
+    def test_validation_suite_covers_four_protocols_with_exact_counts(self) -> None:
+        runs = smoke_runs(
+            benchmark="ignored",
+            evaluation_set="ignored",
+            limit=10,
+            all_benchmarks=False,
+            validation_suite=True,
+        )
+
+        self.assertEqual(
+            [run.benchmark for run in runs],
+            [
+                "visual_top_k_closed_set",
+                "visual_disease_confusion_sets",
+                "evidence_grounded_diagnosis",
+                "open_ended_diagnosis",
+            ],
+        )
+        self.assertEqual(
+            [run.evaluation_set for run in runs],
+            ["validation"] * 4,
+        )
+        self.assertEqual(
+            [run.expected_task_count for run in runs],
+            [10, 10, 10, 10],
+        )
+        self.assertEqual(runs[1].selection_limit, 5)
+
     def test_all_benchmarks_produce_exact_task_count(self) -> None:
         runs = smoke_runs(
             benchmark="ignored",

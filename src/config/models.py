@@ -14,10 +14,16 @@ ModelEngine = Literal[
     "vllm",
     "transformers",
     "azure_openai",
+    "openrouter",
     "vllm_endpoint",
 ]
 ApiStyle = Literal["chat_completions", "responses"]
-ThinkingControl = Literal["kimi_api", "chat_template", "reasoning_effort"]
+ThinkingControl = Literal[
+    "kimi_api",
+    "chat_template",
+    "reasoning_effort",
+    "openrouter_reasoning",
+]
 
 
 class ModelConfigError(ValueError):
@@ -152,6 +158,7 @@ class BackendProfileConfig:
     api_key_env: str | None = None
     deployment_env: str | None = None
     model_env: str | None = None
+    request_model: str | None = None
     api_version_env: str | None = None
 
     @property
@@ -327,6 +334,7 @@ _PROFILE_KEYS = {
     "api_key_env",
     "deployment_env",
     "model_env",
+    "request_model",
     "api_version_env",
 }
 _REASONING_KEYS = {
@@ -430,9 +438,13 @@ def load_model_config(
                 f"Local model {model.id} requires generation.do_sample"
             )
     else:
-        if source.type != "provider_api":
+        if (
+            source.type != "provider_api"
+            and not backend.active_profile.request_model
+        ):
             raise ModelConfigError(
-                f"API model {model.id} requires source.type provider_api"
+                f"API model {model.id} requires source.type provider_api "
+                "or backend.profiles.<name>.request_model"
             )
         config_type = AzureModelConfig
     return config_type(
@@ -680,6 +692,7 @@ def _parse_backend_profile(
         "vllm",
         "transformers",
         "azure_openai",
+        "openrouter",
         "vllm_endpoint",
     }:
         raise ModelConfigError(
@@ -702,10 +715,12 @@ def _parse_backend_profile(
         "kimi_api",
         "chat_template",
         "reasoning_effort",
+        "openrouter_reasoning",
     }:
         raise ModelConfigError(
             f"{section}.thinking_control must be 'kimi_api', "
-            "'chat_template', or 'reasoning_effort'"
+            "'chat_template', 'reasoning_effort', or "
+            "'openrouter_reasoning'"
         )
     if backend_type == "local":
         if engine not in {"vllm", "transformers"}:
@@ -813,6 +828,9 @@ def _parse_backend_profile(
         ),
         model_env=_optional_text(
             value.get("model_env"), f"{section}.model_env"
+        ),
+        request_model=_optional_text(
+            value.get("request_model"), f"{section}.request_model"
         ),
         api_version_env=_optional_text(
             value.get("api_version_env"),

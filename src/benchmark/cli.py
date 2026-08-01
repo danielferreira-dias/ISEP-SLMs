@@ -201,6 +201,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Override only the runtime request concurrency.",
     )
     run_parser.add_argument(
+        "--request-interval-seconds",
+        type=_non_negative_float,
+        default=0.0,
+        help=(
+            "Minimum delay between request starts for rate-limited API "
+            "providers (default: 0)."
+        ),
+    )
+    run_parser.add_argument(
         "--output-root",
         type=Path,
         help="Override the benchmark output directory.",
@@ -222,7 +231,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     judge_parser = subparsers.add_parser(
         "judge",
-        help="Judge a completed open-ended diagnosis run with GPT-5.6 Luna.",
+        help="Judge a completed open-ended diagnosis run.",
     )
     judge_parser.add_argument(
         "--run",
@@ -234,7 +243,27 @@ def build_parser() -> argparse.ArgumentParser:
         "--batch-size",
         type=_positive_integer,
         default=8,
-        help="Maximum concurrent Luna judge requests (default: 8).",
+        help="Maximum concurrent judge requests (default: 8).",
+    )
+    judge_parser.add_argument(
+        "--judge-model",
+        default="gpt_5_6_luna",
+        help="Model config ID used as the single judge (default: Luna).",
+    )
+    judge_parser.add_argument(
+        "--judge-backend-profile",
+        help="Optional backend profile for the selected judge model.",
+    )
+    judge_parser.add_argument(
+        "--fallback-judge-model",
+        help=(
+            "Optional judge used only when the primary judge returns a "
+            "content-policy safety refusal."
+        ),
+    )
+    judge_parser.add_argument(
+        "--fallback-judge-backend-profile",
+        help="Optional backend profile for the fallback judge model.",
     )
     judge_parser.add_argument(
         "--dry-run",
@@ -273,6 +302,12 @@ def main(
                     run_directory=run_directory,
                     batch_size=args.batch_size,
                     dry_run=args.dry_run,
+                    judge_model_id=args.judge_model,
+                    judge_backend_profile=args.judge_backend_profile,
+                    fallback_judge_model_id=args.fallback_judge_model,
+                    fallback_judge_backend_profile=(
+                        args.fallback_judge_backend_profile
+                    ),
                 )
             )
             print(json.dumps(result, indent=2, sort_keys=True))
@@ -424,6 +459,7 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
                 save_rendered_prompts=(
                     benchmark.execution.save_rendered_prompts
                 ),
+                request_interval_seconds=args.request_interval_seconds,
             )
             executor = BenchmarkExecutor(
                 backend=backend,
@@ -693,6 +729,7 @@ def _run_identity(
         "runtime_binding_sha256": canonical_hash(runtime_binding),
         "reasoning_capture": args.reasoning_capture,
         "batch_size": str(effective_batch_size),
+        "request_interval_seconds": str(args.request_interval_seconds),
         "max_output_tokens": str(benchmark.execution.max_output_tokens),
         "structured_output_mode": args.structured_output,
         "execution_transport": "asyncio_v1",
@@ -775,6 +812,7 @@ def _run_manifest(
             "max_output_tokens": benchmark.execution.max_output_tokens,
             "reasoning_capture": args.reasoning_capture,
             "structured_output": args.structured_output,
+            "request_interval_seconds": args.request_interval_seconds,
         },
     }
 
@@ -953,6 +991,13 @@ def _positive_float(value: str) -> float:
     parsed = float(value)
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be positive")
+    return parsed
+
+
+def _non_negative_float(value: str) -> float:
+    parsed = float(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be non-negative")
     return parsed
 
 
