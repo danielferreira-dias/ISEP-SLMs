@@ -498,7 +498,7 @@ As decisões seguintes devem ser congeladas antes das execuções completas.
 
 ### 12.1 Modo principal por modelo
 
-Recomendação:
+Decisão aprovada e congelada em 31 de julho de 2026:
 
 - utilizar `prompt_only` como condição principal para todos os modelos;
 - utilizar `json_schema` apenas como ablation de deployment em modelos
@@ -508,43 +508,37 @@ Recomendação:
 
 ### 12.2 Política de scoring principal
 
-É necessário declarar previamente:
+Decisão aprovada e congelada em 31 de julho de 2026:
 
-- métrica clínica primária;
-- métricas secundárias;
-- reliability gates;
-- tratamento de outputs recuperáveis.
-
-Recomendação:
-
-- Top-1 e Grounded Top-1 como endpoints clínicos principais;
-- Top-3, morphology F1 e description F1 como endpoints secundários;
+- utilizar Top-1 no Visual Top-K e Grounded Top-1 no
+  Evidence-Grounded Diagnosis como endpoints clínicos principais;
+- utilizar Top-3, Top-6, MRR e macro F1 no Visual Top-K e morphology F1,
+  description F1 e os restantes scores clínicos no Evidence-Grounded como
+  endpoints secundários;
 - JSON/schema/semantic compliance reportados separadamente;
-- end-to-end `ok` como métrica operacional;
-- sem score agregado único.
+- utilizar a representação canónica permitida para medir capacidade clínica,
+  mantendo a validade JSON estrita como métrica independente;
+- outputs inválidos contam como incorretos segundo o contrato de cada
+  benchmark;
+- `ok` end-to-end é uma métrica operacional;
+- não criar um score agregado único.
 
 ### 12.3 Partição utilizada para escolher o teacher
 
-Teacher, prompts e decisões de parsing devem ser escolhidos apenas na
-Validation.
+Decisão aprovada e congelada em 31 de julho de 2026:
 
-Existe atualmente uma lacuna de configuração que deve ser resolvida antes da
-seleção real do teacher:
-
-- `validation.parquet` existe para Visual Top-K, mas ainda não está exposto
-  como `evaluation_set` na configuração da benchmark;
-- Evidence-Grounded Diagnosis expõe apenas `external_ddi_evidence`;
-- não existe atualmente uma coorte interna de Validation com a mesma
-  combinação de labels DDI, SKINCON e captions SkinCAP.
-
-Assim, o evidence externo pode ser utilizado como teste final ou smoke test
-de engenharia, mas não deve ser utilizado repetidamente para escolher
-prompts, parsers ou o teacher. É necessário decidir se:
-
-1. Evidence-Grounded Diagnosis será exclusivamente uma avaliação externa
-   final; ou
-2. será criada uma coorte de desenvolvimento separada com anotações
-   equivalentes.
+- teacher, prompts, parsers, checkpoints, thresholds e geração são escolhidos
+  exclusivamente em Validation;
+- `validation.parquet` está exposto como `evaluation_set: validation` no
+  Visual Top-K, com o papel `development_validation`;
+- a experiência
+  `configs/experiments/teacher_selection_visual_validation_v1.yaml` é a única
+  experiência atualmente autorizada para selecionar o teacher;
+- Evidence-Grounded Diagnosis permanece exclusivamente uma avaliação externa
+  final, porque ainda não existe uma coorte interna de Validation com labels
+  DDI, conceitos SKINCON e descrições SkinCAP equivalentes;
+- os smoke tests externos já executados são testes de engenharia e não podem
+  orientar alterações ao protocolo.
 
 O Internal Test completo, o benchmark interno fixo e os conjuntos externos
 não devem ser utilizados para ajustar:
@@ -556,24 +550,12 @@ não devem ser utilizados para ajustar:
 - escolha do teacher;
 - regras semânticas.
 
-Os dez casos externos já inspecionados devem ser documentados como smoke test
-de engenharia, não como evidência final nem como dados de desenvolvimento.
-
 ### 12.4 Sampling e repetições
 
-Alguns modelos usam sampling. Um único run mistura capacidade do modelo com
-variância de geração.
-
-É necessário decidir entre:
-
-1. um único run primário com seed/config congelados;
-2. múltiplas repetições para todos;
-3. um run para todos e três repetições apenas para finalistas.
-
-Recomendação de custo controlado:
+Decisão aprovada e congelada em 31 de julho de 2026:
 
 - um run completo por candidato na Validation;
-- três repetições para os dois ou três finalistas;
+- três repetições, com seeds 42, 43 e 44, para os três finalistas;
 - uma única execução selada no Internal Test e conjuntos externos.
 
 ### 12.5 Reasoning capture
@@ -627,20 +609,10 @@ Antes da comparação final devem ser definidos:
 - tratamento de safety refusals e backend errors;
 - comparação de latência, tokens e custo.
 
-## 13. Recomendação imediata
+## 13. Próxima sequência experimental
 
-Ainda não é aconselhável iniciar todas as benchmarks finais.
-
-Primeiro devem ser tomadas e registadas quatro decisões:
-
-1. confirmar `prompt_only` como condição principal comum;
-2. escolher as métricas primárias e reliability gates;
-3. expor a Validation do Visual Top-K e decidir se Evidence será apenas teste
-   externo ou terá uma coorte de desenvolvimento separada;
-4. decidir a política de uma ou múltiplas repetições para modelos com
-   sampling.
-
-Depois destas decisões, devem ser executados:
+As quatro decisões de protocolo foram aprovadas e registadas. A ordem de
+execução é agora:
 
 1. um dry run final de configuração;
 2. a benchmark completa de Validation;

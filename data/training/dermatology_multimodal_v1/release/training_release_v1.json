@@ -1,0 +1,51 @@
+{
+  "release": {
+    "id": "dermatology_multimodal_training_v1",
+    "version": "1.0.0",
+    "purpose": "training_only",
+    "base_train_images": 6417,
+    "total_train_images": 81787,
+    "images_by_dataset": {
+      "derm1m": 75015,
+      "fitzpatrick17k_c": 2991,
+      "hiba": 355,
+      "pad_ufes_20": 1528,
+      "scin": 1898
+    },
+    "images_by_training_role": {
+      "description_only": 17518,
+      "in_domain_diagnosis": 18914,
+      "out_of_domain": 45355
+    },
+    "excluded_new_candidates": 2869,
+    "exclusions_by_reason": {
+      "exact_duplicate_within_training": 1367,
+      "perceptual_duplicate_of_protected_evaluation": 1502
+    },
+    "protected_evaluation_manifests": [
+      "data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/validation.parquet",
+      "data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/internal_test.parquet",
+      "data/benchmarks/derma_isep/visual_top_k_v1/datasets/external/external_ddi.parquet",
+      "data/benchmarks/derma_isep/visual_top_k_v1/datasets/external/external_skindisnet.parquet"
+    ],
+    "rules": {
+      "clinical_photographs_only": true,
+      "benchmark_splits_modified": false,
+      "protected_exact_and_perceptual_duplicates_excluded": true,
+      "perceptual_hamming_threshold": 4,
+      "derm1m_filter": "metadata_high_precision_v1"
+    },
+    "artifacts": {
+      "train_images": "train_images.parquet",
+      "teacher_annotation_queue": "teacher_annotation_queue.parquet",
+      "all_candidates": "all_candidates.parquet",
+      "reports": "reports/"
+    },
+    "artifact_sha256": {
+      "train_images": "27cd70a80e35abe7db257f4772058776d635c4d2702ab73fa5b45f070b56b3cb",
+      "teacher_annotation_queue": "27cd70a80e35abe7db257f4772058776d635c4d2702ab73fa5b45f070b56b3cb",
+      "all_candidates": "ac2aecf4a147690cf0655600e6a8ce05fa049db55328e9b201020c2d990c050b",
+      "derm1m_filter_decisions": "e28fb02a2a3e1daf11732380eaade0f4fb0a4800a137af8bcfe274b53abe7255"
+    }
+  }
+}

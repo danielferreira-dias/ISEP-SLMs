@@ -1,0 +1,130 @@
+# Development-only teacher selection on the visual dermatology benchmark.
+
+schema_version: 1
+
+experiment:
+  id: teacher_selection_visual_validation_v1
+  version: 1.0.0
+  type: teacher_selection
+  status: ready_for_execution
+  description: >
+    Development-only comparison of teacher candidates and small student
+    baselines on the closed-set visual dermatology Validation split. Results
+    may be used to select the teacher, prompts, parsers, checkpoints,
+    thresholds, and generation settings, but must not be presented as final
+    held-out performance.
+
+benchmark:
+  config: visual_top_k_closed_set
+  evaluation_set: validation
+  source: auto
+  repository: danielfdias98/ISEPDermaBench
+
+models:
+  - config: configs/models/qwen_3_6_27b.yaml
+    enabled: true
+
+  - config: configs/models/kimi_k2_6.yaml
+    enabled: true
+
+  - config: configs/models/gpt_5_6_luna.yaml
+    enabled: true
+
+  - config: configs/models/gemma_4_31b_it.yaml
+    enabled: true
+
+  - config: configs/models/qwen_small_9b.yaml
+    enabled: true
+
+  - config: configs/models/qwen_small_4b.yaml
+    enabled: true
+
+  - config: configs/models/gemma_4_e4b_it.yaml
+    enabled: true
+
+  - config: configs/models/minicpm_v_4_6.yaml
+    enabled: true
+
+  - config: configs/models/medgemma_1_5_4b.yaml
+    enabled: true
+
+selection_policy:
+  evaluation_role: development_validation
+  teacher_selection_allowed: true
+  prompt_selection_allowed: true
+  checkpoint_selection_allowed: true
+  threshold_selection_allowed: true
+  parser_selection_allowed: true
+  generation_setting_selection_allowed: true
+  prohibited_evaluation_sets:
+    - internal_benchmark
+    - internal_test
+    - external_ddi
+    - external_skindisnet
+  structured_output_mode: prompt_only
+  clinical_scoring_representation: canonical_output
+  invalid_output_policy: count_as_incorrect
+  strict_format_metrics_reported_separately: true
+  aggregate_score_allowed: false
+
+teacher_selection:
+  status: pending
+  selected_model_id: null
+  candidate_model_ids:
+    - qwen_3_6_27b
+    - kimi_k2_6
+    - gpt_5_6_luna
+    - gemma_4_31b_it
+  primary_metrics:
+    - top_1_accuracy
+  secondary_metrics:
+    - top_3_accuracy
+    - top_6_accuracy
+    - mean_reciprocal_rank
+    - macro_f1_top_1
+  reliability_metrics:
+    - json_validity_rate
+    - recoverable_json_validity_rate
+    - schema_compliance_rate
+    - canonical_schema_compliance_rate
+    - invalid_disease_id_rate
+    - duplicate_prediction_rate
+  operational_tiebreakers:
+    - latency
+    - evaluation_cost
+
+repetitions:
+  initial_screen:
+    count: 1
+    seeds:
+      - 42
+  finalists:
+    finalist_count: 3
+    count: 3
+    seeds:
+      - 42
+      - 43
+      - 44
+  final_test_policy: one_sealed_execution
+
+reasoning_capture:
+  mode: available
+  separate_from_answer: true
+  use_as_training_target: false
+  availability_categories:
+    - full
+    - summary
+    - tokens_only
+    - none
+  missing_reasoning_is_not_penalized: true
+
+tracking:
+  save_environment: true
+  save_git_commit: true
+  save_config_snapshot: true
+  save_model_revisions: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+
+output:
+  directory: outputs/experiments/teacher_selection_visual_validation_v1

@@ -278,6 +278,8 @@ _DATASET_KEYS = {
     "reference_policy",
     "leakage_policy",
     "description",
+    "development_validation",
+    "internal_benchmark",
 }
 
 
@@ -399,13 +401,13 @@ def list_benchmark_configs(
     *,
     root: Path | None = None,
 ) -> tuple[BenchmarkConfig, ...]:
-    """Load all three benchmark configurations in stable ID order."""
+    """Load all DermaISEP runtime task configurations in stable ID order."""
 
     project_root = root or _project_root()
     configs = [
         load_benchmark_config(path, root=project_root)
         for path in sorted(
-            (project_root / "configs/benchmarks").glob("*.yaml")
+            (project_root / "configs/benchmarks/derma_isep").glob("*.yaml")
         )
     ]
     ids = [config.benchmark.id for config in configs]
@@ -806,7 +808,7 @@ def _resolve_config_path(
             f"Benchmark config not found: {value}"
         )
     matches: list[Path] = []
-    for path in sorted(directory.glob("*.yaml")):
+    for path in sorted((directory / "derma_isep").glob("*.yaml")):
         document = _load_yaml(path)
         section = document.get("benchmark")
         if isinstance(section, dict) and section.get("id") == str(

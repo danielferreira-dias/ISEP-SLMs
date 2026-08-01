@@ -1,0 +1,12 @@
+dataset_id,training_role,include,image_count
+derm1m,description_only,False,371
+derm1m,description_only,True,17518
+derm1m,in_domain_diagnosis,False,1337
+derm1m,in_domain_diagnosis,True,12179
+derm1m,out_of_domain,False,1161
+derm1m,out_of_domain,True,45318
+fitzpatrick17k_c,in_domain_diagnosis,True,2991
+hiba,in_domain_diagnosis,True,318
+hiba,out_of_domain,True,37
+pad_ufes_20,in_domain_diagnosis,True,1528
+scin,in_domain_diagnosis,True,1898

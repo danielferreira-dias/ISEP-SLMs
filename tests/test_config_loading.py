@@ -80,7 +80,7 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
             "visual_top_k_closed_set", root=ROOT
         )
         by_path = load_benchmark_config(
-            "configs/benchmarks/visual_top_k.yaml",
+            "configs/benchmarks/derma_isep/visual_top_k.yaml",
             root=ROOT,
         )
         self.assertEqual(by_id, by_path)
@@ -145,10 +145,77 @@ class ExperimentConfigContractTests(unittest.TestCase):
                 document["benchmark"]["config"],
                 root=ROOT,
             )
-            self.assertEqual(
-                document["benchmark"]["evaluation_set"],
-                benchmark.dataset.default_evaluation_set,
+            evaluation_set = benchmark.dataset.evaluation_set(
+                document["benchmark"]["evaluation_set"]
             )
+            self.assertTrue(evaluation_set.manifest.is_file())
+
+    def test_teacher_selection_is_validation_only(self) -> None:
+        path = (
+            ROOT
+            / "configs/experiments/"
+            "teacher_selection_visual_validation_v1.yaml"
+        )
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        benchmark = load_benchmark_config(
+            document["benchmark"]["config"],
+            root=ROOT,
+        )
+        evaluation_set = benchmark.dataset.evaluation_set(
+            document["benchmark"]["evaluation_set"]
+        )
+
+        self.assertEqual(
+            document["experiment"]["type"],
+            "teacher_selection",
+        )
+        self.assertEqual(
+            evaluation_set.role,
+            "development_validation",
+        )
+        self.assertTrue(
+            document["selection_policy"]["teacher_selection_allowed"]
+        )
+        self.assertEqual(
+            document["selection_policy"]["structured_output_mode"],
+            benchmark.structured_output.mode,
+        )
+        self.assertFalse(
+            document["selection_policy"]["aggregate_score_allowed"]
+        )
+        self.assertEqual(
+            document["repetitions"]["initial_screen"],
+            {"count": 1, "seeds": [42]},
+        )
+        self.assertEqual(
+            document["repetitions"]["finalists"]["count"],
+            3,
+        )
+        self.assertEqual(
+            document["repetitions"]["finalists"]["seeds"],
+            [42, 43, 44],
+        )
+
+    def test_final_visual_experiment_forbids_selection(self) -> None:
+        path = (
+            ROOT / "configs/experiments/zero_shot_visual_v1.yaml"
+        )
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        policy = document["selection_policy"]
+
+        self.assertEqual(
+            document["benchmark"]["evaluation_set"],
+            "internal_benchmark_1000",
+        )
+        for key in (
+            "teacher_selection_allowed",
+            "prompt_selection_allowed",
+            "checkpoint_selection_allowed",
+            "threshold_selection_allowed",
+            "parser_selection_allowed",
+            "generation_setting_selection_allowed",
+        ):
+            self.assertFalse(policy[key])
 
 
 if __name__ == "__main__":

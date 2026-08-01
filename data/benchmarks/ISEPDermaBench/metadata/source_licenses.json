@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "sources": {
+    "fitzpatrick17k_c": {
+      "license_id": "CC_BY_NC_SA_3_0"
+    },
+    "pad_ufes_20": {
+      "license_id": "CC_BY_4_0"
+    },
+    "scin": {
+      "license_id": "SCIN_DATA_USE_LICENSE"
+    },
+    "ddi": {
+      "license_id": "DDI_RESEARCH_USE_AGREEMENT",
+      "notes": "Keep this repository private and comply with the DDI Research Use Agreement. Do not infer redistribution rights from this combined dataset card."
+    },
+    "skindisnet": {
+      "license_id": "SKINDISNET_RESEARCH_USE"
+    }
+  }
+}

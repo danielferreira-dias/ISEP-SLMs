@@ -61,7 +61,7 @@ The release passed:
 
 ## Frozen release
 
-`data/benchmarks/visual_top_k_v1/release/benchmark_release_v1.yaml` stores
+`data/benchmarks/derma_isep/visual_top_k_v1/release/benchmark_release_v1.yaml` stores
 SHA-256 checksums for the source manifests, taxonomy, benchmark, prompt,
 schema, policies, review decisions, generated manifests, and reports.
 Validation fails if any referenced file changes without rebuilding the
@@ -70,13 +70,13 @@ release.
 ## Outputs
 
 - internal datasets under
-  `data/benchmarks/visual_top_k_v1/datasets/internal/`;
+  `data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/`;
 - external datasets under
-  `data/benchmarks/visual_top_k_v1/datasets/external/`;
+  `data/benchmarks/derma_isep/visual_top_k_v1/datasets/external/`;
 - split and balance reports under
-  `data/benchmarks/visual_top_k_v1/reports/`;
+  `data/benchmarks/derma_isep/visual_top_k_v1/reports/`;
 - integrity and release manifests under
-  `data/benchmarks/visual_top_k_v1/release/`.
+  `data/benchmarks/derma_isep/visual_top_k_v1/release/`.
 
 The root `README.md` documents the purpose and correct use of every artifact.
 

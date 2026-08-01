@@ -47,7 +47,7 @@ split:
       - race_ethnicity
     secondary_feature_weight: 0.25
   outputs:
-    directory: data/benchmarks/visual_top_k_v1
+    directory: data/benchmarks/derma_isep/visual_top_k_v1
     train: datasets/internal/train.parquet
     validation: datasets/internal/validation.parquet
     internal_test: datasets/internal/internal_test.parquet
@@ -66,8 +66,8 @@ release:
   version: 1.0.1
   status: frozen
   taxonomy: configs/taxonomies/diseases.yaml
-  benchmark: configs/benchmarks/visual_top_k.yaml
-  prompt: prompts/benchmarks/top_k.yaml
-  output_schema: schemas/visual_top_k.schema.json
+  benchmark: data/benchmarks/ISEPDermaBench/artifacts/configs/visual_top_k.yaml
+  prompt: data/benchmarks/ISEPDermaBench/artifacts/prompts/top_k.yaml
+  output_schema: data/benchmarks/ISEPDermaBench/artifacts/schemas/visual_top_k.schema.json
   disease_policy: configs/datasets/disease_inclusion.yaml
   duplicate_review: configs/datasets/duplicate_review.yaml

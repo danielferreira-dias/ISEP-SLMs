@@ -1,10 +1,11 @@
 # Multimodal benchmark pipeline
 
-This package runs the project's three dermatology benchmarks through one
-reproducible command-line pipeline. Model and benchmark YAML files are loaded
-into validated dataclasses, images are resolved from direct files, ZIP files,
-or embedded Parquet columns, inference is delegated to the selected backend,
-and task-specific adapters validate and score only the model's final JSON.
+This package runs the project's three frozen ISEPDermaBench protocols through
+one reproducible command-line pipeline. Model YAML files are loaded into
+validated dataclasses. Benchmark images, rendered prompts, and response
+schemas come directly from the task Parquets; gold references are loaded from
+the corresponding isolated `_references` configuration and joined only inside
+the scorer.
 
 The pipeline is intended for thesis experiments, not for clinical deployment
 or patient-care decisions.
@@ -94,10 +95,9 @@ measured biological attribute.
 ```text
 configs/models/*.yaml ──> typed ModelConfig ──> inference backend
                                                      │
-configs/benchmarks/*.yaml ─> typed BenchmarkConfig   │
+ISEPDermaBench tasks ──> image + frozen request      │
               │                                      │
-              ├─ prompt + schema + taxonomies        │
-              └─ Parquet manifest ─> stable subset   │
+              └─ isolated references ─> stable subset│
                                       │              │
                                       └─ task adapter
                                              │
@@ -180,17 +180,20 @@ uv run python -m src.benchmark.cli list-benchmarks
 ```
 
 IDs from the first column can be passed directly to `--model` or
-`--benchmark`. YAML filenames and paths are also accepted.
+`--benchmark`. The benchmark loader uses the local
+`data/benchmarks/ISEPDermaBench` mirror by default and falls back to the
+private Hugging Face dataset. Use `--benchmark-source local` or
+`--benchmark-source hub` to require one source explicitly.
 
 After `uv sync`, `uv run isep-benchmark ...` is an equivalent shorter entry
 point for every `python -m src.benchmark.cli ...` command shown below.
 
 ## Validate before inference
 
-`--dry-run` validates both typed configs, prompt and schema references,
-taxonomy compatibility, the Parquet schema, deterministic selection, and
-access to every selected image. It does not start vLLM, load weights, use a
-GPU, require provider credentials, or make a network request.
+`--dry-run` validates the model config, ISEPDermaBench task/reference
+contract, embedded response schema, deterministic selection, and every
+selected image. It does not start vLLM, load weights, use a GPU, require
+provider credentials, or make a network request when the local mirror exists.
 
 ```bash
 uv run python -m src.benchmark.cli run \

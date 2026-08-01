@@ -183,9 +183,18 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
                 "configs/models/medgemma_1_5_4b.yaml",
             }.issubset(paths)
         )
+        teacher_selection = yaml.safe_load(
+            (
+                ROOT
+                / "configs/experiments/"
+                "teacher_selection_visual_validation_v1.yaml"
+            ).read_text()
+        )
         self.assertIn(
             "gemma_4_31b_it",
-            experiment["teacher_selection"]["candidate_model_ids"],
+            teacher_selection["teacher_selection"][
+                "candidate_model_ids"
+            ],
         )
 
     def test_gemma_e4b_uses_official_hugging_face_model(self) -> None:

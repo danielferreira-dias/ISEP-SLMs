@@ -15,7 +15,6 @@ import yaml
 
 from src.benchmark.datasets import (
     LoadedBenchmarkDataset,
-    load_benchmark_dataset,
 )
 from src.benchmark.environment import collect_environment
 from src.benchmark.executor import (
@@ -23,6 +22,13 @@ from src.benchmark.executor import (
     ExecutionConfig,
 )
 from src.benchmark.images import prepare_benchmark_image
+from src.benchmark.isep_dermabench import (
+    DEFAULT_REPO_ID,
+    FrozenISEPDermaBenchAdapter,
+    list_isep_dermabench_configs,
+    load_isep_dermabench_config,
+    load_isep_dermabench_dataset,
+)
 from src.benchmark.report import generate_run_report
 from src.benchmark.results import (
     RunPaths,
@@ -37,9 +43,7 @@ from src.benchmark.task_adapters import build_task_adapter
 from src.config import (
     BenchmarkConfig,
     ModelConfig,
-    list_benchmark_configs,
     list_model_configs,
-    load_benchmark_config,
     load_model_config,
 )
 from src.data_pipeline.deduplication import ImageResolver
@@ -66,8 +70,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m src.benchmark.cli",
         description=(
-            "Run reproducible multimodal dermatology benchmarks from YAML "
-            "model and benchmark configurations."
+            "Run model YAMLs against the frozen ISEPDermaBench release."
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -98,6 +101,23 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument(
         "--evaluation-set",
         help="Named evaluation set; defaults to the benchmark protocol.",
+    )
+    run_parser.add_argument(
+        "--benchmark-source",
+        choices=("auto", "local", "hub"),
+        default="auto",
+        help=(
+            "Load ISEPDermaBench from the local mirror when available or "
+            "directly from Hugging Face (default: auto)."
+        ),
+    )
+    run_parser.add_argument(
+        "--benchmark-repo",
+        default=DEFAULT_REPO_ID,
+        help=(
+            "Hugging Face dataset repository used by hub mode "
+            f"(default: {DEFAULT_REPO_ID})."
+        ),
     )
     run_parser.add_argument(
         "--limit",
@@ -236,7 +256,7 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         root=root,
         backend_profile=args.backend_profile,
     )
-    benchmark = load_benchmark_config(args.benchmark, root=root)
+    benchmark = load_isep_dermabench_config(args.benchmark, root=root)
     args.structured_output = (
         benchmark.structured_output.mode
         if args.structured_output == "benchmark"
@@ -259,18 +279,21 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         structured_output_mode=args.structured_output,
     )
     _validate_runtime_options(args=args, model=model)
-    adapter = build_task_adapter(
+    source_adapter = build_task_adapter(
         benchmark_config=raw_benchmark,
         prompt_config=prompt,
         schema=schema,
         disease_taxonomy_items=disease_items,
     )
-    dataset = load_benchmark_dataset(
+    adapter = FrozenISEPDermaBenchAdapter(source_adapter)
+    dataset = load_isep_dermabench_dataset(
         root=root,
-        config=raw_benchmark,
+        benchmark=benchmark,
         evaluation_set=args.evaluation_set,
         limit=args.limit,
         seed=args.seed,
+        source=args.benchmark_source,
+        repo_id=args.benchmark_repo,
     )
     if not dataset.samples:
         raise ValueError("The selected benchmark dataset contains no tasks")
@@ -289,8 +312,16 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         reasoning_capture=args.reasoning_capture,
         structured_output_mode=args.structured_output,
     )
+    embedded_images = {
+        sample.image_uri: sample.image_bytes
+        for sample in dataset.samples
+        if sample.image_bytes is not None
+    }
     with ImageResolver(root) as resolver:
         def image_loader(image_uri: str) -> bytes:
+            embedded = embedded_images.get(image_uri)
+            if embedded is not None:
+                return embedded
             return prepare_benchmark_image(
                 resolver.read_bytes(image_uri),
                 benchmark.image_preprocessing,
@@ -390,7 +421,7 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         try:
             report_path = generate_run_report(
                 paths.directory,
-                image_loader=resolver.read_bytes,
+                image_loader=image_loader,
             )
             report_error = None
         except Exception as exc:
@@ -806,7 +837,7 @@ def _print_models(root: Path) -> None:
 
 def _print_benchmarks(root: Path) -> None:
     rows = []
-    for config in list_benchmark_configs(root=root):
+    for config in list_isep_dermabench_configs(root=root):
         evaluation_sets = ",".join(
             item.id for item in config.dataset.evaluation_sets
         )

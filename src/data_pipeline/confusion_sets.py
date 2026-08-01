@@ -43,7 +43,9 @@ CONFUSION_TASK_ARROW_SCHEMA = pa.schema(
 def build_confusion_set_release(root: Path) -> dict[str, Any]:
     """Create the deterministic paired confusion-set task release."""
 
-    benchmark_path = root / "configs/benchmarks/visual_confusion_sets.yaml"
+    benchmark_path = (
+        root / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
+    )
     benchmark = load_yaml(benchmark_path)
     definition_path = (
         root / benchmark["taxonomy"]["confusion_sets"]["path"]
@@ -131,11 +133,131 @@ def build_confusion_set_release(root: Path) -> dict[str, Any]:
         },
     }
     _write_yaml({"release": release}, release_path)
+    development_validation = build_confusion_validation_release(root)
     return {
         "paths": artifact_paths | {"release_manifest": release_path},
         "tasks": tasks,
         "selection": selection,
         "summary": summary,
+        "integrity": integrity,
+        "release": release,
+        "development_validation": development_validation,
+    }
+
+
+def build_confusion_validation_release(root: Path) -> dict[str, Any]:
+    """Create paired confusion tasks from development Validation only."""
+
+    benchmark_path = (
+        root / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
+    )
+    benchmark = load_yaml(benchmark_path)
+    development = benchmark["dataset"]["development_validation"]
+    definition_path = root / benchmark["taxonomy"]["confusion_sets"]["path"]
+    disease_taxonomy_path = root / benchmark["taxonomy"]["disease"]["path"]
+    prompt_path = root / benchmark["prompt"]["path"]
+    schema_path = root / benchmark["schema"]["path"]
+    definition = load_yaml(definition_path)
+    disease_taxonomy = load_yaml(disease_taxonomy_path)
+    source_path = root / development["source_manifest"]
+    task_path = root / development["task_manifest"]
+    summary_path = root / development["summary_report"]
+    integrity_path = root / development["integrity_report"]
+    release_path = root / development["release_manifest"]
+
+    source_all = pq.read_table(source_path).to_pandas()
+    source = _one_validation_image_per_group(
+        source_all,
+        seed=int(development["representative_seed"]),
+    )
+    active_ids = {
+        str(item["id"])
+        for item in disease_taxonomy["diseases"]
+    }
+    tasks, selection = build_confusion_tasks(
+        source=source,
+        definition=definition,
+        active_disease_ids=active_ids,
+    )
+    expected = development["expected_counts"]
+    integrity = validate_confusion_task_frame(
+        tasks=tasks,
+        source=source,
+        definition=definition,
+        active_disease_ids=active_ids,
+        expected_release={
+            "active_confusion_set_count": int(
+                expected["active_confusion_set_count"]
+            ),
+            "covered_disease_count": int(expected["covered_disease_count"]),
+            "unique_image_count": int(expected["unique_image_count"]),
+            "paired_task_count": int(expected["paired_task_count"]),
+        },
+    )
+    if not integrity["passed"]:
+        raise ValueError(
+            "Generated validation confusion tasks failed integrity checks"
+        )
+
+    _write_task_manifest(tasks, task_path)
+    summary = _build_summary(tasks)
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    summary.to_csv(summary_path, index=False)
+    _write_yaml({"integrity": integrity}, integrity_path)
+
+    release = {
+        "id": "visual_confusion_sets_validation_v1",
+        "version": "1.0.0",
+        "status": "development",
+        "release_date": "2026-07-31",
+        "task_schema_version": CONFUSION_TASK_SCHEMA_VERSION,
+        "evaluation_origin": "development_validation",
+        "representative_seed": int(development["representative_seed"]),
+        "selection_seed": int(
+            _definition_config(definition)["selection"]["seed"]
+        ),
+        "integrity_passed": True,
+        "source": {
+            "validation_manifest": _path_record(root, source_path),
+            "visual_top_k_release": _path_record(
+                root,
+                root
+                / "data/benchmarks/derma_isep/visual_top_k_v1/release/"
+                "benchmark_release_v1.yaml",
+            ),
+        },
+        "configuration": {
+            "benchmark": _path_record(root, benchmark_path),
+            "confusion_sets": _path_record(root, definition_path),
+            "disease_taxonomy": _path_record(root, disease_taxonomy_path),
+            "prompt": _path_record(root, prompt_path),
+            "output_schema": _path_record(root, schema_path),
+        },
+        "counts": {
+            "source_validation_images": int(len(source_all)),
+            "source_validation_groups": int(
+                source_all["leakage_group_id"].nunique()
+            ),
+            "representative_images": int(len(source)),
+            "selected_images": int(tasks["sample_id"].nunique()),
+            "tasks": int(len(tasks)),
+        },
+        "artifacts": {
+            "task_manifest": _path_record(root, task_path),
+            "summary_report": _path_record(root, summary_path),
+            "integrity_report": _path_record(root, integrity_path),
+        },
+    }
+    _write_yaml({"release": release}, release_path)
+    return {
+        "paths": {
+            "task_manifest": task_path,
+            "summary_report": summary_path,
+            "integrity_report": integrity_path,
+            "release_manifest": release_path,
+        },
+        "tasks": tasks,
+        "selection": selection,
         "integrity": integrity,
         "release": release,
     }
@@ -343,11 +465,12 @@ def validate_confusion_task_frame(
     source: pd.DataFrame,
     definition: dict[str, Any],
     active_disease_ids: set[str],
+    expected_release: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Validate paired task, candidate, balance, and source invariants."""
 
     taxonomy = _definition_config(definition)
-    expected = taxonomy["expected_release"]
+    expected = expected_release or taxonomy["expected_release"]
     candidate_count = int(taxonomy["candidate_count"])
     set_lookup = {
         str(item["id"]): {
@@ -530,7 +653,7 @@ def validate_confusion_set_release(root: Path) -> dict[str, Any]:
     """Validate release checksums and recompute task-frame invariants."""
 
     benchmark = load_yaml(
-        root / "configs/benchmarks/visual_confusion_sets.yaml"
+        root / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
     )
     release_path = root / benchmark["dataset"]["release_manifest"]
     release = load_yaml(release_path)["release"]
@@ -576,7 +699,104 @@ def validate_confusion_set_release(root: Path) -> dict[str, Any]:
         raise ValueError(
             "Confusion-set release failed recomputed integrity checks"
         )
+    validate_confusion_validation_release(root)
     return release
+
+
+def validate_confusion_validation_release(root: Path) -> dict[str, Any]:
+    """Validate the development-only paired confusion task release."""
+
+    benchmark = load_yaml(
+        root / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
+    )
+    development = benchmark["dataset"]["development_validation"]
+    release_path = root / development["release_manifest"]
+    release = load_yaml(release_path)["release"]
+    for section in ["source", "configuration", "artifacts"]:
+        for name, entry in release[section].items():
+            path = root / entry["path"]
+            if _file_sha256(path) != entry["sha256"]:
+                raise ValueError(
+                    "Validation confusion release checksum mismatch for "
+                    f"{section}.{name}: {path}"
+                )
+    if release.get("evaluation_origin") != "development_validation":
+        raise ValueError(
+            "Validation confusion release has the wrong evaluation origin"
+        )
+
+    definition = load_yaml(
+        root / benchmark["taxonomy"]["confusion_sets"]["path"]
+    )
+    disease_taxonomy = load_yaml(
+        root / benchmark["taxonomy"]["disease"]["path"]
+    )
+    active_ids = {
+        str(item["id"])
+        for item in disease_taxonomy["diseases"]
+    }
+    source_all = pq.read_table(root / development["source_manifest"]).to_pandas()
+    source = _one_validation_image_per_group(
+        source_all,
+        seed=int(development["representative_seed"]),
+    )
+    task_table = pq.read_table(root / development["task_manifest"])
+    if task_table.schema != CONFUSION_TASK_ARROW_SCHEMA:
+        raise ValueError("Validation confusion task manifest schema mismatch")
+    tasks = task_table.to_pandas()
+    expected = development["expected_counts"]
+    integrity = validate_confusion_task_frame(
+        tasks=tasks,
+        source=source,
+        definition=definition,
+        active_disease_ids=active_ids,
+        expected_release={
+            "active_confusion_set_count": int(
+                expected["active_confusion_set_count"]
+            ),
+            "covered_disease_count": int(expected["covered_disease_count"]),
+            "unique_image_count": int(expected["unique_image_count"]),
+            "paired_task_count": int(expected["paired_task_count"]),
+        },
+    )
+    if not integrity["passed"]:
+        raise ValueError(
+            "Validation confusion release failed recomputed integrity checks"
+        )
+    return release
+
+
+def _one_validation_image_per_group(
+    source: pd.DataFrame,
+    *,
+    seed: int,
+) -> pd.DataFrame:
+    """Select one deterministic representative from each leakage group."""
+
+    required = {"sample_id", "leakage_group_id"}
+    missing = sorted(required - set(source.columns))
+    if missing:
+        raise ValueError(
+            "Validation source is missing columns: " + ", ".join(missing)
+        )
+    selected = source.copy()
+    selected["_representative_key"] = selected.apply(
+        lambda row: _seeded_digest(
+            seed,
+            "validation-representative:"
+            f"{row['leakage_group_id']}:{row['sample_id']}",
+        ),
+        axis=1,
+    )
+    return (
+        selected.sort_values(
+            ["leakage_group_id", "_representative_key", "sample_id"],
+            kind="mergesort",
+        )
+        .drop_duplicates("leakage_group_id", keep="first")
+        .drop(columns=["_representative_key"])
+        .reset_index(drop=True)
+    )
 
 
 def _validate_definition(

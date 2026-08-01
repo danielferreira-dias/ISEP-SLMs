@@ -14,6 +14,14 @@ subgroup-support reporting.
 
 The primary current reports are:
 
+- `datasets_overview.html`: self-contained visual map of the training pool,
+  21-class subset, internal splits, external datasets, benchmark views, and
+  example manifest rows. Regenerate it with:
+
+  ```bash
+  uv run python -m src.data_pipeline.dataset_overview_report
+  ```
+
 - `source_disease_inventory_v3.csv`: source labels, canonical labels, mapping
   status, and per-source counts;
 - `all_source_disease_coverage_v3.csv`: totals for every canonical source
@@ -55,6 +63,6 @@ artifacts are intentionally calculated only from taxonomy contributors.
 Perceptual matches are candidates rather than confirmed duplicates. Pending
 rows already share a leakage group, so a candidate relationship cannot cross
 internal splits. The frozen release is stored under
-`data/benchmarks/visual_top_k_v1/`. Model-ready Parquet datasets,
+`data/benchmarks/derma_isep/visual_top_k_v1/`. Model-ready Parquet datasets,
 release-specific reports, and integrity metadata are separated into
 `datasets/`, `reports/`, and `release/`, respectively.

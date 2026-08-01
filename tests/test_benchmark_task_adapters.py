@@ -28,7 +28,7 @@ class BenchmarkTaskAdapterTests(unittest.TestCase):
 
     def test_factory_prepares_existing_visual_top_k_task(self) -> None:
         adapter = _adapter(
-            "configs/benchmarks/visual_top_k.yaml",
+            "configs/benchmarks/derma_isep/visual_top_k.yaml",
             self.diseases,
         )
         self.assertIsInstance(adapter, VisualTopKTaskAdapter)
@@ -43,7 +43,7 @@ class BenchmarkTaskAdapterTests(unittest.TestCase):
 
     def test_confusion_adapter_requires_and_narrows_candidates(self) -> None:
         adapter = _adapter(
-            "configs/benchmarks/visual_confusion_sets.yaml",
+            "configs/benchmarks/derma_isep/visual_confusion_sets.yaml",
             self.diseases,
         )
         self.assertIsInstance(adapter, ConfusionSetTaskAdapter)
@@ -77,7 +77,7 @@ class BenchmarkTaskAdapterTests(unittest.TestCase):
 
     def test_evidence_adapter_renders_both_taxonomies(self) -> None:
         config_path = (
-            "configs/benchmarks/evidence_grounded_diagnosis.yaml"
+            "configs/benchmarks/derma_isep/evidence_grounded_diagnosis.yaml"
         )
         adapter = _adapter(config_path, self.diseases)
         self.assertIsInstance(adapter, EvidenceGroundedTaskAdapter)

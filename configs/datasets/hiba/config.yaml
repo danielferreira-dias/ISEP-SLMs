@@ -1,0 +1,26 @@
+dataset:
+  id: hiba
+  version: "2025"
+  name: HIBA Skin Lesions
+  task_type: disease_classification
+  description: >
+    Paired clinical and dermoscopic lesion images from Hospital Italiano de
+    Buenos Aires. Only the clinical overview and close-up images are used.
+  license_id: CC_BY_4_0
+
+source:
+  repository: https://api.isic-archive.com/doi/hiba-skin-lesions/
+  metadata: configs/datasets/hiba/data/hiba-skin-lesions.csv
+  image_archive: configs/datasets/hiba/data/hiba-skin-lesions.zip
+  format: csv_with_zip_archive
+  row_unit: image
+
+training:
+  role: training_only
+  image_modality:
+    include:
+      - "clinical: overview"
+      - "clinical: close-up"
+    exclude:
+      - dermoscopic
+  allow_benchmark_membership: false

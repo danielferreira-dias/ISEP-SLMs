@@ -13,8 +13,10 @@ experiment:
     grounding, confidence calibration, and structured-output reliability.
 
 benchmark:
-  config: configs/benchmarks/evidence_grounded_diagnosis.yaml
-  evaluation_set: external_ddi_evidence
+  config: evidence_grounded_diagnosis
+  evaluation_set: external_ddi
+  source: auto
+  repository: danielfdias98/ISEPDermaBench
 
 models:
   - config: configs/models/qwen_3_6_27b.yaml

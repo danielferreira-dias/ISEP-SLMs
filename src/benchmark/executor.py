@@ -173,7 +173,11 @@ class BenchmarkExecutor:
         prepared: list[_PreparedRequest] = []
         for sample in samples:
             try:
-                image_bytes = self.image_loader(sample.image_uri)
+                image_bytes = (
+                    sample.image_bytes
+                    if sample.image_bytes is not None
+                    else self.image_loader(sample.image_uri)
+                )
             except Exception as exc:
                 self._write_failure(
                     sample=sample,
@@ -205,7 +209,7 @@ class BenchmarkExecutor:
                 "user_prompt": task.user_prompt,
                 "schema": task.schema,
                 "image_uri": sample.image_uri,
-                "image_embedded": False,
+                "image_embedded": sample.image_bytes is not None,
             }
             prepared.append(
                 _PreparedRequest(

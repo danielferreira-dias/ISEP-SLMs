@@ -36,10 +36,7 @@ dataset_roles:
     - dermobench
   excluded_from_coverage:
     skincon: Morphology annotation overlay; it does not provide independent disease cases.
-    skincap: Derived from Fitzpatrick17k and DDI; counting it would duplicate upstream cases.
     skincare: Contains derived SkinCAP data and incompatible SkinCoT targets.
-    dermavqa: Visual question answering data without a fixed fine-grained disease target.
-    dermnet_kaggle: Upstream rights are unresolved and its 23 directory labels combine multiple diseases.
 
 eligibility:
   minimum_unique_groups_total: 100

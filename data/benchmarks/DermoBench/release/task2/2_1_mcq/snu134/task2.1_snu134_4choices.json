@@ -1,0 +1,3362 @@
+[
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_abscess_abscess_F_34_21419",
+    "image": "snu134/A/abscess/abscess_F_34_21419.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Paronychia\nB) Abscess\nC) Cellulitis\nD) Prurigo pigmentosa"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Abscess"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_abscess_abscess_F_44_304288",
+    "image": "snu134/A/abscess/abscess_F_44_304288.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Folliculitis\nB) Abscess\nC) Inflamed cyst\nD) Cellulitis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Abscess"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_acne_acne_M_16_194761",
+    "image": "snu134/A/acne/acne_M_16_194761.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Folliculitis\nB) Inflamed cyst\nC) Cellulitis\nD) Acne"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Acne"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_acne_acne_M_16_259425",
+    "image": "snu134/A/acne/acne_M_16_259425.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Cellulitis\nB) Staphylococcal scalded skin syndrome\nC) Acne\nD) Prurigo pigmentosa"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Acne"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_acne_acne_M_31_130979",
+    "image": "snu134/A/acne/acne_M_31_130979.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Inflamed cyst\nB) Impetigo\nC) Paronychia\nD) Acne"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Acne"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_acne_acne_M_41_191825",
+    "image": "snu134/A/acne/acne_M_41_191825.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Folliculitis\nB) Cellulitis\nC) Staphylococcal scalded skin syndrome\nD) Acne"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Acne"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_cellulitis_cellulitis_F_27_146843",
+    "image": "snu134/A/cellulitis/cellulitis_F_27_146843.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Acne\nB) Cellulitis\nC) Paronychia\nD) Furuncle"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Cellulitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_cellulitis_cellulitis_F_67_120700",
+    "image": "snu134/A/cellulitis/cellulitis_F_67_120700.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Prurigo pigmentosa\nB) Cellulitis\nC) Paronychia\nD) Staphylococcal scalded skin syndrome"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Cellulitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_cellulitis_cellulitis_M_21_55991",
+    "image": "snu134/A/cellulitis/cellulitis_M_21_55991.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Abscess\nB) Cellulitis\nC) Impetigo\nD) Staphylococcal scalded skin syndrome"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Cellulitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_cellulitis_cellulitis_M_27_78324",
+    "image": "snu134/A/cellulitis/cellulitis_M_27_78324.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Impetigo\nB) Cellulitis\nC) Confluent and reticulated papillomatosis\nD) Furuncle"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Cellulitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_confluentreticulatedpapillomatosis_confluentreticulatedpapillomatosis_F_14_2430442",
+    "image": "snu134/A/confluentreticulatedpapillomatosis/confluentreticulatedpapillomatosis_F_14_2430442.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Prurigo pigmentosa\nB) Staphylococcal scalded skin syndrome\nC) Confluent and reticulated papillomatosis\nD) Furuncle"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Confluent and reticulated papillomatosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_confluentreticulatedpapillomatosis_confluentreticulatedpapillomatosis_F_18_3301900",
+    "image": "snu134/A/confluentreticulatedpapillomatosis/confluentreticulatedpapillomatosis_F_18_3301900.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Inflamed cyst\nB) Confluent and reticulated papillomatosis\nC) Impetigo\nD) Prurigo pigmentosa"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Confluent and reticulated papillomatosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_confluentreticulatedpapillomatosis_confluentreticulatedpapillomatosis_F_23_5802350",
+    "image": "snu134/A/confluentreticulatedpapillomatosis/confluentreticulatedpapillomatosis_F_23_5802350.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Prurigo pigmentosa\nB) Folliculitis\nC) Confluent and reticulated papillomatosis\nD) Abscess"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Confluent and reticulated papillomatosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_folliculitis_folliculitis_F_29_56461",
+    "image": "snu134/A/folliculitis/folliculitis_F_29_56461.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Cellulitis\nB) Staphylococcal scalded skin syndrome\nC) Furuncle\nD) Folliculitis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Folliculitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_folliculitis_folliculitis_F_37_18964",
+    "image": "snu134/A/folliculitis/folliculitis_F_37_18964.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Confluent and reticulated papillomatosis\nB) Folliculitis\nC) Cellulitis\nD) Staphylococcal scalded skin syndrome"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Folliculitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_folliculitis_folliculitis_M_29_47940",
+    "image": "snu134/A/folliculitis/folliculitis_M_29_47940.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Folliculitis\nB) Inflamed cyst\nC) Cellulitis\nD) Impetigo"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Folliculitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_folliculitis_folliculitis_M_47_44583",
+    "image": "snu134/A/folliculitis/folliculitis_M_47_44583.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Folliculitis\nB) Cellulitis\nC) Prurigo pigmentosa\nD) Acne"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Folliculitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_furuncle_furuncle_F_36_1150737",
+    "image": "snu134/A/furuncle/furuncle_F_36_1150737.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Confluent and reticulated papillomatosis\nB) Prurigo pigmentosa\nC) Staphylococcal scalded skin syndrome\nD) Furuncle"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Furuncle"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_furuncle_furuncle_F_45_881486",
+    "image": "snu134/A/furuncle/furuncle_F_45_881486.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Prurigo pigmentosa\nB) Impetigo\nC) Furuncle\nD) Paronychia"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Furuncle"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_furuncle_furuncle_F_8_790785",
+    "image": "snu134/A/furuncle/furuncle_F_8_790785.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Furuncle\nB) Paronychia\nC) Prurigo pigmentosa\nD) Inflamed cyst"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Furuncle"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_furuncle_furuncle_M_33_990542",
+    "image": "snu134/A/furuncle/furuncle_M_33_990542.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Cellulitis\nB) Folliculitis\nC) Confluent and reticulated papillomatosis\nD) Furuncle"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Furuncle"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_impetigo_impetigo_F_16_3536067",
+    "image": "snu134/A/impetigo/impetigo_F_16_3536067.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Cellulitis\nB) Paronychia\nC) Acne\nD) Impetigo"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Impetigo"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_impetigo_impetigo_F_51_525274",
+    "image": "snu134/A/impetigo/impetigo_F_51_525274.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Prurigo pigmentosa\nB) Staphylococcal scalded skin syndrome\nC) Abscess\nD) Impetigo"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Impetigo"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_impetigo_impetigo_M_12_527113",
+    "image": "snu134/A/impetigo/impetigo_M_12_527113.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Prurigo pigmentosa\nB) Impetigo\nC) Folliculitis\nD) Confluent and reticulated papillomatosis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Impetigo"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_impetigo_impetigo_M_12_888217",
+    "image": "snu134/A/impetigo/impetigo_M_12_888217.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Impetigo\nB) Prurigo pigmentosa\nC) Folliculitis\nD) Inflamed cyst"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Impetigo"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_impetigo_impetigo_M_17_187636",
+    "image": "snu134/A/impetigo/impetigo_M_17_187636.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Abscess\nB) Folliculitis\nC) Impetigo\nD) Paronychia"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Impetigo"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_inflammedcyst_inflammedcyst_F_59_398458",
+    "image": "snu134/A/inflammedcyst/inflammedcyst_F_59_398458.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Prurigo pigmentosa\nB) Inflamed cyst\nC) Acne\nD) Impetigo"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Inflamed cyst"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_inflammedcyst_inflammedcyst_F_64_298980",
+    "image": "snu134/A/inflammedcyst/inflammedcyst_F_64_298980.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Inflamed cyst\nB) Acne\nC) Folliculitis\nD) Prurigo pigmentosa"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Inflamed cyst"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_inflammedcyst_inflammedcyst_M_76_586424",
+    "image": "snu134/A/inflammedcyst/inflammedcyst_M_76_586424.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Folliculitis\nB) Inflamed cyst\nC) Furuncle\nD) Acne"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Inflamed cyst"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_inflammedcyst_inflammedcyst_M_78_239001",
+    "image": "snu134/A/inflammedcyst/inflammedcyst_M_78_239001.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Folliculitis\nB) Paronychia\nC) Prurigo pigmentosa\nD) Inflamed cyst"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Inflamed cyst"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_paronychia_paronychia_F_28_24503",
+    "image": "snu134/A/paronychia/paronychia_F_28_24503.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Paronychia\nB) Abscess\nC) Acne\nD) Inflamed cyst"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Paronychia"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_paronychia_paronychia_F_44_42776",
+    "image": "snu134/A/paronychia/paronychia_F_44_42776.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Paronychia\nB) Abscess\nC) Folliculitis\nD) Staphylococcal scalded skin syndrome"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Paronychia"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_paronychia_paronychia_M_26_96282",
+    "image": "snu134/A/paronychia/paronychia_M_26_96282.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Cellulitis\nB) Paronychia\nC) Prurigo pigmentosa\nD) Furuncle"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Paronychia"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_paronychia_paronychia_M_57_144783",
+    "image": "snu134/A/paronychia/paronychia_M_57_144783.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Folliculitis\nB) Cellulitis\nC) Confluent and reticulated papillomatosis\nD) Paronychia"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Paronychia"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_prurigopigmentosa_prurigopigmentosa_F_16_135714",
+    "image": "snu134/A/prurigopigmentosa/prurigopigmentosa_F_16_135714.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Confluent and reticulated papillomatosis\nB) Prurigo pigmentosa\nC) Cellulitis\nD) Inflamed cyst"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Prurigo pigmentosa"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_prurigopigmentosa_prurigopigmentosa_F_23_95309",
+    "image": "snu134/A/prurigopigmentosa/prurigopigmentosa_F_23_95309.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Acne\nB) Prurigo pigmentosa\nC) Folliculitis\nD) Cellulitis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Prurigo pigmentosa"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_prurigopigmentosa_prurigopigmentosa_F_32_199290",
+    "image": "snu134/A/prurigopigmentosa/prurigopigmentosa_F_32_199290.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Impetigo\nB) Prurigo pigmentosa\nC) Paronychia\nD) Cellulitis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Prurigo pigmentosa"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_prurigopigmentosa_prurigopigmentosa_M_15_464659",
+    "image": "snu134/A/prurigopigmentosa/prurigopigmentosa_M_15_464659.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Prurigo pigmentosa\nB) Acne\nC) Abscess\nD) Paronychia"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Prurigo pigmentosa"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_staphylococcalscaldedskinsyndrome_staphylococcalscaldedskinsyndrome_F_6_43480",
+    "image": "snu134/A/staphylococcalscaldedskinsyndrome/staphylococcalscaldedskinsyndrome_F_6_43480.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Folliculitis\nB) Prurigo pigmentosa\nC) Staphylococcal scalded skin syndrome\nD) Abscess"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Staphylococcal scalded skin syndrome"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_A_staphylococcalscaldedskinsyndrome_staphylococcalscaldedskinsyndrome_F_7_134761",
+    "image": "snu134/A/staphylococcalscaldedskinsyndrome/staphylococcalscaldedskinsyndrome_F_7_134761.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Cellulitis\nB) Folliculitis\nC) Paronychia\nD) Staphylococcal scalded skin syndrome"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Staphylococcal scalded skin syndrome"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_actinickeratosis_actinickeratosis_F_79_91275",
+    "image": "snu134/B/actinickeratosis/actinickeratosis_F_79_91275.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Angiofibroma\nB) Congenital nevus\nC) Actinic keratosis\nD) Subungual hematoma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Actinic keratosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_actinickeratosis_actinickeratosis_F_88_192631",
+    "image": "snu134/B/actinickeratosis/actinickeratosis_F_88_192631.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Angiokeratoma\nB) Actinic keratosis\nC) Pyogenic granuloma\nD) Blue nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Actinic keratosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_actinickeratosis_actinickeratosis_M_67_181146",
+    "image": "snu134/B/actinickeratosis/actinickeratosis_M_67_181146.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Actinic keratosis\nB) Lentigo\nC) Wart\nD) Becker nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Actinic keratosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_actinickeratosis_actinickeratosis_M_78_240776",
+    "image": "snu134/B/actinickeratosis/actinickeratosis_M_78_240776.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Sebaceous hyperplasia\nB) Actinic keratosis\nC) Lentigo\nD) Subungual hematoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Actinic keratosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_angiofibroma_angiofibroma_F_5_464599",
+    "image": "snu134/B/angiofibroma/angiofibroma_F_5_464599.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Pyogenic granuloma\nB) Angiofibroma\nC) Epidermal cyst\nD) Lentigo"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Angiofibroma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_angiokeratoma_angiokeratoma_F_28_643454",
+    "image": "snu134/B/angiokeratoma/angiokeratoma_F_28_643454.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Angiokeratoma\nB) Skin tag\nC) Xanthelasma\nD) Lentigo"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Angiokeratoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_beckernevus_beckernevus_M_32_964050",
+    "image": "snu134/B/beckernevus/beckernevus_M_32_964050.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Skin tag\nB) Becker nevus\nC) Angiofibroma\nD) Neurofibroma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Becker nevus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_bluenevus_bluenevus_F_8_219187",
+    "image": "snu134/B/bluenevus/bluenevus_F_8_219187.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Wart\nB) Epidermal cyst\nC) Skin tag\nD) Blue nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Blue nevus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_congenitalnevus_congenitalnevus_M_18_1040068",
+    "image": "snu134/B/congenitalnevus/congenitalnevus_M_18_1040068.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Congenital nevus\nB) Subungual hematoma\nC) Pyogenic granuloma\nD) Sebaceous hyperplasia"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Congenital nevus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_dermatofibroma_dermatofibroma_M_35_119291",
+    "image": "snu134/B/dermatofibroma/dermatofibroma_M_35_119291.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Dermatofibroma\nB) Skin tag\nC) Seborrheic keratosis\nD) Becker nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Dermatofibroma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_epidermalcyst_epidermalcyst_F_49_24034",
+    "image": "snu134/B/epidermalcyst/epidermalcyst_F_49_24034.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Congenital nevus\nB) Becker nevus\nC) Lymphangioma\nD) Epidermal cyst"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Epidermal cyst"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_epidermalnevus_epidermalnevus_M_5_992632",
+    "image": "snu134/B/epidermalnevus/epidermalnevus_M_5_992632.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Actinic keratosis\nB) Skin tag\nC) Sebaceous hyperplasia\nD) Epidermal nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Epidermal nevus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_hemangioma_hemangioma_F_10_133729",
+    "image": "snu134/B/hemangioma/hemangioma_F_10_133729.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Wart\nB) Hemangioma\nC) Steatocystoma multiplex\nD) Verruca plana"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Hemangioma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_juvenilexanthogranuloma_juvenilexanthogranuloma_F_12_231780",
+    "image": "snu134/B/juvenilexanthogranuloma/juvenilexanthogranuloma_F_12_231780.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Angiokeratoma\nB) Juvenile xanthogranuloma\nC) Organoid nevus\nD) Neurofibromatosis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Juvenile xanthogranuloma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_juvenilexanthogranuloma_juvenilexanthogranuloma_M_6_1104371",
+    "image": "snu134/B/juvenilexanthogranuloma/juvenilexanthogranuloma_M_6_1104371.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Juvenile xanthogranuloma\nB) Skin tag\nC) Pyogenic granuloma\nD) Blue nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Juvenile xanthogranuloma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_lentigo_lentigo_F_49_755539",
+    "image": "snu134/B/lentigo/lentigo_F_49_755539.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Seborrheic keratosis\nB) Dermatofibroma\nC) Verruca plana\nD) Lentigo"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Lentigo"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_lentigo_lentigo_F_74_506664",
+    "image": "snu134/B/lentigo/lentigo_F_74_506664.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Sebaceous hyperplasia\nB) Lentigo\nC) Verruca plana\nD) Angiofibroma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Lentigo"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_lymphangioma_lymphangioma_M_32_723192",
+    "image": "snu134/B/lymphangioma/lymphangioma_M_32_723192.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Lymphangioma\nB) Juvenile xanthogranuloma\nC) Dermatofibroma\nD) Subungual hematoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Lymphangioma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_melanocyticnevus_melanocyticnevus_F_13_551542",
+    "image": "snu134/B/melanocyticnevus/melanocyticnevus_F_13_551542.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Lymphangioma\nB) Becker nevus\nC) Melanocytic nevus\nD) Nevus spilus"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Melanocytic nevus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_melanocyticnevus_melanocyticnevus_M_31_77595",
+    "image": "snu134/B/melanocyticnevus/melanocyticnevus_M_31_77595.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Sebaceous hyperplasia\nB) Skin tag\nC) Melanocytic nevus\nD) Angiofibroma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Melanocytic nevus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_melanocyticnevus_melanocyticnevus_M_39_51968",
+    "image": "snu134/B/melanocyticnevus/melanocyticnevus_M_39_51968.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Melanocytic nevus\nB) Blue nevus\nC) Becker nevus\nD) Neurofibroma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Melanocytic nevus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_neurofibroma_neurofibroma_M_48_571793",
+    "image": "snu134/B/neurofibroma/neurofibroma_M_48_571793.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Xanthelasma\nB) Neurofibroma\nC) Organoid nevus\nD) Blue nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Neurofibroma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_neurofibromatosis_neurofibromatosis_M_22_1816458",
+    "image": "snu134/B/neurofibromatosis/neurofibromatosis_M_22_1816458.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Steatocystoma multiplex\nB) Angiofibroma\nC) Epidermal nevus\nD) Neurofibromatosis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Neurofibromatosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_nevusspilus_nevusspilus_M_5_167490",
+    "image": "snu134/B/nevusspilus/nevusspilus_M_5_167490.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Hemangioma\nB) Pyogenic granuloma\nC) Nevus spilus\nD) Neurofibroma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Nevus spilus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_organoidnevus_organoidnevus_M_12_1487023",
+    "image": "snu134/B/organoidnevus/organoidnevus_M_12_1487023.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Congenital nevus\nB) Steatocystoma multiplex\nC) Organoid nevus\nD) Dermatofibroma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Organoid nevus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_pyogenicgranuloma_pyogenicgranuloma_F_44_396821",
+    "image": "snu134/B/pyogenicgranuloma/pyogenicgranuloma_F_44_396821.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Pyogenic granuloma\nB) Xanthelasma\nC) Skin tag\nD) Angiofibroma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Pyogenic granuloma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_sebaceoushyperplasia_sebaceoushyperplasia_F_64_186735",
+    "image": "snu134/B/sebaceoushyperplasia/sebaceoushyperplasia_F_64_186735.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Sebaceous hyperplasia\nB) Becker nevus\nC) Angiofibroma\nD) Hemangioma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Sebaceous hyperplasia"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_sebaceoushyperplasia_sebaceoushyperplasia_M_70_26597",
+    "image": "snu134/B/sebaceoushyperplasia/sebaceoushyperplasia_M_70_26597.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Neurofibroma\nB) Sebaceous hyperplasia\nC) Becker nevus\nD) Wart"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Sebaceous hyperplasia"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_seborrheickeratosis_seborrheickeratosis_F_54_85318",
+    "image": "snu134/B/seborrheickeratosis/seborrheickeratosis_F_54_85318.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Seborrheic keratosis\nB) Melanocytic nevus\nC) Angiokeratoma\nD) Lentigo"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Seborrheic keratosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_seborrheickeratosis_seborrheickeratosis_F_57_93324",
+    "image": "snu134/B/seborrheickeratosis/seborrheickeratosis_F_57_93324.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Melanocytic nevus\nB) Steatocystoma multiplex\nC) Seborrheic keratosis\nD) Hemangioma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Seborrheic keratosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_seborrheickeratosis_seborrheickeratosis_F_58_204698",
+    "image": "snu134/B/seborrheickeratosis/seborrheickeratosis_F_58_204698.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Lentigo\nB) Epidermal cyst\nC) Xanthelasma\nD) Seborrheic keratosis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Seborrheic keratosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_seborrheickeratosis_seborrheickeratosis_F_87_139362",
+    "image": "snu134/B/seborrheickeratosis/seborrheickeratosis_F_87_139362.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Blue nevus\nB) Pyogenic granuloma\nC) Melanocytic nevus\nD) Seborrheic keratosis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Seborrheic keratosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_skintag_skintag_F_51_138895",
+    "image": "snu134/B/skintag/skintag_F_51_138895.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Melanocytic nevus\nB) Skin tag\nC) Seborrheic keratosis\nD) Sebaceous hyperplasia"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Skin tag"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_steatocystomamultiplex_steatocystomamultiplex_M_22_569810",
+    "image": "snu134/B/steatocystomamultiplex/steatocystomamultiplex_M_22_569810.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Epidermal nevus\nB) Organoid nevus\nC) Epidermal cyst\nD) Steatocystoma multiplex"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Steatocystoma multiplex"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_subungalhematoma_subungalhematoma_F_46_135840",
+    "image": "snu134/B/subungalhematoma/subungalhematoma_F_46_135840.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Subungual hematoma\nB) Angiokeratoma\nC) Becker nevus\nD) Epidermal cyst"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Subungual hematoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_subungalhematoma_subungalhematoma_F_62_49577",
+    "image": "snu134/B/subungalhematoma/subungalhematoma_F_62_49577.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Angiofibroma\nB) Subungual hematoma\nC) Xanthelasma\nD) Lentigo"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Subungual hematoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_verrucaplana_verrucaplana_M_28_545445",
+    "image": "snu134/B/verrucaplana/verrucaplana_M_28_545445.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Lymphangioma\nB) Epidermal cyst\nC) Verruca plana\nD) Blue nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Verruca plana"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_wart_wart_M_41_205346",
+    "image": "snu134/B/wart/wart_M_41_205346.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Wart\nB) Lymphangioma\nC) Subungual hematoma\nD) Angiokeratoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Wart"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_wart_wart_M_60_76847",
+    "image": "snu134/B/wart/wart_M_60_76847.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Nevus spilus\nB) Wart\nC) Pyogenic granuloma\nD) Epidermal nevus"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Wart"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_B_xanthelasma_xanthelasma_M_52_227294",
+    "image": "snu134/B/xanthelasma/xanthelasma_M_52_227294.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Lymphangioma\nB) Xanthelasma\nC) Epidermal nevus\nD) Dermatofibroma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Xanthelasma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_onychomycosis_onychomycosis_F_48_85892",
+    "image": "snu134/F/onychomycosis/onychomycosis_F_48_85892.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Tinea corporis\nB) Tinea cruris\nC) Onychomycosis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Onychomycosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_onychomycosis_onychomycosis_F_66_147634",
+    "image": "snu134/F/onychomycosis/onychomycosis_F_66_147634.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Tinea cruris\nB) Tinea corporis\nC) Tinea versicolor\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Onychomycosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_onychomycosis_onychomycosis_F_66_163356",
+    "image": "snu134/F/onychomycosis/onychomycosis_F_66_163356.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Tinea corporis\nB) Onychomycosis\nC) Tinea faciei\nD) Tinea cruris"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Onychomycosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_onychomycosis_onychomycosis_M_37_20102",
+    "image": "snu134/F/onychomycosis/onychomycosis_M_37_20102.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Tinea faciei\nB) Onychomycosis\nC) Tinea cruris\nD) Tinea pedis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Onychomycosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_onychomycosis_onychomycosis_M_51_85019",
+    "image": "snu134/F/onychomycosis/onychomycosis_M_51_85019.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Tinea versicolor\nB) Tinea pedis\nC) Onychomycosis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Onychomycosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_onychomycosis_onychomycosis_M_70_145489",
+    "image": "snu134/F/onychomycosis/onychomycosis_M_70_145489.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Onychomycosis\nB) Tinea pedis\nC) Tinea faciei\nD) Tinea corporis"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Onychomycosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_onychomycosis_onychomycosis_M_73_166443",
+    "image": "snu134/F/onychomycosis/onychomycosis_M_73_166443.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Tinea cruris\nB) Tinea corporis\nC) Tinea versicolor\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Onychomycosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_onychomycosis_onychomycosis_M_73_193418",
+    "image": "snu134/F/onychomycosis/onychomycosis_M_73_193418.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Tinea faciei\nB) Tinea cruris\nC) Tinea pedis\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Onychomycosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_F_44_25151",
+    "image": "snu134/F/tineacorporis/tineacorporis_F_44_25151.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Tinea faciei\nB) Tinea corporis\nC) Onychomycosis\nD) Tinea versicolor"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_F_58_106348",
+    "image": "snu134/F/tineacorporis/tineacorporis_F_58_106348.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Onychomycosis\nB) Tinea faciei\nC) Tinea versicolor\nD) Tinea corporis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_F_58_96679",
+    "image": "snu134/F/tineacorporis/tineacorporis_F_58_96679.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Tinea cruris\nB) Tinea versicolor\nC) Tinea corporis\nD) Tinea pedis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_M_22_83561",
+    "image": "snu134/F/tineacorporis/tineacorporis_M_22_83561.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Tinea corporis\nB) Tinea pedis\nC) Onychomycosis\nD) Tinea versicolor"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_M_38_160554",
+    "image": "snu134/F/tineacorporis/tineacorporis_M_38_160554.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Tinea cruris\nB) Tinea faciei\nC) Tinea versicolor\nD) Tinea corporis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_M_38_239576",
+    "image": "snu134/F/tineacorporis/tineacorporis_M_38_239576.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Tinea corporis\nB) Tinea versicolor\nC) Onychomycosis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_M_38_253367",
+    "image": "snu134/F/tineacorporis/tineacorporis_M_38_253367.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Tinea corporis\nB) Tinea cruris\nC) Onychomycosis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_M_46_69318",
+    "image": "snu134/F/tineacorporis/tineacorporis_M_46_69318.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Tinea pedis\nB) Tinea cruris\nC) Tinea faciei\nD) Tinea corporis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacorporis_tineacorporis_M_84_321898",
+    "image": "snu134/F/tineacorporis/tineacorporis_M_84_321898.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Tinea faciei\nB) Tinea pedis\nC) Tinea corporis\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Tinea corporis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacruris_tineacruris_M_26_466179",
+    "image": "snu134/F/tineacruris/tineacruris_M_26_466179.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Tinea pedis\nB) Onychomycosis\nC) Tinea corporis\nD) Tinea cruris"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea cruris"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacruris_tineacruris_M_47_138920",
+    "image": "snu134/F/tineacruris/tineacruris_M_47_138920.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Tinea cruris\nB) Tinea pedis\nC) Tinea corporis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Tinea cruris"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineacruris_tineacruris_M_47_143572",
+    "image": "snu134/F/tineacruris/tineacruris_M_47_143572.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Onychomycosis\nB) Tinea cruris\nC) Tinea corporis\nD) Tinea versicolor"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Tinea cruris"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineafaciale_tineafaciale_F_37_155388",
+    "image": "snu134/F/tineafaciale/tineafaciale_F_37_155388.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Tinea pedis\nB) Tinea versicolor\nC) Tinea cruris\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea faciei"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineafaciale_tineafaciale_F_37_188067",
+    "image": "snu134/F/tineafaciale/tineafaciale_F_37_188067.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Tinea versicolor\nB) Onychomycosis\nC) Tinea pedis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea faciei"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineafaciale_tineafaciale_F_39_380426",
+    "image": "snu134/F/tineafaciale/tineafaciale_F_39_380426.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Tinea versicolor\nB) Tinea corporis\nC) Onychomycosis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea faciei"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineafaciale_tineafaciale_F_44_248798",
+    "image": "snu134/F/tineafaciale/tineafaciale_F_44_248798.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Tinea faciei\nB) Tinea corporis\nC) Tinea versicolor\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Tinea faciei"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineafaciale_tineafaciale_M_29_1170836",
+    "image": "snu134/F/tineafaciale/tineafaciale_M_29_1170836.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Tinea versicolor\nB) Tinea corporis\nC) Tinea pedis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea faciei"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineapedis_tineapedis_F_36_149200",
+    "image": "snu134/F/tineapedis/tineapedis_F_36_149200.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Tinea corporis\nB) Tinea pedis\nC) Tinea faciei\nD) Tinea cruris"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Tinea pedis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineapedis_tineapedis_F_46_155671",
+    "image": "snu134/F/tineapedis/tineapedis_F_46_155671.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Onychomycosis\nB) Tinea pedis\nC) Tinea versicolor\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Tinea pedis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineapedis_tineapedis_F_46_84661",
+    "image": "snu134/F/tineapedis/tineapedis_F_46_84661.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Onychomycosis\nB) Tinea pedis\nC) Tinea versicolor\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Tinea pedis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineapedis_tineapedis_F_46_98615",
+    "image": "snu134/F/tineapedis/tineapedis_F_46_98615.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Tinea pedis\nB) Tinea corporis\nC) Tinea faciei\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Tinea pedis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineapedis_tineapedis_M_40_99803",
+    "image": "snu134/F/tineapedis/tineapedis_M_40_99803.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Tinea versicolor\nB) Tinea faciei\nC) Tinea pedis\nD) Tinea cruris"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Tinea pedis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineapedis_tineapedis_M_45_406078",
+    "image": "snu134/F/tineapedis/tineapedis_M_45_406078.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Tinea pedis\nB) Tinea corporis\nC) Tinea cruris\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Tinea pedis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineapedis_tineapedis_M_45_833990",
+    "image": "snu134/F/tineapedis/tineapedis_M_45_833990.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Tinea pedis\nB) Tinea corporis\nC) Tinea cruris\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Tinea pedis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineapedis_tineapedis_M_64_97304",
+    "image": "snu134/F/tineapedis/tineapedis_M_64_97304.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Onychomycosis\nB) Tinea versicolor\nC) Tinea pedis\nD) Tinea cruris"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Tinea pedis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineaversicolor_tineaversicolor_F_23_123381",
+    "image": "snu134/F/tineaversicolor/tineaversicolor_F_23_123381.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Onychomycosis\nB) Tinea cruris\nC) Tinea versicolor\nD) Tinea corporis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Tinea versicolor"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineaversicolor_tineaversicolor_F_34_81819",
+    "image": "snu134/F/tineaversicolor/tineaversicolor_F_34_81819.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Tinea faciei\nB) Tinea pedis\nC) Tinea versicolor\nD) Tinea corporis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Tinea versicolor"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineaversicolor_tineaversicolor_M_2_164671",
+    "image": "snu134/F/tineaversicolor/tineaversicolor_M_2_164671.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Onychomycosis\nB) Tinea corporis\nC) Tinea versicolor\nD) Tinea cruris"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Tinea versicolor"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineaversicolor_tineaversicolor_M_44_318496",
+    "image": "snu134/F/tineaversicolor/tineaversicolor_M_44_318496.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Tinea pedis\nB) Tinea versicolor\nC) Tinea cruris\nD) Onychomycosis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Tinea versicolor"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineaversicolor_tineaversicolor_M_44_422694",
+    "image": "snu134/F/tineaversicolor/tineaversicolor_M_44_422694.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Onychomycosis\nB) Tinea pedis\nC) Tinea versicolor\nD) Tinea cruris"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Tinea versicolor"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineaversicolor_tineaversicolor_M_49_144629",
+    "image": "snu134/F/tineaversicolor/tineaversicolor_M_49_144629.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Tinea pedis\nB) Tinea faciei\nC) Onychomycosis\nD) Tinea versicolor"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Tinea versicolor"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_F_tineaversicolor_tineaversicolor_M_67_148258",
+    "image": "snu134/F/tineaversicolor/tineaversicolor_M_67_148258.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Onychomycosis\nB) Tinea versicolor\nC) Tinea pedis\nD) Tinea faciei"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Tinea versicolor"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_basalcellcarcinoma_basalcellcarcinoma_F_55_80804",
+    "image": "snu134/M/basalcellcarcinoma/basalcellcarcinoma_F_55_80804.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Keratoacanthoma\nB) Squamous cell carcinoma\nC) Basal cell carcinoma\nD) Bowen disease"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Basal cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_basalcellcarcinoma_basalcellcarcinoma_F_66_176938",
+    "image": "snu134/M/basalcellcarcinoma/basalcellcarcinoma_F_66_176938.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Bowen disease\nB) Keratoacanthoma\nC) Malignant melanoma\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Basal cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_basalcellcarcinoma_basalcellcarcinoma_F_82_123350",
+    "image": "snu134/M/basalcellcarcinoma/basalcellcarcinoma_F_82_123350.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Keratoacanthoma\nB) Squamous cell carcinoma\nC) Malignant melanoma\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Basal cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_basalcellcarcinoma_basalcellcarcinoma_F_84_120161",
+    "image": "snu134/M/basalcellcarcinoma/basalcellcarcinoma_F_84_120161.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Squamous cell carcinoma\nB) Malignant melanoma\nC) Basal cell carcinoma\nD) Keratoacanthoma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Basal cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_basalcellcarcinoma_basalcellcarcinoma_M_58_757373",
+    "image": "snu134/M/basalcellcarcinoma/basalcellcarcinoma_M_58_757373.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Basal cell carcinoma\nB) Bowen disease\nC) Keratoacanthoma\nD) Malignant melanoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Basal cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_basalcellcarcinoma_basalcellcarcinoma_M_71_95613",
+    "image": "snu134/M/basalcellcarcinoma/basalcellcarcinoma_M_71_95613.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Keratoacanthoma\nB) Squamous cell carcinoma\nC) Basal cell carcinoma\nD) Bowen disease"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Basal cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_basalcellcarcinoma_basalcellcarcinoma_M_78_158487",
+    "image": "snu134/M/basalcellcarcinoma/basalcellcarcinoma_M_78_158487.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Malignant melanoma\nB) Keratoacanthoma\nC) Squamous cell carcinoma\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Basal cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_basalcellcarcinoma_basalcellcarcinoma_M_80_89876",
+    "image": "snu134/M/basalcellcarcinoma/basalcellcarcinoma_M_80_89876.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Basal cell carcinoma\nB) Keratoacanthoma\nC) Malignant melanoma\nD) Bowen disease"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Basal cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_bowendisease_bowendisease_F_62_475510",
+    "image": "snu134/M/bowendisease/bowendisease_F_62_475510.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Malignant melanoma\nB) Squamous cell carcinoma\nC) Bowen disease\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Bowen disease"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_bowendisease_bowendisease_F_68_75997",
+    "image": "snu134/M/bowendisease/bowendisease_F_68_75997.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Basal cell carcinoma\nB) Squamous cell carcinoma\nC) Keratoacanthoma\nD) Bowen disease"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Bowen disease"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_bowendisease_bowendisease_F_69_252545",
+    "image": "snu134/M/bowendisease/bowendisease_F_69_252545.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Basal cell carcinoma\nB) Bowen disease\nC) Malignant melanoma\nD) Squamous cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Bowen disease"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_bowendisease_bowendisease_F_82_56107",
+    "image": "snu134/M/bowendisease/bowendisease_F_82_56107.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Bowen disease\nB) Basal cell carcinoma\nC) Squamous cell carcinoma\nD) Malignant melanoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Bowen disease"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_bowendisease_bowendisease_F_82_725594",
+    "image": "snu134/M/bowendisease/bowendisease_F_82_725594.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Squamous cell carcinoma\nB) Bowen disease\nC) Malignant melanoma\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Bowen disease"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_bowendisease_bowendisease_F_85_597990",
+    "image": "snu134/M/bowendisease/bowendisease_F_85_597990.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Basal cell carcinoma\nB) Bowen disease\nC) Squamous cell carcinoma\nD) Malignant melanoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Bowen disease"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_bowendisease_bowendisease_M_83_364694",
+    "image": "snu134/M/bowendisease/bowendisease_M_83_364694.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Bowen disease\nB) Squamous cell carcinoma\nC) Keratoacanthoma\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Bowen disease"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_keratoacanthoma_keratoacanthoma_F_83_79925",
+    "image": "snu134/M/keratoacanthoma/keratoacanthoma_F_83_79925.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Keratoacanthoma\nB) Squamous cell carcinoma\nC) Malignant melanoma\nD) Bowen disease"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Keratoacanthoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_keratoacanthoma_keratoacanthoma_F_86_257892",
+    "image": "snu134/M/keratoacanthoma/keratoacanthoma_F_86_257892.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Basal cell carcinoma\nB) Keratoacanthoma\nC) Malignant melanoma\nD) Squamous cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Keratoacanthoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_keratoacanthoma_keratoacanthoma_M_46_99768",
+    "image": "snu134/M/keratoacanthoma/keratoacanthoma_M_46_99768.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Malignant melanoma\nB) Squamous cell carcinoma\nC) Basal cell carcinoma\nD) Keratoacanthoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Keratoacanthoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_F_33_203796",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_F_33_203796.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Malignant melanoma\nB) Keratoacanthoma\nC) Bowen disease\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_F_46_244485",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_F_46_244485.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Basal cell carcinoma\nB) Keratoacanthoma\nC) Malignant melanoma\nD) Squamous cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_F_53_276043",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_F_53_276043.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Malignant melanoma\nB) Keratoacanthoma\nC) Squamous cell carcinoma\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_F_57_57994",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_F_57_57994.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Keratoacanthoma\nB) Malignant melanoma\nC) Bowen disease\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_F_57_726391",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_F_57_726391.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Keratoacanthoma\nB) Basal cell carcinoma\nC) Malignant melanoma\nD) Squamous cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_F_66_175358",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_F_66_175358.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Squamous cell carcinoma\nB) Bowen disease\nC) Keratoacanthoma\nD) Malignant melanoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_M_43_222355",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_M_43_222355.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Malignant melanoma\nB) Keratoacanthoma\nC) Bowen disease\nD) Squamous cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_M_44_189332",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_M_44_189332.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Bowen disease\nB) Squamous cell carcinoma\nC) Malignant melanoma\nD) Keratoacanthoma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_M_49_331125",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_M_49_331125.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Malignant melanoma\nB) Keratoacanthoma\nC) Squamous cell carcinoma\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_M_53_243095",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_M_53_243095.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Keratoacanthoma\nB) Basal cell carcinoma\nC) Bowen disease\nD) Malignant melanoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_M_57_470125",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_M_57_470125.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Squamous cell carcinoma\nB) Basal cell carcinoma\nC) Bowen disease\nD) Malignant melanoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_M_69_290547",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_M_69_290547.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Keratoacanthoma\nB) Malignant melanoma\nC) Basal cell carcinoma\nD) Bowen disease"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_M_76_102515",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_M_76_102515.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Keratoacanthoma\nB) Basal cell carcinoma\nC) Malignant melanoma\nD) Bowen disease"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_malignantmelanoma_malignantmelanoma_M_80_248262",
+    "image": "snu134/M/malignantmelanoma/malignantmelanoma_M_80_248262.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Basal cell carcinoma\nB) Keratoacanthoma\nC) Bowen disease\nD) Malignant melanoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Malignant melanoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_squamouscellcarcinoma_squamouscellcarcinoma_F_38_100997",
+    "image": "snu134/M/squamouscellcarcinoma/squamouscellcarcinoma_F_38_100997.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Keratoacanthoma\nB) Squamous cell carcinoma\nC) Bowen disease\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Squamous cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_squamouscellcarcinoma_squamouscellcarcinoma_F_66_341213",
+    "image": "snu134/M/squamouscellcarcinoma/squamouscellcarcinoma_F_66_341213.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Malignant melanoma\nB) Bowen disease\nC) Keratoacanthoma\nD) Squamous cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Squamous cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_squamouscellcarcinoma_squamouscellcarcinoma_F_76_474661",
+    "image": "snu134/M/squamouscellcarcinoma/squamouscellcarcinoma_F_76_474661.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Keratoacanthoma\nB) Squamous cell carcinoma\nC) Bowen disease\nD) Malignant melanoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Squamous cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_squamouscellcarcinoma_squamouscellcarcinoma_F_80_212103",
+    "image": "snu134/M/squamouscellcarcinoma/squamouscellcarcinoma_F_80_212103.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Bowen disease\nB) Basal cell carcinoma\nC) Squamous cell carcinoma\nD) Keratoacanthoma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Squamous cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_squamouscellcarcinoma_squamouscellcarcinoma_F_86_2048605",
+    "image": "snu134/M/squamouscellcarcinoma/squamouscellcarcinoma_F_86_2048605.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Keratoacanthoma\nB) Squamous cell carcinoma\nC) Bowen disease\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Squamous cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_squamouscellcarcinoma_squamouscellcarcinoma_F_86_315149",
+    "image": "snu134/M/squamouscellcarcinoma/squamouscellcarcinoma_F_86_315149.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Basal cell carcinoma\nB) Malignant melanoma\nC) Keratoacanthoma\nD) Squamous cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Squamous cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_squamouscellcarcinoma_squamouscellcarcinoma_F_86_600683",
+    "image": "snu134/M/squamouscellcarcinoma/squamouscellcarcinoma_F_86_600683.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Malignant melanoma\nB) Bowen disease\nC) Squamous cell carcinoma\nD) Basal cell carcinoma"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Squamous cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_M_squamouscellcarcinoma_squamouscellcarcinoma_M_49_1012241",
+    "image": "snu134/M/squamouscellcarcinoma/squamouscellcarcinoma_M_49_1012241.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Bowen disease\nB) Squamous cell carcinoma\nC) Basal cell carcinoma\nD) Keratoacanthoma"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Squamous cell carcinoma"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_acutegeneralizedexanthematouspustulosis_acutegeneralizedexanthematouspustulosis_F_66_641807",
+    "image": "snu134/S/acutegeneralizedexanthematouspustulosis/acutegeneralizedexanthematouspustulosis_F_66_641807.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Psoriasis\nB) Lupus erythematosus\nC) Pustular psoriasis\nD) Acute generalized exanthematous pustulosis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Acute generalized exanthematous pustulosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_alopeciaareata_alopeciaareata_M_35_203310",
+    "image": "snu134/S/alopeciaareata/alopeciaareata_M_35_203310.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Alopecia areata\nB) Psoriasis\nC) Insect bite\nD) Xerotic eczema"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Alopecia areata"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_amyloidosis_amyloidosis_M_24_602366",
+    "image": "snu134/S/amyloidosis/amyloidosis_M_24_602366.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Urticaria\nB) Lupus erythematosus\nC) Pustular psoriasis\nD) Amyloidosis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Amyloidosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_contactdermatitis_contactdermatitis_F_64_1433795",
+    "image": "snu134/S/contactdermatitis/contactdermatitis_F_64_1433795.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Pustular psoriasis\nB) Contact dermatitis\nC) Urticaria\nD) Seborrheic dermatitis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Contact dermatitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_drugeruption_drugeruption_F_57_27014",
+    "image": "snu134/S/drugeruption/drugeruption_F_57_27014.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Drug eruption\nB) Amyloidosis\nC) Vasculitis\nD) Morphea"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Drug eruption"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_erythemaannularecentrifugum_erythemaannularecentrifugum_M_34_685777",
+    "image": "snu134/S/erythemaannularecentrifugum/erythemaannularecentrifugum_M_34_685777.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Psoriasis\nB) Urticaria\nC) Erythema multiforme\nD) Erythema annulare centrifugum"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Erythema annulare centrifugum"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_erythemamultiforme_erythemamultiforme_F_55_1036535",
+    "image": "snu134/S/erythemamultiforme/erythemamultiforme_F_55_1036535.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Granuloma annulare\nB) Hand eczema\nC) Amyloidosis\nD) Erythema multiforme"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Erythema multiforme"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_erythemamultiforme_erythemamultiforme_M_11_173886",
+    "image": "snu134/S/erythemamultiforme/erythemamultiforme_M_11_173886.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Palmoplantar pustulosis\nB) Pustular psoriasis\nC) Erythema multiforme\nD) Vasculitis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Erythema multiforme"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_exfoliativedermatitis_exfoliativedermatitis_F_83_6786989",
+    "image": "snu134/S/exfoliativedermatitis/exfoliativedermatitis_F_83_6786989.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Exfoliative dermatitis\nB) Seborrheic dermatitis\nC) Pompholyx\nD) Alopecia areata"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Exfoliative dermatitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_granulomaannulare_granulomaannulare_F_71_1323961",
+    "image": "snu134/S/granulomaannulare/granulomaannulare_F_71_1323961.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Granuloma annulare\nB) Morphea\nC) Lupus erythematosus\nD) Pyoderma gangrenosum"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Granuloma annulare"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_handeczema_handeczema_M_50_100933",
+    "image": "snu134/S/handeczema/handeczema_M_50_100933.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Hand eczema\nB) Acute generalized exanthematous pustulosis\nC) Contact dermatitis\nD) Lupus erythematosus"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Hand eczema"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_insectbite_insectbite_F_27_28811",
+    "image": "snu134/S/insectbite/insectbite_F_27_28811.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Psoriasis\nB) Morphea\nC) Lichen simplex chronicus\nD) Insect bite"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Insect bite"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_insectbite_insectbite_F_66_42911",
+    "image": "snu134/S/insectbite/insectbite_F_66_42911.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Contact dermatitis\nB) Insect bite\nC) Lichen simplex chronicus\nD) Hand eczema"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Insect bite"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_insectbite_insectbite_M_74_130186",
+    "image": "snu134/S/insectbite/insectbite_M_74_130186.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Urticaria pigmentosa\nB) Lupus erythematosus\nC) Xerotic eczema\nD) Insect bite"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Insect bite"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_lichenamyloidosis_lichenamyloidosis_M_18_198294",
+    "image": "snu134/S/lichenamyloidosis/lichenamyloidosis_M_18_198294.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Lichen amyloidosis\nB) Xerotic eczema\nC) Seborrheic dermatitis\nD) Urticaria pigmentosa"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Lichen amyloidosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_lichenamyloidosis_lichenamyloidosis_M_48_2007109",
+    "image": "snu134/S/lichenamyloidosis/lichenamyloidosis_M_48_2007109.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Xerotic eczema\nB) Urticaria\nC) Lichen amyloidosis\nD) Seborrheic dermatitis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Lichen amyloidosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_lichenplanus_lichenplanus_M_34_309186",
+    "image": "snu134/S/lichenplanus/lichenplanus_M_34_309186.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Lichen planus\nB) Lupus erythematosus\nC) Lichen simplex chronicus\nD) Psoriasis"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Lichen planus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_lichensimplexchronicus_lichensimplexchronicus_M_25_492868",
+    "image": "snu134/S/lichensimplexchronicus/lichensimplexchronicus_M_25_492868.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Granuloma annulare\nB) Alopecia areata\nC) Urticaria pigmentosa\nD) Lichen simplex chronicus"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Lichen simplex chronicus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_lupuserythematosus_lupuserythematosus_F_26_68461",
+    "image": "snu134/S/lupuserythematosus/lupuserythematosus_F_26_68461.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Nummular eczema\nB) Lupus erythematosus\nC) Pustular psoriasis\nD) Vasculitis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Lupus erythematosus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_lupuserythematosus_lupuserythematosus_F_32_1036781",
+    "image": "snu134/S/lupuserythematosus/lupuserythematosus_F_32_1036781.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Lupus erythematosus\nB) Seborrheic dermatitis\nC) Erythema annulare centrifugum\nD) Pompholyx"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Lupus erythematosus"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_morphea_morphea_F_31_999186",
+    "image": "snu134/S/morphea/morphea_F_31_999186.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Amyloidosis\nB) Morphea\nC) Lichen amyloidosis\nD) Granuloma annulare"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Morphea"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_nummulareczema_nummulareczema_M_43_17931",
+    "image": "snu134/S/nummulareczema/nummulareczema_M_43_17931.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Nummular eczema\nB) Erythema annulare centrifugum\nC) Pompholyx\nD) Pyoderma gangrenosum"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Nummular eczema"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_nummulareczema_nummulareczema_M_61_122843",
+    "image": "snu134/S/nummulareczema/nummulareczema_M_61_122843.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Pyoderma gangrenosum\nB) Contact dermatitis\nC) Xerotic eczema\nD) Nummular eczema"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Nummular eczema"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_palmoplantarpustulosis_palmoplantarpustulosis_M_71_1461904",
+    "image": "snu134/S/palmoplantarpustulosis/palmoplantarpustulosis_M_71_1461904.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Lichen simplex chronicus\nB) Nummular eczema\nC) Palmoplantar pustulosis\nD) Contact dermatitis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Palmoplantar pustulosis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_pompholyx_pompholyx_M_48_67351",
+    "image": "snu134/S/pompholyx/pompholyx_M_48_67351.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Pompholyx\nB) Vasculitis\nC) Exfoliative dermatitis\nD) Urticaria pigmentosa"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Pompholyx"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_pompholyx_pompholyx_M_53_108875",
+    "image": "snu134/S/pompholyx/pompholyx_M_53_108875.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Pompholyx\nB) Granuloma annulare\nC) Lichen simplex chronicus\nD) Erythema multiforme"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Pompholyx"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_psoriasis_psoriasis_M_25_154720",
+    "image": "snu134/S/psoriasis/psoriasis_M_25_154720.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Lichen simplex chronicus\nB) Lupus erythematosus\nC) Psoriasis\nD) Drug eruption"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Psoriasis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_psoriasis_psoriasis_M_52_116556",
+    "image": "snu134/S/psoriasis/psoriasis_M_52_116556.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Pompholyx\nB) Psoriasis\nC) Pustular psoriasis\nD) Acute generalized exanthematous pustulosis"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Psoriasis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_pustularpsoriasis_pustularpsoriasis_F_54_30835",
+    "image": "snu134/S/pustularpsoriasis/pustularpsoriasis_F_54_30835.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Palmoplantar pustulosis\nB) Urticaria pigmentosa\nC) Hand eczema\nD) Pustular psoriasis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Pustular psoriasis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_pyodermagangrenosum_pyodermagangrenosum_F_52_253666",
+    "image": "snu134/S/pyodermagangrenosum/pyodermagangrenosum_F_52_253666.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Vitiligo\nB) Lupus erythematosus\nC) Pyoderma gangrenosum\nD) Pompholyx"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Pyoderma gangrenosum"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_seborrheicdermatitis_seborrheicdermatitis_M_27_126815",
+    "image": "snu134/S/seborrheicdermatitis/seborrheicdermatitis_M_27_126815.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Drug eruption\nB) Exfoliative dermatitis\nC) Erythema annulare centrifugum\nD) Seborrheic dermatitis"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Seborrheic dermatitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_urticaria_urticaria_F_46_33623",
+    "image": "snu134/S/urticaria/urticaria_F_46_33623.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Lupus erythematosus\nB) Morphea\nC) Xerotic eczema\nD) Urticaria"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Urticaria"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_urticariapigmentosa_urticariapigmentosa_M_2_263775",
+    "image": "snu134/S/urticariapigmentosa/urticariapigmentosa_M_2_263775.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Palmoplantar pustulosis\nB) Erythema annulare centrifugum\nC) Urticaria pigmentosa\nD) Lichen planus"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Urticaria pigmentosa"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_urticariapigmentosa_urticariapigmentosa_M_2_332864",
+    "image": "snu134/S/urticariapigmentosa/urticariapigmentosa_M_2_332864.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Urticaria pigmentosa\nB) Amyloidosis\nC) Morphea\nD) Exfoliative dermatitis"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Urticaria pigmentosa"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_urticariapigmentosa_urticariapigmentosa_M_3_65240",
+    "image": "snu134/S/urticariapigmentosa/urticariapigmentosa_M_3_65240.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Amyloidosis\nB) Hand eczema\nC) Urticaria pigmentosa\nD) Lupus erythematosus"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Urticaria pigmentosa"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_vasculitis_vasculitis_F_27_37571",
+    "image": "snu134/S/vasculitis/vasculitis_F_27_37571.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Vasculitis\nB) Pompholyx\nC) Urticaria pigmentosa\nD) Lupus erythematosus"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Vasculitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_vasculitis_vasculitis_F_5_153712",
+    "image": "snu134/S/vasculitis/vasculitis_F_5_153712.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Morphea\nB) Pompholyx\nC) Vasculitis\nD) Acute generalized exanthematous pustulosis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Vasculitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_vasculitis_vasculitis_F_82_29075",
+    "image": "snu134/S/vasculitis/vasculitis_F_82_29075.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Lichen planus\nB) Exfoliative dermatitis\nC) Vasculitis\nD) Palmoplantar pustulosis"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Vasculitis"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_vitiligo_vitiligo_M_15_557205",
+    "image": "snu134/S/vitiligo/vitiligo_M_15_557205.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Vitiligo\nB) Xerotic eczema\nC) Acute generalized exanthematous pustulosis\nD) Lichen simplex chronicus"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Vitiligo"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_S_xeroticeczema_xeroticeczema_M_73_167386",
+    "image": "snu134/S/xeroticeczema/xeroticeczema_M_73_167386.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Xerotic eczema\nB) Nummular eczema\nC) Lupus erythematosus\nD) Lichen planus"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Xerotic eczema"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_eczemaherpeticum_eczemaherpeticum_F_2_1561608",
+    "image": "snu134/V/eczemaherpeticum/eczemaherpeticum_F_2_1561608.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Herpes simplex\nB) Varicella\nC) Eczema herpeticum\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Eczema herpeticum"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_eczemaherpeticum_eczemaherpeticum_F_2_833603",
+    "image": "snu134/V/eczemaherpeticum/eczemaherpeticum_F_2_833603.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Herpes zoster\nB) Varicella\nC) Herpes simplex\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Eczema herpeticum"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_eczemaherpeticum_eczemaherpeticum_M_40_2635567",
+    "image": "snu134/V/eczemaherpeticum/eczemaherpeticum_M_40_2635567.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Herpes zoster\nB) Herpes simplex\nC) Eczema herpeticum\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Eczema herpeticum"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_eczemaherpeticum_eczemaherpeticum_M_6_1257948",
+    "image": "snu134/V/eczemaherpeticum/eczemaherpeticum_M_6_1257948.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Varicella\nB) Herpes simplex\nC) Herpes zoster\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Eczema herpeticum"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_eczemaherpeticum_eczemaherpeticum_M_6_3729208",
+    "image": "snu134/V/eczemaherpeticum/eczemaherpeticum_M_6_3729208.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Herpes zoster\nB) Varicella\nC) Eczema herpeticum\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Eczema herpeticum"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_eczemaherpeticum_eczemaherpeticum_M_6_6841623",
+    "image": "snu134/V/eczemaherpeticum/eczemaherpeticum_M_6_6841623.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Herpes zoster\nB) Herpes simplex\nC) Eczema herpeticum\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Eczema herpeticum"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpessimplex_herpessimplex_F_45_30093",
+    "image": "snu134/V/herpessimplex/herpessimplex_F_45_30093.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Herpes simplex\nB) Varicella\nC) Eczema herpeticum\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Herpes simplex"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpessimplex_herpessimplex_F_67_607449",
+    "image": "snu134/V/herpessimplex/herpessimplex_F_67_607449.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Herpes zoster\nB) Varicella\nC) Eczema herpeticum\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Herpes simplex"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpessimplex_herpessimplex_M_27_121131",
+    "image": "snu134/V/herpessimplex/herpessimplex_M_27_121131.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Varicella\nB) Herpes simplex\nC) Eczema herpeticum\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Herpes simplex"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpessimplex_herpessimplex_M_30_248578",
+    "image": "snu134/V/herpessimplex/herpessimplex_M_30_248578.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Varicella\nB) Herpes zoster\nC) Herpes simplex\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Herpes simplex"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpessimplex_herpessimplex_M_36_118222",
+    "image": "snu134/V/herpessimplex/herpessimplex_M_36_118222.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Varicella\nB) Herpes simplex\nC) Eczema herpeticum\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Herpes simplex"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpessimplex_herpessimplex_M_66_572960",
+    "image": "snu134/V/herpessimplex/herpessimplex_M_66_572960.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Varicella\nB) Herpes zoster\nC) Herpes simplex\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Herpes simplex"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_1_82619",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_1_82619.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Eczema herpeticum\nB) Herpes simplex\nC) Herpes zoster\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_24_40261",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_24_40261.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Herpes zoster\nB) Eczema herpeticum\nC) Herpes simplex\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_24_40745",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_24_40745.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Herpes zoster\nB) Varicella\nC) Herpes simplex\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_24_45403",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_24_45403.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Eczema herpeticum\nB) Varicella\nC) Herpes simplex\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_31_65329",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_31_65329.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Eczema herpeticum\nB) Herpes zoster\nC) Varicella\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_39_74311",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_39_74311.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Eczema herpeticum\nB) Herpes simplex\nC) Varicella\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_41_88008",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_41_88008.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Eczema herpeticum\nB) Herpes simplex\nC) Herpes zoster\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_41_98183",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_41_98183.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Varicella\nB) Herpes simplex\nC) Herpes zoster\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_44_198003",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_44_198003.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Varicella\nB) Herpes simplex\nC) Eczema herpeticum\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_64_125417",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_64_125417.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Eczema herpeticum\nB) Varicella\nC) Herpes zoster\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_65_73439",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_65_73439.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Herpes zoster\nB) Eczema herpeticum\nC) Varicella\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_65_85406",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_65_85406.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Herpes simplex\nB) Eczema herpeticum\nC) Varicella\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_6_186760",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_6_186760.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Herpes zoster\nB) Varicella\nC) Herpes simplex\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_F_8_70845",
+    "image": "snu134/V/herpeszoster/herpeszoster_F_8_70845.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Varicella\nB) Herpes simplex\nC) Herpes zoster\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_M_37_117036",
+    "image": "snu134/V/herpeszoster/herpeszoster_M_37_117036.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Eczema herpeticum\nB) Herpes zoster\nC) Varicella\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_M_45_161501",
+    "image": "snu134/V/herpeszoster/herpeszoster_M_45_161501.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Herpes simplex\nB) Herpes zoster\nC) Eczema herpeticum\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_M_48_175379",
+    "image": "snu134/V/herpeszoster/herpeszoster_M_48_175379.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Herpes simplex\nB) Varicella\nC) Eczema herpeticum\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_herpeszoster_herpeszoster_M_67_75688",
+    "image": "snu134/V/herpeszoster/herpeszoster_M_67_75688.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Herpes zoster\nB) Herpes simplex\nC) Varicella\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Herpes zoster"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_F_30_190951",
+    "image": "snu134/V/varicella/varicella_F_30_190951.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Eczema herpeticum\nB) Herpes zoster\nC) Varicella\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_F_30_237067",
+    "image": "snu134/V/varicella/varicella_F_30_237067.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Eczema herpeticum\nB) Varicella\nC) Herpes simplex\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_F_30_475961",
+    "image": "snu134/V/varicella/varicella_F_30_475961.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Herpes simplex\nB) Herpes zoster\nC) Eczema herpeticum\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_F_43_116341",
+    "image": "snu134/V/varicella/varicella_F_43_116341.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Herpes simplex\nB) Eczema herpeticum\nC) Herpes zoster\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_F_43_158725",
+    "image": "snu134/V/varicella/varicella_F_43_158725.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nBased on the skin lesion shown in this image, please select the most accurate diagnosis from the options below.\nA) Eczema herpeticum\nB) Herpes simplex\nC) Varicella\nD) Herpes zoster"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_F_43_84112",
+    "image": "snu134/V/varicella/varicella_F_43_84112.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Eczema herpeticum\nB) Herpes zoster\nC) Herpes simplex\nD) Varicella"
+      },
+      {
+        "from": "gpt",
+        "value": "D) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_M_28_125379",
+    "image": "snu134/V/varicella/varicella_M_28_125379.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nObserve this skin image. Which of the following diagnoses is the most likely?\nA) Eczema herpeticum\nB) Varicella\nC) Herpes zoster\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "B) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_M_32_105019",
+    "image": "snu134/V/varicella/varicella_M_32_105019.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nConsidering the clinical presentation of the skin lesion in the image, which of the following is the most likely diagnosis?\nA) Herpes zoster\nB) Eczema herpeticum\nC) Varicella\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "C) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_M_32_118875",
+    "image": "snu134/V/varicella/varicella_M_32_118875.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Varicella\nB) Herpes zoster\nC) Herpes simplex\nD) Eczema herpeticum"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Varicella"
+      }
+    ]
+  },
+  {
+    "id": "task2_diagnosis_mcq_snu134_V_varicella_varicella_M_32_99606",
+    "image": "snu134/V/varicella/varicella_M_32_99606.png",
+    "conversations": [
+      {
+        "from": "human",
+        "value": "<image>\nWhich of the following diagnoses best matches the skin condition shown in this image?\nA) Varicella\nB) Eczema herpeticum\nC) Herpes zoster\nD) Herpes simplex"
+      },
+      {
+        "from": "gpt",
+        "value": "A) Varicella"
+      }
+    ]
+  }
+]

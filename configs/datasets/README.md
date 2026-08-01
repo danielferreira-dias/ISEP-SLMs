@@ -24,12 +24,28 @@ The normalization and selection flow is:
 5. Build the cross-dataset coverage report using
    `disease_inclusion.yaml`.
 6. Split eligible cases by `leakage_group_id` and produce the generated
-   benchmark manifest consumed by `configs/benchmarks/visual_top_k.yaml`.
+   benchmark manifest consumed by
+   `configs/benchmarks/derma_isep/visual_top_k.yaml`.
 
 `catalog.yaml` is the registry of all dataset configurations and records
 whether a dataset contributes to disease selection, is reserved for external
-evaluation, or is excluded because it duplicates another source or has an
-incompatible target.
+evaluation, is training-only, or is excluded because it duplicates another
+source or has an incompatible target.
+
+## Build the augmented training corpus
+
+HIBA is handled by a separate training-only pipeline. It does not change the
+frozen benchmark splits. Derm1M was removed after its label-quality audit:
+
+```bash
+uv run python -m src.data_pipeline.training_corpus
+```
+
+The output is documented under
+`data/training/dermatology_multimodal_v1/README.md`. It starts from the frozen
+6,417-image training split, adds only eligible clinical photographs, and
+screens every new image against validation, internal test, DDI, and
+SkinDisNet using exact and perceptual hashes.
 
 ## Build normalized manifests and coverage reports
 
@@ -46,8 +62,7 @@ Validate existing outputs without rebuilding them:
 ```
 
 The pipeline builds normalized manifests for Fitzpatrick17k-C, PAD-UFES-20,
-SCIN, SkinDisNet, DDI, and the Dermnet Kaggle mirror. It then concatenates the
-three taxonomy contributors into
+SCIN, SkinDisNet, and DDI. It then concatenates the three taxonomy contributors into
 `data/combined/visual_top_k_development_pool_v3.parquet` and creates the
 source-label inventory, demographic-availability report, subgroup-support
 report, and preliminary disease-coverage reports under `data/reports/`.
@@ -59,7 +74,7 @@ conservative candidates: they remain included but share a
 `leakage_group_id` until reviewed.
 
 The same command creates the frozen `visual_top_k_dataset_v1` release under
-`data/benchmarks/visual_top_k_v1/`. Model-ready Parquet files are separated
+`data/benchmarks/derma_isep/visual_top_k_v1/`. Model-ready Parquet files are separated
 into `datasets/internal/` and `datasets/external/`; human-readable summaries
 are stored under `reports/`, and integrity metadata under `release/`. Its
 release manifest records checksums for the source manifests, configurations,
@@ -67,7 +82,7 @@ review decisions, and generated artifacts.
 
 After the visual Top-K release is available, the pipeline also creates the
 provisional paired confusion-set release under
-`data/benchmarks/visual_confusion_sets_v1/`. It selects a balanced subset of
+`data/benchmarks/derma_isep/visual_confusion_sets_v1/`. It selects a balanced subset of
 the sealed 1,000-case benchmark and creates one low-confusability and one
 high-confusability three-way ranking task for every selected image.
 
@@ -123,11 +138,9 @@ measurement systems rather than converted into a single scale.
 | `ddi/` | Diverse Dermatology Images | Complete metadata and all 656 official images |
 | `skindisnet/` | SkinDisNet | Complete official version 2 archive with 1,710 preprocessed smartphone images and patient metadata |
 | `skincon/` | SKINCON | Complete concept annotations; images remain subject to Fitzpatrick17k/DDI access |
-| `skincap/` | SkinCAP | Complete gated Hugging Face snapshot for the locally authenticated account |
-| `skincare/` | SkinCaRe | Complete gated Hugging Face snapshot for the locally authenticated account |
-| `dermavqa/` | DermaVQA | Public OSF files, including the IIYI image archive and Reddit answer annotations |
+| `skincare/` | SkinCaRe | Complete gated Hugging Face snapshot, including its SkinCAP and SkinCoT components |
 | `dermobench/` | DermoBench | Gated task annotations; images must be obtained from the original providers |
-| `dermnet/` | Dermnet Kaggle mirror | Complete 19,559-image archive; excluded pending upstream-rights and label-quality review |
+| `hiba/` | HIBA Skin Lesions | Complete official archive; only 355 clinical overview/close-up images are training-only |
 
 ## Important constraints
 
@@ -144,12 +157,9 @@ measurement systems rather than converted into a single scale.
   decisions remain auditable.
 - Do not commit or redistribute raw payloads without checking the applicable
   licence and access agreement.
-- DDI, SkinCAP, SkinCaRe, and the DDI portion of SKINCON have additional access
+- DDI, SkinCaRe (including its SkinCAP component), and the DDI portion of SKINCON have additional access
   restrictions. Access to one derived dataset does not automatically grant
   rights to all upstream images.
-- Dermnet is a third-party mirror whose displayed Kaggle licence does not
-  resolve the upstream rights for every atlas image. Keep it excluded unless
-  those rights are confirmed in writing.
 - A text-only language model cannot learn directly from image pixels. Image-only
   datasets need a visual encoder or a carefully audited structured-to-text
   transformation.

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dermatology dataset overview</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --muted: #607080;
+      --line: #dbe4ea;
+      --panel: #ffffff;
+      --page: #f4f7f9;
+      --blue: #176b87;
+      --blue-soft: #dff1f5;
+      --green: #237a57;
+      --green-soft: #e2f3eb;
+      --amber: #a85e00;
+      --amber-soft: #fff0d7;
+      --red: #a33a3a;
+      --red-soft: #fbe5e5;
+      --shadow: 0 10px 28px rgba(31, 55, 73, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--page);
+      font: 15px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      color: white;
+      background: linear-gradient(130deg, #12394a, #176b87 58%, #2e8871);
+      padding: 52px max(24px, calc((100vw - 1240px) / 2));
+    }
+    header h1 { margin: 0 0 8px; font-size: clamp(30px, 5vw, 50px); line-height: 1.08; }
+    header p { max-width: 820px; margin: 0; color: #d9eef4; font-size: 17px; }
+    nav {
+      position: sticky; top: 0; z-index: 10; overflow-x: auto;
+      display: flex; gap: 8px; padding: 10px max(20px, calc((100vw - 1240px) / 2));
+      border-bottom: 1px solid var(--line); background: rgba(255,255,255,.94); backdrop-filter: blur(10px);
+    }
+    nav a { white-space: nowrap; color: var(--blue); text-decoration: none; font-weight: 650; padding: 7px 10px; border-radius: 8px; }
+    nav a:hover { background: var(--blue-soft); }
+    main { max-width: 1240px; margin: 0 auto; padding: 28px 20px 72px; }
+    section { scroll-margin-top: 74px; margin: 0 0 32px; }
+    h2 { font-size: 25px; margin: 0 0 8px; }
+    h3 { margin: 24px 0 8px; }
+    .lede { color: var(--muted); max-width: 920px; margin-top: 0; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 18px 0; }
+    .card, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+    .card { padding: 18px; }
+    .card .value { display: block; font-size: 30px; font-weight: 780; line-height: 1.1; color: var(--blue); }
+    .card .label { display: block; margin-top: 6px; color: var(--muted); }
+    .panel { padding: 20px; margin-top: 14px; }
+    .callout { border-left: 5px solid var(--blue); background: var(--blue-soft); border-radius: 10px; padding: 16px 18px; margin: 16px 0; }
+    .callout strong { color: #104e63; }
+    .flow { display: grid; grid-template-columns: repeat(7, auto); align-items: stretch; gap: 10px; margin: 18px 0; }
+    .flow-box { display: grid; place-content: center; min-height: 92px; padding: 12px; text-align: center; border: 1px solid var(--line); border-radius: 12px; background: white; box-shadow: var(--shadow); }
+    .flow-box strong { display: block; font-size: 20px; color: var(--blue); }
+    .flow-arrow { display: grid; place-content: center; color: var(--muted); font-size: 22px; }
+    .role-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px; }
+    .role { padding:16px; border-radius:12px; border:1px solid var(--line); }
+    .role.classify { background:var(--green-soft); }
+    .role.describe { background:var(--blue-soft); }
+    .role.abstain { background:var(--amber-soft); }
+    .role b { display:block; margin-bottom:4px; }
+    .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 11px; background: white; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { position: sticky; top: 0; background: #edf3f6; color: #334653; font-size: 12px; letter-spacing: .035em; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #f7fafb; }
+    td.numeric { text-align: right; font-variant-numeric: tabular-nums; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .small { font-size: 11px; color: var(--muted); }
+    .bar-track { width: 150px; height: 9px; margin-top: 6px; overflow: hidden; border-radius: 99px; background: #e8eef1; }
+    .bar { display: block; height: 100%; border-radius: inherit; background: var(--blue); }
+    .filter { width: min(420px, 100%); margin: 8px 0 12px; padding: 10px 12px; border: 1px solid #bdcbd3; border-radius: 9px; font: inherit; }
+    code { padding: 2px 5px; border-radius: 5px; background: #e9eff2; }
+    footer { color: var(--muted); margin-top: 38px; padding-top: 18px; border-top: 1px solid var(--line); }
+    @media (max-width: 800px) {
+      .flow { grid-template-columns: 1fr; }
+      .flow-arrow { transform: rotate(90deg); min-height: 24px; }
+      .role-grid { grid-template-columns: 1fr; }
+      th { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dermatology dataset overview</h1>
+    <p>A read-only view of the training pool, 21-class subset, auxiliary annotation datasets, development splits, sealed tests, external datasets, and specialized benchmark manifests.</p>
+  </header>
+  <nav>
+    <a href="#map">Map</a>
+    <a href="#clarification">6,417 → 18,914</a>
+    <a href="#training">Training pool</a>
+    <a href="#auxiliary">Auxiliary</a>
+    <a href="#classes">21 classes</a>
+    <a href="#evaluation">Evaluation</a>
+    <a href="#external">External</a>
+    <a href="#benchmarks">Benchmarks</a>
+    <a href="#samples">Rows</a>
+    <a href="#files">Files</a>
+  </nav>
+  <main>
+    <section id="map">
+      <h2>Current data map</h2>
+      <p class="lede">The 81,787-image manifest is a multimodal training pool. Only 18,914 images have a diagnosis mapped to one of the 21 active classes.</p>
+      <div class="cards">
+        <div class="card"><span class="value">81,787</span><span class="label">images in the multimodal training pool</span></div>
+        <div class="card"><span class="value">34,326</span><span class="label">training leakage groups</span></div>
+        <div class="card"><span class="value">18,914</span><span class="label">images mapped to the 21 classes</span></div>
+        <div class="card"><span class="value">21</span><span class="label">active closed-set diseases</span></div>
+        <div class="card"><span class="value">2,869</span><span class="label">new candidates excluded by duplicate checks</span></div>
+      </div>
+      <div class="flow">
+        <div class="flow-box"><span>Original internal Train</span><strong>18,914</strong><small>21-class images</small></div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box"><span>Derm1M mapped</span><strong>12,179</strong><small>21-class images</small></div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box"><span>HIBA mapped</span><strong>318</strong><small>21-class images</small></div>
+        <div class="flow-arrow">=</div>
+        <div class="flow-box"><span>Augmented diagnosis subset</span><strong>18,914</strong><small>21 classes</small></div>
+      </div>
+    </section>
+
+    <section id="clarification">
+      <h2>Why 6,417 became 18,914</h2>
+      <div class="callout"><strong>Both numbers were correct at different stages.</strong> The 6,417 images are the frozen original Train from Fitzpatrick17k-C, PAD-UFES-20, and SCIN. After that split was frozen, eligible Derm1M and HIBA images were added to the training layer only. Of those additions, 12,497 map safely to the same 21-class taxonomy.</div>
+      <div class="role-grid">
+        <div class="role classify"><b>18,914 diagnosis images</b>Eligible for 21-class diagnosis, differential, evidence, and rationale targets.</div>
+        <div class="role describe"><b>17,518 description-only images</b>Eligible for morphology and description, but not for a forced diagnosis.</div>
+        <div class="role abstain"><b>45,355 out-of-domain images</b>Potential abstention examples; they must not be treated as one of the 21 classes.</div>
+      </div>
+    </section>
+
+    <section id="training">
+      <h2>Multimodal training pool</h2>
+      <p class="lede">A <code>training_role</code> defines what each record may safely teach. It is not a conventional single-label classification dataset.</p>
+      <div class="table-wrap"><table><thead><tr><th>Training role</th><th>Images</th><th>Groups</th><th>Sources</th><th>Safe use</th></tr></thead><tbody><tr><td>Description only</td><td class="numeric">17,518</td><td class="numeric">7,861</td><td class="numeric">1</td><td>May teach morphology and description; no diagnosis may be invented.</td></tr><tr><td>21-class diagnosis</td><td class="numeric">18,914</td><td class="numeric">10,677</td><td class="numeric">5</td><td>May teach findings, differential and one of the 21 diagnoses.</td></tr><tr><td>Outside the 21-class taxonomy</td><td class="numeric">45,355</td><td class="numeric">19,886</td><td class="numeric">2</td><td>May teach abstention; it is not a 21-class classification target.</td></tr></tbody></table></div>
+      <h3>Breakdown by source and role</h3>
+      <input class="filter" type="search" placeholder="Filter source or role…" oninput="filterTable('source-role-table', this.value)">
+      <div class="table-wrap"><table id="source-role-table"><thead><tr><th>Source</th><th>Training role</th><th>Images</th><th>Groups</th></tr></thead><tbody><tr><td>Derm1M</td><td>Description only</td><td class="numeric">17,518</td><td class="numeric">7,861</td></tr><tr><td>Derm1M</td><td>21-class diagnosis</td><td class="numeric">12,179</td><td class="numeric">5,486</td></tr><tr><td>Derm1M</td><td>Outside the 21-class taxonomy</td><td class="numeric">45,318</td><td class="numeric">19,853</td></tr><tr><td>Fitzpatrick17k-C</td><td>21-class diagnosis</td><td class="numeric">2,991</td><td class="numeric">2,984</td></tr><tr><td>HIBA</td><td>21-class diagnosis</td><td class="numeric">318</td><td class="numeric">229</td></tr><tr><td>HIBA</td><td>Outside the 21-class taxonomy</td><td class="numeric">37</td><td class="numeric">33</td></tr><tr><td>PAD-UFES-20</td><td>21-class diagnosis</td><td class="numeric">1,528</td><td class="numeric">1,074</td></tr><tr><td>SCIN</td><td>21-class diagnosis</td><td class="numeric">1,898</td><td class="numeric">904</td></tr></tbody></table></div>
+    </section>
+
+    <section id="auxiliary">
+      <h2>Auxiliary and configured datasets</h2>
+      <p class="lede">These datasets are present in <code>configs/datasets/</code> but must not be added to the image totals as independent cases. Some annotate images already counted elsewhere; others are inactive because their labels, grouping, provenance, or licences do not yet satisfy the current release policy.</p>
+      <div class="table-wrap"><table><thead><tr><th>Dataset</th><th>Local size</th><th>What it contains</th><th>Independent images?</th><th>Current use</th><th>Main caution</th></tr></thead><tbody><tr><td>SkinCAP</td><td>4,000</td><td>Fitzpatrick17k + DDI image-caption overlay</td><td>No — all images come from upstream datasets</td><td>Clinical descriptions in Evidence-Grounded; candidate SFT caption targets</td><td>Gated; upstream terms also apply</td></tr><tr><td>SkinCaRe</td><td>7,041</td><td>4,000 SkinCAP + 3,041 SkinCoT</td><td>No — SkinCAP and DermNet/SkinCoT lineages are reused</td><td>Not in the current manifests; possible audited rationale source</td><td>Gated; reasoning and licensing require review</td></tr><tr><td>SKINCON</td><td>4,346 annotations (3,866 usable)</td><td>48 binary morphology concepts over Fitzpatrick17k + DDI</td><td>No — annotation layer only</td><td>Morphology gold labels in Evidence-Grounded</td><td>Upstream image licences apply</td></tr><tr><td>DermNet Kaggle mirror</td><td>19,559</td><td>Clinical images in 23 broad directory categories</td><td>Potentially, but case grouping is unavailable</td><td>Excluded from current Train and disease coverage</td><td>Provenance and CC BY-NC-ND restrictions require resolution</td></tr><tr><td>DermaVQA</td><td>1,488 encounters</td><td>Multilingual image questions and free-text answers</td><td>Not assumed — IIYI/Reddit lineage may overlap other sources</td><td>Not in current manifests; candidate future interactive task source</td><td>Privacy, answer quality, and treatment advice require audit</td></tr><tr><td>DermoBench</td><td>Task release</td><td>Derived multimodal evaluation suite spanning several source datasets</td><td>No — derived benchmark, not an independent source</td><td>Separate benchmark suite; not part of current Derma-ISEP releases</td><td>Gated and upstream licences apply</td></tr></tbody></table></div>
+      <div class="callout"><strong>Active overlays:</strong> SkinCAP supplies clinical descriptions and SKINCON supplies morphology concepts for Evidence-Grounded Diagnosis. They enrich Fitzpatrick17k/DDI records; they do not add new independent patients. <strong>Currently inactive:</strong> SkinCaRe, DermNet, and DermaVQA are not part of the 81,787-image training manifest, while DermoBench remains a separate derived evaluation suite.</div>
+    </section>
+
+    <section id="classes">
+      <h2>21-class diagnosis subset</h2>
+      <p class="lede">These are the 18,914 images that may receive a disease classification target. Counts remain imbalanced, so SFT sampling should be class-aware.</p>
+      <input class="filter" type="search" placeholder="Filter disease or ID…" oninput="filterTable('class-table', this.value)">
+      <div class="table-wrap"><table id="class-table"><thead><tr><th>ID</th><th>Disease</th><th>Images</th><th>Groups</th><th>Fitzpatrick17k-C</th><th>PAD-UFES-20</th><th>SCIN</th><th>Derm1M</th><th>HIBA</th><th>Relative support</th></tr></thead><tbody><tr><td><span class="mono">D001</span></td><td>Melanoma</td><td class="numeric">920</td><td class="numeric">463</td><td class="numeric">180</td><td class="numeric">33</td><td class="numeric">0</td><td class="numeric">642</td><td class="numeric">65</td><td><div class="bar-track" aria-label="920"><span class="bar blue" style="width:27.32%"></span></div></td></tr><tr><td><span class="mono">D002</span></td><td>Melanocytic nevus</td><td class="numeric">1,255</td><td class="numeric">563</td><td class="numeric">0</td><td class="numeric">150</td><td class="numeric">7</td><td class="numeric">1,045</td><td class="numeric">53</td><td><div class="bar-track" aria-label="1,255"><span class="bar blue" style="width:37.27%"></span></div></td></tr><tr><td><span class="mono">D003</span></td><td>Psoriasis</td><td class="numeric">3,006</td><td class="numeric">1,412</td><td class="numeric">533</td><td class="numeric">0</td><td class="numeric">122</td><td class="numeric">2,351</td><td class="numeric">0</td><td><div class="bar-track" aria-label="3,006"><span class="bar blue" style="width:89.28%"></span></div></td></tr><tr><td><span class="mono">D004</span></td><td>Basal cell carcinoma</td><td class="numeric">1,243</td><td class="numeric">822</td><td class="numeric">264</td><td class="numeric">531</td><td class="numeric">8</td><td class="numeric">326</td><td class="numeric">114</td><td><div class="bar-track" aria-label="1,243"><span class="bar blue" style="width:36.92%"></span></div></td></tr><tr><td><span class="mono">D005</span></td><td>Squamous cell carcinoma</td><td class="numeric">727</td><td class="numeric">486</td><td class="numeric">256</td><td class="numeric">109</td><td class="numeric">10</td><td class="numeric">304</td><td class="numeric">48</td><td><div class="bar-track" aria-label="727"><span class="bar blue" style="width:21.59%"></span></div></td></tr><tr><td><span class="mono">D006</span></td><td>Seborrheic keratosis</td><td class="numeric">222</td><td class="numeric">180</td><td class="numeric">34</td><td class="numeric">158</td><td class="numeric">0</td><td class="numeric">9</td><td class="numeric">21</td><td><div class="bar-track" aria-label="222"><span class="bar blue" style="width:6.59%"></span></div></td></tr><tr><td><span class="mono">D007</span></td><td>Actinic keratosis</td><td class="numeric">687</td><td class="numeric">528</td><td class="numeric">93</td><td class="numeric">547</td><td class="numeric">15</td><td class="numeric">15</td><td class="numeric">17</td><td><div class="bar-track" aria-label="687"><span class="bar blue" style="width:20.40%"></span></div></td></tr><tr><td><span class="mono">D009</span></td><td>Contact dermatitis</td><td class="numeric">916</td><td class="numeric">534</td><td class="numeric">223</td><td class="numeric">0</td><td class="numeric">331</td><td class="numeric">362</td><td class="numeric">0</td><td><div class="bar-track" aria-label="916"><span class="bar blue" style="width:27.21%"></span></div></td></tr><tr><td><span class="mono">D011</span></td><td>Acne vulgaris</td><td class="numeric">960</td><td class="numeric">672</td><td class="numeric">287</td><td class="numeric">0</td><td class="numeric">73</td><td class="numeric">600</td><td class="numeric">0</td><td><div class="bar-track" aria-label="960"><span class="bar blue" style="width:28.51%"></span></div></td></tr><tr><td><span class="mono">D012</span></td><td>Rosacea</td><td class="numeric">244</td><td class="numeric">177</td><td class="numeric">55</td><td class="numeric">0</td><td class="numeric">38</td><td class="numeric">151</td><td class="numeric">0</td><td><div class="bar-track" aria-label="244"><span class="bar blue" style="width:7.25%"></span></div></td></tr><tr><td><span class="mono">D013</span></td><td>Vitiligo</td><td class="numeric">517</td><td class="numeric">267</td><td class="numeric">77</td><td class="numeric">0</td><td class="numeric">0</td><td class="numeric">440</td><td class="numeric">0</td><td><div class="bar-track" aria-label="517"><span class="bar blue" style="width:15.35%"></span></div></td></tr><tr><td><span class="mono">D014</span></td><td>Eczema</td><td class="numeric">3,367</td><td class="numeric">1,919</td><td class="numeric">113</td><td class="numeric">0</td><td class="numeric">621</td><td class="numeric">2,633</td><td class="numeric">0</td><td><div class="bar-track" aria-label="3,367"><span class="bar blue" style="width:100.00%"></span></div></td></tr><tr><td><span class="mono">D015</span></td><td>Seborrheic dermatitis</td><td class="numeric">110</td><td class="numeric">93</td><td class="numeric">78</td><td class="numeric">0</td><td class="numeric">23</td><td class="numeric">9</td><td class="numeric">0</td><td><div class="bar-track" aria-label="110"><span class="bar blue" style="width:3.27%"></span></div></td></tr><tr><td><span class="mono">D016</span></td><td>Folliculitis</td><td class="numeric">702</td><td class="numeric">497</td><td class="numeric">126</td><td class="numeric">0</td><td class="numeric">167</td><td class="numeric">409</td><td class="numeric">0</td><td><div class="bar-track" aria-label="702"><span class="bar blue" style="width:20.85%"></span></div></td></tr><tr><td><span class="mono">D017</span></td><td>Urticaria</td><td class="numeric">1,748</td><td class="numeric">959</td><td class="numeric">86</td><td class="numeric">0</td><td class="numeric">243</td><td class="numeric">1,419</td><td class="numeric">0</td><td><div class="bar-track" aria-label="1,748"><span class="bar blue" style="width:51.92%"></span></div></td></tr><tr><td><span class="mono">D018</span></td><td>Scabies</td><td class="numeric">539</td><td class="numeric">298</td><td class="numeric">138</td><td class="numeric">0</td><td class="numeric">29</td><td class="numeric">372</td><td class="numeric">0</td><td><div class="bar-track" aria-label="539"><span class="bar blue" style="width:16.01%"></span></div></td></tr><tr><td><span class="mono">D019</span></td><td>Pityriasis rosea</td><td class="numeric">420</td><td class="numeric">256</td><td class="numeric">86</td><td class="numeric">0</td><td class="numeric">56</td><td class="numeric">278</td><td class="numeric">0</td><td><div class="bar-track" aria-label="420"><span class="bar blue" style="width:12.47%"></span></div></td></tr><tr><td><span class="mono">D022</span></td><td>Prurigo nodularis</td><td class="numeric">91</td><td class="numeric">73</td><td class="numeric">57</td><td class="numeric">0</td><td class="numeric">31</td><td class="numeric">3</td><td class="numeric">0</td><td><div class="bar-track" aria-label="91"><span class="bar blue" style="width:2.70%"></span></div></td></tr><tr><td><span class="mono">D023</span></td><td>Granuloma annulare</td><td class="numeric">300</td><td class="numeric">192</td><td class="numeric">90</td><td class="numeric">0</td><td class="numeric">37</td><td class="numeric">173</td><td class="numeric">0</td><td><div class="bar-track" aria-label="300"><span class="bar blue" style="width:8.91%"></span></div></td></tr><tr><td><span class="mono">D024</span></td><td>Erythema multiforme</td><td class="numeric">413</td><td class="numeric">222</td><td class="numeric">106</td><td class="numeric">0</td><td class="numeric">10</td><td class="numeric">297</td><td class="numeric">0</td><td><div class="bar-track" aria-label="413"><span class="bar blue" style="width:12.27%"></span></div></td></tr><tr><td><span class="mono">D025</span></td><td>Drug eruption</td><td class="numeric">527</td><td class="numeric">336</td><td class="numeric">109</td><td class="numeric">0</td><td class="numeric">77</td><td class="numeric">341</td><td class="numeric">0</td><td><div class="bar-track" aria-label="527"><span class="bar blue" style="width:15.65%"></span></div></td></tr></tbody></table></div>
+    </section>
+
+    <section id="evaluation">
+      <h2>Internal development and final evaluation</h2>
+      <p class="lede">These manifests remain protected from gradient-based training. Validation may influence development; Internal Test and Internal Benchmark may not.</p>
+      <div class="table-wrap"><table><thead><tr><th>Manifest</th><th>Images</th><th>Groups</th><th>Classes</th><th>Purpose</th></tr></thead><tbody><tr><td>Original internal Train</td><td class="numeric">6,417</td><td class="numeric">4,962</td><td class="numeric">21</td><td>Original 21-class training source</td></tr><tr><td>Benchmark Validation</td><td class="numeric">1,683</td><td class="numeric">1,063</td><td class="numeric">21</td><td>Teacher, prompt, checkpoint and threshold selection</td></tr><tr><td>Sealed Internal Test</td><td class="numeric">1,722</td><td class="numeric">1,063</td><td class="numeric">21</td><td>Complete final internal audit</td></tr><tr><td>Internal Benchmark 1000</td><td class="numeric">1,000</td><td class="numeric">1,000</td><td class="numeric">21</td><td>Primary paired before/after comparison</td></tr><tr><td>Internal Test reserve</td><td class="numeric">63</td><td class="numeric">63</td><td class="numeric">21</td><td>Protected groups outside the primary 1,000</td></tr></tbody></table></div>
+    </section>
+
+    <section id="external">
+      <h2>External datasets</h2>
+      <p class="lede">External datasets test distribution shift. They cover subsets of the 21-class taxonomy and must not select the teacher, prompt, checkpoint, parser, or thresholds.</p>
+      <div class="table-wrap"><table><thead><tr><th>Dataset</th><th>Images</th><th>Groups</th><th>Supported classes</th><th>Purpose</th></tr></thead><tbody><tr><td>DDI</td><td class="numeric">300</td><td class="numeric">299</td><td class="numeric">8</td><td>External generalization only</td></tr><tr><td>SkinDisNet</td><td class="numeric">1,365</td><td class="numeric">333</td><td class="numeric">4</td><td>External generalization only</td></tr></tbody></table></div>
+      <h3>Supported external class distribution</h3>
+      <div class="table-wrap"><table><thead><tr><th>Dataset</th><th>ID</th><th>Disease</th><th>Images</th><th>Groups</th></tr></thead><tbody><tr><td>DDI</td><td><span class="mono">D001</span></td><td>Melanoma</td><td class="numeric">13</td><td class="numeric">13</td></tr><tr><td>DDI</td><td><span class="mono">D002</span></td><td>Melanocytic nevus</td><td class="numeric">119</td><td class="numeric">119</td></tr><tr><td>DDI</td><td><span class="mono">D004</span></td><td>Basal cell carcinoma</td><td class="numeric">41</td><td class="numeric">41</td></tr><tr><td>DDI</td><td><span class="mono">D005</span></td><td>Squamous cell carcinoma</td><td class="numeric">45</td><td class="numeric">44</td></tr><tr><td>DDI</td><td><span class="mono">D006</span></td><td>Seborrheic keratosis</td><td class="numeric">72</td><td class="numeric">72</td></tr><tr><td>DDI</td><td><span class="mono">D007</span></td><td>Actinic keratosis</td><td class="numeric">4</td><td class="numeric">4</td></tr><tr><td>DDI</td><td><span class="mono">D016</span></td><td>Folliculitis</td><td class="numeric">1</td><td class="numeric">1</td></tr><tr><td>DDI</td><td><span class="mono">D022</span></td><td>Prurigo nodularis</td><td class="numeric">5</td><td class="numeric">5</td></tr><tr><td>SkinDisNet</td><td><span class="mono">D009</span></td><td>Contact dermatitis</td><td class="numeric">477</td><td class="numeric">110</td></tr><tr><td>SkinDisNet</td><td><span class="mono">D014</span></td><td>Eczema</td><td class="numeric">466</td><td class="numeric">115</td></tr><tr><td>SkinDisNet</td><td><span class="mono">D015</span></td><td>Seborrheic dermatitis</td><td class="numeric">79</td><td class="numeric">18</td></tr><tr><td>SkinDisNet</td><td><span class="mono">D018</span></td><td>Scabies</td><td class="numeric">343</td><td class="numeric">90</td></tr></tbody></table></div>
+    </section>
+
+    <section id="benchmarks">
+      <h2>Benchmark views</h2>
+      <p class="lede">A benchmark is a task contract over a manifest. The same image may support ranking, paired confusion, or evidence-grounding without becoming a new training image.</p>
+      <div class="table-wrap"><table><thead><tr><th>Benchmark</th><th>Role</th><th>Rows/tasks</th><th>Unique cases/groups</th><th>What is scored</th></tr></thead><tbody><tr><td>Visual Top-K</td><td>Development</td><td class="numeric">1,683</td><td class="numeric">1,063</td><td>21-class ranking</td></tr><tr><td>Visual Top-K</td><td>Final internal</td><td class="numeric">1,000</td><td class="numeric">1,000</td><td>21-class ranking</td></tr><tr><td>Visual Confusion Sets</td><td>Development</td><td class="numeric">834</td><td class="numeric">417</td><td>834 tasks = 417 images × two difficulty conditions</td></tr><tr><td>Visual Confusion Sets</td><td>Final internal</td><td class="numeric">828</td><td class="numeric">414</td><td>828 tasks = 414 images × two difficulty conditions</td></tr><tr><td>Evidence-Grounded Diagnosis</td><td>Development</td><td class="numeric">137</td><td class="numeric">137</td><td>137 morphology; 124 description; 137 diagnosis</td></tr><tr><td>Evidence-Grounded Diagnosis</td><td>External DDI</td><td class="numeric">636</td><td class="numeric">632</td><td>636 morphology; 635 description; 294 diagnosis</td></tr></tbody></table></div>
+    </section>
+
+    <section id="samples">
+      <h2>Example manifest rows</h2>
+      <p class="lede">These examples show metadata only. A <code>zip://archive::member</code> URI identifies an image stored inside a source archive.</p>
+      <input class="filter" type="search" placeholder="Filter sample rows…" oninput="filterTable('sample-table', this.value)">
+      <div class="table-wrap"><table id="sample-table"><thead><tr><th>Training role</th><th>Source</th><th>Sample ID</th><th>Disease ID</th><th>Caption excerpt</th><th>Image URI</th></tr></thead><tbody><tr><td>Description only</td><td>Derm1M</td><td><span class="mono">DERM1M_260c32071614e4e870b4bdcf</span></td><td>—</td><td>This image displays a clinical picture of a patient with a skin disease characterized by a red, itchy rash with a raised, scaly appearance. The cause of the disease is not yet d…</td><td><span class="mono small">zip://configs/datasets/derm1m/data/youtube.zip::sUcPJ65siLk_frame_1324_0_0.jpg</span></td></tr><tr><td>Description only</td><td>Derm1M</td><td><span class="mono">DERM1M_e9ffb78b2ad209b14d9bc5d2</span></td><td>—</td><td>The user has described experiencing skin conditions along the inner sides of both forearms for nearly two years, initially starting on the right forearm. The user reports subder…</td><td><span class="mono small">zip://configs/datasets/derm1m/data/IIYI.zip::15627_1.png</span></td></tr><tr><td>Description only</td><td>Derm1M</td><td><span class="mono">DERM1M_b723205a1d102957199b2856</span></td><td>—</td><td>The poster reports experiencing severe itching on a rash that has developed near the thigh. The itching worsens upon scratching, causing the affected area to expand. The cause i…</td><td><span class="mono small">zip://configs/datasets/derm1m/data/IIYI.zip::2824_3.png</span></td></tr><tr><td>21-class diagnosis</td><td>Fitzpatrick17k-C</td><td><span class="mono">FITZPATRICK17K_C_72bcd875e7a573b4139883059e69328d</span></td><td>D001</td><td>—</td><td><span class="mono small">zip://configs/datasets/fitzpatrick17k/data/raw/fitzpatrick17k.zip::data/finalfitz17k/72bcd875e7a573b41…</span></td></tr><tr><td>21-class diagnosis</td><td>Fitzpatrick17k-C</td><td><span class="mono">FITZPATRICK17K_C_dfa9796851f899e99961603c951742fa</span></td><td>D025</td><td>—</td><td><span class="mono small">zip://configs/datasets/fitzpatrick17k/data/raw/fitzpatrick17k.zip::data/finalfitz17k/dfa9796851f899e99…</span></td></tr><tr><td>21-class diagnosis</td><td>Fitzpatrick17k-C</td><td><span class="mono">FITZPATRICK17K_C_6e591f8824da87ea646538a845ac6d9a</span></td><td>D003</td><td>—</td><td><span class="mono small">zip://configs/datasets/fitzpatrick17k/data/raw/fitzpatrick17k.zip::data/finalfitz17k/6e591f8824da87ea6…</span></td></tr><tr><td>Outside the 21-class taxonomy</td><td>Derm1M</td><td><span class="mono">DERM1M_d59f310376da370ccce7c074</span></td><td>—</td><td>Male, 15 years old, has been experiencing spontaneous blistering all over his body since childhood, which heals and forms flat scars as shown in the attached image. The self-ass…</td><td><span class="mono small">zip://configs/datasets/derm1m/data/IIYI.zip::26549_2.png</span></td></tr><tr><td>Outside the 21-class taxonomy</td><td>Derm1M</td><td><span class="mono">DERM1M_a643e8c190301c52bef0e4ee</span></td><td>—</td><td>This is a at distance clinical image with FST3 skin tone. The age of this male patient is 30 to 39. The skin texture of this patient is elevated irregular. The patient&#x27;s symptom…</td><td><span class="mono small">zip://configs/datasets/derm1m/data/public.zip::5899129680709041892.png</span></td></tr><tr><td>Outside the 21-class taxonomy</td><td>Derm1M</td><td><span class="mono">DERM1M_90d97eed05bc6b87cebc8bc6</span></td><td>—</td><td>The forum post discusses a newborn&#x27;s rash, questioning if it is neonatal toxic erythema. The newborn is one day old, showing good signs of health such as responsiveness and norm…</td><td><span class="mono small">zip://configs/datasets/derm1m/data/IIYI.zip::6310_1.png</span></td></tr></tbody></table></div>
+    </section>
+
+    <section id="files">
+      <h2>Where the data live</h2>
+      <div class="table-wrap"><table><thead><tr><th>Artifact</th><th>Repository-relative path</th></tr></thead><tbody><tr><td>Augmented training pool</td><td><span class="mono">data/training/dermatology_multimodal_v1/train_images.parquet</span></td></tr><tr><td>Teacher annotation queue</td><td><span class="mono">data/training/dermatology_multimodal_v1/teacher_annotation_queue.parquet</span></td></tr><tr><td>HF-ready 21-class image release</td><td><span class="mono">data/training/ISEPDermData/</span></td></tr><tr><td>Original internal Train</td><td><span class="mono">data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/train.parquet</span></td></tr><tr><td>Benchmark Validation</td><td><span class="mono">data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/validation.parquet</span></td></tr><tr><td>Sealed Internal Test</td><td><span class="mono">data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/internal_test.parquet</span></td></tr><tr><td>Primary Internal Benchmark</td><td><span class="mono">data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/internal_benchmark_1000.parquet</span></td></tr><tr><td>External DDI</td><td><span class="mono">data/benchmarks/derma_isep/visual_top_k_v1/datasets/external/external_ddi.parquet</span></td></tr><tr><td>External SkinDisNet</td><td><span class="mono">data/benchmarks/derma_isep/visual_top_k_v1/datasets/external/external_skindisnet.parquet</span></td></tr><tr><td>SkinCAP captions and labels</td><td><span class="mono">configs/datasets/skincap/data/skincap_v240623.csv</span></td></tr><tr><td>SKINCON morphology annotations</td><td><span class="mono">configs/datasets/skincon/data/annotations/</span></td></tr><tr><td>SkinCaRe / SkinCoT reasoning data</td><td><span class="mono">configs/datasets/skincare/data/</span></td></tr></tbody></table></div>
+    </section>
+
+    <footer>
+      Generated from materialized Parquet manifests and release metadata by <code>python -m src.data_pipeline.dataset_overview_report</code>. This report does not modify datasets or splits.
+    </footer>
+  </main>
+  <script>
+    function filterTable(tableId, query) {
+      const needle = query.trim().toLowerCase();
+      document.querySelectorAll(`#${tableId} tbody tr`).forEach((row) => {
+        row.hidden = needle && !row.textContent.toLowerCase().includes(needle);
+      });
+    }
+  </script>
+</body>
+</html>

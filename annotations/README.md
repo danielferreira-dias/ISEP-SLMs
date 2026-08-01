@@ -28,6 +28,7 @@ Each annotation should identify:
 10. [Leakage-safe benchmark release](dataset_pipeline/10_leakage_safe_benchmark_release.md)
 11. [Benchmark execution smoke test](dataset_pipeline/11_benchmark_smoke_test.md)
 12. [Fixed paired benchmark and demographic balance](dataset_pipeline/12_fixed_paired_benchmark_and_demographic_balance.md)
+13. [ISEPDermaBench Hugging Face release](dataset_pipeline/13_isep_dermabench_huggingface_release.md)
 
 ## Benchmarks
 
@@ -38,3 +39,6 @@ Each annotation should identify:
 1. [Interactive multimodal dermatology model strategy](notes/01_estrategia_modelo_multimodal_interativo.md)
 2. [Teacher thinking and small-model distillation](notes/02_thinking_teacher_e_distillation.md)
 3. [Output limitations, parsing, and metric policy](notes/03_limitacoes_output_parsing_e_metricas.md)
+4. [Training and evaluation data organization](notes/04_organizacao_dos_dados_de_treino_e_avaliacao.md)
+5. [Teacher selection, benchmark validation, and interactive synthetic data](notes/05_selecao_do_teacher_validacao_das_benchmarks_e_dados_interativos.md)
+6. [Flow between Validation, Internal Benchmark, and fine-tuning](notes/06_fluxo_validation_internal_benchmark_e_fine_tuning.md)

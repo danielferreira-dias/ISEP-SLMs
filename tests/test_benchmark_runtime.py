@@ -98,12 +98,17 @@ class DeterministicSelectionTests(unittest.TestCase):
     def test_repository_manifests_use_the_expected_selection_units(self) -> None:
         cases = [
             (
-                "visual_top_k.yaml",
+                "derma_isep/visual_top_k.yaml",
                 "internal_benchmark_1000",
                 2,
             ),
-            ("visual_confusion_sets.yaml", None, 4),
-            ("evidence_grounded_diagnosis.yaml", None, 2),
+            (
+                "derma_isep/visual_top_k.yaml",
+                "validation",
+                2,
+            ),
+            ("derma_isep/visual_confusion_sets.yaml", None, 4),
+            ("derma_isep/evidence_grounded_diagnosis.yaml", None, 2),
         ]
         for filename, evaluation_set, expected_tasks in cases:
             with self.subTest(filename=filename):

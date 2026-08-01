@@ -1,0 +1,90 @@
+{
+  "taxonomy_id": "dermatology_diseases",
+  "active_class_count": 21,
+  "classes": [
+    {
+      "disease_id": "D001",
+      "label": "melanoma"
+    },
+    {
+      "disease_id": "D002",
+      "label": "melanocytic_nevus"
+    },
+    {
+      "disease_id": "D003",
+      "label": "psoriasis"
+    },
+    {
+      "disease_id": "D004",
+      "label": "basal_cell_carcinoma"
+    },
+    {
+      "disease_id": "D005",
+      "label": "squamous_cell_carcinoma"
+    },
+    {
+      "disease_id": "D006",
+      "label": "seborrheic_keratosis"
+    },
+    {
+      "disease_id": "D007",
+      "label": "actinic_keratosis"
+    },
+    {
+      "disease_id": "D009",
+      "label": "contact_dermatitis"
+    },
+    {
+      "disease_id": "D011",
+      "label": "acne_vulgaris"
+    },
+    {
+      "disease_id": "D012",
+      "label": "rosacea"
+    },
+    {
+      "disease_id": "D013",
+      "label": "vitiligo"
+    },
+    {
+      "disease_id": "D014",
+      "label": "eczema"
+    },
+    {
+      "disease_id": "D015",
+      "label": "seborrheic_dermatitis"
+    },
+    {
+      "disease_id": "D016",
+      "label": "folliculitis"
+    },
+    {
+      "disease_id": "D017",
+      "label": "urticaria"
+    },
+    {
+      "disease_id": "D018",
+      "label": "scabies"
+    },
+    {
+      "disease_id": "D019",
+      "label": "pityriasis_rosea"
+    },
+    {
+      "disease_id": "D022",
+      "label": "prurigo_nodularis"
+    },
+    {
+      "disease_id": "D023",
+      "label": "granuloma_annulare"
+    },
+    {
+      "disease_id": "D024",
+      "label": "erythema_multiforme"
+    },
+    {
+      "disease_id": "D025",
+      "label": "drug_eruption"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "sources": {
+    "fitzpatrick17k_c": {
+      "display_name": "Fitzpatrick17k-C",
+      "license_id": "CC_BY_NC_SA_3_0",
+      "notes": "Corrected labels over the upstream Fitzpatrick17k images."
+    },
+    "pad_ufes_20": {
+      "display_name": "PAD-UFES-20",
+      "license_id": "CC_BY_4_0"
+    },
+    "scin": {
+      "display_name": "SCIN",
+      "license_id": "SCIN_DATA_USE_LICENSE"
+    },
+    "hiba": {
+      "display_name": "HIBA",
+      "license_id": "CC_BY_4_0"
+    }
+  }
+}

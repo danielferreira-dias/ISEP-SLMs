@@ -1,0 +1,408 @@
+{
+  "release": {
+    "id": "ISEPDermaBench",
+    "version": "1.0.0",
+    "schema_version": "1.0.0",
+    "visibility": "private",
+    "created_at": "2026-08-01",
+    "reference_isolation": true,
+    "image_preprocessing_profile": "dermatology_api_safe_rgb_jpeg_v1",
+    "embedded_image_bytes": 239732051,
+    "splits": [
+      {
+        "benchmark": "visual_top_k",
+        "benchmark_id": "visual_top_k_closed_set",
+        "split": "validation",
+        "source_evaluation_set": "validation",
+        "task_count": 1683,
+        "sample_count": 1683,
+        "group_count": 1063,
+        "task_shards": [
+          {
+            "path": "tasks/visual_top_k/validation-00000-of-00004.parquet",
+            "rows": 512,
+            "bytes": 19395693,
+            "sha256": "461538665cbef0fea08cc244831e416a2e47fea7b8f0fb89d2235facf4dbc2f8"
+          },
+          {
+            "path": "tasks/visual_top_k/validation-00001-of-00004.parquet",
+            "rows": 512,
+            "bytes": 18908442,
+            "sha256": "25056086314b936583df558e2f5473df90606bf024e89d9eaf0a21f25ba67876"
+          },
+          {
+            "path": "tasks/visual_top_k/validation-00002-of-00004.parquet",
+            "rows": 512,
+            "bytes": 18866443,
+            "sha256": "a420b2211e3c7039f04ef2d5c6d8de3ce1678c0f28935f88abc084c077b197fa"
+          },
+          {
+            "path": "tasks/visual_top_k/validation-00003-of-00004.parquet",
+            "rows": 147,
+            "bytes": 5565473,
+            "sha256": "31ac5e4691e1ef3ddd56a16aaef060f8a4059621fc211d5848d33ec97f8eb356"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/visual_top_k/validation-00000-of-00004.parquet",
+            "rows": 512,
+            "bytes": 61863,
+            "sha256": "66ef0b0b4a8ab8ab572741eb7a3e702eb21542791c5011953d603c755fd01a2b"
+          },
+          {
+            "path": "references/visual_top_k/validation-00001-of-00004.parquet",
+            "rows": 512,
+            "bytes": 62834,
+            "sha256": "41aef825bb0d53ef1b7108001f1f594d861a6f51c4a4adc02f454ab0c953f1c2"
+          },
+          {
+            "path": "references/visual_top_k/validation-00002-of-00004.parquet",
+            "rows": 512,
+            "bytes": 61509,
+            "sha256": "96e96a20b15d36caaff8a58697e6b7359f263bb1f65135e023a606e3ba41b103"
+          },
+          {
+            "path": "references/visual_top_k/validation-00003-of-00004.parquet",
+            "rows": 147,
+            "bytes": 29648,
+            "sha256": "2386fc2410a48ae3e01ae9f838a588393a929c380d7bb2580489112c0c3a9a35"
+          }
+        ]
+      },
+      {
+        "benchmark": "visual_top_k",
+        "benchmark_id": "visual_top_k_closed_set",
+        "split": "internal_benchmark",
+        "source_evaluation_set": "internal_benchmark_1000",
+        "task_count": 1000,
+        "sample_count": 1000,
+        "group_count": 1000,
+        "task_shards": [
+          {
+            "path": "tasks/visual_top_k/internal_benchmark-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 18599803,
+            "sha256": "61154f2efb4d9013420a97f8ff09ccc5d84189c2861ddedda6138a9c6a0ede6c"
+          },
+          {
+            "path": "tasks/visual_top_k/internal_benchmark-00001-of-00002.parquet",
+            "rows": 488,
+            "bytes": 17868647,
+            "sha256": "020afe513d056bb3f299e12ebb91f9597ce4a0f02f66fe401406049b97ad9d10"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/visual_top_k/internal_benchmark-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 69085,
+            "sha256": "e71a1c6080e31e6bc12f9c53aed55a11b5b06c7a337137659f4dab57918f1950"
+          },
+          {
+            "path": "references/visual_top_k/internal_benchmark-00001-of-00002.parquet",
+            "rows": 488,
+            "bytes": 67351,
+            "sha256": "426904b163f1c9aa12986c4d7a8b4d131f87bc5d247d1bcf5567b9a2a5859b0f"
+          }
+        ]
+      },
+      {
+        "benchmark": "visual_top_k",
+        "benchmark_id": "visual_top_k_closed_set",
+        "split": "external_ddi",
+        "source_evaluation_set": "external_ddi",
+        "task_count": 300,
+        "sample_count": 300,
+        "group_count": 299,
+        "task_shards": [
+          {
+            "path": "tasks/visual_top_k/external_ddi-00000-of-00001.parquet",
+            "rows": 300,
+            "bytes": 10379873,
+            "sha256": "93b22877fd771e0f846792fc4d86e6a3b35080f60e8d59c5e1a9ee9994423f20"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/visual_top_k/external_ddi-00000-of-00001.parquet",
+            "rows": 300,
+            "bytes": 18986,
+            "sha256": "5d1cb0244dfa5a7fafd66bd1eb2ad53cd6c498dc4a8d854231a602f7696a85fe"
+          }
+        ]
+      },
+      {
+        "benchmark": "visual_top_k",
+        "benchmark_id": "visual_top_k_closed_set",
+        "split": "external_skindisnet",
+        "source_evaluation_set": "external_skindisnet",
+        "task_count": 1365,
+        "sample_count": 1365,
+        "group_count": 333,
+        "task_shards": [
+          {
+            "path": "tasks/visual_top_k/external_skindisnet-00000-of-00003.parquet",
+            "rows": 512,
+            "bytes": 15539694,
+            "sha256": "6cc0b3d4a7b936fa31c8d678d0a48fbbbed1b23c12243b38cf8ba52f122dea3b"
+          },
+          {
+            "path": "tasks/visual_top_k/external_skindisnet-00001-of-00003.parquet",
+            "rows": 512,
+            "bytes": 15357281,
+            "sha256": "9e716f56a9c6a8d9ea17386e4dc51b93538193ee045fb5fa6977d85eb669dcbf"
+          },
+          {
+            "path": "tasks/visual_top_k/external_skindisnet-00002-of-00003.parquet",
+            "rows": 341,
+            "bytes": 9942681,
+            "sha256": "59d02f885dbb2ac6945f60b8af3efc05a9753666d821f55628f5b7bcf99af93d"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/visual_top_k/external_skindisnet-00000-of-00003.parquet",
+            "rows": 512,
+            "bytes": 39856,
+            "sha256": "b1075dfe9df7f6e3b39b2fa698d0184fca75f8725cb41dee4eb05159ff02e15a"
+          },
+          {
+            "path": "references/visual_top_k/external_skindisnet-00001-of-00003.parquet",
+            "rows": 512,
+            "bytes": 39818,
+            "sha256": "0592410ad7a6fd714b2ef1f5e9cb1eb424a4c6d3b641012d36ef3842cb38d6da"
+          },
+          {
+            "path": "references/visual_top_k/external_skindisnet-00002-of-00003.parquet",
+            "rows": 341,
+            "bytes": 31318,
+            "sha256": "62a6d87a3a1cfc070d6b949f842f2222d7b6d171ed161455b915a731ae26e1ff"
+          }
+        ]
+      },
+      {
+        "benchmark": "visual_confusion_sets",
+        "benchmark_id": "visual_disease_confusion_sets",
+        "split": "validation",
+        "source_evaluation_set": "validation_paired_confusion_tasks",
+        "task_count": 834,
+        "sample_count": 417,
+        "group_count": 417,
+        "task_shards": [
+          {
+            "path": "tasks/visual_confusion_sets/validation-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 16582079,
+            "sha256": "5ccaddae82bb5034b89b06fece708810ef34f9b1c84bc4733c750fcbcd3e8a49"
+          },
+          {
+            "path": "tasks/visual_confusion_sets/validation-00001-of-00002.parquet",
+            "rows": 322,
+            "bytes": 10090202,
+            "sha256": "b7eeb05d2d0dafd149abb72394c16eaad7ed47e38ce17cd3b2ebce7f44213331"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/visual_confusion_sets/validation-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 54559,
+            "sha256": "7aec8fbda47d5ad5089869f81907d99b510ac250b92affec36f2a444f4f24148"
+          },
+          {
+            "path": "references/visual_confusion_sets/validation-00001-of-00002.parquet",
+            "rows": 322,
+            "bytes": 41150,
+            "sha256": "2533be17f77b988668b8726be06fc172be04ab885eceabecd41b99a3c85dfc13"
+          }
+        ]
+      },
+      {
+        "benchmark": "visual_confusion_sets",
+        "benchmark_id": "visual_disease_confusion_sets",
+        "split": "internal_benchmark",
+        "source_evaluation_set": "paired_confusion_tasks",
+        "task_count": 828,
+        "sample_count": 414,
+        "group_count": 414,
+        "task_shards": [
+          {
+            "path": "tasks/visual_confusion_sets/internal_benchmark-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 16647785,
+            "sha256": "701301ba6491c858b0c98602029f0e2e0f864e831b0586a4715719739c744ecd"
+          },
+          {
+            "path": "tasks/visual_confusion_sets/internal_benchmark-00001-of-00002.parquet",
+            "rows": 316,
+            "bytes": 10212635,
+            "sha256": "f97803fb23698bba85102b09ccac0e45776d4d506911ab7d704b0ea4413369ea"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/visual_confusion_sets/internal_benchmark-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 53209,
+            "sha256": "d3cd87eb386bd61495a70fda8b7440a437597f0a9fb8ba4d18b7234c3de26442"
+          },
+          {
+            "path": "references/visual_confusion_sets/internal_benchmark-00001-of-00002.parquet",
+            "rows": 316,
+            "bytes": 39949,
+            "sha256": "aa392c032591490fcea5a2664bb92625d1d3c1ab097c6befcf87a5f3d1683fbf"
+          }
+        ]
+      },
+      {
+        "benchmark": "evidence_grounded_diagnosis",
+        "benchmark_id": "evidence_grounded_diagnosis",
+        "split": "validation",
+        "source_evaluation_set": "validation_fitzpatrick_evidence",
+        "task_count": 137,
+        "sample_count": 137,
+        "group_count": 137,
+        "task_shards": [
+          {
+            "path": "tasks/evidence_grounded_diagnosis/validation-00000-of-00001.parquet",
+            "rows": 137,
+            "bytes": 4787813,
+            "sha256": "de2077f44ceb755d16658bed41298188b61effdfae634bf1d1bdd7ab1f00a43d"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/evidence_grounded_diagnosis/validation-00000-of-00001.parquet",
+            "rows": 137,
+            "bytes": 52618,
+            "sha256": "31c16db225b6af4f088634b45ce1be3c9b4c6b380ee773c210742412f9709562"
+          }
+        ]
+      },
+      {
+        "benchmark": "evidence_grounded_diagnosis",
+        "benchmark_id": "evidence_grounded_diagnosis",
+        "split": "internal_benchmark",
+        "source_evaluation_set": "internal_benchmark_evidence",
+        "task_count": 134,
+        "sample_count": 134,
+        "group_count": 134,
+        "task_shards": [
+          {
+            "path": "tasks/evidence_grounded_diagnosis/internal_benchmark-00000-of-00001.parquet",
+            "rows": 134,
+            "bytes": 4743911,
+            "sha256": "699fe41047aafc2155f8d1362639af1affeca4886bd5e83cbef0034a9cde3e52"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/evidence_grounded_diagnosis/internal_benchmark-00000-of-00001.parquet",
+            "rows": 134,
+            "bytes": 51338,
+            "sha256": "0cccc8a74ac38ecf2ca8319f3af44e5e31a4ccad3d251e6caacf476b72d91130"
+          }
+        ]
+      },
+      {
+        "benchmark": "evidence_grounded_diagnosis",
+        "benchmark_id": "evidence_grounded_diagnosis",
+        "split": "external_ddi",
+        "source_evaluation_set": "external_ddi_evidence",
+        "task_count": 636,
+        "sample_count": 636,
+        "group_count": 632,
+        "task_shards": [
+          {
+            "path": "tasks/evidence_grounded_diagnosis/external_ddi-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 17801927,
+            "sha256": "65918de7e02d7b5fea1aade6489c73fcc77c4705783a1456027d7b506a5c2c71"
+          },
+          {
+            "path": "tasks/evidence_grounded_diagnosis/external_ddi-00001-of-00002.parquet",
+            "rows": 124,
+            "bytes": 4361401,
+            "sha256": "496c538c89025c7e6a1065b3c8f790c64ff7478a5011069bdb0bb0fc4de5b6f1"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/evidence_grounded_diagnosis/external_ddi-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 102031,
+            "sha256": "d30c90349f49a62951575c5391fc3b5388cd560f98f68671bc46e552a162445c"
+          },
+          {
+            "path": "references/evidence_grounded_diagnosis/external_ddi-00001-of-00002.parquet",
+            "rows": 124,
+            "bytes": 38260,
+            "sha256": "ef00c0254863cf9dc8775207bcaf7b7d1959046ecd9538aa24fc567b3a140b9f"
+          }
+        ]
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "artifacts/configs/visual_top_k.yaml",
+        "source": "configs/benchmarks/derma_isep/visual_top_k.yaml",
+        "sha256": "f9a6efd9999243fb2da5a87fe473b1eb6841aa70b86ad0d3f546faa958bdddf2"
+      },
+      {
+        "path": "artifacts/configs/visual_confusion_sets.yaml",
+        "source": "configs/benchmarks/derma_isep/visual_confusion_sets.yaml",
+        "sha256": "9bdc7a8678f71425bdc20f16261711dd9f5cb615d26f6fdd4e1803c0fc1f5f6a"
+      },
+      {
+        "path": "artifacts/configs/evidence_grounded_diagnosis.yaml",
+        "source": "configs/benchmarks/derma_isep/evidence_grounded_diagnosis.yaml",
+        "sha256": "e5847ca23ebe0523a6f81e5b86b974ac50829e20466bb23cceff3c820bea3e2a"
+      },
+      {
+        "path": "artifacts/prompts/top_k.yaml",
+        "source": "prompts/benchmarks/top_k.yaml",
+        "sha256": "51f78f608e0ba785522bbab3cf3d07c6fef569e8b9c6d45fc8ebd1feda1ab23b"
+      },
+      {
+        "path": "artifacts/prompts/confusion_sets.yaml",
+        "source": "prompts/benchmarks/confusion_sets.yaml",
+        "sha256": "ae863dfa975933f278fc970b00bb17c12590df93ef6652111fcac94fbb1ba441"
+      },
+      {
+        "path": "artifacts/prompts/evidence_grounded_diagnosis.yaml",
+        "source": "prompts/benchmarks/evidence_grounded_diagnosis.yaml",
+        "sha256": "91113fc5e87458a29791b2ac93d139aa122d866ebd755211177a685619664a08"
+      },
+      {
+        "path": "artifacts/schemas/visual_top_k.schema.json",
+        "source": "schemas/visual_top_k.schema.json",
+        "sha256": "587b65b8375a630bb87c81ef179e4e7aa5445e43e3e987199ce664160a8edc23"
+      },
+      {
+        "path": "artifacts/schemas/visual_confusion_sets.schema.json",
+        "source": "schemas/visual_confusion_sets.schema.json",
+        "sha256": "9020eca3a86fd4a0f80cb03ce89b8147014d6445941514fa2a19901827b36023"
+      },
+      {
+        "path": "artifacts/schemas/evidence_grounded_diagnosis.schema.json",
+        "source": "schemas/evidence_grounded_diagnosis.schema.json",
+        "sha256": "f6bd5035dfb0283070374f54ca4200ea77524243b0e4a510af3dbdf4a27fe54c"
+      },
+      {
+        "path": "artifacts/taxonomies/diseases.yaml",
+        "source": "configs/taxonomies/diseases.yaml",
+        "sha256": "46eee9e3af0bbf363b443cd17ede21e275a8eeb68c6a5aba4baf9b9c6be272a7"
+      },
+      {
+        "path": "artifacts/taxonomies/disease_confusion_sets.yaml",
+        "source": "configs/taxonomies/disease_confusion_sets.yaml",
+        "sha256": "1775df064d301dffeee1a792f0109b64406c96d61395a4d95c4b161dc1b66e34"
+      }
+    ],
+    "source_licenses": {
+      "path": "metadata/source_licenses.json",
+      "sha256": "d3748092d23280adf4de7e0199db54643e3e8b1fb68d30b3b210452c61934206"
+    }
+  }
+}

@@ -53,7 +53,9 @@ def run_smoke_test(root: Path) -> dict[str, Any]:
     """Load one frozen sample, render prompts, validate output, and score it."""
 
     release = validate_benchmark_release(root)
-    benchmark = load_yaml(root / "configs/benchmarks/visual_top_k.yaml")
+    benchmark = load_yaml(
+        root / "configs/benchmarks/derma_isep/visual_top_k.yaml"
+    )
     prompt = load_yaml(root / benchmark["prompt"]["path"])
     taxonomy = load_yaml(root / benchmark["taxonomy"]["path"])
     schema = json.loads(

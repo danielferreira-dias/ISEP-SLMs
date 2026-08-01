@@ -10,7 +10,9 @@ import yaml
 
 from src.data_pipeline.evidence_grounded import (
     TASK_ARROW_SCHEMA,
+    validate_evidence_grounded_internal_release,
     validate_evidence_grounded_release,
+    validate_evidence_grounded_validation_release,
 )
 
 
@@ -37,7 +39,7 @@ class EvidenceGroundedReleaseTests(unittest.TestCase):
         config = yaml.safe_load(
             (
                 ROOT
-                / "configs/benchmarks/evidence_grounded_diagnosis.yaml"
+                / "configs/benchmarks/derma_isep/evidence_grounded_diagnosis.yaml"
             ).read_text()
         )
         dataset = config["dataset"]
@@ -46,6 +48,74 @@ class EvidenceGroundedReleaseTests(unittest.TestCase):
         table = pq.read_table(path)
         self.assertEqual(table.schema, TASK_ARROW_SCHEMA)
         self.assertEqual(table.num_rows, 636)
+
+    def test_internal_validation_release_has_independent_references(self) -> None:
+        result = validate_evidence_grounded_validation_release(ROOT)
+        self.assertTrue(result["passed"])
+        self.assertEqual(result["checksum_errors"], [])
+        self.assertEqual(result["sample_count"], 137)
+        self.assertEqual(result["unique_group_count"], 137)
+        self.assertEqual(
+            result["cohorts"],
+            {
+                "morphology": 137,
+                "description": 124,
+                "diagnosis": 137,
+            },
+        )
+
+        config = yaml.safe_load(
+            (
+                ROOT
+                / "configs/benchmarks/derma_isep/"
+                "evidence_grounded_diagnosis.yaml"
+            ).read_text()
+        )
+        evaluation = config["dataset"]["evaluation_sets"][
+            "validation_fitzpatrick_evidence"
+        ]
+        table = pq.read_table(ROOT / evaluation["manifest"])
+        self.assertEqual(table.schema, TASK_ARROW_SCHEMA)
+        frame = table.to_pandas()
+        self.assertTrue(
+            frame["evaluation_origin"]
+            .eq("development_validation")
+            .all()
+        )
+        self.assertEqual(frame["disease_id"].nunique(), 19)
+
+    def test_internal_benchmark_has_independent_references(self) -> None:
+        result = validate_evidence_grounded_internal_release(ROOT)
+        self.assertTrue(result["passed"])
+        self.assertEqual(result["checksum_errors"], [])
+        self.assertEqual(result["sample_count"], 134)
+        self.assertEqual(result["unique_group_count"], 134)
+        self.assertEqual(
+            result["cohorts"],
+            {
+                "morphology": 134,
+                "description": 119,
+                "diagnosis": 134,
+            },
+        )
+
+        config = yaml.safe_load(
+            (
+                ROOT
+                / "configs/benchmarks/derma_isep/"
+                "evidence_grounded_diagnosis.yaml"
+            ).read_text()
+        )
+        evaluation = config["dataset"]["evaluation_sets"][
+            "internal_benchmark_evidence"
+        ]
+        table = pq.read_table(ROOT / evaluation["manifest"])
+        self.assertEqual(table.schema, TASK_ARROW_SCHEMA)
+        frame = table.to_pandas()
+        self.assertTrue(
+            frame["evaluation_origin"].eq("internal_benchmark").all()
+        )
+        self.assertEqual(frame["disease_id"].nunique(), 19)
 
     def test_external_experiment_references_benchmark_and_all_models(
         self,
@@ -59,7 +129,7 @@ class EvidenceGroundedReleaseTests(unittest.TestCase):
         )
         self.assertEqual(
             experiment["benchmark"]["config"],
-            "configs/benchmarks/evidence_grounded_diagnosis.yaml",
+            "configs/benchmarks/derma_isep/evidence_grounded_diagnosis.yaml",
         )
         self.assertFalse(
             experiment["selection_policy"]["teacher_selection_allowed"]

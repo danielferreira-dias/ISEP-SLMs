@@ -155,10 +155,18 @@ class TaxonomyContractTests(unittest.TestCase):
             (ROOT / "configs/taxonomies/diseases.yaml").read_text()
         )
         schema = json.loads(
-            (ROOT / "schemas/visual_top_k.schema.json").read_text()
+            (
+                ROOT
+                / "data/benchmarks/ISEPDermaBench/artifacts/schemas/"
+                "visual_top_k.schema.json"
+            ).read_text()
         )
         benchmark = yaml.safe_load(
-            (ROOT / "configs/benchmarks/visual_top_k.yaml").read_text()
+            (
+                ROOT
+                / "data/benchmarks/ISEPDermaBench/artifacts/configs/"
+                "visual_top_k.yaml"
+            ).read_text()
         )
         active_ids = [item["id"] for item in taxonomy["diseases"]]
         retired_ids = {item["id"] for item in taxonomy["retired_diseases"]}

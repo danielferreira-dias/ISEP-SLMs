@@ -1,0 +1,235 @@
+# Paired low- and high-confusability dermatology ranking benchmark.
+
+benchmark:
+  id: visual_disease_confusion_sets
+  version: 0.5.0
+  task: visual_disease_contrast_ranking
+  status: provisional_pending_clinical_review
+  description: >
+    Evaluates whether a vision-language model can rank diseases in controlled
+    three-way candidate sets. Every selected image is evaluated once with
+    low-confusability distractors and once with its clinically motivated
+    high-confusability disease set.
+  candidate_count: 3
+  ranking_count: 3
+
+prompt:
+  path: prompts/benchmarks/confusion_sets.yaml
+
+schema:
+  path: schemas/visual_confusion_sets.schema.json
+  dynamic_candidate_enum: true
+
+taxonomy:
+  disease:
+    path: configs/taxonomies/diseases.yaml
+    id_field: id
+    label_field: display_name
+    expected_size: 21
+  confusion_sets:
+    path: configs/taxonomies/disease_confusion_sets.yaml
+    expected_set_count: 5
+    expected_covered_disease_count: 15
+
+dataset:
+  source_manifest: data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/internal_benchmark_1000.parquet
+  task_manifest: data/benchmarks/derma_isep/visual_confusion_sets_v1/datasets/internal/confusion_tasks.parquet
+  default_evaluation_set: paired_confusion_tasks
+  evaluation_sets:
+    validation_paired_confusion_tasks:
+      manifest: data/benchmarks/derma_isep/visual_confusion_sets_v1/datasets/development/validation_confusion_tasks.parquet
+      role: development_validation
+      description: >
+        Paired low/high-confusability tasks generated exclusively from the
+        frozen visual Top-K Validation split. Results may select the teacher,
+        prompts, parsers, generation settings, and thresholds.
+    paired_confusion_tasks:
+      manifest: data/benchmarks/derma_isep/visual_confusion_sets_v1/datasets/internal/confusion_tasks.parquet
+      role: internal_paired
+      description: >
+        Fixed paired low- and high-confusability tasks for 414 unique images.
+  development_validation:
+    source_manifest: data/benchmarks/derma_isep/visual_top_k_v1/datasets/internal/validation.parquet
+    task_manifest: data/benchmarks/derma_isep/visual_confusion_sets_v1/datasets/development/validation_confusion_tasks.parquet
+    representative_seed: 3042
+    expected_counts:
+      active_confusion_set_count: 5
+      covered_disease_count: 15
+      unique_image_count: 417
+      paired_task_count: 834
+    summary_report: data/benchmarks/derma_isep/visual_confusion_sets_v1/reports/validation_confusion_set_summary_v1.csv
+    integrity_report: data/benchmarks/derma_isep/visual_confusion_sets_v1/release/validation_integrity_report_v1.yaml
+    release_manifest: data/benchmarks/derma_isep/visual_confusion_sets_v1/release/validation_release_v1.yaml
+  task_id_column: task_id
+  pair_id_column: pair_id
+  sample_id_column: sample_id
+  image_column: image_uri
+  label_column: disease_id
+  group_column: leakage_group_id
+  candidate_ids_column: candidate_disease_ids
+  condition_column: difficulty
+  confusion_set_column: confusion_set_id
+  conditions:
+    - low_confusability
+    - high_confusability
+  expected_unique_images: 414
+  expected_pairs: 414
+  expected_tasks: 828
+  summary_report: data/benchmarks/derma_isep/visual_confusion_sets_v1/reports/confusion_set_summary_v1.csv
+  integrity_report: data/benchmarks/derma_isep/visual_confusion_sets_v1/release/integrity_report_v1.yaml
+  release_manifest: data/benchmarks/derma_isep/visual_confusion_sets_v1/release/benchmark_release_v1.yaml
+  description: >
+    Reuses a deterministic subset of the sealed 1,000-case internal benchmark.
+    Each pair contains the same image and reference disease under both
+    candidate-list conditions.
+
+metrics:
+  - id: top_1_accuracy
+    description: >
+      The proportion of tasks for which the first-ranked candidate is the
+      reference disease. It measures direct three-way classification accuracy.
+    value: proportion
+    higher_is_better: true
+
+  - id: top_2_accuracy
+    description: >
+      The proportion of tasks for which the reference disease appears in the
+      first two ranks. It measures short-list recall in the three-way task.
+    value: proportion
+    higher_is_better: true
+
+  - id: mean_reciprocal_rank
+    description: >
+      The mean reciprocal rank of the reference disease, with invalid outputs
+      receiving zero. It measures how highly the correct disease is ordered.
+    value: score_between_0_and_1
+    higher_is_better: true
+
+  - id: macro_f1_top_1
+    description: >
+      The unweighted mean of per-disease F1 scores using the first-ranked
+      candidate as the prediction. It measures class-balanced discrimination.
+    value: score_between_0_and_1
+    higher_is_better: true
+
+  - id: macro_set_top_1_accuracy
+    description: >
+      The unweighted mean of Top-1 accuracy across confusion sets. It prevents
+      larger sets from dominating the overall disease-discrimination result.
+    value: proportion
+    higher_is_better: true
+
+  - id: low_confusability_accuracy
+    description: >
+      Top-1 accuracy when the same images are presented with distractors from
+      different appearance partitions. It measures coarse visual
+      discrimination under the easier candidate condition.
+    value: proportion
+    higher_is_better: true
+
+  - id: high_confusability_accuracy
+    description: >
+      Top-1 accuracy when images are presented with clinically motivated
+      look-alike diseases. It measures fine-grained visual discrimination.
+    value: proportion
+    higher_is_better: true
+
+  - id: confusability_accuracy_gap
+    description: >
+      Low-confusability Top-1 accuracy minus high-confusability Top-1 accuracy
+      on paired images. It measures the accuracy loss caused by harder
+      distractors; smaller non-negative values indicate greater robustness.
+    value: signed_proportion_difference
+    higher_is_better: false
+
+  - id: confusability_accuracy_gap_ci_lower
+    description: >
+      The lower bound of the 95% paired-bootstrap confidence interval for the
+      confusability accuracy gap. It measures uncertainty in the estimated
+      accuracy loss caused by harder distractors.
+    value: signed_proportion_difference
+
+  - id: confusability_accuracy_gap_ci_upper
+    description: >
+      The upper bound of the 95% paired-bootstrap confidence interval for the
+      confusability accuracy gap. It measures uncertainty in the estimated
+      accuracy loss caused by harder distractors.
+    value: signed_proportion_difference
+
+  - id: json_validity_rate
+    description: >
+      The proportion of raw responses that parse as JSON. It measures basic
+      machine readability independently of diagnostic correctness.
+    value: proportion
+    higher_is_better: true
+
+  - id: schema_compliance_rate
+    description: >
+      The proportion of parsed responses containing exactly three unique
+      allowed candidates with consecutive ranks. It measures structural
+      reliability for the controlled ranking task.
+    value: proportion
+    higher_is_better: true
+
+  - id: invalid_candidate_id_rate
+    description: >
+      The proportion of tasks containing a disease ID outside that task's
+      three supplied candidates. It measures candidate-set adherence.
+    value: proportion
+    higher_is_better: false
+
+  - id: duplicate_prediction_rate
+    description: >
+      The proportion of tasks that repeat a disease ID. It measures whether
+      the model produces a complete ranking rather than duplicate candidates.
+    value: proportion
+    higher_is_better: false
+
+validation:
+  require_valid_json: true
+  reject_ids_outside_task_candidates: true
+  require_unique_disease_ids: true
+  required_prediction_count: 3
+  require_consecutive_ranks: true
+  require_reference_in_candidates: true
+  invalid_output_policy: count_as_incorrect
+
+comparison:
+  conditions_paired_by: pair_id
+  model_stages_paired_by: task_id
+  require_identical_task_ids: true
+  require_identical_manifest_checksum: true
+  confidence_interval:
+    method: paired_bootstrap
+    confidence_level: 0.95
+    resamples: 10000
+    seed: 42
+    cluster: pair_id
+
+image_preprocessing:
+  profile: dermatology_api_safe_rgb_jpeg_v1
+  max_edge_pixels: 768
+  max_encoded_bytes: 45000
+  jpeg_quality: 85
+  minimum_jpeg_quality: 40
+  minimum_edge_pixels: 224
+
+execution:
+  max_output_tokens: 8192
+  batch_size: 8
+  resume: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  fail_fast_on_invalid_output: false
+
+structured_output:
+  mode: prompt_only
+
+output:
+  directory: outputs/benchmark_runs
+
+release:
+  id: visual_confusion_sets_dataset_v1
+  version: 0.2.0
+  status: provisional_pending_clinical_review
+  release_date: "2026-07-29"

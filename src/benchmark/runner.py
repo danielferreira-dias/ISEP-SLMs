@@ -55,6 +55,10 @@ class BenchmarkSample:
     metadata: dict[str, Any]
     task_id: str | None = None
     candidate_disease_ids: tuple[str, ...] | None = None
+    image_bytes: bytes | None = None
+    system_prompt: str | None = None
+    user_prompt: str | None = None
+    response_schema: dict[str, Any] | None = None
 
 
 @dataclass(slots=True)

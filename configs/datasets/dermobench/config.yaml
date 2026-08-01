@@ -15,10 +15,13 @@ source:
   format: json_and_jsonl_annotation_suite
   hub_repo: mendicant04/DermoBench
   gated: true
-  local_root: configs/datasets/dermobench/data
-  images_included: false
+  local_root: data/benchmarks/dermobench/release
+  image_archive: data/benchmarks/dermobench/release/dermobench_release_imgs.zip
+  archive_content_root: imgs
+  images_included: true
   image_resolution: >
-    Resolve each relative image path against its original upstream dataset;
+    Resolve each record's relative image path inside image_archive under
+    archive_content_root. Preserve its upstream dataset segment and provenance;
     do not treat DermoBench annotation records as a new image source.
 
 normalization:

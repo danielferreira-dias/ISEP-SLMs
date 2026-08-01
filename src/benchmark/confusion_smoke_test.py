@@ -56,7 +56,7 @@ def run_confusion_smoke_test(root: Path) -> dict[str, Any]:
 
     release = validate_confusion_set_release(root)
     benchmark = load_yaml(
-        root / "configs/benchmarks/visual_confusion_sets.yaml"
+        root / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
     )
     prompt = load_yaml(root / benchmark["prompt"]["path"])
     taxonomy = load_yaml(

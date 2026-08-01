@@ -32,22 +32,14 @@ datasets:
     config: configs/datasets/skincon/config.yaml
     role: excluded_from_disease_coverage
 
-  - id: skincap
-    config: configs/datasets/skincap/config.yaml
-    role: excluded_from_disease_coverage
-
   - id: skincare
     config: configs/datasets/skincare/config.yaml
-    role: excluded_from_disease_coverage
-
-  - id: dermavqa
-    config: configs/datasets/dermavqa/config.yaml
     role: excluded_from_disease_coverage
 
   - id: dermobench
     config: configs/datasets/dermobench/config.yaml
     role: external_evaluation_only
 
-  - id: dermnet_kaggle
-    config: configs/datasets/dermnet/config.yaml
-    role: excluded_from_disease_coverage
+  - id: hiba
+    config: configs/datasets/hiba/config.yaml
+    role: training_only

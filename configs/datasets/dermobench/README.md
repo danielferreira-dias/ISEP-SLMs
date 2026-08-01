@@ -2,33 +2,30 @@
 
 ## Local status
 
-DermoBench access has been approved for this project. Download the gated
-annotation suite into `data/`; it contains JSON/JSONL task files, not a
-redistributable image archive.
+DermoBench is stored locally at `data/benchmarks/dermobench/release/`. This
+release contains its JSON/JSONL task files and
+`dermobench_release_imgs.zip` (about 3.2 GB), whose `imgs/` directory includes
+the image payload referenced by the task records. Do not commit the clone or
+the archive.
 
 ```bash
-hf download mendicant04/DermoBench --repo-type dataset \
-  --local-dir configs/datasets/dermobench/data
+git clone https://huggingface.co/datasets/mendicant04/DermoBench
 ```
 
-The command uses the Hugging Face account already authenticated locally. If
-needed, authenticate first with `hf auth login` and submit the dataset access
-request while signed in. Do not commit downloaded data.
+For a new clone, authenticate with the Hugging Face account approved for this
+gated dataset before cloning. Do not commit downloaded data.
 
 ## Image access and resolution
 
-Each record has a relative `image` path. The benchmark metadata does not
-include the corresponding image files, so resolve every path to its upstream
-provider and retain a local path-resolution audit. Existing local DDI images
-can cover the DDI tasks (including Task 4 and the DDI subset of Task 2.1),
-subject to a verified identifier/path match. SKINCON is an annotation overlay,
-not an image source; its tasks need the underlying image datasets.
+Each record has a relative `image` path. Resolve it inside
+`dermobench_release_imgs.zip` as `imgs/<image path>`; keep a path-resolution
+audit and verify all referenced records before executing a task. The archive
+contains source-labelled folders including DDI, Derm1M, Derm7pt, DermNet,
+Fitzpatrick17k, ISIC, PAD-UFES-20, SCIN, SKINCON and SNU134.
 
-For Derm7pt, Derm1M-EDU, and SNU134, obtain the images directly from their
-respective source providers under their own access terms. A successful
-DermoBench request does not grant those image licences. Do not run a task
-until all of its referenced images have been resolved and the matching rate is
-recorded.
+The archive's presence does not replace upstream attribution or licensing
+obligations. DermoBench remains a derived evaluation suite and is not an
+independent image source.
 
 ## Evaluation policy
 

@@ -12,6 +12,7 @@ import yaml
 from src.data_pipeline.confusion_sets import (
     build_confusion_tasks,
     validate_confusion_set_release,
+    validate_confusion_validation_release,
     validate_confusion_task_frame,
 )
 
@@ -107,7 +108,8 @@ class ConfusionSetReleaseTests(unittest.TestCase):
         benchmark = yaml.safe_load(
             (
                 ROOT
-                / "configs/benchmarks/visual_confusion_sets.yaml"
+                / "data/benchmarks/ISEPDermaBench/artifacts/configs/"
+                "visual_confusion_sets.yaml"
             ).read_text(encoding="utf-8")
         )
         required_paths = [
@@ -121,11 +123,35 @@ class ConfusionSetReleaseTests(unittest.TestCase):
         self.assertEqual(release["id"], "visual_confusion_sets_dataset_v1")
         self.assertTrue(release["integrity_passed"])
 
+    def test_validation_release_is_separate_and_balanced(self) -> None:
+        release = validate_confusion_validation_release(ROOT)
+        self.assertEqual(
+            release["evaluation_origin"],
+            "development_validation",
+        )
+        self.assertEqual(release["counts"]["selected_images"], 417)
+        self.assertEqual(release["counts"]["tasks"], 834)
+
+        benchmark = yaml.safe_load(
+            (
+                ROOT
+                / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
+            ).read_text(encoding="utf-8")
+        )
+        evaluation = benchmark["dataset"]["evaluation_sets"][
+            "validation_paired_confusion_tasks"
+        ]
+        tasks = pd.read_parquet(ROOT / evaluation["manifest"])
+        self.assertEqual(len(tasks), 834)
+        self.assertEqual(tasks["sample_id"].nunique(), 417)
+        self.assertEqual(tasks["leakage_group_id"].nunique(), 417)
+        self.assertEqual(tasks["disease_id"].nunique(), 15)
+
     def test_config_metrics_have_english_descriptions(self) -> None:
         benchmark = yaml.safe_load(
             (
                 ROOT
-                / "configs/benchmarks/visual_confusion_sets.yaml"
+                / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
             ).read_text(encoding="utf-8")
         )
         metric_ids = {
@@ -139,7 +165,9 @@ class ConfusionSetReleaseTests(unittest.TestCase):
 
         schema = json.loads(
             (
-                ROOT / "schemas/visual_confusion_sets.schema.json"
+                ROOT
+                / "data/benchmarks/ISEPDermaBench/artifacts/schemas/"
+                "visual_confusion_sets.schema.json"
             ).read_text(encoding="utf-8")
         )
         predictions = schema["properties"]["predictions"]

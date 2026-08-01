@@ -10,7 +10,6 @@ import pyarrow.parquet as pq
 
 from src.data_pipeline.adapters import (
     build_ddi,
-    build_dermnet_kaggle,
     build_fitzpatrick17k_c,
     build_pad_ufes_20,
     build_scin,
@@ -44,7 +43,6 @@ SUPPORTED_BUILDERS: dict[
     "scin": build_scin,
     "skindisnet": build_skindisnet,
     "ddi": build_ddi,
-    "dermnet_kaggle": build_dermnet_kaggle,
 }
 
 
@@ -330,7 +328,7 @@ def validate_outputs(root: Path) -> None:
             flush=True,
         )
     confusion_benchmark = load_yaml(
-        root / "configs/benchmarks/visual_confusion_sets.yaml"
+        root / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
     )
     confusion_release_path = (
         root / confusion_benchmark["dataset"]["release_manifest"]

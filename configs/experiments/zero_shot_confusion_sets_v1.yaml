@@ -12,8 +12,10 @@ experiment:
     high-confusability three-way dermatology ranking tasks.
 
 benchmark:
-  config: configs/benchmarks/visual_confusion_sets.yaml
-  evaluation_set: paired_confusion_tasks
+  config: visual_disease_confusion_sets
+  evaluation_set: internal_benchmark
+  source: auto
+  repository: danielfdias98/ISEPDermaBench
 
 models:
   - config: configs/models/qwen_3_6_27b.yaml

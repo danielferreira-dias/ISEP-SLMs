@@ -18,6 +18,7 @@ configs/datasets/*/data/
 data/manifests/*.parquet
 data/combined/*.parquet
 data/benchmarks/**/*.parquet
+data/training/**/*.parquet
 data/reports/*.parquet
 outputs/benchmark_runs/
 
