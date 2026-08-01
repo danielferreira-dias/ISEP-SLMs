@@ -29,6 +29,7 @@ from src.benchmark.isep_dermabench import (
     load_isep_dermabench_config,
     load_isep_dermabench_dataset,
 )
+from src.benchmark.open_ended_judge import judge_run
 from src.benchmark.report import generate_run_report
 from src.benchmark.results import (
     RunPaths,
@@ -218,6 +219,28 @@ def build_parser() -> argparse.ArgumentParser:
             "without loading a model, starting vLLM, or calling an API."
         ),
     )
+
+    judge_parser = subparsers.add_parser(
+        "judge",
+        help="Judge a completed open-ended diagnosis run with GPT-5.6 Luna.",
+    )
+    judge_parser.add_argument(
+        "--run",
+        type=Path,
+        required=True,
+        help="Completed open-ended benchmark run directory.",
+    )
+    judge_parser.add_argument(
+        "--batch-size",
+        type=_positive_integer,
+        default=8,
+        help="Maximum concurrent Luna judge requests (default: 8).",
+    )
+    judge_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate the run, references, judge prompt, and schema only.",
+    )
     return parser
 
 
@@ -240,6 +263,20 @@ def main(
             return 0
         if args.command == "run":
             return _run_command(args, root=project_root)
+        if args.command == "judge":
+            run_directory = args.run
+            if not run_directory.is_absolute():
+                run_directory = project_root / run_directory
+            result = asyncio.run(
+                judge_run(
+                    root=project_root,
+                    run_directory=run_directory,
+                    batch_size=args.batch_size,
+                    dry_run=args.dry_run,
+                )
+            )
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
         parser.error(f"Unsupported command: {args.command}")
     except KeyboardInterrupt:
         print("Benchmark interrupted.", file=sys.stderr)

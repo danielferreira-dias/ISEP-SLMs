@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ISEPDermaBenchLoaderTests(unittest.TestCase):
-    def test_lists_the_three_frozen_protocols(self) -> None:
+    def test_lists_the_four_frozen_protocols(self) -> None:
         configs = list_isep_dermabench_configs(root=ROOT)
         self.assertEqual(
             {config.benchmark.id for config in configs},
@@ -29,8 +29,30 @@ class ISEPDermaBenchLoaderTests(unittest.TestCase):
                 "visual_top_k_closed_set",
                 "visual_disease_confusion_sets",
                 "evidence_grounded_diagnosis",
+                "open_ended_diagnosis",
             },
         )
+
+    def test_open_ended_inputs_do_not_expose_scoring_references(self) -> None:
+        config = load_isep_dermabench_config(
+            "open_ended_diagnosis",
+            root=ROOT,
+        )
+        loaded = load_isep_dermabench_dataset(
+            root=ROOT,
+            benchmark=config,
+            evaluation_set="validation",
+            limit=3,
+            seed=42,
+            source="local",
+        )
+
+        self.assertEqual(len(loaded.samples), 3)
+        for sample in loaded.samples:
+            self.assertEqual(sample.candidate_disease_ids, ())
+            self.assertEqual(sample.response_schema, {})
+            self.assertEqual(sample.metadata["output_mode"], "free_text")
+            self.assertNotIn(sample.disease_id, sample.user_prompt or "")
 
     def test_local_task_and_reference_views_are_joined_for_scoring(self) -> None:
         config = load_isep_dermabench_config(

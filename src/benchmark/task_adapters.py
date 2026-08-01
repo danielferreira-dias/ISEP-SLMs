@@ -370,6 +370,96 @@ class EvidenceGroundedTaskAdapter:
         )
 
 
+class OpenEndedDiagnosisTaskAdapter:
+    """Adapter that preserves a natural-language clinical response verbatim."""
+
+    def __init__(
+        self,
+        *,
+        benchmark_id: str,
+        system_prompt_template: str,
+        user_prompt_template: str,
+    ) -> None:
+        self._benchmark_id = benchmark_id
+        self.system_prompt_template = system_prompt_template
+        self.user_prompt_template = user_prompt_template
+
+    @property
+    def benchmark_id(self) -> str:
+        return self._benchmark_id
+
+    def prepare(self, sample: BenchmarkSample) -> PreparedTask:
+        return PreparedTask(
+            benchmark_id=self.benchmark_id,
+            task_id=sample.task_id or sample.sample_id,
+            sample_id=sample.sample_id,
+            system_prompt=self.system_prompt_template,
+            user_prompt=self.user_prompt_template,
+            schema={},
+            allowed_disease_ids=(),
+        )
+
+    def parse_response(
+        self,
+        model_id: str,
+        raw_text: str,
+        prepared_task: PreparedTask,
+        reasoning_text: str | None = None,
+    ) -> ModelResponse:
+        del reasoning_text
+        _require_matching_benchmark(prepared_task, self.benchmark_id)
+        text = raw_text.strip()
+        if not text:
+            return ModelResponse(
+                model_id=model_id,
+                raw_text=raw_text,
+                parsed_output=None,
+                json_valid=False,
+                schema_valid=False,
+                validation_errors=["empty_free_text_response"],
+                metadata={"output_mode": "free_text"},
+            )
+        # The generic executor uses these two booleans as output-contract
+        # success flags. In free-text mode they mean non-empty text accepted;
+        # no JSON parsing or schema validation has occurred.
+        return ModelResponse(
+            model_id=model_id,
+            raw_text=raw_text,
+            parsed_output=None,
+            json_valid=True,
+            schema_valid=True,
+            recoverable_json_valid=True,
+            metadata={
+                "output_mode": "free_text",
+                "free_text_valid": True,
+            },
+        )
+
+    def compute_metrics(
+        self,
+        predictions: Iterable[BenchmarkPrediction],
+    ) -> dict[str, Any]:
+        values = list(predictions)
+        nonempty = [
+            item
+            for item in values
+            if bool(item.response.raw_text.strip())
+        ]
+        return {
+            "total": len(values),
+            "free_text_response_rate": (
+                len(nonempty) / len(values) if values else 0.0
+            ),
+            "mean_response_characters": (
+                sum(len(item.response.raw_text) for item in nonempty)
+                / len(nonempty)
+                if nonempty
+                else 0.0
+            ),
+            "judging_status": "pending",
+        }
+
+
 def build_task_adapter(
     *,
     benchmark_config: Mapping[str, Any],
@@ -471,6 +561,12 @@ def build_task_adapter(
                 field="bins",
                 default=10,
             ),
+        )
+    if task == "open_ended_clinical_diagnosis":
+        return OpenEndedDiagnosisTaskAdapter(
+            benchmark_id=benchmark_id,
+            system_prompt_template=str(prompt_config["system_prompt"]),
+            user_prompt_template=str(prompt_config["user_template"]),
         )
     raise ValueError(f"Unsupported benchmark task: {task}")
 

@@ -1,4 +1,4 @@
-"""Typed, validated configuration for the three benchmark protocols."""
+"""Typed, validated configuration for benchmark protocols."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ BenchmarkTask = Literal[
     "visual_disease_ranking",
     "visual_disease_contrast_ranking",
     "evidence_grounded_visual_diagnosis",
+    "open_ended_clinical_diagnosis",
 ]
 
 

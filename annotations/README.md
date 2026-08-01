@@ -33,6 +33,7 @@ Each annotation should identify:
 ## Benchmarks
 
 1. [Paired visual disease confusion sets](benchmarks/01_visual_disease_confusion_sets.md)
+2. [Open-ended diagnosis with a single blinded judge](benchmarks/02_open_ended_diagnosis_single_judge.md)
 
 ## Notes
 

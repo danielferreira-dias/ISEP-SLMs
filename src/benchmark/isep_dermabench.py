@@ -102,6 +102,13 @@ SPECS = (
             ("external_ddi_evidence", "external_ddi"),
         ),
     ),
+    ISEPDermaBenchSpec(
+        key="open_ended_diagnosis",
+        benchmark_id="open_ended_diagnosis",
+        aliases=("open_ended_diagnosis.yaml",),
+        default_split="internal_benchmark",
+        splits=("validation", "internal_benchmark"),
+    ),
 )
 
 
@@ -138,7 +145,7 @@ def load_isep_dermabench_config(
             id=split,
             manifest=release_root / "tasks" / spec.key,
             role=(
-                "development"
+                "development_validation"
                 if split == "validation"
                 else "sealed_evaluation"
             ),
@@ -179,7 +186,13 @@ def load_isep_dermabench_config(
         release_root / "artifacts/prompts" / _prompt_filename(spec.key)
     )
     schema_path = (
-        release_root / "artifacts/schemas" / f"{spec.key}.schema.json"
+        release_root
+        / "artifacts/schemas"
+        / (
+            "open_ended_diagnosis_judge.schema.json"
+            if spec.key == "open_ended_diagnosis"
+            else f"{spec.key}.schema.json"
+        )
     )
     confusion_path = (
         release_root
@@ -238,7 +251,7 @@ def load_isep_dermabench_config(
 
 
 def list_isep_dermabench_configs(*, root: Path) -> tuple[BenchmarkConfig, ...]:
-    """Return the three frozen benchmark protocol configs."""
+    """Return the four frozen benchmark protocol configs."""
 
     return tuple(
         load_isep_dermabench_config(spec.benchmark_id, root=root)
@@ -365,10 +378,11 @@ class FrozenISEPDermaBenchAdapter:
     def prepare(self, sample: BenchmarkSample) -> PreparedTask:
         if sample.system_prompt is None or sample.user_prompt is None:
             raise ValueError("ISEPDermaBench sample has no rendered prompts")
-        if sample.response_schema is None:
+        output_mode = str(sample.metadata.get("output_mode", "structured"))
+        if sample.response_schema is None and output_mode != "free_text":
             raise ValueError("ISEPDermaBench sample has no response schema")
         candidate_ids = tuple(sample.candidate_disease_ids or ())
-        if not candidate_ids:
+        if not candidate_ids and output_mode != "free_text":
             raise ValueError("ISEPDermaBench sample has no candidate diseases")
         benchmark_id = str(
             sample.metadata.get("benchmark_id", "")
@@ -379,7 +393,7 @@ class FrozenISEPDermaBenchAdapter:
             sample_id=sample.sample_id,
             system_prompt=sample.system_prompt,
             user_prompt=sample.user_prompt,
-            schema=dict(sample.response_schema),
+            schema=dict(sample.response_schema or {}),
             allowed_disease_ids=candidate_ids,
         )
 
@@ -465,7 +479,7 @@ def _release_row_to_sample(
 ) -> BenchmarkSample:
     task_id = str(task["task_id"])
     image_bytes = _extract_image_bytes(task["image"])
-    response_schema = json.loads(str(task["response_schema_json"]))
+    response_schema = json.loads(str(task["response_schema_json"] or "{}"))
     if not isinstance(response_schema, dict):
         raise ValueError(f"Task {task_id} response schema is not an object")
     metadata = {
@@ -575,6 +589,7 @@ def _prompt_filename(key: str) -> str:
         "visual_top_k": "top_k.yaml",
         "visual_confusion_sets": "confusion_sets.yaml",
         "evidence_grounded_diagnosis": "evidence_grounded_diagnosis.yaml",
+        "open_ended_diagnosis": "open_ended_diagnosis.yaml",
     }[key]
 
 

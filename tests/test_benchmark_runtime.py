@@ -8,8 +8,10 @@ import unittest
 
 import pandas as pd
 import yaml
-
-from src.benchmark.datasets import load_benchmark_dataset
+from src.benchmark.isep_dermabench import (
+    load_isep_dermabench_config,
+    load_isep_dermabench_dataset,
+)
 from src.benchmark.executor import (
     BenchmarkExecutor,
     ExecutionConfig,
@@ -97,32 +99,25 @@ class DeterministicSelectionTests(unittest.TestCase):
 
     def test_repository_manifests_use_the_expected_selection_units(self) -> None:
         cases = [
-            (
-                "derma_isep/visual_top_k.yaml",
-                "internal_benchmark_1000",
-                2,
-            ),
-            (
-                "derma_isep/visual_top_k.yaml",
-                "validation",
-                2,
-            ),
-            ("derma_isep/visual_confusion_sets.yaml", None, 4),
-            ("derma_isep/evidence_grounded_diagnosis.yaml", None, 2),
+            ("visual_top_k_closed_set", "internal_benchmark", 2),
+            ("visual_top_k_closed_set", "validation", 2),
+            ("visual_disease_confusion_sets", None, 4),
+            ("evidence_grounded_diagnosis", None, 2),
+            ("open_ended_diagnosis", None, 2),
         ]
-        for filename, evaluation_set, expected_tasks in cases:
-            with self.subTest(filename=filename):
-                config = yaml.safe_load(
-                    (
-                        ROOT / "configs/benchmarks" / filename
-                    ).read_text(encoding="utf-8")
-                )
-                loaded = load_benchmark_dataset(
+        for benchmark_id, evaluation_set, expected_tasks in cases:
+            with self.subTest(benchmark_id=benchmark_id):
+                config = load_isep_dermabench_config(
+                    benchmark_id,
                     root=ROOT,
-                    config=config,
+                )
+                loaded = load_isep_dermabench_dataset(
+                    root=ROOT,
+                    benchmark=config,
                     evaluation_set=evaluation_set,
                     limit=2,
                     seed=42,
+                    source="local",
                 )
                 self.assertEqual(len(loaded.samples), expected_tasks)
 

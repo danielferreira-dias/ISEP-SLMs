@@ -1,6 +1,6 @@
 # Multimodal benchmark pipeline
 
-This package runs the project's three frozen ISEPDermaBench protocols through
+This package runs the project's four frozen ISEPDermaBench protocols through
 one reproducible command-line pipeline. Model YAML files are loaded into
 validated dataclasses. Benchmark images, rendered prompts, and response
 schemas come directly from the task Parquets; gold references are loaded from
@@ -14,14 +14,22 @@ or patient-care decisions.
 
 | Benchmark ID | Purpose | Default evaluation set | Output cap |
 | --- | --- | --- | ---: |
-| `visual_top_k_closed_set` | Rank six diseases from the fixed 21-class taxonomy | `internal_benchmark_1000` | 8,192 |
-| `visual_disease_confusion_sets` | Rank three candidates under paired low/high-confusability conditions | `paired_confusion_tasks` | 8,192 |
-| `evidence_grounded_diagnosis` | Findings, observation-only description, six diagnoses, confidence, and evidence links | `external_ddi_evidence` | 8,192 |
+| `visual_top_k_closed_set` | Rank six diseases from the fixed 21-class taxonomy | `internal_benchmark` | 8,192 |
+| `visual_disease_confusion_sets` | Rank three candidates under paired low/high-confusability conditions | `internal_benchmark` | 8,192 |
+| `evidence_grounded_diagnosis` | Findings, observation-only description, six diagnoses, confidence, and evidence links | `internal_benchmark` | 8,192 |
+| `open_ended_diagnosis` | Natural clinical prose with visible findings and an explicitly ranked Top-3 | `internal_benchmark` | 8,192 |
 
-All three protocols use `prompt_only` structured output. A provider is not
+The three structured protocols use `prompt_only` structured output. A provider is not
 given constrained JSON decoding when another model cannot receive the same
 constraint. This keeps the comparison focused on the models rather than on a
 provider-specific output feature.
+
+`open_ended_diagnosis` deliberately has no response schema and exposes no
+candidate taxonomy. The evaluated answer is retained verbatim and is scored
+in a second command by one blinded GPT-5.6 Luna judge. The judge sees the
+image, correct diagnosis, optional exact-match SKINCON/SkinCAP references, and
+only the final user-visible answer. It never receives the evaluated model's
+identity or provider reasoning.
 
 The output caps are intentionally much larger than the expected JSON. They
 provide a finite execution boundary without encouraging terse answers. Before
@@ -106,6 +114,15 @@ ISEPDermaBench tasks ──> image + frozen request      │
                          deterministic validation and metrics
                                              │
                               append-safe run artifacts
+```
+
+For the open-ended protocol, the final free-text answer follows a separate
+stage:
+
+```text
+final prose + image + isolated reference
+                 │
+                 └──> single blinded Luna judge ──> judge metrics + HTML
 ```
 
 The subset is selected by the lowest SHA-256 scores derived from the benchmark
@@ -217,7 +234,49 @@ uv run python -m src.benchmark.cli run \
   --benchmark evidence_grounded_diagnosis \
   --limit 10 \
   --dry-run
+
+uv run python -m src.benchmark.cli run \
+  --model gpt_5_6_luna \
+  --benchmark open_ended_diagnosis \
+  --evaluation-set validation \
+  --limit 10 \
+  --dry-run
 ```
+
+## Open-ended diagnosis and single-judge scoring
+
+First run a model normally. Its response must be concise clinical prose with
+exactly three clearly ranked diagnoses; JSON and private chain-of-thought are
+not requested.
+
+```bash
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_5_4b \
+  --benchmark open_ended_diagnosis \
+  --evaluation-set validation \
+  --limit 100
+```
+
+Then judge the completed run directory. A dry-run validates all task,
+reference, prompt, and judge-schema joins without calling Luna:
+
+```bash
+uv run python -m src.benchmark.cli judge \
+  --run outputs/benchmark_runs/open_ended_diagnosis/qwen_3_5_4b/<run> \
+  --dry-run
+
+uv run python -m src.benchmark.cli judge \
+  --run outputs/benchmark_runs/open_ended_diagnosis/qwen_3_5_4b/<run>
+```
+
+The second command writes `judgments.jsonl`, `judge_metrics.json`,
+`judge_manifest.yaml`, and `judge_report.html` beside the original run. The
+principal metrics are judge Top-1/Top-3 accuracy and reciprocal rank, plus
+0–4 scores for diagnosis correctness, visible findings, evidence grounding,
+clinical-rationale quality, and differential quality. Unsupported claims and
+the overall-verdict distribution are also reported. These metrics depend on
+the fixed judge and prompt; they must be reported as judge-based estimates,
+not deterministic ground truth.
 
 ## Run against an existing vLLM server
 
@@ -489,6 +548,10 @@ The evidence-grounded task calculates:
 - evidence-reference validity and visible-evidence grounding;
 - confidence calibration;
 - JSON, schema, and cross-field semantic compliance.
+
+The open-ended task itself reports only response availability and length.
+Clinical correctness is calculated by its explicit single-judge stage, never
+by extracting disease names from prose with hidden heuristics.
 
 BERTScore and subgroup analyses are declared as deferred in the benchmark
 YAML and are not silently approximated. The implementation uses frozen

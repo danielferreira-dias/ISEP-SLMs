@@ -1,0 +1,57 @@
+benchmark:
+  id: open_ended_diagnosis
+  version: 1.0.0
+  task: open_ended_clinical_diagnosis
+  description: >
+    Evaluates a natural-language dermatology assessment without exposing a
+    candidate disease list. The model describes visible findings, ranks three
+    diagnoses in prose, and gives a concise clinical rationale.
+  top_k: 3
+
+prompt:
+  path: artifacts/prompts/open_ended_diagnosis.yaml
+
+taxonomy:
+  path: artifacts/taxonomies/diseases.yaml
+
+judge:
+  model_config: configs/models/gpt_5_6_luna.yaml
+  prompt_path: artifacts/judges/open_ended_diagnosis_judge.yaml
+  schema_path: artifacts/schemas/open_ended_diagnosis_judge.schema.json
+  reasoning_effort: high
+  max_output_tokens: 2048
+  retries: 3
+
+dataset:
+  default_evaluation_set: internal_benchmark
+  evaluation_sets:
+    validation:
+      role: development_validation
+      expected_tasks: 100
+    internal_benchmark:
+      role: sealed_evaluation
+      expected_tasks: 300
+  selection_seed: 42
+  requested_differential_count: 3
+
+execution:
+  output_mode: free_text
+  max_output_tokens: 8192
+  batch_size: 8
+  resume: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+
+image_preprocessing:
+  profile: dermatology_api_safe_rgb_jpeg_v1
+  max_edge_pixels: 768
+  max_encoded_bytes: 45000
+  jpeg_quality: 85
+  minimum_jpeg_quality: 40
+  minimum_edge_pixels: 224
+
+structured_output:
+  mode: prompt_only
+
+output:
+  directory: outputs/benchmark_runs

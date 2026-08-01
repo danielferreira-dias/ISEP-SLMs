@@ -1,0 +1,49 @@
+# Zero-shot free-text diagnosis followed by the frozen single-judge stage.
+
+schema_version: 1
+
+experiment:
+  id: zero_shot_open_ended_diagnosis_v1
+  version: 1.0.0
+  type: zero_shot_evaluation
+  status: ready_for_execution
+  description: >
+    Compares natural-language Top-3 dermatology assessments and visible
+    clinical rationales using the blinded GPT-5.6 Luna judge protocol.
+
+benchmark:
+  config: open_ended_diagnosis
+  evaluation_set: internal_benchmark
+  source: auto
+  repository: danielfdias98/ISEPDermaBench
+
+judge:
+  model: configs/models/gpt_5_6_luna.yaml
+  count: 1
+  reasoning_effort: high
+  human_review: false
+  compare_models_in_one_request: false
+
+selection_policy:
+  evaluation_role: sealed_primary_evaluation
+  teacher_selection_allowed: false
+  prompt_selection_allowed: false
+  checkpoint_selection_allowed: false
+  threshold_selection_allowed: false
+
+repetitions:
+  count: 1
+  seeds:
+    - 42
+
+tracking:
+  save_environment: true
+  save_git_commit: true
+  save_config_snapshot: true
+  save_model_revisions: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  save_judgments: true
+
+output:
+  directory: outputs/experiments/zero_shot_open_ended_diagnosis_v1

@@ -12,7 +12,6 @@ import yaml
 from src.data_pipeline.confusion_sets import (
     build_confusion_tasks,
     validate_confusion_set_release,
-    validate_confusion_validation_release,
     validate_confusion_task_frame,
 )
 
@@ -124,34 +123,37 @@ class ConfusionSetReleaseTests(unittest.TestCase):
         self.assertTrue(release["integrity_passed"])
 
     def test_validation_release_is_separate_and_balanced(self) -> None:
-        release = validate_confusion_validation_release(ROOT)
-        self.assertEqual(
-            release["evaluation_origin"],
-            "development_validation",
-        )
-        self.assertEqual(release["counts"]["selected_images"], 417)
-        self.assertEqual(release["counts"]["tasks"], 834)
-
-        benchmark = yaml.safe_load(
+        paths = sorted(
             (
                 ROOT
-                / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
-            ).read_text(encoding="utf-8")
+                / "data/benchmarks/ISEPDermaBench/tasks/"
+                "visual_confusion_sets"
+            ).glob("validation-*.parquet")
         )
-        evaluation = benchmark["dataset"]["evaluation_sets"][
-            "validation_paired_confusion_tasks"
-        ]
-        tasks = pd.read_parquet(ROOT / evaluation["manifest"])
+        tasks = pd.concat([pd.read_parquet(path) for path in paths])
         self.assertEqual(len(tasks), 834)
         self.assertEqual(tasks["sample_id"].nunique(), 417)
         self.assertEqual(tasks["leakage_group_id"].nunique(), 417)
-        self.assertEqual(tasks["disease_id"].nunique(), 15)
+        references = pd.concat(
+            [
+                pd.read_parquet(path)
+                for path in sorted(
+                    (
+                        ROOT
+                        / "data/benchmarks/ISEPDermaBench/references/"
+                        "visual_confusion_sets"
+                    ).glob("validation-*.parquet")
+                )
+            ]
+        )
+        self.assertEqual(references["reference_disease_id"].nunique(), 15)
 
     def test_config_metrics_have_english_descriptions(self) -> None:
         benchmark = yaml.safe_load(
             (
                 ROOT
-                / "configs/benchmarks/derma_isep/visual_confusion_sets.yaml"
+                / "data/benchmarks/ISEPDermaBench/artifacts/configs/"
+                "visual_confusion_sets.yaml"
             ).read_text(encoding="utf-8")
         )
         metric_ids = {

@@ -61,6 +61,18 @@ configs:
     path: references/evidence_grounded_diagnosis/internal_benchmark-*.parquet
   - split: external_ddi
     path: references/evidence_grounded_diagnosis/external_ddi-*.parquet
+- config_name: open_ended_diagnosis
+  data_files:
+  - split: validation
+    path: tasks/open_ended_diagnosis/validation-*.parquet
+  - split: internal_benchmark
+    path: tasks/open_ended_diagnosis/internal_benchmark-*.parquet
+- config_name: open_ended_diagnosis_references
+  data_files:
+  - split: validation
+    path: references/open_ended_diagnosis/validation-*.parquet
+  - split: internal_benchmark
+    path: references/open_ended_diagnosis/internal_benchmark-*.parquet
 ---
 
 # ISEPDermaBench
@@ -103,6 +115,8 @@ from a `_references` configuration in a model request.
 | evidence_grounded_diagnosis | validation | 137 | 137 | 137 |
 | evidence_grounded_diagnosis | internal_benchmark | 134 | 134 | 134 |
 | evidence_grounded_diagnosis | external_ddi | 636 | 636 | 632 |
+| open_ended_diagnosis | validation | 100 | 100 | 100 |
+| open_ended_diagnosis | internal_benchmark | 300 | 300 | 300 |
 
 ### `visual_top_k`
 
@@ -120,6 +134,15 @@ same image is evaluated once per condition.
 Morphology grounding, observation-only clinical description, six-disease
 differential diagnosis, and explicit evidence links. It includes Validation,
 the newly materialized sealed internal evidence cohort, and external DDI.
+
+
+### `open_ended_diagnosis`
+
+Free-text, image-only clinical assessment with an explicitly ranked Top-3
+differential and concise visible-evidence rationale. The evaluated model sees
+no disease taxonomy, candidate IDs, gold label, SKINCON concepts, SkinCAP
+description, or JSON schema. A separate single-judge stage uses GPT-5.6 Luna
+and the isolated reference configuration.
 
 ## Input schema
 
@@ -174,6 +197,10 @@ image. Exact shard checksums and counts are recorded in `release.json`.
 Build and validate locally with:
 
 ```bash
-python -m src.data_pipeline.huggingface_benchmark_export
-python -m src.data_pipeline.huggingface_benchmark_export --validate-only
+python -m src.data_pipeline.open_ended_benchmark \
+  --source data/benchmarks/ISEPDermaBench-v1.0.0 \
+  --output data/benchmarks/ISEPDermaBench-v1.1.0
+python -m src.data_pipeline.open_ended_benchmark \
+  --output data/benchmarks/ISEPDermaBench-v1.1.0 \
+  --validate-only
 ```

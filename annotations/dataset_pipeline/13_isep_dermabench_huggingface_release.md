@@ -2,7 +2,7 @@
 
 ## Objective
 
-Create a private, reproducible Hugging Face benchmark dataset for the three
+Create a private, reproducible Hugging Face benchmark dataset for the four
 DermaISEP multimodal tasks while preventing scoring references from being sent
 to a model as input.
 
@@ -10,8 +10,9 @@ to a model as input.
 
 - Dataset: `danielfdias98/ISEPDermaBench`
 - Bucket: `danielfdias98/ISEPDermaBench`
-- Frozen dataset tag: `v1.0.0`
+- Frozen dataset tags: `v1.0.0` and `v1.1.0`
 - Initial dataset commit: `9d12adfcc3308b4629e97b3a6bfa0627fb094158`
+- Version 1.1.0 dataset commit: `7cb7adcf21d95e9a45b600329e010f40fbb7dace`
 
 Both destinations are private. The dataset repository is the interface for
 Hugging Face Dataset Viewer and `load_dataset`; the bucket is a complete
@@ -30,6 +31,9 @@ visual_confusion_sets_references
 
 evidence_grounded_diagnosis
 evidence_grounded_diagnosis_references
+
+open_ended_diagnosis
+open_ended_diagnosis_references
 ```
 
 Task configurations contain the exact model request:
@@ -60,10 +64,13 @@ the inference request.
 | Evidence-Grounded Diagnosis | Validation | 137 | 137 | 137 |
 | Evidence-Grounded Diagnosis | Internal Benchmark | 134 | 134 | 134 |
 | Evidence-Grounded Diagnosis | External DDI | 636 | 636 | 632 |
+| Open-Ended Diagnosis | Validation | 100 | 100 | 100 |
+| Open-Ended Diagnosis | Internal Benchmark | 300 | 300 | 300 |
 
-The release contains 6,917 tasks across nine splits. Embedded benchmark image
-bytes total 239,732,051 bytes; the complete compressed local release occupies
-approximately 226 MB.
+Version 1.1.0 adds 400 open-ended tasks across two splits. Its model inputs
+contain no candidate list or scoring references. The corresponding isolated
+reference views provide the correct label and optional SKINCON/SkinCAP aids
+only to the single blinded judge.
 
 ## Missing Internal Evidence cohort
 
@@ -118,15 +125,23 @@ The release validator confirmed:
 - zero Validation/Internal Benchmark overlap by `leakage_group_id`;
 - all copied configs, prompts, schemas, and taxonomies match their hashes.
 
-The complete unit-test suite passed: 135 tests.
+The v1.1.0 open-ended integration tests validate cohort size, 21-class
+coverage, group isolation, free-text preservation, judge-schema scoring, and
+the absence of model identity and provider reasoning from judge requests.
+The exact bucket sync was verified after publication: all 58 files were
+identical, with zero pending uploads, downloads, or deletions.
 
 ## Rebuild
 
 ```bash
-python -m src.data_pipeline.evidence_grounded
-python -m src.data_pipeline.huggingface_benchmark_export
-python -m src.data_pipeline.huggingface_benchmark_export --validate-only
+python -m src.data_pipeline.open_ended_benchmark \
+  --source data/benchmarks/ISEPDermaBench-v1.0.0 \
+  --output data/benchmarks/ISEPDermaBench-v1.1.0
+python -m src.data_pipeline.open_ended_benchmark \
+  --output data/benchmarks/ISEPDermaBench-v1.1.0 \
+  --validate-only
 ```
 
-The export is generated under `data/benchmarks/ISEPDermaBench/`. Generated
+The first command requires a local copy of the frozen `v1.0.0` release. The
+export is generated under `data/benchmarks/ISEPDermaBench-v1.1.0/`. Generated
 Parquet shards and release manifests must not be edited manually.

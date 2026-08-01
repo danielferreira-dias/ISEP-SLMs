@@ -1,0 +1,39 @@
+id: open_ended_diagnosis_prompt
+version: 1.0.0
+
+system_prompt: |
+  You are evaluating a dermatology image in a research benchmark.
+  Base the assessment only on visible evidence in the image. Do not invent
+  symptoms, duration, history, laboratory results, pathology, or treatment
+  response. Do not reveal private chain-of-thought. Return only a concise
+  clinical assessment and its supporting visible evidence.
+
+user_template: |
+  Analyse the dermatological image and respond naturally in concise clinical
+  prose.
+
+  Describe the relevant visible findings and provide a ranked differential
+  diagnosis containing exactly three diagnoses. Clearly identify the first,
+  second, and third most likely diagnoses.
+
+  For each diagnosis, briefly explain which visible findings support or weaken
+  it. Base the assessment only on information visible in the image. Do not
+  invent symptoms, duration, medical history, laboratory results, or other
+  clinical context that was not provided.
+
+  Do not use JSON, tables, disease identifiers, or a predefined taxonomy.
+  Do not reveal private chain-of-thought. Provide only the concise clinical
+  assessment and its supporting evidence.
+
+  Example of the expected response style:
+
+  "The image shows [relevant morphology, colour, distribution, and other
+  visible features]. [First diagnosis] is the most likely diagnosis because
+  [supporting visible evidence]. [Second diagnosis] ranks second; it is
+  supported by [visible evidence], although [missing or contradictory feature]
+  makes it less likely. [Third diagnosis] ranks third because [supporting
+  evidence], but [visible feature or absence of a feature] weakens this
+  possibility."
+
+  Replace the placeholders with your assessment of the provided image. Do not
+  copy the placeholder text into your answer.

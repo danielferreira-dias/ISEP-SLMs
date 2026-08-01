@@ -10,11 +10,12 @@ import unittest
 import yaml
 
 from src.config import (
-    BenchmarkConfigError,
     ModelConfigError,
-    list_benchmark_configs,
-    load_benchmark_config,
     load_model_config,
+)
+from src.benchmark.isep_dermabench import (
+    list_isep_dermabench_configs,
+    load_isep_dermabench_config,
 )
 
 
@@ -23,27 +24,27 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class BenchmarkConfigLoaderTests(unittest.TestCase):
     def test_all_benchmarks_have_defaults_budgets_and_prompt_only(self) -> None:
-        configs = list_benchmark_configs(root=ROOT)
+        configs = list_isep_dermabench_configs(root=ROOT)
 
-        self.assertEqual(len(configs), 3)
+        self.assertEqual(len(configs), 4)
         by_id = {item.benchmark.id: item for item in configs}
         self.assertEqual(
             by_id[
                 "visual_top_k_closed_set"
             ].dataset.default_evaluation_set,
-            "internal_benchmark_1000",
+            "internal_benchmark",
         )
         self.assertEqual(
             by_id[
                 "visual_disease_confusion_sets"
             ].dataset.default_evaluation_set,
-            "paired_confusion_tasks",
+            "internal_benchmark",
         )
         self.assertEqual(
             by_id[
                 "evidence_grounded_diagnosis"
             ].dataset.default_evaluation_set,
-            "external_ddi_evidence",
+            "internal_benchmark",
         )
         self.assertEqual(
             by_id["visual_top_k_closed_set"].max_output_tokens,
@@ -69,32 +70,32 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
                 config.image_preprocessing.max_encoded_bytes,
                 45_000,
             )
-            self.assertTrue(config.dataset.default.manifest.is_file())
+            self.assertTrue(config.dataset.default.manifest.is_dir())
             self.assertEqual(
                 config.output_directory,
                 ROOT / "outputs/benchmark_runs",
             )
 
     def test_benchmark_loads_by_id_and_relative_path(self) -> None:
-        by_id = load_benchmark_config(
+        by_id = load_isep_dermabench_config(
             "visual_top_k_closed_set", root=ROOT
         )
-        by_path = load_benchmark_config(
-            "configs/benchmarks/derma_isep/visual_top_k.yaml",
+        by_path = load_isep_dermabench_config(
+            "visual_top_k.yaml",
             root=ROOT,
         )
         self.assertEqual(by_id, by_path)
 
     def test_unknown_benchmark_and_evaluation_set_are_clear(self) -> None:
         with self.assertRaisesRegex(
-            BenchmarkConfigError, "Unknown benchmark ID"
+            ValueError, "Unknown ISEPDermaBench benchmark"
         ):
-            load_benchmark_config("does_not_exist", root=ROOT)
-        config = load_benchmark_config(
+            load_isep_dermabench_config("does_not_exist", root=ROOT)
+        config = load_isep_dermabench_config(
             "visual_top_k_closed_set", root=ROOT
         )
         with self.assertRaisesRegex(
-            BenchmarkConfigError, "available sets"
+            ValueError, "Unknown evaluation set"
         ):
             config.dataset.evaluation_set("does_not_exist")
 
@@ -141,14 +142,14 @@ class ExperimentConfigContractTests(unittest.TestCase):
         ):
             document = yaml.safe_load(path.read_text(encoding="utf-8"))
             self.assertNotIn("overrides", document)
-            benchmark = load_benchmark_config(
+            benchmark = load_isep_dermabench_config(
                 document["benchmark"]["config"],
                 root=ROOT,
             )
             evaluation_set = benchmark.dataset.evaluation_set(
                 document["benchmark"]["evaluation_set"]
             )
-            self.assertTrue(evaluation_set.manifest.is_file())
+            self.assertTrue(evaluation_set.manifest.is_dir())
 
     def test_teacher_selection_is_validation_only(self) -> None:
         path = (
@@ -157,7 +158,7 @@ class ExperimentConfigContractTests(unittest.TestCase):
             "teacher_selection_visual_validation_v1.yaml"
         )
         document = yaml.safe_load(path.read_text(encoding="utf-8"))
-        benchmark = load_benchmark_config(
+        benchmark = load_isep_dermabench_config(
             document["benchmark"]["config"],
             root=ROOT,
         )
@@ -205,7 +206,7 @@ class ExperimentConfigContractTests(unittest.TestCase):
 
         self.assertEqual(
             document["benchmark"]["evaluation_set"],
-            "internal_benchmark_1000",
+            "internal_benchmark",
         )
         for key in (
             "teacher_selection_allowed",

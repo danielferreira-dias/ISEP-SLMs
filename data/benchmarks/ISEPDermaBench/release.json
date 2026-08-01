@@ -1,13 +1,13 @@
 {
   "release": {
     "id": "ISEPDermaBench",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "schema_version": "1.0.0",
     "visibility": "private",
     "created_at": "2026-08-01",
     "reference_isolation": true,
     "image_preprocessing_profile": "dermatology_api_safe_rgb_jpeg_v1",
-    "embedded_image_bytes": 239732051,
+    "embedded_image_bytes": 253742386,
     "splits": [
       {
         "benchmark": "visual_top_k",
@@ -341,6 +341,64 @@
             "sha256": "ef00c0254863cf9dc8775207bcaf7b7d1959046ecd9538aa24fc567b3a140b9f"
           }
         ]
+      },
+      {
+        "benchmark": "open_ended_diagnosis",
+        "benchmark_id": "open_ended_diagnosis",
+        "split": "validation",
+        "source_evaluation_set": "validation",
+        "task_count": 100,
+        "sample_count": 100,
+        "group_count": 100,
+        "reference_enrichment": {
+          "skincon": 84,
+          "skincap": 82
+        },
+        "task_shards": [
+          {
+            "path": "tasks/open_ended_diagnosis/validation-00000-of-00001.parquet",
+            "rows": 100,
+            "bytes": 3465680,
+            "sha256": "6ca02fa99eef4709a77a3e97a77ac0b7f7c0d529bd4f96d584a0aca68f432abf"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/open_ended_diagnosis/validation-00000-of-00001.parquet",
+            "rows": 100,
+            "bytes": 43691,
+            "sha256": "9286fc3e5167e065cfae24fb117ca45aad7ee6540bda8fcf1e72f71c138d3596"
+          }
+        ]
+      },
+      {
+        "benchmark": "open_ended_diagnosis",
+        "benchmark_id": "open_ended_diagnosis",
+        "split": "internal_benchmark",
+        "source_evaluation_set": "internal_benchmark",
+        "task_count": 300,
+        "sample_count": 300,
+        "group_count": 300,
+        "reference_enrichment": {
+          "skincon": 134,
+          "skincap": 119
+        },
+        "task_shards": [
+          {
+            "path": "tasks/open_ended_diagnosis/internal_benchmark-00000-of-00001.parquet",
+            "rows": 300,
+            "bytes": 10700767,
+            "sha256": "184315850a7c780969fb8f153f47d55d2ea9a948a06d33a702f4e631b5a41b85"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/open_ended_diagnosis/internal_benchmark-00000-of-00001.parquet",
+            "rows": 300,
+            "bytes": 71352,
+            "sha256": "aac177ae14bbd1cd0c88d6bbb8a8e1c8aa91a0e2ccdae960de034b189b2ae19e"
+          }
+        ]
       }
     ],
     "artifacts": [
@@ -398,11 +456,39 @@
         "path": "artifacts/taxonomies/disease_confusion_sets.yaml",
         "source": "configs/taxonomies/disease_confusion_sets.yaml",
         "sha256": "1775df064d301dffeee1a792f0109b64406c96d61395a4d95c4b161dc1b66e34"
+      },
+      {
+        "path": "artifacts/configs/open_ended_diagnosis.yaml",
+        "source": "src/benchmark/resources/open_ended_diagnosis/benchmark.yaml",
+        "sha256": "e4f9bafa400c6b9bf01bd866e2352b9c5e9c836eb47dc89f687f7ac1060060e5"
+      },
+      {
+        "path": "artifacts/prompts/open_ended_diagnosis.yaml",
+        "source": "src/benchmark/resources/open_ended_diagnosis/model_prompt.yaml",
+        "sha256": "2da9eb9ab12ece105963276f718840f556737c67235e7ac85ba8d77da10dc79b"
+      },
+      {
+        "path": "artifacts/judges/open_ended_diagnosis_judge.yaml",
+        "source": "src/benchmark/resources/open_ended_diagnosis/judge_prompt.yaml",
+        "sha256": "7b9b48fd4180c7ae3137d9511a4ac058d0d2e3b31dc9d9693ee50a480ecd583d"
+      },
+      {
+        "path": "artifacts/schemas/open_ended_diagnosis_judge.schema.json",
+        "source": "src/benchmark/resources/open_ended_diagnosis/judge.schema.json",
+        "sha256": "5732bd7413dd0ccee829bc297658df83304724a4155f68b8d13a1f07344c392f"
       }
     ],
     "source_licenses": {
       "path": "metadata/source_licenses.json",
       "sha256": "d3748092d23280adf4de7e0199db54643e3e8b1fb68d30b3b210452c61934206"
+    },
+    "open_ended_judge": {
+      "model_id": "gpt_5_6_luna",
+      "model_config": "configs/models/gpt_5_6_luna.yaml",
+      "single_judge": true,
+      "second_judge": false,
+      "human_review": false,
+      "input_policy": "image_reference_final_response_only"
     }
   }
 }
