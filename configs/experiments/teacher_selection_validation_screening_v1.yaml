@@ -1,0 +1,98 @@
+# Development-only paired screening across every Validation task.
+
+schema_version: 1
+
+experiment:
+  id: teacher_selection_validation_screening_v1
+  version: 1.0.0
+  type: teacher_selection_screening
+  status: ready_for_execution
+  description: >
+    Records the fixed, class-balanced cohorts used to screen the selected
+    Qwen student, the local Qwen 27B candidate, and the three OpenRouter
+    candidates under paired thinking conditions.
+
+benchmarks:
+  - config: visual_top_k_closed_set
+    evaluation_set: validation
+    initial_task_ids: data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/visual_top_k_100_cases.task_ids.txt
+    expansion_task_ids: data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/visual_top_k_200_cases.task_ids.txt
+
+  - config: visual_disease_confusion_sets
+    evaluation_set: validation
+    initial_task_ids: data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/visual_confusion_sets_100_pairs.task_ids.txt
+    expansion_task_ids: data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/visual_confusion_sets_200_pairs.task_ids.txt
+    note: 100 pairs produce 200 requests; 200 pairs produce 400 requests.
+
+  - config: evidence_grounded_diagnosis
+    evaluation_set: validation
+    initial_task_ids: data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/evidence_grounded_diagnosis_100_cases.task_ids.txt
+    expansion_task_ids: data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/evidence_grounded_diagnosis_137_cases.task_ids.txt
+    note: The complete Validation task contains 137 cases, not 200.
+
+  - config: open_ended_diagnosis
+    evaluation_set: validation
+    initial_task_ids: data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/open_ended_diagnosis_100_cases.task_ids.txt
+    expansion_task_ids: null
+    note: The initial cohort is already the complete 100-case Validation task.
+
+models:
+  - config: configs/models/qwen_3_6_27b.yaml
+    enabled: true
+  - config: configs/models/qwen_small_4b.yaml
+    enabled: true
+  - config: configs/models/qwen_3_7_flash_openrouter.yaml
+    enabled: true
+  - config: configs/models/minimax_m3_openrouter.yaml
+    enabled: true
+  - config: configs/models/mimo_v2_5_openrouter.yaml
+    enabled: true
+
+thinking_protocol:
+  phase_1:
+    id: thinking_off
+    cli_override: disabled
+    applies_to_all_except: []
+  phase_2:
+    id: thinking_on
+    cli_override: enabled
+    max_output_tokens_override: 14336
+    reasoning_max_tokens: 10240
+    applies_to_all_except: []
+    paired_with_phase_1: true
+    note: >
+      The total completion cap includes reasoning and the final answer.
+      Controllable profiles therefore use a separate 10240-token reasoning
+      budget, leaving up to 4096 tokens for the scored answer. The budget maps
+      to thinking_token_budget on vLLM and reasoning.max_tokens on OpenRouter.
+      Phase 1 had zero truncations, so its 8192-token total cap was non-binding.
+      Both effective limits are recorded without modifying the frozen
+      ISEPDermaBench artifacts.
+  fixed_exception: null
+
+selection_policy:
+  evaluation_role: development_validation
+  teacher_selection_allowed: true
+  same_task_ids_for_every_model: true
+  same_task_ids_for_thinking_ab: true
+  initial_unit_count: 100
+  expansion_is_nested: true
+  expansion_trigger: >
+    Expand only when leading models are too close or conclusions are unstable.
+  prohibited_evaluation_sets:
+    - internal_benchmark
+    - internal_test
+    - external_ddi
+    - external_skindisnet
+
+tracking:
+  save_environment: true
+  save_git_commit: true
+  save_config_snapshot: true
+  save_model_revisions: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  save_reasoning_separately: true
+
+output:
+  directory: outputs/validation_screening_v1

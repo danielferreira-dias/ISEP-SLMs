@@ -18,8 +18,11 @@ from urllib.request import Request, urlopen
 
 import modal
 
+from src.modal._shared import run_benchmark, smoke_runs
+
 
 APP_NAME = "isep-qwen-3-6-27b-benchmark"
+MODEL_CONFIG_ID = "qwen_3_6_27b"
 MODEL_ID = "Qwen/Qwen3.6-27B"
 MODEL_REVISION = "main"
 GPU = "A100-80GB"
@@ -61,6 +64,7 @@ runtime_image = (
             "VLLM_CACHE_ROOT": VLLM_CACHE_PATH,
         }
     )
+    .add_local_python_source("src.modal._shared")
 )
 
 
@@ -132,59 +136,53 @@ def main(
     batch_size: int = 8,
     reasoning_capture: str = "available",
     output_root: str | None = None,
+    validation_suite: bool = False,
+    teacher_screening: bool = False,
+    thinking_mode: str = "config",
+    max_output_tokens: int | None = None,
     dry_run: bool = False,
     startup_timeout: int = STARTUP_TIMEOUT_SECONDS,
 ) -> None:
     """Run a benchmark smoke test through the remote Modal vLLM server."""
 
     project_root = Path(__file__).resolve().parents[2]
-    if limit <= 0:
-        raise ValueError("limit must be positive")
+    runs = smoke_runs(
+        benchmark=benchmark,
+        evaluation_set=evaluation_set,
+        limit=limit,
+        all_benchmarks=False,
+        validation_suite=validation_suite,
+        teacher_screening=teacher_screening,
+    )
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
     if startup_timeout <= 0:
         raise ValueError("startup_timeout must be positive")
 
-    command = [
-        sys.executable,
-        "-m",
-        "src.benchmark.cli",
-        "run",
-        "--model",
-        "qwen_3_6_27b",
-        "--benchmark",
-        benchmark,
-        "--evaluation-set",
-        evaluation_set,
-        "--limit",
-        str(limit),
-        "--seed",
-        str(seed),
-        "--batch-size",
-        str(batch_size),
-        "--reasoning-capture",
-        reasoning_capture,
-    ]
-    if output_root:
-        command.extend(["--output-root", output_root])
-
-    if dry_run:
-        command.append("--dry-run")
-        subprocess.run(command, cwd=project_root, check=True)
-        return
-
-    server_url = QwenVllmServer.get_url()
-    if not server_url:
-        raise RuntimeError("Modal did not return a URL for the vLLM server")
-    _wait_until_healthy(server_url, timeout_seconds=startup_timeout)
-
-    command.extend(["--base-url", f"{server_url.rstrip('/')}/v1"])
-    print(
-        f"Running {benchmark} with {MODEL_ID}: "
-        f"{limit} selected case(s), seed {seed}.",
-        flush=True,
-    )
-    subprocess.run(command, cwd=project_root, check=True)
+    server_url: str | None = None
+    if not dry_run:
+        server_url = QwenVllmServer.get_url()
+        if not server_url:
+            raise RuntimeError(
+                "Modal did not return a URL for the vLLM server"
+            )
+        _wait_until_healthy(server_url, timeout_seconds=startup_timeout)
+    for run in runs:
+        run_benchmark(
+            project_root=project_root,
+            model_config_id=MODEL_CONFIG_ID,
+            model_id=MODEL_ID,
+            run=run,
+            seed=seed,
+            batch_size=batch_size,
+            reasoning_capture=reasoning_capture,
+            structured_output="prompt_only",
+            output_root=output_root,
+            dry_run=dry_run,
+            server_url=server_url,
+            thinking_mode=thinking_mode,
+            max_output_tokens=max_output_tokens,
+        )
 
 
 def _wait_until_healthy(url: str, *, timeout_seconds: int) -> None:

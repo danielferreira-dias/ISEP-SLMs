@@ -56,6 +56,7 @@ reasoning:
 
 generation:
   profile: thinking_general_tasks
+  reasoning_max_tokens: 10240
   do_sample: true
   temperature: 1.0
   top_p: 0.95

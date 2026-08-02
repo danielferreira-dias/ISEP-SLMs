@@ -62,6 +62,25 @@ class ModalSmokeSuiteTests(unittest.TestCase):
         )
         self.assertEqual(confusion.selection_limit, 5)
 
+    def test_teacher_screening_uses_fixed_task_id_files(self) -> None:
+        runs = smoke_runs(
+            benchmark="ignored",
+            evaluation_set="ignored",
+            limit=10,
+            all_benchmarks=False,
+            teacher_screening=True,
+        )
+
+        self.assertEqual(len(runs), 4)
+        self.assertEqual(
+            [run.expected_task_count for run in runs],
+            [100, 200, 100, 100],
+        )
+        self.assertTrue(
+            all(run.task_ids_file is not None for run in runs)
+        )
+        self.assertIn("100_pairs", runs[1].task_ids_file or "")
+
     def test_all_benchmarks_rejects_odd_task_count(self) -> None:
         with self.assertRaisesRegex(ValueError, "must be even"):
             smoke_runs(
@@ -130,11 +149,72 @@ class ModalSmokeSuiteTests(unittest.TestCase):
                 output_root=None,
                 dry_run=True,
                 server_url=None,
+                thinking_mode="disabled",
             )
 
         command = subprocess_run.call_args.args[0]
         index = command.index("--structured-output")
         self.assertEqual(command[index + 1], "json_schema")
+        thinking_index = command.index("--thinking-mode")
+        self.assertEqual(command[thinking_index + 1], "disabled")
+
+    def test_run_benchmark_uses_task_ids_instead_of_limit(self) -> None:
+        run = smoke_runs(
+            benchmark="ignored",
+            evaluation_set="ignored",
+            limit=100,
+            all_benchmarks=False,
+            teacher_screening=True,
+        )[0]
+
+        with patch("src.modal._shared.subprocess.run") as subprocess_run:
+            run_benchmark(
+                project_root=Path("/project"),
+                model_config_id="model",
+                model_id="provider/model",
+                run=run,
+                seed=42,
+                batch_size=4,
+                reasoning_capture="available",
+                structured_output="prompt_only",
+                output_root=None,
+                dry_run=True,
+                server_url=None,
+                thinking_mode="disabled",
+            )
+
+        command = subprocess_run.call_args.args[0]
+        self.assertIn("--task-ids-file", command)
+        self.assertNotIn("--limit", command)
+
+    def test_run_benchmark_passes_max_output_token_override(self) -> None:
+        run = smoke_runs(
+            benchmark="visual_top_k_closed_set",
+            evaluation_set="validation",
+            limit=10,
+            all_benchmarks=False,
+        )[0]
+
+        with patch("src.modal._shared.subprocess.run") as subprocess_run:
+            run_benchmark(
+                project_root=Path("/project"),
+                model_config_id="model",
+                model_id="provider/model",
+                run=run,
+                seed=42,
+                batch_size=4,
+                reasoning_capture="available",
+                structured_output="prompt_only",
+                output_root=None,
+                dry_run=True,
+                server_url=None,
+                thinking_mode="enabled",
+                max_output_tokens=10_240,
+            )
+
+        command = subprocess_run.call_args.args[0]
+        index = command.index("--max-output-tokens")
+        self.assertEqual(command[index + 1], "10240")
 
 
 if __name__ == "__main__":

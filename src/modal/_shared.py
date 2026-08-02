@@ -19,6 +19,7 @@ class SmokeRun:
     evaluation_set: str
     selection_limit: int
     expected_task_count: int
+    task_ids_file: str | None = None
 
 
 def smoke_runs(
@@ -29,18 +30,71 @@ def smoke_runs(
     all_benchmarks: bool,
     evidence_and_top_k: bool = False,
     validation_suite: bool = False,
+    teacher_screening: bool = False,
 ) -> tuple[SmokeRun, ...]:
     """Resolve a single run or one of the fixed benchmark smoke suites."""
 
     if limit <= 0:
         raise ValueError("limit must be positive")
     selected_suites = sum(
-        (all_benchmarks, evidence_and_top_k, validation_suite)
+        (
+            all_benchmarks,
+            evidence_and_top_k,
+            validation_suite,
+            teacher_screening,
+        )
     )
     if selected_suites > 1:
         raise ValueError(
-            "all_benchmarks, evidence_and_top_k, and validation_suite are "
-            "mutually exclusive"
+            "all_benchmarks, evidence_and_top_k, validation_suite, and "
+            "teacher_screening are mutually exclusive"
+        )
+    if teacher_screening:
+        cohort_root = (
+            "data/benchmarks/ISEPDermaBench/metadata/"
+            "validation_screening_v1"
+        )
+        return (
+            SmokeRun(
+                benchmark="visual_top_k_closed_set",
+                evaluation_set="validation",
+                selection_limit=100,
+                expected_task_count=100,
+                task_ids_file=(
+                    f"{cohort_root}/"
+                    "visual_top_k_100_cases.task_ids.txt"
+                ),
+            ),
+            SmokeRun(
+                benchmark="visual_disease_confusion_sets",
+                evaluation_set="validation",
+                selection_limit=100,
+                expected_task_count=200,
+                task_ids_file=(
+                    f"{cohort_root}/"
+                    "visual_confusion_sets_100_pairs.task_ids.txt"
+                ),
+            ),
+            SmokeRun(
+                benchmark="evidence_grounded_diagnosis",
+                evaluation_set="validation",
+                selection_limit=100,
+                expected_task_count=100,
+                task_ids_file=(
+                    f"{cohort_root}/"
+                    "evidence_grounded_diagnosis_100_cases.task_ids.txt"
+                ),
+            ),
+            SmokeRun(
+                benchmark="open_ended_diagnosis",
+                evaluation_set="validation",
+                selection_limit=100,
+                expected_task_count=100,
+                task_ids_file=(
+                    f"{cohort_root}/"
+                    "open_ended_diagnosis_100_cases.task_ids.txt"
+                ),
+            ),
         )
     if validation_suite:
         if limit % 2:
@@ -155,6 +209,8 @@ def run_benchmark(
     output_root: str | None,
     dry_run: bool,
     server_url: str | None,
+    thinking_mode: str = "config",
+    max_output_tokens: int | None = None,
 ) -> None:
     """Invoke the repository CLI for one resolved smoke run."""
 
@@ -169,8 +225,6 @@ def run_benchmark(
         run.benchmark,
         "--evaluation-set",
         run.evaluation_set,
-        "--limit",
-        str(run.selection_limit),
         "--seed",
         str(seed),
         "--batch-size",
@@ -179,7 +233,19 @@ def run_benchmark(
         reasoning_capture,
         "--structured-output",
         structured_output,
+        "--thinking-mode",
+        thinking_mode,
     ]
+    if max_output_tokens is not None:
+        if max_output_tokens <= 0:
+            raise ValueError("max_output_tokens must be positive")
+        command.extend(
+            ["--max-output-tokens", str(max_output_tokens)]
+        )
+    if run.task_ids_file is not None:
+        command.extend(["--task-ids-file", run.task_ids_file])
+    else:
+        command.extend(["--limit", str(run.selection_limit)])
     if output_root:
         command.extend(["--output-root", output_root])
     if dry_run:

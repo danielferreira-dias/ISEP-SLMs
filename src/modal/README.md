@@ -3,6 +3,27 @@
 This directory contains reproducible Modal applications for running the
 dermatology benchmark pipeline on cloud GPUs.
 
+## Validation teacher screening with thinking
+
+The model launchers accept the same auditable thinking and completion-budget
+overrides as the benchmark CLI. The thinking-on phase uses the fixed 100-case
+Validation cohorts and a 14,336-token total generation cap:
+
+```bash
+modal run src/modal/<launcher>.py \
+  --teacher-screening \
+  --thinking-mode enabled \
+  --max-output-tokens 14336 \
+  --output-root outputs/validation_screening_v1/thinking_on
+```
+
+The override is passed to every task in the suite and recorded in each run
+identity, manifest, and config snapshot. Every controllable model additionally
+reads its 10,240-token reasoning budget from the model YAML. Local vLLM sends
+it as `thinking_token_budget`; OpenRouter sends it as `reasoning.max_tokens`.
+This leaves up to 4,096 tokens for the final answer. The published
+ISEPDermaBench YAML files retain their frozen 8,192-token default.
+
 ## Qwen 3.6 27B
 
 `qwen_3_6_27b.py` exposes `Qwen/Qwen3.6-27B` through vLLM's
@@ -11,7 +32,8 @@ the same benchmark runner used for API and local models. The application:
 
 - retains Hugging Face weights and vLLM cache data in Modal Volumes;
 - accepts one image plus text per benchmark request;
-- disables Qwen thinking while retaining its general-task sampling settings;
+- defaults to Qwen thinking disabled while allowing an explicit audited
+  thinking override;
 - uses the generation parameters from `configs/models/qwen_3_6_27b.yaml`;
 - allows up to 20 minutes for each long thinking request and disables silent
   SDK retries for vLLM requests;
@@ -68,105 +90,26 @@ and stores outputs under `outputs/benchmark_runs/`. The endpoint created by
 `modal run` is ephemeral; use `modal deploy` only when a persistent service is
 actually required.
 
-## Qwen 3.5 9B
+## Qwen 3.5 4B official student
 
-`qwen_small_9b.py` runs `Qwen/Qwen3.5-9B` in BF16 on one NVIDIA L40S.
-The 48 GB GPU comfortably accommodates the model and its 16,384-token context
-while costing less than the A100 80 GB used by the larger candidates. Thinking
-is disabled at both the vLLM server and request levels, while the sampling
-parameters come from `configs/models/qwen_small_9b.yaml`.
-
-Run the default ten-case visual Top-K smoke test:
-
-```bash
-modal run src/modal/qwen_small_9b.py
-```
-
-Run another benchmark or evaluation set:
-
-```bash
-modal run src/modal/qwen_small_9b.py \
-  --benchmark evidence_grounded_diagnosis \
-  --evaluation-set external_ddi_evidence \
-  --limit 10
-```
-
-Validate the configuration locally without allocating an L40S:
-
-```bash
-modal run src/modal/qwen_small_9b.py --dry-run
-```
-
-## Gemma 4 31B IT
-
-`gemma_4_31b_it.py` runs `google/gemma-4-31B-it` in BF16 on a dedicated
-A100 80 GB. It uses the Gemma 4 reasoning parser, but thinking is disabled in
-both the server default and the per-request model configuration. The launcher
-uses the same persistent Hugging Face and vLLM cache volumes as Qwen while
-running in an independent Modal App, so both models can run simultaneously.
-
-Run the default ten-case visual Top-K smoke test:
-
-```bash
-modal run src/modal/gemma_4_31b_it.py
-```
-
-Run ten paired confusion-set images, producing twenty low/high tasks:
-
-```bash
-modal run src/modal/gemma_4_31b_it.py \
-  --benchmark visual_disease_confusion_sets \
-  --evaluation-set paired_confusion_tasks \
-  --limit 10
-```
-
-Run ten evidence-grounded DDI cases:
-
-```bash
-modal run src/modal/gemma_4_31b_it.py \
-  --benchmark evidence_grounded_diagnosis \
-  --evaluation-set external_ddi_evidence \
-  --limit 10
-```
-
-Validate locally without allocating the A100:
-
-```bash
-modal run src/modal/gemma_4_31b_it.py --dry-run
-```
-
-## Gemma 4 E4B and Qwen 3.5 4B
-
-The two small-model launchers use independent Modal Apps on NVIDIA L40S
-GPUs:
-
-| Launcher | Hugging Face model | Default concurrency |
-| --- | --- | ---: |
-| `gemma_4_e4b_it.py` | `google/gemma-4-E4B-it` | 8 |
-| `qwen_small_4b.py` | `Qwen/Qwen3.5-4B` | 8 |
-
-Both attach the existing `huggingface-secret` Modal secret and share the
-persistent Hugging Face and vLLM cache volumes. Public-model downloads avoid
-anonymous Hub rate limits. Gemma uses the Gemma 4 reasoning parser with
-thinking disabled.
+`qwen_small_4b.py` runs the official student, `Qwen/Qwen3.5-4B`, in BF16 on
+one NVIDIA L40S. It attaches the `huggingface-secret` Modal secret and reuses
+the persistent Hugging Face and vLLM cache volumes. Thinking is disabled by
+default but can still be overridden in an explicitly audited experiment.
 
 Run exactly ten scored tasks from each of the three benchmarks while keeping
 one model server alive:
 
 ```bash
-modal run src/modal/gemma_4_e4b_it.py \
-  --all-benchmarks --limit 10
-
 modal run src/modal/qwen_small_4b.py \
   --all-benchmarks --limit 10
 ```
 
-For Gemma E4B and Qwen 4B, compare prompt-only generation with vLLM
-JSON Schema constraints on exactly the visual Top-K and evidence-grounded
-benchmarks:
+Compare prompt-only generation with vLLM JSON Schema constraints on the visual
+Top-K and evidence-grounded benchmarks:
 
 ```bash
-modal run src/modal/<launcher>.py \
+modal run src/modal/qwen_small_4b.py \
   --evidence-and-top-k \
   --structured-output both \
   --limit 10
@@ -183,6 +126,6 @@ the benchmark CLI's native meaning and therefore selects pairs.
 Validate all benchmark configurations without allocating a GPU:
 
 ```bash
-modal run src/modal/gemma_4_e4b_it.py \
+modal run src/modal/qwen_small_4b.py \
   --all-benchmarks --limit 10 --dry-run
 ```

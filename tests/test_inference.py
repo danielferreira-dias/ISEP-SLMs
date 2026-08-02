@@ -286,6 +286,117 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
             ["chat_template_kwargs"]["thinking"]
         )
 
+    def test_vllm_sends_numeric_thinking_budget_when_enabled(self) -> None:
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content="{}"),
+                )
+            ],
+            usage=None,
+        )
+        client = _FakeClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="qwen",
+            client=client,
+            generation={
+                "thinking_mode": "enabled",
+                "reasoning_max_tokens": 8192,
+            },
+            thinking_control="chat_template",
+        )
+
+        backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        self.assertEqual(
+            client.chat_create.payload["extra_body"]
+            ["thinking_token_budget"],
+            8192,
+        )
+
+    def test_openrouter_sends_numeric_reasoning_budget_when_enabled(self) -> None:
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content="{}"),
+                )
+            ],
+            usage=None,
+        )
+        client = _FakeClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="qwen-flash",
+            client=client,
+            generation={
+                "thinking_mode": "enabled",
+                "reasoning_max_tokens": 8192,
+            },
+            thinking_control="openrouter_reasoning",
+            include_extended_sampling=False,
+        )
+
+        backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        self.assertEqual(
+            client.chat_create.payload["extra_body"]["reasoning"],
+            {
+                "max_tokens": 8192,
+                "enabled": True,
+                "exclude": False,
+            },
+        )
+
+    def test_openrouter_explicitly_disables_reasoning_effort(self) -> None:
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content="{}"),
+                )
+            ],
+            usage=None,
+        )
+        client = _FakeClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="reasoning-model",
+            client=client,
+            generation={
+                "thinking_mode": "disabled",
+                "reasoning_max_tokens": 8192,
+            },
+            thinking_control="openrouter_reasoning",
+            include_extended_sampling=False,
+        )
+
+        backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        self.assertEqual(
+            client.chat_create.payload["extra_body"]["reasoning"],
+            {
+                "effort": "none",
+                "enabled": False,
+                "exclude": False,
+            },
+        )
+
+
     def test_azure_fallback_maps_disabled_thinking_to_no_effort(self) -> None:
         response = SimpleNamespace(
             choices=[
@@ -1034,7 +1145,7 @@ class VllmBackendTests(unittest.TestCase):
         self,
     ) -> None:
         model_config = SimpleNamespace(
-            source=SimpleNamespace(repo_id="Qwen/Qwen3.5-9B"),
+            source=SimpleNamespace(repo_id="Qwen/Qwen3.5-4B"),
             processor=None,
             backend=SimpleNamespace(
                 active_profile=SimpleNamespace(
@@ -1056,7 +1167,7 @@ class VllmBackendTests(unittest.TestCase):
             port=8100,
         )
 
-        self.assertEqual(server_config.model, "Qwen/Qwen3.5-9B")
+        self.assertEqual(server_config.model, "Qwen/Qwen3.5-4B")
         self.assertEqual(server_config.port, 8100)
         self.assertEqual(server_config.dtype, "bfloat16")
         self.assertEqual(server_config.tensor_parallel_size, 2)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-from dataclasses import replace
+from dataclasses import asdict, replace
 import json
 import os
 from pathlib import Path
@@ -204,6 +204,17 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     run_parser.add_argument(
+        "--thinking-mode",
+        choices=("config", "disabled", "enabled"),
+        default="config",
+        help=(
+            "Override the evaluated model's thinking mode for a paired "
+            "development experiment. 'config' preserves the model YAML "
+            "(default). Luna teacher runs should use 'config' to retain "
+            "reasoning effort high."
+        ),
+    )
+    run_parser.add_argument(
         "--structured-output",
         choices=("benchmark", "prompt_only", "json_schema"),
         default="benchmark",
@@ -216,6 +227,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--batch-size",
         type=_positive_integer,
         help="Override only the runtime request concurrency.",
+    )
+    run_parser.add_argument(
+        "--max-output-tokens",
+        type=_positive_integer,
+        help=(
+            "Development-only generation cap override. The effective value "
+            "is recorded in the run identity, manifest, and config snapshot."
+        ),
     )
     run_parser.add_argument(
         "--request-interval-seconds",
@@ -287,6 +306,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Validate the run, references, judge prompt, and schema only.",
     )
+    judge_parser.add_argument(
+        "--retry-invalid",
+        action="store_true",
+        help=(
+            "Re-evaluate only prior judge_invalid records and append their "
+            "new judgments before recomputing metrics."
+        ),
+    )
     return parser
 
 
@@ -325,6 +352,7 @@ def main(
                     fallback_judge_backend_profile=(
                         args.fallback_judge_backend_profile
                     ),
+                    retry_invalid=args.retry_invalid,
                 )
             )
             print(json.dumps(result, indent=2, sort_keys=True))
@@ -345,7 +373,17 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         root=root,
         backend_profile=args.backend_profile,
     )
+    model = _override_thinking_mode(model, args.thinking_mode)
     benchmark = load_isep_dermabench_config(args.benchmark, root=root)
+    configured_max_output_tokens = benchmark.execution.max_output_tokens
+    if args.max_output_tokens is not None:
+        benchmark = replace(
+            benchmark,
+            execution=replace(
+                benchmark.execution,
+                max_output_tokens=args.max_output_tokens,
+            ),
+        )
     if args.prompt_override is not None:
         if benchmark.benchmark.id != "open_ended_diagnosis":
             raise ValueError(
@@ -425,6 +463,7 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         server_mode=args.server_mode,
         reasoning_capture=args.reasoning_capture,
         structured_output_mode=args.structured_output,
+        thinking_mode_request=args.thinking_mode,
     )
     embedded_images = {
         sample.image_uri: sample.image_bytes
@@ -473,6 +512,22 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
             ),
             config_snapshot={
                 "model": raw_model,
+                "effective_model_runtime": {
+                    "thinking_mode_request": args.thinking_mode,
+                    "reasoning": asdict(model.reasoning),
+                    "generation": asdict(model.generation),
+                },
+                "effective_benchmark_runtime": {
+                    "configured_max_output_tokens": (
+                        configured_max_output_tokens
+                    ),
+                    "max_output_tokens": (
+                        benchmark.execution.max_output_tokens
+                    ),
+                    "max_output_tokens_overridden": (
+                        args.max_output_tokens is not None
+                    ),
+                },
                 "benchmark": raw_benchmark,
                 "prompt": prompt,
                 "output_schema": schema,
@@ -699,6 +754,45 @@ def _validate_runtime_options(
         raise ValueError("--task-ids-file cannot be combined with --limit")
 
 
+def _override_thinking_mode(
+    model: ModelConfig,
+    requested: str,
+) -> ModelConfig:
+    """Apply an explicit, auditable thinking override to one run."""
+
+    if requested == "config":
+        return model
+    if requested not in {"disabled", "enabled"}:
+        raise ValueError(f"Unsupported thinking mode: {requested!r}")
+    enabled = requested == "enabled"
+    reasoning = replace(
+        model.reasoning,
+        enabled=enabled,
+        chat_template_kwargs=replace(
+            model.reasoning.chat_template_kwargs,
+            enable_thinking=enabled,
+        ),
+    )
+    reasoning_effort = model.generation.reasoning_effort
+    reasoning_max_tokens = model.generation.reasoning_max_tokens
+    if not enabled:
+        reasoning_effort = None
+        reasoning_max_tokens = None
+    elif (
+        reasoning_effort is None
+        and model.backend.active_profile.thinking_control
+        == "reasoning_effort"
+    ):
+        reasoning_effort = "high"
+    generation = replace(
+        model.generation,
+        thinking_mode=requested,
+        reasoning_effort=reasoning_effort,
+        reasoning_max_tokens=reasoning_max_tokens,
+    )
+    return replace(model, reasoning=reasoning, generation=generation)
+
+
 def _select_explicit_task_ids(
     dataset: LoadedBenchmarkDataset,
     *,
@@ -732,16 +826,37 @@ def _select_explicit_task_ids(
     frame = frame.sort_values("_explicit_order", kind="stable").drop(
         columns=["_explicit_order"]
     ).reset_index(drop=True)
+    unit_column = str(dataset.selection.get("unit_column", "task_id"))
+    if unit_column != "task_id" and unit_column in frame.columns:
+        selected_id_set = set(task_ids)
+        unit_ids = list(
+            dict.fromkeys(frame[unit_column].astype(str).tolist())
+        )
+        for unit_id in unit_ids:
+            complete_unit_ids = set(
+                dataset.frame.loc[
+                    dataset.frame[unit_column].astype(str) == unit_id,
+                    "task_id",
+                ].astype(str)
+            )
+            if not complete_unit_ids.issubset(selected_id_set):
+                raise ValueError(
+                    "Explicit task cohort splits selection unit "
+                    f"{unit_id!r}; include every task in the unit"
+                )
+    else:
+        unit_column = "task_id"
+        unit_ids = task_ids
     selection = {
         "algorithm": "explicit_task_ids_v1",
         "seed": dataset.selection.get("seed"),
         "benchmark_release_hash": dataset.release_sha256,
-        "unit_column": "task_id",
+        "unit_column": unit_column,
         "task_column": "task_id",
-        "requested_limit": len(task_ids),
-        "selected_unit_count": len(task_ids),
+        "requested_limit": len(unit_ids),
+        "selected_unit_count": len(unit_ids),
         "selected_task_count": len(task_ids),
-        "unit_ids": task_ids,
+        "unit_ids": unit_ids,
         "task_ids": task_ids,
         "task_ids_file": str(path),
     }
@@ -877,6 +992,13 @@ def _run_identity(
         "request_interval_seconds": str(args.request_interval_seconds),
         "max_output_tokens": str(benchmark.execution.max_output_tokens),
         "structured_output_mode": args.structured_output,
+        "thinking_mode_request": args.thinking_mode,
+        "effective_thinking_sha256": canonical_hash(
+            {
+                "reasoning": asdict(model.reasoning),
+                "generation": asdict(model.generation),
+            }
+        ),
         "execution_transport": "asyncio_v1",
     }
 
@@ -956,6 +1078,20 @@ def _run_manifest(
             "seed": args.seed,
             "max_output_tokens": benchmark.execution.max_output_tokens,
             "reasoning_capture": args.reasoning_capture,
+            "thinking_mode_request": args.thinking_mode,
+            "effective_reasoning_enabled": model.reasoning.enabled,
+            "effective_chat_template_enable_thinking": (
+                model.reasoning.chat_template_kwargs.enable_thinking
+            ),
+            "effective_generation_thinking_mode": (
+                model.generation.thinking_mode
+            ),
+            "effective_reasoning_effort": (
+                model.generation.reasoning_effort
+            ),
+            "effective_reasoning_max_tokens": (
+                model.generation.reasoning_max_tokens
+            ),
             "structured_output": args.structured_output,
             "request_interval_seconds": args.request_interval_seconds,
         },
@@ -971,6 +1107,7 @@ def _dry_run_summary(
     server_mode: str,
     reasoning_capture: str,
     structured_output_mode: str,
+    thinking_mode_request: str,
 ) -> dict[str, Any]:
     profile = model.backend.active_profile
     return {
@@ -990,6 +1127,18 @@ def _dry_run_summary(
             "server_mode": server_mode,
         },
         "reasoning_capture": reasoning_capture,
+        "thinking": {
+            "request": thinking_mode_request,
+            "reasoning_enabled": model.reasoning.enabled,
+            "chat_template_enable_thinking": (
+                model.reasoning.chat_template_kwargs.enable_thinking
+            ),
+            "generation_mode": model.generation.thinking_mode,
+            "reasoning_effort": model.generation.reasoning_effort,
+            "reasoning_max_tokens": (
+                model.generation.reasoning_max_tokens
+            ),
+        },
         "execution_transport": "asyncio_v1",
         "structured_output": structured_output_mode,
         "max_output_tokens": benchmark.execution.max_output_tokens,

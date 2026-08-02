@@ -317,6 +317,7 @@ def generation_values(config: Any | None) -> dict[str, Any]:
         "stop",
         "chat_template_kwargs",
         "reasoning_effort",
+        "reasoning_max_tokens",
         "thinking_mode",
     ):
         value = getattr(config, key, None)

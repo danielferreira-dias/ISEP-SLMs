@@ -561,6 +561,7 @@ async def judge_run(
     fallback_judge_model_id: str | None = None,
     fallback_judge_backend_profile: str | None = None,
     fallback_backend: InferenceBackend | None = None,
+    retry_invalid: bool = False,
 ) -> dict[str, Any]:
     root = root.resolve()
     run_directory = run_directory.resolve()
@@ -672,15 +673,17 @@ async def judge_run(
         _atomic_yaml(paths["manifest"], manifest_document)
 
     prior = _latest_by_task(read_jsonl(paths["judgments"]))
+    completed_statuses = {
+        "ok",
+        "model_failure",
+        "judge_safety_refusal",
+    }
+    if not retry_invalid:
+        completed_statuses.add("judge_invalid")
     completed = {
         task_id
         for task_id, item in prior.items()
-        if item.get("status") in {
-            "ok",
-            "model_failure",
-            "judge_safety_refusal",
-            "judge_invalid",
-        }
+        if item.get("status") in completed_statuses
     }
     generation = _generation(model)
     owns_backend = backend is None

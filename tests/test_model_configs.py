@@ -22,35 +22,32 @@ class QwenModelConfigTests(unittest.TestCase):
     def test_qwen_3_5_disables_thinking_but_keeps_general_sampling(
         self,
     ) -> None:
-        for filename, expected_id in [
-            ("qwen_small_4b.yaml", "qwen_3_5_4b"),
-            ("qwen_small_9b.yaml", "qwen_3_5_9b"),
-        ]:
-            config = _load_model(filename)
-            self.assertEqual(config["model"]["id"], expected_id)
-            self.assertEqual(
-                config["source"]["repo_id"],
-                f"Qwen/Qwen3.5-{expected_id.rsplit('_', 1)[-1].upper()}",
-            )
-            self.assertFalse(config["reasoning"]["enabled"])
-            self.assertFalse(
-                config["reasoning"]["chat_template_kwargs"][
-                    "enable_thinking"
-                ]
-            )
-            self.assertEqual(
-                config["generation"],
-                {
-                    "profile": "thinking_general_tasks",
-                    "do_sample": True,
-                    "temperature": 1.0,
-                    "top_p": 0.95,
-                    "top_k": 20,
-                    "min_p": 0.0,
-                    "presence_penalty": 1.5,
-                    "repetition_penalty": 1.0,
-                },
-            )
+        config = _load_model("qwen_small_4b.yaml")
+        self.assertEqual(config["model"]["id"], "qwen_3_5_4b")
+        self.assertEqual(
+            config["source"]["repo_id"],
+            "Qwen/Qwen3.5-4B",
+        )
+        self.assertFalse(config["reasoning"]["enabled"])
+        self.assertFalse(
+            config["reasoning"]["chat_template_kwargs"][
+                "enable_thinking"
+            ]
+        )
+        self.assertEqual(
+            config["generation"],
+            {
+                "profile": "thinking_general_tasks",
+                "reasoning_max_tokens": 10_240,
+                "do_sample": True,
+                "temperature": 1.0,
+                "top_p": 0.95,
+                "top_k": 20,
+                "min_p": 0.0,
+                "presence_penalty": 1.5,
+                "repetition_penalty": 1.0,
+            },
+        )
 
     def test_qwen_3_6_disables_thinking_but_keeps_general_sampling(
         self,
@@ -65,111 +62,23 @@ class QwenModelConfigTests(unittest.TestCase):
         self.assertEqual(config["generation"]["presence_penalty"], 0.0)
         self.assertEqual(config["generation"]["repetition_penalty"], 1.0)
         self.assertEqual(
+            config["generation"]["reasoning_max_tokens"],
+            10_240,
+        )
+        self.assertEqual(config["generation"]["thinking_mode"], "disabled")
+        self.assertEqual(
             config["backend"]["profiles"]["vllm"][
                 "request_timeout_seconds"
             ],
             1200,
         )
 
-    def test_zero_shot_experiment_replaces_2b_with_9b(self) -> None:
-        experiment = yaml.safe_load(
-            (
-                ROOT / "configs/experiments/zero_shot_visual_v1.yaml"
-            ).read_text()
-        )
-        paths = {
-            entry["config"] for entry in experiment["models"]
-        }
-        self.assertIn("configs/models/qwen_small_9b.yaml", paths)
-        self.assertNotIn("configs/models/qwen_small_2b.yaml", paths)
-
-
-class OtherMultimodalModelConfigTests(unittest.TestCase):
-    def test_gemma_4_models_use_recommended_sampling(self) -> None:
-        for filename in [
-            "gemma_4_e4b_it.yaml",
-            "gemma_4_31b_it.yaml",
-        ]:
-            config = _load_model(filename)
-            expected_generation = {
-                "profile": "gemma_4_recommended",
-                "do_sample": True,
-                "temperature": 1.0,
-                "top_p": 0.95,
-                "top_k": 64,
-                "repetition_penalty": 1.0,
-            }
-            if filename == "gemma_4_31b_it.yaml":
-                expected_generation["thinking_mode"] = "disabled"
-            self.assertEqual(
-                config["generation"],
-                expected_generation,
-            )
-            if filename == "gemma_4_31b_it.yaml":
-                self.assertEqual(
-                    config["backend"]["profiles"]["vllm"][
-                        "request_timeout_seconds"
-                    ],
-                    1200,
-                )
-            self.assertFalse(config["reasoning"]["enabled"])
-            self.assertFalse(
-                config["reasoning"]["chat_template_kwargs"][
-                    "enable_thinking"
-                ]
-            )
-            self.assertTrue(
-                config["reasoning"]["exclude_from_structured_output"]
-            )
-
-    def test_zero_shot_experiment_includes_remaining_models(self) -> None:
-        experiment = yaml.safe_load(
-            (
-                ROOT / "configs/experiments/zero_shot_visual_v1.yaml"
-            ).read_text()
-        )
-        paths = {entry["config"] for entry in experiment["models"]}
-        self.assertTrue(
-            {
-                "configs/models/gemma_4_31b_it.yaml",
-                "configs/models/gemma_4_e4b_it.yaml",
-            }.issubset(paths)
-        )
-        teacher_selection = yaml.safe_load(
-            (
-                ROOT
-                / "configs/experiments/"
-                "teacher_selection_visual_validation_v1.yaml"
-            ).read_text()
-        )
-        self.assertIn(
-            "gemma_4_31b_it",
-            teacher_selection["teacher_selection"][
-                "candidate_model_ids"
-            ],
-        )
-
-    def test_gemma_e4b_uses_official_hugging_face_model(self) -> None:
-        config = _load_model("gemma_4_e4b_it.yaml")
-        self.assertEqual(config["model"]["id"], "gemma_4_e4b_it")
-        self.assertEqual(
-            config["source"]["repo_id"],
-            "google/gemma-4-E4B-it",
-        )
-        self.assertEqual(
-            config["backend"]["profiles"]["vllm"]["engine"],
-            "vllm",
-        )
-        self.assertNotIn("artifact", config)
-        self.assertTrue(config["usage"]["fine_tuning"])
-
-
 class TypedModelConfigTests(unittest.TestCase):
     def test_all_models_load_into_frozen_typed_configs(self) -> None:
         configs = list_model_configs(root=ROOT)
 
-        self.assertEqual(len(configs), 7)
-        self.assertEqual(len({item.model.id for item in configs}), 7)
+        self.assertEqual(len(configs), 6)
+        self.assertEqual(len({item.model.id for item in configs}), 6)
         local = [
             item
             for item in configs
@@ -180,8 +89,8 @@ class TypedModelConfigTests(unittest.TestCase):
             for item in configs
             if isinstance(item, AzureModelConfig)
         ]
-        self.assertEqual(len(local), 5)
-        self.assertEqual(len(api), 2)
+        self.assertEqual(len(local), 2)
+        self.assertEqual(len(api), 4)
         for config in local:
             profile = config.backend.active_profile
             self.assertEqual(profile.engine, "vllm")
@@ -189,22 +98,16 @@ class TypedModelConfigTests(unittest.TestCase):
         self.assertEqual(profile.max_model_len, 16384)
         self.assertEqual(profile.limit_images_per_prompt, 1)
 
-    def test_small_modal_models_support_vllm_json_schema_mode(self) -> None:
-        for config_id in (
-            "gemma_4_e4b_it",
-            "qwen_3_5_4b",
-        ):
-            with self.subTest(config_id=config_id):
-                model = load_model_config(config_id, root=ROOT)
-                self.assertIn(
-                    "json_schema",
-                    model.capabilities.structured_output_modes,
-                )
+    def test_official_student_supports_vllm_json_schema_mode(self) -> None:
+        model = load_model_config("qwen_3_5_4b", root=ROOT)
+        self.assertIn(
+            "json_schema",
+            model.capabilities.structured_output_modes,
+        )
 
     def test_openrouter_profiles_use_explicit_provider_model_slugs(self) -> None:
         expected = {
             "gpt_5_6_luna": "openai/gpt-5.6-luna-pro",
-            "gemma_4_31b_it": "google/gemma-4-31b-it:free",
         }
         for model_id, request_model in expected.items():
             with self.subTest(model_id=model_id):
@@ -234,6 +137,42 @@ class TypedModelConfigTests(unittest.TestCase):
             "json_schema",
             judge.capabilities.structured_output_modes,
         )
+        self.assertEqual(judge.generation.reasoning_max_tokens, 10_240)
+        self.assertEqual(judge.generation.thinking_mode, "disabled")
+        self.assertIsNone(judge.generation.reasoning_effort)
+        self.assertIsNone(judge.generation.temperature)
+        self.assertEqual(judge.generation.top_p, 0.95)
+        self.assertEqual(judge.generation.presence_penalty, 0.0)
+
+    def test_new_openrouter_reasoning_candidates_match_capabilities(self) -> None:
+        minimax = load_model_config(
+            "minimax_m3_openrouter",
+            root=ROOT,
+        )
+        self.assertTrue(minimax.usage.benchmark)
+        self.assertIn("image", minimax.capabilities.modalities)
+        self.assertEqual(
+            minimax.backend.active_profile.request_model,
+            "minimax/minimax-m3",
+        )
+        self.assertEqual(minimax.generation.temperature, 1.0)
+        self.assertEqual(minimax.generation.top_p, 0.95)
+        self.assertEqual(minimax.generation.reasoning_max_tokens, 10_240)
+
+        mimo = load_model_config("mimo_v2_5_openrouter", root=ROOT)
+        self.assertTrue(mimo.usage.benchmark)
+        self.assertIn("image", mimo.capabilities.modalities)
+        self.assertEqual(
+            mimo.backend.active_profile.request_model,
+            "xiaomi/mimo-v2.5",
+        )
+        self.assertIn(
+            "json_schema",
+            mimo.capabilities.structured_output_modes,
+        )
+        self.assertEqual(mimo.generation.temperature, 1.0)
+        self.assertEqual(mimo.generation.top_p, 0.95)
+        self.assertEqual(mimo.generation.reasoning_max_tokens, 10_240)
 
     def test_model_can_be_loaded_by_repo_relative_path(self) -> None:
         config = load_model_config(

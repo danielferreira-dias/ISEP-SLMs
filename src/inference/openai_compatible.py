@@ -339,6 +339,19 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             raise InferenceRequestError(
                 "thinking_mode must be 'enabled' or 'disabled'"
             )
+        reasoning_max_tokens = generation.get("reasoning_max_tokens")
+        if (
+            reasoning_max_tokens is not None
+            and (
+                isinstance(reasoning_max_tokens, bool)
+                or not isinstance(reasoning_max_tokens, int)
+                or reasoning_max_tokens <= 0
+            )
+        ):
+            raise InferenceRequestError(
+                "reasoning_max_tokens must be a positive integer"
+            )
+        thinking_enabled = thinking_mode == "enabled"
         if (
             thinking_mode is not None
             and self.thinking_control == "chat_template"
@@ -354,13 +367,37 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         if self.thinking_control == "openrouter_reasoning":
             reasoning: dict[str, Any] = {}
             reasoning_effort = generation.get("reasoning_effort")
-            if reasoning_effort is not None:
+            if (
+                thinking_enabled
+                and reasoning_max_tokens is not None
+                and reasoning_effort is not None
+            ):
+                raise InferenceRequestError(
+                    "OpenRouter reasoning_effort and "
+                    "reasoning_max_tokens are mutually exclusive"
+                )
+            if thinking_mode == "disabled":
+                # OpenRouter documents effort="none" as the explicit
+                # cross-provider switch for disabling reasoning. Some
+                # providers still reason when sent only enabled=false, so
+                # send both signals and let the CLI override take precedence
+                # over any configured effort.
+                reasoning["effort"] = "none"
+            elif thinking_enabled and reasoning_max_tokens is not None:
+                reasoning["max_tokens"] = reasoning_max_tokens
+            elif reasoning_effort is not None:
                 reasoning["effort"] = reasoning_effort
             if thinking_mode is not None:
-                reasoning["enabled"] = thinking_mode == "enabled"
+                reasoning["enabled"] = thinking_enabled
             if reasoning:
                 reasoning["exclude"] = False
                 extra_body["reasoning"] = reasoning
+        elif thinking_enabled and reasoning_max_tokens is not None:
+            # vLLM 0.23 exposes a request-level thinking budget as an
+            # OpenAI-compatible extension. It forces the reasoning section to
+            # close at the budget while allowing generation of the final answer
+            # to continue within the overall max_tokens limit.
+            extra_body["thinking_token_budget"] = reasoning_max_tokens
         if template_kwargs:
             extra_body["chat_template_kwargs"] = template_kwargs
         if extra_body:

@@ -141,6 +141,9 @@ def main(
     all_benchmarks: bool = False,
     evidence_and_top_k: bool = False,
     validation_suite: bool = False,
+    teacher_screening: bool = False,
+    thinking_mode: str = "config",
+    max_output_tokens: int | None = None,
     dry_run: bool = False,
     startup_timeout: int = STARTUP_TIMEOUT_SECONDS,
 ) -> None:
@@ -154,6 +157,7 @@ def main(
         all_benchmarks=all_benchmarks,
         evidence_and_top_k=evidence_and_top_k,
         validation_suite=validation_suite,
+        teacher_screening=teacher_screening,
     )
     modes = structured_output_modes(structured_output)
     if batch_size <= 0:
@@ -184,4 +188,6 @@ def main(
                 output_root=output_root,
                 dry_run=dry_run,
                 server_url=server_url,
+                thinking_mode=thinking_mode,
+                max_output_tokens=max_output_tokens,
             )

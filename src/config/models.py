@@ -35,6 +35,7 @@ class GenerationConfig:
 
     profile: str = "default"
     reasoning_effort: str | None = None
+    reasoning_max_tokens: int | None = None
     thinking_mode: Literal["enabled", "disabled"] | None = None
     do_sample: bool | None = None
     temperature: float | None = None
@@ -347,6 +348,7 @@ _CHAT_TEMPLATE_KEYS = {"enable_thinking"}
 _GENERATION_KEYS = {
     "profile",
     "reasoning_effort",
+    "reasoning_max_tokens",
     "thinking_mode",
     "do_sample",
     "temperature",
@@ -403,9 +405,10 @@ def load_model_config(
     capabilities = _parse_capabilities(
         _mapping(document["capabilities"], "capabilities")
     )
-    if "image" not in capabilities.modalities:
+    if not {"text", "image"}.issubset(capabilities.modalities):
         raise ModelConfigError(
-            f"capabilities.modalities for {model.id} must include 'image'"
+            f"capabilities.modalities for {model.id} must include both "
+            "'text' and 'image'"
         )
     source = _parse_source(_mapping(document["source"], "source"))
     processor = (
@@ -885,12 +888,27 @@ def _parse_generation(value: dict[str, Any]) -> GenerationConfig:
         raise ModelConfigError(
             "generation.thinking_mode must be 'enabled' or 'disabled'"
         )
+    reasoning_effort = _optional_text(
+        value.get("reasoning_effort"),
+        "generation.reasoning_effort",
+    )
+    reasoning_max_tokens = _optional_integer(
+        value.get("reasoning_max_tokens"),
+        "generation.reasoning_max_tokens",
+    )
+    if reasoning_max_tokens is not None and reasoning_max_tokens <= 0:
+        raise ModelConfigError(
+            "generation.reasoning_max_tokens must be positive"
+        )
+    if reasoning_effort is not None and reasoning_max_tokens is not None:
+        raise ModelConfigError(
+            "generation.reasoning_effort and "
+            "generation.reasoning_max_tokens are mutually exclusive"
+        )
     return GenerationConfig(
         profile=_text(value["profile"], "generation.profile"),
-        reasoning_effort=_optional_text(
-            value.get("reasoning_effort"),
-            "generation.reasoning_effort",
-        ),
+        reasoning_effort=reasoning_effort,
+        reasoning_max_tokens=reasoning_max_tokens,
         thinking_mode=thinking_mode,
         do_sample=_optional_boolean(
             value.get("do_sample"), "generation.do_sample"

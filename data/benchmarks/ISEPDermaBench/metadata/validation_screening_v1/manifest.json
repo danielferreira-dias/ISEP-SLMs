@@ -1,0 +1,89 @@
+{
+  "benchmark_release": "ISEPDermaBench/1.5.0",
+  "benchmark_release_sha256": "59dac0f72a71566283197244a05b301647339c50fe9f2c9e20b0a11b80421cfe",
+  "evaluation_set": "validation",
+  "id": "validation_teacher_screening_v1",
+  "purpose": "Development-only paired teacher screening; not final reporting",
+  "schema_version": 1,
+  "seed": 42,
+  "selection_algorithm": "class_balanced_nested_round_robin_v1",
+  "tasks": {
+    "evidence_grounded_diagnosis": {
+      "available_tasks": 137,
+      "available_units": 137,
+      "cohorts": [
+        {
+          "is_initial_screen": true,
+          "sha256": "087ba3d55a9bab306540bb4d5043a8b5cccc910e477317ffc7f392aab201c9ea",
+          "task_count": 100,
+          "task_ids_file": "evidence_grounded_diagnosis_100_cases.task_ids.txt",
+          "unit_count": 100
+        },
+        {
+          "is_initial_screen": false,
+          "sha256": "e06319b626123201bb44f4a7f013c784fff8635541ad0c9ba279892fabe72cb0",
+          "task_count": 137,
+          "task_ids_file": "evidence_grounded_diagnosis_137_cases.task_ids.txt",
+          "unit_count": 137
+        }
+      ],
+      "selection_unit": "case"
+    },
+    "open_ended_diagnosis": {
+      "available_tasks": 100,
+      "available_units": 100,
+      "cohorts": [
+        {
+          "is_initial_screen": true,
+          "sha256": "8287faaabd064528d51b20daa14fba643d4ea08bafd9ea476032f135b37b6b27",
+          "task_count": 100,
+          "task_ids_file": "open_ended_diagnosis_100_cases.task_ids.txt",
+          "unit_count": 100
+        }
+      ],
+      "selection_unit": "case"
+    },
+    "visual_confusion_sets": {
+      "available_tasks": 834,
+      "available_units": 417,
+      "cohorts": [
+        {
+          "is_initial_screen": true,
+          "sha256": "b3ed333ee39c5bdf0c647c5a5bf6cd59400e9015a6015c656912116185db2510",
+          "task_count": 200,
+          "task_ids_file": "visual_confusion_sets_100_pairs.task_ids.txt",
+          "unit_count": 100
+        },
+        {
+          "is_initial_screen": false,
+          "sha256": "f461d276fe669535aa60cc510d3db61953861b925c23391b816169f278af2c4b",
+          "task_count": 400,
+          "task_ids_file": "visual_confusion_sets_200_pairs.task_ids.txt",
+          "unit_count": 200
+        }
+      ],
+      "selection_unit": "image_pair"
+    },
+    "visual_top_k": {
+      "available_tasks": 1000,
+      "available_units": 1000,
+      "cohorts": [
+        {
+          "is_initial_screen": true,
+          "sha256": "95b30ad2097a1b2b7ca7ccb42541c8ff7c3ba87199b745d670aeea6ef2b2760d",
+          "task_count": 100,
+          "task_ids_file": "visual_top_k_100_cases.task_ids.txt",
+          "unit_count": 100
+        },
+        {
+          "is_initial_screen": false,
+          "sha256": "56e44fdf0f22a0aefc7293ee8efef20e2659072e1c11b2c2c12d658f687e02fb",
+          "task_count": 200,
+          "task_ids_file": "visual_top_k_200_cases.task_ids.txt",
+          "unit_count": 200
+        }
+      ],
+      "selection_unit": "case"
+    }
+  }
+}

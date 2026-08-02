@@ -1,12 +1,12 @@
-# Low-cost multimodal judge candidate served through OpenRouter.
+# Native omnimodal reasoning candidate served through OpenRouter.
 
 schema_version: 1
 
 model:
-  id: qwen_3_7_flash_openrouter
-  display_name: Qwen 3.7 Flash (OpenRouter)
-  family: qwen
-  evaluation_role: judge_candidate
+  id: mimo_v2_5_openrouter
+  display_name: MiMo V2.5 (OpenRouter)
+  family: mimo
+  evaluation_role: teacher_candidate
   training_stage: provider_managed
   task_adaptation_stage: none
   domain: general
@@ -19,16 +19,18 @@ capabilities:
   modalities:
     - text
     - image
+    - video
+    - audio
   structured_output_modes:
     - prompt_only
     - json_schema
-  context_length_tokens: 1000000
-  maximum_output_tokens: 65536
+  context_length_tokens: 1048576
 
 source:
   type: provider_api
   provider: openrouter
-  model_name: qwen/qwen3.7-flash
+  model_name: xiaomi/mimo-v2.5
+  license: mit
 
 backend:
   default_profile: openrouter
@@ -38,25 +40,22 @@ backend:
       engine: openrouter
       api_style: chat_completions
       api_key_env: OPENROUTER_API_KEY
-      request_model: qwen/qwen3.7-flash
+      request_model: xiaomi/mimo-v2.5
       thinking_control: openrouter_reasoning
-      request_timeout_seconds: 600
+      request_timeout_seconds: 1200
 
 reasoning:
   enabled: false
   exclude_from_structured_output: true
 
 generation:
-  # Qwen recommends top_p=0.95 for qwen-flash in thinking mode and top_k=20.
-  # OpenRouter does not expose top_k for this route, so only supported fields
-  # are pinned. Temperature is omitted because Qwen advises changing only one
-  # of temperature and top_p on the hosted API.
-  profile: qwen_3_7_reasoning_recommended
+  # OpenRouter and Xiaomi publish temperature=1.0 and top_p=0.95 for this
+  # route. The benchmark thinking-on phase activates the dormant budget.
+  profile: mimo_v2_5_recommended
   thinking_mode: disabled
   reasoning_max_tokens: 10240
+  temperature: 1.0
   top_p: 0.95
-  presence_penalty: 0.0
-  seed: 42
 
 security:
   trust_remote_code: false

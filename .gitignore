@@ -21,7 +21,7 @@ data/combined/*.parquet
 data/benchmarks/**/*.parquet
 data/training/**/*.parquet
 data/reports/*.parquet
-outputs/benchmark_runs/
+outputs/
 
 # Local credentials
 .env

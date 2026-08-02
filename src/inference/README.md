@@ -108,6 +108,34 @@ summary. The Responses API requests `reasoning={"summary": "auto"}` for
 `full` and `summary` capture; it stores only that official provider summary
 and never attempts to extract raw chain of thought.
 
+## Reasoning budgets
+
+`generation.reasoning_max_tokens` is the normalized numeric budget used by
+thinking-capable OpenAI-compatible models. It is independent from
+`max_output_tokens`, which remains the total completion cap and therefore
+includes both exposed reasoning and the final answer.
+
+| Transport | Provider request field |
+| --- | --- |
+| Local vLLM 0.23 | `thinking_token_budget` |
+| OpenRouter | `reasoning.max_tokens` |
+
+The budget must be a positive integer and cannot be combined with
+`reasoning_effort`. It is dormant when `thinking_mode` is disabled. For
+controllable teacher-screening profiles, the total cap is 14,336 and the
+reasoning budget is 10,240, reserving up to 4,096 tokens for the scored answer.
+
+A reasoning budget is request-time generation control, not a prompt injected
+into an active completion. Chat-completion streaming is one-way: the client can
+observe deltas or cancel the request, but cannot add a new user message to that
+same generation. A forced intervention would require cancelling and issuing a
+second request while preserving the provider's complete, unmodified
+`reasoning_details`. That is a different two-turn protocol and is intentionally
+not used for the paired teacher-screening benchmark.
+
+See the official [vLLM sampling-parameter documentation](https://docs.vllm.ai/en/v0.23.0/api/vllm/sampling_params/)
+and [OpenRouter reasoning-token documentation](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens).
+
 ## Managed vLLM process
 
 `ManagedVllmServer` starts one server without using a shell, waits for its

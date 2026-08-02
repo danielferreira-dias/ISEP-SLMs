@@ -34,6 +34,9 @@ Each annotation should identify:
 
 1. [Paired visual disease confusion sets](benchmarks/01_visual_disease_confusion_sets.md)
 2. [Open-ended diagnosis with a single blinded judge](benchmarks/02_open_ended_diagnosis_single_judge.md)
+3. [Validation teacher screening: thinking-off results and full disclosure](benchmarks/03_validation_teacher_screening_thinking_off.md)
+4. [Reasoning screening summary](benchmarks/04_reasoning_screening_summary.md)
+5. [Teacher/student selection and final benchmark process](benchmarks/05_teacher_student_selection_and_final_benchmark_process.md)
 
 ## Notes
 
@@ -50,3 +53,4 @@ Each annotation should identify:
 11. [Dermatology MLLM and reasoning strategy research](notes/11_dermatology_mllm_reasoning_strategy_research.md)
 12. [Open-ended model and judge prompt decision record](notes/12_open_ended_model_and_judge_prompt_decision_record.md)
 13. [Textbook-grounded dermatology reasoning](notes/13_textbook_grounded_dermatology_reasoning.md)
+14. [Synthetic dataset comparison and architecture decision](notes/14_synthetic_dataset_comparison_and_architecture_decision.md)

@@ -481,6 +481,70 @@ class OpenEndedDiagnosisTests(unittest.TestCase):
                 {"qwen_3_7_flash_openrouter": 1},
             )
 
+    def test_retry_invalid_rejudges_only_the_invalid_record(self) -> None:
+        task = _first_row(
+            RELEASE / "tasks/open_ended_diagnosis",
+            "validation",
+        )
+        invalid = InferenceResult(
+            model_id="scripted",
+            final_text="",
+            reasoning=ReasoningTrace(capture_mode="none"),
+        )
+        with TemporaryDirectory() as directory:
+            run = Path(directory)
+            (run / "run_manifest.yaml").write_text(
+                yaml.safe_dump(
+                    {
+                        "benchmark": {"id": "open_ended_diagnosis"},
+                        "evaluation": {"evaluation_set": "validation"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (run / "predictions.jsonl").write_text(
+                json.dumps(
+                    {
+                        "task_id": task["task_id"],
+                        "sample_id": task["sample_id"],
+                        "status": "ok",
+                        "response": {"final_text": "A ranked differential."},
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            first = asyncio.run(
+                judge_run(
+                    root=ROOT,
+                    run_directory=run,
+                    backend=_ScriptedBackend([invalid, invalid, invalid]),
+                )
+            )
+            self.assertEqual(first["metrics"]["judge_invalid_count"], 1)
+
+            retry_backend = _ScriptedBackend([_result(_valid_judgment())])
+            second = asyncio.run(
+                judge_run(
+                    root=ROOT,
+                    run_directory=run,
+                    backend=retry_backend,
+                    retry_invalid=True,
+                )
+            )
+            records = [
+                json.loads(line)
+                for line in Path(second["judgments_path"])
+                .read_text(encoding="utf-8")
+                .splitlines()
+            ]
+            self.assertEqual(len(records), 2)
+            self.assertEqual(records[-1]["status"], "ok")
+            self.assertEqual(len(retry_backend.requests), 1)
+            self.assertEqual(second["metrics"]["judge_invalid_count"], 0)
+            self.assertEqual(second["metrics"]["judge_coverage"], 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()

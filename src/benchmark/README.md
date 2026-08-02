@@ -130,6 +130,68 @@ release hash, seed, and case ID. It never depends on the model ID. For the
 confusion benchmark, `--limit N` selects `N` image pairs and therefore runs
 `2N` tasks.
 
+## Fixed Validation teacher-screening cohorts
+
+Teacher screening uses versioned task-ID files under
+`data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1`. The initial
+100-unit cohort and every expansion are nested, class-balanced development
+views. They are identical for every model and for the thinking off/on A/B.
+They are not prevalence estimates and must not be reported as final held-out
+performance.
+
+Use the explicit cohort and thinking override for every non-Luna model:
+
+```bash
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_5_4b \
+  --benchmark visual_top_k_closed_set \
+  --evaluation-set validation \
+  --task-ids-file data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/visual_top_k_100_cases.task_ids.txt \
+  --thinking-mode disabled \
+  --output-root outputs/validation_screening_v1/thinking_off
+
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_5_4b \
+  --benchmark visual_top_k_closed_set \
+  --evaluation-set validation \
+  --task-ids-file data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/visual_top_k_100_cases.task_ids.txt \
+  --thinking-mode enabled \
+  --max-output-tokens 14336 \
+  --output-root outputs/validation_screening_v1/thinking_on
+```
+
+Thinking-on teacher screening uses a development-only 14,336-token total
+completion cap. Every controllable local/OpenRouter reasoning profile
+configures `generation.reasoning_max_tokens: 10240`, leaving up to 4,096
+tokens for the final answer. The normalized field is translated to
+`thinking_token_budget` for vLLM and to `reasoning.max_tokens` for
+OpenRouter. It is mutually exclusive with `reasoning_effort` and is sent only
+when thinking is enabled. The frozen benchmark artifacts remain at 8,192;
+the effective total cap and reasoning budget are included in the run identity,
+manifest, dry-run summary, and config snapshot. Because phase 1 recorded zero
+truncations, its 8,192-token cap was non-binding and those runs do not need to
+be repeated.
+
+Luna is the fixed exception: omit the override so its model YAML retains
+`reasoning_effort: high`, execute it once, and reuse that result as the Luna
+reference in both phase comparisons:
+
+```bash
+uv run python -m src.benchmark.cli run \
+  --model gpt_5_6_luna \
+  --benchmark visual_top_k_closed_set \
+  --evaluation-set validation \
+  --task-ids-file data/benchmarks/ISEPDermaBench/metadata/validation_screening_v1/visual_top_k_100_cases.task_ids.txt \
+  --thinking-mode config \
+  --output-root outputs/validation_screening_v1/luna_high
+```
+
+Visual Top-K and Confusion Sets can expand to 200 cases/pairs. Evidence can
+expand only to its complete 137 cases, and Open-ended Validation already
+contains exactly 100 cases. The CLI stores the requested and effective
+thinking settings in the run identity, manifest, dry-run output, and config
+snapshot.
+
 ## Backend compatibility
 
 The local path targets vLLM `0.23.0` on Linux x86-64 with NVIDIA CUDA. The
@@ -140,11 +202,11 @@ machine.
 | Model configuration | Default transport | Managed vLLM | Important behavior |
 | --- | --- | --- | --- |
 | `qwen_3_5_4b` | vLLM | Yes | Qwen reasoning parser and official sampling recipe |
-| `qwen_3_5_9b` | vLLM | Yes | Qwen reasoning parser and official sampling recipe |
 | `qwen_3_6_27b` | vLLM | Yes | Qwen reasoning parser; requires substantially more GPU memory |
-| `gemma_4_e4b_it` | vLLM | Yes | Gemma 4 reasoning parser and sampling recipe |
-| `gemma_4_31b_it` | vLLM | Yes | Gemma 4 reasoning parser; large-model GPU requirements |
 | `gpt_5_6_luna` | Azure Responses | No | Official reasoning summary only |
+| `qwen_3_7_flash_openrouter` | OpenRouter | No | Multimodal; Qwen reasoning sampling and a 10,240-token reasoning budget |
+| `minimax_m3_openrouter` | OpenRouter | No | Multimodal; official temperature 1.0/top-p 0.95 recipe |
+| `mimo_v2_5_openrouter` | OpenRouter | No | Omnimodal; image-capable with official temperature 1.0/top-p 0.95 recipe |
 
 “Managed” means the CLI may start and stop `vllm serve`. It does not mean the
 repository downloads a model in advance or provisions a GPU. GPT uses the
@@ -268,6 +330,18 @@ clinical-rationale quality, and differential quality. Unsupported claims and
 the overall-verdict distribution are also reported. These metrics depend on
 the fixed judge and prompt; they must be reported as judge-based estimates,
 not deterministic ground truth.
+
+If a completed judge run contains `judge_invalid` records, retry only those
+cases without rejudging successful records:
+
+```bash
+uv run python -m src.benchmark.cli judge \
+  --run outputs/benchmark_runs/open_ended_diagnosis/qwen_3_5_4b/<run> \
+  --retry-invalid
+```
+
+The new records are appended and the latest judgment per task is used to
+recompute metrics and the HTML report.
 
 Luna remains the default judge. An alternative judge candidate can be tested
 without overwriting Luna's artifacts:
@@ -399,26 +473,50 @@ project contract.
 
 ### OpenRouter profiles
 
-`gpt_5_6_luna` and `gemma_4_31b_it` also define optional `openrouter`
-profiles. Both use the OpenAI-compatible Chat Completions endpoint and require:
+The API-native Qwen 3.7 Flash, MiniMax M3, and MiMo V2.5 configurations use
+OpenRouter directly. `gpt_5_6_luna` also defines an optional `openrouter`
+profile. Every OpenRouter profile uses the OpenAI-compatible Chat Completions
+endpoint and requires:
 
 ```text
 OPENROUTER_API_KEY
 ```
 
-The profiles pin the provider model slugs rather than relying on environment
-defaults:
+The profiles pin provider model slugs rather than relying on environment
+defaults. The image-benchmark eligible native routes are:
 
 ```text
-openai/gpt-5.6-luna-pro
-google/gemma-4-31b-it:free
+qwen/qwen3.7-flash
+minimax/minimax-m3
+xiaomi/mimo-v2.5
 ```
 
 OpenRouter receives text before the base64 image, its unified
 `reasoning` object is used instead of provider-specific thinking fields, and
-unsupported extended sampling fields such as `top_k` are omitted. Gemma uses
-temperature `1.0`, top-p `0.95`, and reasoning disabled. Luna Pro maps the
-configured high effort to `reasoning: {effort: high}`.
+unsupported extended sampling fields such as `top_k` are omitted. Luna Pro
+maps the configured high effort to `reasoning: {effort: high}`. Qwen 3.7 Flash pins
+top-p `0.95` and presence penalty `0.0` for reasoning evaluation. Temperature
+is omitted because Qwen's hosted API advises changing only one of temperature
+and top-p; the documented top-k `20` default cannot be forwarded because this
+OpenRouter route does not expose `top_k`. MiniMax M3 uses its published
+temperature `1.0` and top-p `0.95` evaluation recipe. An explicit thinking-on
+run for these models maps the configured numeric budget to
+`reasoning: {enabled: true, max_tokens: 10240, exclude: false}`.
+
+MiMo V2.5 is a native omnimodal route and is therefore eligible for all four
+ISEPDermaBench image tasks. It uses the published temperature `1.0` and top-p
+`0.95` settings.
+
+Parameter and capability provenance:
+
+- [QwenCloud model list](https://docs.qwencloud.com/developer-guides/getting-started/text-generation-models)
+  and [Chat API reference](https://docs.qwencloud.com/api-reference/chat/openai-chat)
+  for Qwen 3.7 context, output, thinking, and provider defaults;
+- [MiniMax M3 release and evaluation methodology](https://www.minimax.io/blog/minimax-m3)
+  for multimodality, thinking control, and sampling;
+- [MiMo model hyperparameters](https://mimo.mi.com/docs/en-US/api/guidance/model-hyperparameters)
+  and [MiMo V2.5 model card](https://huggingface.co/XiaomiMiMo/MiMo-V2.5)
+  for its multimodal interface and recommended sampling settings.
 
 Reproduce an image-level provider refusal with the frozen benchmark task:
 
@@ -428,23 +526,9 @@ uv run python -m src.test_openrouter_image \
   --reasoning-effort none
 ```
 
-Run the free Gemma endpoint conservatively because its shared upstream pool
-can return HTTP 429 even when the OpenRouter account itself has quota:
-
-```bash
-uv run python -m src.benchmark.cli run \
-  --model gemma_4_31b_it \
-  --backend-profile openrouter \
-  --benchmark visual_top_k_closed_set \
-  --evaluation-set validation \
-  --limit 10 \
-  --batch-size 1 \
-  --request-interval-seconds 6
-```
-
 `--request-interval-seconds` spaces request starts and is included in the
 immutable run identity. It controls client-side pacing but cannot eliminate a
-429 caused by exhaustion of OpenRouter's shared upstream free-provider pool.
+429 caused by exhaustion of an OpenRouter upstream provider pool.
 
 ## Reasoning capture
 

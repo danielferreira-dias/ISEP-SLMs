@@ -7,15 +7,85 @@ import asyncio
 from io import StringIO
 import json
 from pathlib import Path
+import tempfile
 import unittest
 
-from src.benchmark.cli import _execute_and_close_backend, main
+from src.benchmark.cli import (
+    _execute_and_close_backend,
+    _override_thinking_mode,
+    main,
+)
+from src.config import load_model_config
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class BenchmarkCliTests(unittest.TestCase):
+    def test_thinking_override_updates_effective_model_without_mutating_yaml(
+        self,
+    ) -> None:
+        model = load_model_config("qwen_3_5_4b", root=ROOT)
+        enabled = _override_thinking_mode(model, "enabled")
+        disabled = _override_thinking_mode(enabled, "disabled")
+
+        self.assertFalse(model.reasoning.enabled)
+        self.assertFalse(
+            model.reasoning.chat_template_kwargs.enable_thinking
+        )
+        self.assertTrue(enabled.reasoning.enabled)
+        self.assertTrue(
+            enabled.reasoning.chat_template_kwargs.enable_thinking
+        )
+        self.assertEqual(enabled.generation.thinking_mode, "enabled")
+        self.assertFalse(disabled.reasoning.enabled)
+        self.assertFalse(
+            disabled.reasoning.chat_template_kwargs.enable_thinking
+        )
+        self.assertEqual(disabled.generation.thinking_mode, "disabled")
+
+    def test_dry_run_records_max_output_token_override(self) -> None:
+        stdout = StringIO()
+        stderr = StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            status = main(
+                [
+                    "run",
+                    "--model",
+                    "qwen_3_6_27b",
+                    "--benchmark",
+                    "visual_top_k_closed_set",
+                    "--evaluation-set",
+                    "validation",
+                    "--limit",
+                    "1",
+                    "--thinking-mode",
+                    "enabled",
+                    "--max-output-tokens",
+                    "14336",
+                    "--dry-run",
+                ],
+                root=ROOT,
+            )
+
+        self.assertEqual(status, 0, stderr.getvalue())
+        payload = json.loads(stdout.getvalue())
+        self.assertEqual(payload["max_output_tokens"], 14_336)
+        self.assertTrue(payload["thinking"]["reasoning_enabled"])
+        self.assertEqual(
+            payload["thinking"]["reasoning_max_tokens"],
+            10_240,
+        )
+
+    def test_disabling_thinking_clears_configured_reasoning_budget(self) -> None:
+        model = load_model_config("qwen_3_6_27b", root=ROOT)
+
+        enabled = _override_thinking_mode(model, "enabled")
+        disabled = _override_thinking_mode(enabled, "disabled")
+
+        self.assertEqual(enabled.generation.reasoning_max_tokens, 10_240)
+        self.assertIsNone(disabled.generation.reasoning_max_tokens)
+
     def test_async_backend_closes_on_request_event_loop(self) -> None:
         class Executor:
             loop = None
@@ -156,6 +226,32 @@ class BenchmarkCliTests(unittest.TestCase):
         self.assertEqual(payload["selected_tasks"], 1)
         self.assertFalse(payload["network_or_model_called"])
 
+    def test_dry_run_reports_effective_thinking_override(self) -> None:
+        stdout = StringIO()
+        stderr = StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            status = main(
+                [
+                    "run",
+                    "--model",
+                    "qwen_3_5_4b",
+                    "--benchmark",
+                    "visual_top_k_closed_set",
+                    "--limit",
+                    "1",
+                    "--thinking-mode",
+                    "enabled",
+                    "--dry-run",
+                ],
+                root=ROOT,
+            )
+        self.assertEqual(status, 0, stderr.getvalue())
+        thinking = json.loads(stdout.getvalue())["thinking"]
+        self.assertEqual(thinking["request"], "enabled")
+        self.assertTrue(thinking["reasoning_enabled"])
+        self.assertTrue(thinking["chat_template_enable_thinking"])
+        self.assertEqual(thinking["generation_mode"], "enabled")
+
     def test_confusion_limit_counts_pairs_not_individual_tasks(self) -> None:
         stdout = StringIO()
         stderr = StringIO()
@@ -173,6 +269,44 @@ class BenchmarkCliTests(unittest.TestCase):
                 ],
                 root=ROOT,
             )
+        self.assertEqual(status, 0, stderr.getvalue())
+        payload = json.loads(stdout.getvalue())
+        self.assertEqual(payload["selected_units"], 1)
+        self.assertEqual(payload["selected_tasks"], 2)
+
+    def test_explicit_confusion_cohort_retains_pair_unit_semantics(self) -> None:
+        cohort = (
+            ROOT
+            / "data/benchmarks/ISEPDermaBench/metadata/"
+            "validation_screening_v1/"
+            "visual_confusion_sets_100_pairs.task_ids.txt"
+        )
+        task_ids = [
+            line
+            for line in cohort.read_text(encoding="utf-8").splitlines()
+            if line and not line.startswith("#")
+        ][:2]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "one_pair.txt"
+            path.write_text("\n".join(task_ids) + "\n", encoding="utf-8")
+            stdout = StringIO()
+            stderr = StringIO()
+            with redirect_stdout(stdout), redirect_stderr(stderr):
+                status = main(
+                    [
+                        "run",
+                        "--model",
+                        "qwen_3_5_4b",
+                        "--benchmark",
+                        "visual_disease_confusion_sets",
+                        "--evaluation-set",
+                        "validation",
+                        "--task-ids-file",
+                        str(path),
+                        "--dry-run",
+                    ],
+                    root=ROOT,
+                )
         self.assertEqual(status, 0, stderr.getvalue())
         payload = json.loads(stdout.getvalue())
         self.assertEqual(payload["selected_units"], 1)
