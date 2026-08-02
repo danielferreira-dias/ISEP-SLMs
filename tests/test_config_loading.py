@@ -113,7 +113,7 @@ class StrictModelConfigLoaderTests(unittest.TestCase):
             ModelConfigError, "available profiles"
         ):
             load_model_config(
-                "kimi_k2_6",
+                "qwen_3_5_4b",
                 root=ROOT,
                 backend_profile="does_not_exist",
             )

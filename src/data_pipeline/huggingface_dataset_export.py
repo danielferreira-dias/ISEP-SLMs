@@ -28,17 +28,19 @@ from src.data_pipeline.deduplication import ImageResolver
 
 
 EXPORT_SCHEMA_VERSION = "1.0.0"
-EXPORT_RELEASE_VERSION = "1.2.0"
+EXPORT_RELEASE_VERSION = "1.3.0"
 DEFAULT_INPUT = Path(
     "data/training/dermatology_multimodal_v1/train_images.parquet"
 )
 DEFAULT_OUTPUT = Path("data/training/ISEPDermData")
 DEFAULT_SHARD_SIZE = 512
-EXPECTED_IMAGE_COUNT = 6_858
-EXPECTED_GROUP_COUNT = 5_254
+EXPECTED_IMAGE_COUNT = 7_541
+EXPECTED_GROUP_COUNT = 5_671
 EXPECTED_CLASS_COUNT = 21
 EXPECTED_PROMOTED_IMAGE_COUNT = 123
 EXPECTED_PROMOTED_GROUP_COUNT = 63
+EXPECTED_VALIDATION_PROMOTED_IMAGE_COUNT = 683
+EXPECTED_VALIDATION_PROMOTED_GROUP_COUNT = 417
 
 PROMOTION_SOURCE_MANIFESTS = (
     Path("data/manifests/fitzpatrick17k_c_v3.parquet"),
@@ -54,6 +56,10 @@ PROMOTION_PROTECTED_TASKS = (
         "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/"
         "internal_benchmark-*.parquet"
     ),
+)
+VALIDATION_PROMOTION_AUDIT = Path(
+    "data/benchmarks/ISEPDermaBench/metadata/"
+    "visual_top_k_validation_to_train.csv"
 )
 
 # Derm1M is deliberately excluded from the canonical Hugging Face release.
@@ -282,8 +288,10 @@ PAD-UFES-20, SCIN, and HIBA. Derm1M was removed in release 1.1.0 after a
 label-quality audit identified source-derived entity-linking errors and
 context-dependent images unsuitable as direct image-classification targets.
 Release 1.2.0 promotes 123 images from 63 previously unrepresented internal
-reserve groups into Train. Images from groups represented by Validation or the
-sealed Internal Benchmark remain excluded from training.
+reserve groups into Train. Release 1.3.0 additionally promotes 683 images from
+417 whole groups released when visual Top-K Validation was reduced to 1,000
+tasks. Images from groups still represented by Validation or the sealed
+Internal Benchmark remain excluded from training.
 See `metadata/source_licenses.json` and the upstream dataset documentation
 before any redistribution, commercial use, or publication of derived
 artifacts.
@@ -342,11 +350,11 @@ def _source_licenses() -> dict[str, Any]:
     }
 
 
-def _promoted_internal_reserve(
+def _promoted_training_additions(
     root: Path,
     *,
     base_selected: pd.DataFrame,
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Promote only groups absent from train and published evaluations.
 
     The full unpublished source remainder contains companion images from
@@ -391,31 +399,60 @@ def _promoted_internal_reserve(
     promoted = promoted.sort_values("sample_id", kind="stable").reset_index(
         drop=True
     )
-    actual = {
-        "images": len(promoted),
-        "groups": promoted["leakage_group_id"].nunique(),
+    audit_path = root / VALIDATION_PROMOTION_AUDIT
+    if not audit_path.is_file():
+        raise FileNotFoundError(f"Validation promotion audit is missing: {audit_path}")
+    audit = pd.read_csv(audit_path, dtype=str)
+    validation_ids = set(audit["sample_id"])
+    validation_promoted = promoted[
+        promoted["sample_id"].astype(str).isin(validation_ids)
+    ].copy()
+    reserve_promoted = promoted[
+        ~promoted["sample_id"].astype(str).isin(validation_ids)
+    ].copy()
+    if set(validation_promoted["sample_id"].astype(str)) != validation_ids:
+        missing = sorted(validation_ids - set(validation_promoted["sample_id"].astype(str)))
+        raise ValueError(f"Validation promotion rows are missing: {missing[:3]}")
+    if set(validation_promoted["leakage_group_id"].astype(str)) != set(
+        audit["leakage_group_id"].astype(str)
+    ):
+        raise ValueError("Validation promotion group IDs differ from the audit")
+    expected_parts = {
+        "reserve": (EXPECTED_PROMOTED_IMAGE_COUNT, EXPECTED_PROMOTED_GROUP_COUNT),
+        "validation": (
+            EXPECTED_VALIDATION_PROMOTED_IMAGE_COUNT,
+            EXPECTED_VALIDATION_PROMOTED_GROUP_COUNT,
+        ),
     }
-    expected = {
-        "images": EXPECTED_PROMOTED_IMAGE_COUNT,
-        "groups": EXPECTED_PROMOTED_GROUP_COUNT,
+    actual_parts = {
+        "reserve": (len(reserve_promoted), reserve_promoted["leakage_group_id"].nunique()),
+        "validation": (
+            len(validation_promoted),
+            validation_promoted["leakage_group_id"].nunique(),
+        ),
     }
-    if actual != expected:
-        raise ValueError(
-            f"Unexpected internal-reserve promotion: {actual} != {expected}"
-        )
+    if actual_parts != expected_parts:
+        raise ValueError(f"Unexpected promotion counts: {actual_parts} != {expected_parts}")
     if set(promoted["leakage_group_id"].astype(str)) & protected_groups:
         raise ValueError("Promoted groups overlap a published evaluation")
     if set(promoted["leakage_group_id"].astype(str)) & base_groups:
         raise ValueError("Promoted groups overlap the existing training pool")
 
-    promoted["training_role"] = "in_domain_diagnosis"
-    promoted["promotion_policy"] = (
+    reserve_promoted["training_role"] = "in_domain_diagnosis"
+    reserve_promoted["promotion_policy"] = (
         "internal_test_reserve_unrepresented_group_to_train_v1"
     )
+    validation_promoted["training_role"] = "in_domain_diagnosis"
+    validation_promoted["promotion_policy"] = "group_safe_validation_to_train_v1"
+    promoted = pd.concat(
+        [reserve_promoted, validation_promoted],
+        ignore_index=True,
+        sort=False,
+    ).sort_values("sample_id", kind="stable").reset_index(drop=True)
     promoted.attrs["protected_task_paths"] = [
         path.relative_to(root).as_posix() for path in protected_paths
     ]
-    return promoted
+    return promoted, reserve_promoted, validation_promoted
 
 
 def build_huggingface_export(
@@ -444,7 +481,7 @@ def build_huggingface_export(
         (source["training_role"] == "in_domain_diagnosis")
         & ~source["dataset_id"].isin(EXCLUDED_SOURCES)
     ].copy()
-    promoted = _promoted_internal_reserve(
+    promoted, reserve_promoted, validation_promoted = _promoted_training_additions(
         root,
         base_selected=base_selected,
     )
@@ -553,7 +590,7 @@ def build_huggingface_export(
             index=False,
         )
         (
-            promoted.groupby(
+            reserve_promoted.groupby(
                 ["dataset_id", "leakage_group_id"],
                 as_index=False,
             )
@@ -564,6 +601,21 @@ def build_huggingface_export(
             .sort_values(["dataset_id", "leakage_group_id"])
             .to_csv(
                 metadata_directory / "promoted_reserve_groups.csv",
+                index=False,
+            )
+        )
+        (
+            validation_promoted.groupby(
+                ["dataset_id", "leakage_group_id"],
+                as_index=False,
+            )
+            .agg(
+                image_count=("sample_id", "size"),
+                class_count=("disease_id", "nunique"),
+            )
+            .sort_values(["dataset_id", "leakage_group_id"])
+            .to_csv(
+                metadata_directory / "promoted_validation_groups.csv",
                 index=False,
             )
         )
@@ -613,19 +665,20 @@ def build_huggingface_export(
                 "selection": (
                     "training_role == 'in_domain_diagnosis' and "
                     "dataset_id not in {'derm1m'}, plus 63 wholly "
-                    "unrepresented internal-reserve groups"
+                    "unrepresented internal-reserve groups, plus 417 "
+                    "whole groups released from visual Top-K Validation"
                 ),
                 "internal_reserve_promotion": {
                     "policy": (
                         "internal_test_reserve_unrepresented_group_to_train_v1"
                     ),
-                    "image_count": len(promoted),
-                    "group_count": promoted[
+                    "image_count": len(reserve_promoted),
+                    "group_count": reserve_promoted[
                         "leakage_group_id"
                     ].nunique(),
                     "source_counts": {
                         str(key): int(value)
-                        for key, value in promoted["dataset_id"]
+                        for key, value in reserve_promoted["dataset_id"]
                         .value_counts()
                         .sort_index()
                         .items()
@@ -637,6 +690,22 @@ def build_huggingface_export(
                     "audit_file": (
                         "metadata/promoted_reserve_groups.csv"
                     ),
+                },
+                "validation_promotion": {
+                    "policy": "group_safe_validation_to_train_v1",
+                    "image_count": len(validation_promoted),
+                    "group_count": validation_promoted[
+                        "leakage_group_id"
+                    ].nunique(),
+                    "source_counts": {
+                        str(key): int(value)
+                        for key, value in validation_promoted["dataset_id"]
+                        .value_counts()
+                        .sort_index()
+                        .items()
+                    },
+                    "source_audit_file": VALIDATION_PROMOTION_AUDIT.as_posix(),
+                    "audit_file": "metadata/promoted_validation_groups.csv",
                 },
                 "excluded_sources": {
                     "derm1m": (

@@ -130,6 +130,23 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     run_parser.add_argument(
+        "--task-ids-file",
+        type=Path,
+        help=(
+            "Optional newline-delimited task IDs for an explicitly paired "
+            "evaluation subset. Cannot be combined with --limit."
+        ),
+    )
+    run_parser.add_argument(
+        "--prompt-override",
+        type=Path,
+        help=(
+            "Development-only evaluated-model prompt YAML override. "
+            "Available only for open_ended_diagnosis and recorded in the "
+            "run identity and config snapshot."
+        ),
+    )
+    run_parser.add_argument(
         "--seed",
         type=int,
         default=42,
@@ -329,6 +346,21 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         backend_profile=args.backend_profile,
     )
     benchmark = load_isep_dermabench_config(args.benchmark, root=root)
+    if args.prompt_override is not None:
+        if benchmark.benchmark.id != "open_ended_diagnosis":
+            raise ValueError(
+                "--prompt-override is available only for "
+                "open_ended_diagnosis"
+            )
+        prompt_path = args.prompt_override
+        if not prompt_path.is_absolute():
+            prompt_path = root / prompt_path
+        prompt_path = prompt_path.resolve()
+        if not prompt_path.is_file():
+            raise FileNotFoundError(
+                f"Prompt override does not exist: {prompt_path}"
+            )
+        benchmark = replace(benchmark, prompt_path=prompt_path)
     args.structured_output = (
         benchmark.structured_output.mode
         if args.structured_output == "benchmark"
@@ -362,11 +394,21 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         root=root,
         benchmark=benchmark,
         evaluation_set=args.evaluation_set,
-        limit=args.limit,
+        limit=None if args.task_ids_file is not None else args.limit,
         seed=args.seed,
         source=args.benchmark_source,
         repo_id=args.benchmark_repo,
     )
+    if args.task_ids_file is not None:
+        task_ids_path = args.task_ids_file
+        if not task_ids_path.is_absolute():
+            task_ids_path = root / task_ids_path
+        dataset = _select_explicit_task_ids(
+            dataset,
+            path=task_ids_path,
+        )
+    if args.prompt_override is not None:
+        dataset = _override_open_ended_prompt(dataset, prompt=prompt)
     if not dataset.samples:
         raise ValueError("The selected benchmark dataset contains no tasks")
 
@@ -653,6 +695,109 @@ def _validate_runtime_options(
         raise ValueError("--dry-run cannot be combined with --resume")
     if args.resume is not None and args.output_root is not None:
         raise ValueError("--resume cannot be combined with --output-root")
+    if args.task_ids_file is not None and args.limit is not None:
+        raise ValueError("--task-ids-file cannot be combined with --limit")
+
+
+def _select_explicit_task_ids(
+    dataset: LoadedBenchmarkDataset,
+    *,
+    path: Path,
+) -> LoadedBenchmarkDataset:
+    """Select an exact ordered task cohort for paired A/B comparisons."""
+
+    if not path.is_file():
+        raise FileNotFoundError(f"Task ID file does not exist: {path}")
+    task_ids = [
+        line.strip()
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if not task_ids:
+        raise ValueError("Task ID file contains no task IDs")
+    if len(task_ids) != len(set(task_ids)):
+        raise ValueError("Task ID file contains duplicates")
+    sample_by_id = {sample.task_id: sample for sample in dataset.samples}
+    missing = [task_id for task_id in task_ids if task_id not in sample_by_id]
+    if missing:
+        raise ValueError(
+            "Task IDs are absent from the selected benchmark split: "
+            + ", ".join(missing[:10])
+        )
+    order = {task_id: index for index, task_id in enumerate(task_ids)}
+    frame = dataset.frame[
+        dataset.frame["task_id"].astype(str).isin(order)
+    ].copy()
+    frame["_explicit_order"] = frame["task_id"].astype(str).map(order)
+    frame = frame.sort_values("_explicit_order", kind="stable").drop(
+        columns=["_explicit_order"]
+    ).reset_index(drop=True)
+    selection = {
+        "algorithm": "explicit_task_ids_v1",
+        "seed": dataset.selection.get("seed"),
+        "benchmark_release_hash": dataset.release_sha256,
+        "unit_column": "task_id",
+        "task_column": "task_id",
+        "requested_limit": len(task_ids),
+        "selected_unit_count": len(task_ids),
+        "selected_task_count": len(task_ids),
+        "unit_ids": task_ids,
+        "task_ids": task_ids,
+        "task_ids_file": str(path),
+    }
+    selection["selection_hash"] = canonical_hash(selection)
+    return replace(
+        dataset,
+        frame=frame,
+        samples=tuple(sample_by_id[task_id] for task_id in task_ids),
+        selection=selection,
+    )
+
+
+def _override_open_ended_prompt(
+    dataset: LoadedBenchmarkDataset,
+    *,
+    prompt: dict[str, Any],
+) -> LoadedBenchmarkDataset:
+    """Apply an auditable prompt variant without mutating the frozen release."""
+
+    required = ("id", "version", "system_prompt", "user_template")
+    missing = [key for key in required if not isinstance(prompt.get(key), str)]
+    if missing:
+        raise ValueError(
+            "Prompt override requires string fields: " + ", ".join(missing)
+        )
+    system_prompt = str(prompt["system_prompt"])
+    user_prompt = str(prompt["user_template"])
+    prompt_sha256 = canonical_hash(
+        {"system_prompt": system_prompt, "user_prompt": user_prompt}
+    )
+    samples = []
+    for sample in dataset.samples:
+        metadata = dict(sample.metadata)
+        metadata.update(
+            {
+                "prompt_id": str(prompt["id"]),
+                "prompt_version": str(prompt["version"]),
+                "prompt_sha256": prompt_sha256,
+                "prompt_override": True,
+            }
+        )
+        samples.append(
+            replace(
+                sample,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                metadata=metadata,
+            )
+        )
+    frame = dataset.frame.copy()
+    frame["system_prompt"] = system_prompt
+    frame["user_prompt"] = user_prompt
+    frame["prompt_id"] = str(prompt["id"])
+    frame["prompt_version"] = str(prompt["version"])
+    frame["prompt_sha256"] = prompt_sha256
+    return replace(dataset, frame=frame, samples=tuple(samples))
 
 
 def _validate_selected_images(

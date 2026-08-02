@@ -20,7 +20,7 @@ from src.inference.responses import AzureResponsesBackend
 class AzureBackend(InferenceBackend):
     """Select the configured Azure/provider API contract.
 
-    ``openai_compatible`` is suitable for Kimi-style chat endpoints.
+    ``openai_compatible`` is suitable for compatible chat endpoints.
     ``openai_responses`` uses the Responses API for Azure OpenAI deployments.
     Injected clients bypass environment validation, which keeps tests and
     offline configuration inspection independent of provider credentials.

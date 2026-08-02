@@ -45,14 +45,14 @@ class BenchmarkValidationTests(unittest.TestCase):
 
     def test_ranked_id_list_has_auditable_canonical_projection(self) -> None:
         response = parse_and_validate_response(
-            model_id="minicpm",
+            model_id="ranked_list_model",
             raw_text='{"predictions":["D002","D001","D003"]}',
             allowed_disease_ids={"D001", "D002", "D003"},
             top_k=3,
         )
         prediction = BenchmarkPrediction(
             sample_id="SAMPLE_1",
-            model_id="minicpm",
+            model_id="ranked_list_model",
             ground_truth_disease_id="D001",
             response=response,
         )
@@ -481,7 +481,7 @@ class BenchmarkValidationTests(unittest.TestCase):
             ("high_confusability", ["D002", "D001", "D003"]),
         ):
             response = parse_and_validate_response(
-                model_id="minicpm",
+                model_id="ranked_list_model",
                 raw_text=json.dumps({"predictions": ranked_ids}),
                 allowed_disease_ids={"D001", "D002", "D003"},
                 top_k=3,
@@ -490,7 +490,7 @@ class BenchmarkValidationTests(unittest.TestCase):
                 BenchmarkPrediction(
                     task_id=f"PAIR_1::{difficulty}",
                     sample_id="SAMPLE_1",
-                    model_id="minicpm",
+                    model_id="ranked_list_model",
                     ground_truth_disease_id="D001",
                     response=response,
                     metadata={

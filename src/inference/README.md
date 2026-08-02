@@ -53,8 +53,8 @@ BMP signatures are recognized automatically.
   retries are disabled to avoid duplicating expensive generations. Benchmark
   requests use `AsyncOpenAI`; the async HTTP client is closed before a
   managed server is stopped.
-- `OpenAICompatibleChatBackend` also supports provider-hosted chat endpoints,
-  including Kimi-compatible deployments.
+- `OpenAICompatibleChatBackend` also supports provider-hosted, OpenAI-compatible
+  chat endpoints.
 - `AzureResponsesBackend` uses the Responses API. It supports the Azure
   `/openai/v1` endpoint through the standard `OpenAI` client and legacy Azure
   API-version deployments through `AzureOpenAI`.
@@ -108,16 +108,6 @@ summary. The Responses API requests `reasoning={"summary": "auto"}` for
 `full` and `summary` capture; it stores only that official provider summary
 and never attempts to extract raw chain of thought.
 
-MedGemma requests do not use a separate system role. The system instructions
-are prepended to the first user text block while preserving image-first
-ordering, as required by that model's chat-template contract.
-MedGemma can also place a reasoning block directly in message content between
-`<unused94>` and `<unused95>`. Its model configuration enables a deterministic
-content parser that stores this block in `result.reasoning` and exposes only
-the content outside the block as `result.final_text`. If no final content
-exists after the closing token, the answer remains empty and invalid; the
-pipeline never derives a diagnosis from hidden reasoning.
-
 ## Managed vLLM process
 
 `ManagedVllmServer` starts one server without using a shell, waits for its
@@ -143,8 +133,7 @@ with ManagedVllmServer(
 
 `server_config_from_model(...)` transfers the active local profile's dtype,
 tensor parallelism, context length, GPU-memory target, image limit, and
-reasoning parser into the vLLM command. MiniCPM image processor settings are
-also forwarded through `--mm-processor-kwargs`. `ManagedVllmServer` can
+reasoning parser into the vLLM command. `ManagedVllmServer` can
 discard subprocess output (the default) or write both stdout and stderr to
 `log_path`; it closes the file during every shutdown path.
 

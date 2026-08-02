@@ -216,37 +216,6 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         self.assertTrue(result.metadata["async_transport"])
         self.assertTrue(stream.closed)
 
-    def test_kimi_instant_mode_uses_official_thinking_control(self) -> None:
-        response = SimpleNamespace(
-            choices=[
-                SimpleNamespace(
-                    finish_reason="stop",
-                    message=SimpleNamespace(content="{}"),
-                )
-            ],
-            usage=None,
-        )
-        client = _FakeClient(chat_response=response)
-        backend = OpenAICompatibleChatBackend(
-            model_id="kimi",
-            client=client,
-            generation={"thinking_mode": "disabled"},
-            thinking_control="kimi_api",
-        )
-
-        backend.generate_result(
-            system_prompt="System",
-            user_prompt="User",
-            image_bytes=b"image",
-            schema={},
-        )
-
-        self.assertEqual(
-            client.chat_create.payload["extra_body"]["thinking"],
-            {"type": "disabled"},
-        )
-        self.assertNotIn("reasoning_effort", client.chat_create.payload)
-
     def test_openrouter_uses_unified_reasoning_and_text_first(self) -> None:
         response = SimpleNamespace(
             choices=[
@@ -299,7 +268,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         )
         client = _FakeClient(chat_response=response)
         backend = OpenAICompatibleChatBackend(
-            model_id="kimi",
+            model_id="chat-model",
             client=client,
             generation={"thinking_mode": "disabled"},
             thinking_control="chat_template",
@@ -329,7 +298,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         )
         client = _FakeClient(chat_response=response)
         backend = OpenAICompatibleChatBackend(
-            model_id="kimi",
+            model_id="chat-model",
             client=client,
             generation={"thinking_mode": "disabled"},
             thinking_control="reasoning_effort",
@@ -425,7 +394,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
             usage=None,
         )
         backend = OpenAICompatibleChatBackend(
-            model_id="kimi",
+            model_id="chat-model",
             client=_FakeClient(chat_response=response),
             reasoning_capture="full",
         )
@@ -1102,7 +1071,7 @@ class VllmBackendTests(unittest.TestCase):
 
     def test_server_config_includes_image_processor_kwargs(self) -> None:
         model_config = SimpleNamespace(
-            source=SimpleNamespace(repo_id="openbmb/MiniCPM-V-4.6"),
+            source=SimpleNamespace(repo_id="example/multimodal-model"),
             processor=SimpleNamespace(
                 image=SimpleNamespace(
                     downsample_mode="4x",

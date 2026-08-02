@@ -7,7 +7,7 @@ dermatology benchmark pipeline on cloud GPUs.
 
 `qwen_3_6_27b.py` exposes `Qwen/Qwen3.6-27B` through vLLM's
 OpenAI-compatible API on one NVIDIA A100 80 GB. Its local entrypoint calls
-the same benchmark runner used for Luna and Kimi. The application:
+the same benchmark runner used for API and local models. The application:
 
 - retains Hugging Face weights and vLLM cache data in Modal Volumes;
 - accepts one image plus text per benchmark request;
@@ -135,55 +135,33 @@ Validate locally without allocating the A100:
 modal run src/modal/gemma_4_31b_it.py --dry-run
 ```
 
-## MedGemma 1.5 4B, MiniCPM-V 4.6, Gemma 4 E4B, and Qwen 3.5 4B
+## Gemma 4 E4B and Qwen 3.5 4B
 
-The four small-model launchers use independent Modal Apps on NVIDIA L40S
+The two small-model launchers use independent Modal Apps on NVIDIA L40S
 GPUs:
 
 | Launcher | Hugging Face model | Default concurrency |
 | --- | --- | ---: |
-| `medgemma_1_5_4b.py` | `google/medgemma-1.5-4b-it` | 8 |
-| `minicpm_v_4_6.py` | `openbmb/MiniCPM-V-4.6` | 4 |
 | `gemma_4_e4b_it.py` | `google/gemma-4-E4B-it` | 8 |
 | `qwen_small_4b.py` | `Qwen/Qwen3.5-4B` | 8 |
 
-All four attach the existing `huggingface-secret` Modal secret and share the
-persistent Hugging Face and vLLM cache volumes. MedGemma therefore receives
-the token required for its gated repository, while public-model downloads
-also avoid anonymous Hub rate limits. MiniCPM forwards its configured
-`downsample_mode` and `max_slice_nums` processor arguments. Gemma uses the
-Gemma 4 reasoning parser with thinking disabled.
-
-MedGemma may emit reasoning inside the content channel between `<unused94>`
-and `<unused95>`. The shared inference client separates that block into
-`response.reasoning` before validation and keeps only the remaining content
-as the final answer. MedGemma is intentionally restricted to `prompt_only`;
-vLLM JSON Schema constraints caused prolonged generation and truncation on
-the evidence-grounded schema. MiniCPM's ordered string-list JSON is retained
-as the strict raw output and additionally projected into a canonical
-ranked-object view; reports therefore show both strict and canonical metrics.
-
-The MiniCPM image applies upstream vLLM fix `aa1df36c` on top of vLLM 0.23.0.
-The released wheel accessed `image_processor.version`, but the current
-Transformers 5.7+ `MiniCPMV4_6ImageProcessor` no longer exposes that
-attribute. The pinned one-line fallback is the change merged upstream in
-vLLM PR `#44980`; keeping it explicit avoids an unpinned nightly wheel.
+Both attach the existing `huggingface-secret` Modal secret and share the
+persistent Hugging Face and vLLM cache volumes. Public-model downloads avoid
+anonymous Hub rate limits. Gemma uses the Gemma 4 reasoning parser with
+thinking disabled.
 
 Run exactly ten scored tasks from each of the three benchmarks while keeping
 one model server alive:
 
 ```bash
-modal run src/modal/medgemma_1_5_4b.py \
-  --all-benchmarks --limit 10
-
-modal run src/modal/minicpm_v_4_6.py \
-  --all-benchmarks --limit 10
-
 modal run src/modal/gemma_4_e4b_it.py \
+  --all-benchmarks --limit 10
+
+modal run src/modal/qwen_small_4b.py \
   --all-benchmarks --limit 10
 ```
 
-For MiniCPM, Gemma E4B, and Qwen 4B, compare prompt-only generation with vLLM
+For Gemma E4B and Qwen 4B, compare prompt-only generation with vLLM
 JSON Schema constraints on exactly the visual Top-K and evidence-grounded
 benchmarks:
 
@@ -196,24 +174,15 @@ modal run src/modal/<launcher>.py \
 
 `both` creates independent benchmark runs for `prompt_only` and
 `json_schema`; the condition is stored in each run manifest. Use `--dry-run`
-to validate all four combinations without starting the model server.
-
-Run the same two-benchmark suite for MedGemma in prompt-only mode:
-
-```bash
-modal run src/modal/medgemma_1_5_4b.py \
-  --evidence-and-top-k \
-  --structured-output prompt_only \
-  --limit 10
-```
+to validate all combinations without starting the model server.
 
 For the paired confusion benchmark, the suite selects five pairs to produce
 ten scored low/high-confusability tasks. Outside suite mode, `--limit` retains
 the benchmark CLI's native meaning and therefore selects pairs.
 
-Validate all three benchmark configurations without allocating a GPU:
+Validate all benchmark configurations without allocating a GPU:
 
 ```bash
-modal run src/modal/medgemma_1_5_4b.py \
+modal run src/modal/gemma_4_e4b_it.py \
   --all-benchmarks --limit 10 --dry-run
 ```

@@ -348,3 +348,68 @@ de raciocínio clínico explícita, e separadamente dos benchmarks closed-set.
 Os dry-runs iniciais de 10 respostas por task passaram para Luna e Qwen. Os
 selection hashes foram iguais entre modelos, confirmando seleção emparelhada.
 Nenhuma chamada ao modelo foi feita nessa etapa.
+
+## 13. Opção de geração sintética em duas etapas externas
+
+Os dois passes internos testados na prompt open-ended 1.3.0 não melhoraram o
+resultado do Luna. Isso não exclui uma arquitetura com **duas chamadas
+separadas**, porque nessa alternativa existe um contrato verificável entre as
+duas etapas e não apenas uma instrução para o modelo pensar durante mais tempo.
+
+### Etapa 1 — Perceção e morphology grounding
+
+Entrada: imagem ou imagens do caso.
+
+Saída estruturada, sem diagnóstico obrigatório:
+
+- se a imagem é avaliável e quais são as suas limitações;
+- localização anatómica apenas quando visível;
+- lesão primária;
+- configuração e distribuição dentro do campo fotografado;
+- cor ou contraste relativamente à pele adjacente;
+- superfície e alterações secundárias;
+- achados incertos que não devem ser tratados como presentes.
+
+Esta etapa deve ser útil por si própria como exemplo de treino de morphology
+grounding. Não deve inventar sintomas, duração, palpação, história, exames ou
+outras variáveis não observáveis.
+
+### Etapa 2 — Diagnóstico fundamentado e decisão
+
+Entrada: a mesma imagem e o output congelado da Etapa 1. Quando existir
+contexto clínico real e validado, este pode ser fornecido num campo separado.
+
+Saída estruturada:
+
+- diferencial Top-3 ordenado;
+- evidência visual a favor de cada hipótese;
+- evidência visível que enfraquece a hipótese principal, quando avaliável;
+- grau de incerteza;
+- ação `CLASSIFY`, `ASK_CONTEXT`, `REQUEST_BETTER_IMAGE` ou
+  `ABSTAIN_OUT_OF_DOMAIN`;
+- pergunta discriminativa, apenas quando a ação for `ASK_CONTEXT`.
+
+O teacher deve gerar inicialmente sem ver o label. A resposta é comparada com
+o ground truth depois da geração. Isto reduz o risco de construir uma
+justificação retrospetiva que apenas racionaliza o label fornecido.
+
+Regras de aceitação propostas:
+
+1. usar Etapa 1 em treino apenas se os achados forem consistentes, avaliáveis e
+   sem factos inventados;
+2. usar Etapa 2 como rationale diagnóstico apenas quando o Top-1 do teacher
+   coincidir com o ground truth sob equivalência clínica definida;
+3. se a morfologia for aproveitável mas o diagnóstico estiver errado, guardar
+   apenas o target da Etapa 1;
+4. nunca corrigir silenciosamente o diagnóstico do teacher para o label e
+   manter a mesma rationale;
+5. não gerar respostas do utilizador a perguntas clínicas sem metadata real;
+6. preservar rejeições e respetivos motivos para medir enviesamento para casos
+   fáceis, classes ou tons de pele.
+
+Este pipeline é uma opção para o dataset sintético, não uma alteração à prompt
+congelada do benchmark. Deve ser testado contra a geração direta numa amostra
+emparelhada de Validation antes de ser aplicado a todo o Train.
+
+A revisão científica e o desenho experimental correspondente encontram-se em
+[Dermatology MLLM and reasoning strategy research](11_dermatology_mllm_reasoning_strategy_research.md).

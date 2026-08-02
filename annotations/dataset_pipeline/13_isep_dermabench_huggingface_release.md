@@ -55,7 +55,7 @@ the inference request.
 
 | Benchmark | Split | Tasks | Unique images | Groups |
 | --- | --- | ---: | ---: | ---: |
-| Visual Top-K | Validation | 1,683 | 1,683 | 1,063 |
+| Visual Top-K | Validation | 1,000 | 1,000 | 646 |
 | Visual Top-K | Internal Benchmark | 1,000 | 1,000 | 1,000 |
 | Visual Top-K | External DDI | 300 | 300 | 299 |
 | Visual Top-K | External SkinDisNet | 1,365 | 1,365 | 333 |
@@ -71,6 +71,13 @@ Version 1.1.0 adds 400 open-ended tasks across two splits. Its model inputs
 contain no candidate list or scoring references. The corresponding isolated
 reference views provide the correct label and optional SKINCON/SkinCAP aids
 only to the single blinded judge.
+
+Version 1.2.0 reduces Visual Top-K Validation from 1,683 to 1,000 image
+tasks. Selection is performed by complete `leakage_group_id`: all 504 groups
+required by another Validation task remain protected, and a deterministic
+seed-42 subset fills the remaining capacity. The 683 released images belong
+to 417 complete groups and are promoted to ISEPDermData Train. The audit is
+stored in `metadata/visual_top_k_validation_to_train.csv`.
 
 ## Missing Internal Evidence cohort
 

@@ -198,21 +198,33 @@ def _validate_judgment_semantics(judgment: dict[str, Any]) -> None:
     unsupported_examples = list(judgment["unsupported_claim_examples"])
     errors: list[str] = []
 
-    if rank == 0 and diagnosis_score == 4:
+    if rank == 0 and diagnosis_score > 2:
         errors.append(
-            "rank 0 cannot be combined with diagnosis_correctness 4"
+            "rank 0 requires diagnosis_correctness of at most 2"
         )
-    if rank == 0 and verdict == "correct":
-        errors.append("rank 0 cannot be combined with verdict 'correct'")
+    if rank == 0 and verdict in {"correct", "mostly_correct"}:
+        errors.append(
+            "rank 0 cannot be combined with a correct or mostly_correct "
+            "verdict"
+        )
     if rank == 1 and diagnosis_score < 3:
         errors.append(
             "rank 1 requires diagnosis_correctness of at least 3"
         )
-    if rank == 1 and verdict in {"partially_correct", "incorrect"}:
+    if rank == 1 and verdict == "incorrect":
         errors.append(
-            "rank 1 cannot be combined with a partially_correct or "
-            "incorrect verdict"
+            "rank 1 cannot be combined with an incorrect verdict"
         )
+    if rank == 2 and diagnosis_score != 3:
+        errors.append("rank 2 requires diagnosis_correctness 3")
+    if rank == 3 and diagnosis_score != 2:
+        errors.append("rank 3 requires diagnosis_correctness 2")
+    if verdict == "correct" and not (rank == 1 and diagnosis_score == 4):
+        errors.append(
+            "verdict 'correct' requires rank 1 and diagnosis_correctness 4"
+        )
+    if verdict == "mostly_correct" and rank != 1:
+        errors.append("verdict 'mostly_correct' requires rank 1")
     if unsupported_count == 0 and unsupported_examples:
         errors.append(
             "unsupported_claim_examples must be empty when the count is 0"

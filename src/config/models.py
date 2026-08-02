@@ -19,7 +19,6 @@ ModelEngine = Literal[
 ]
 ApiStyle = Literal["chat_completions", "responses"]
 ThinkingControl = Literal[
-    "kimi_api",
     "chat_template",
     "reasoning_effort",
     "openrouter_reasoning",
@@ -712,14 +711,13 @@ def _parse_backend_profile(
     )
     if thinking_control not in {
         None,
-        "kimi_api",
         "chat_template",
         "reasoning_effort",
         "openrouter_reasoning",
     }:
         raise ModelConfigError(
-            f"{section}.thinking_control must be 'kimi_api', "
-            "'chat_template', 'reasoning_effort', or "
+            f"{section}.thinking_control must be 'chat_template', "
+            "'reasoning_effort', or "
             "'openrouter_reasoning'"
         )
     if backend_type == "local":

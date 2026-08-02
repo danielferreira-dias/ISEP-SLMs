@@ -84,13 +84,12 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         )
         if thinking_control not in {
             None,
-            "kimi_api",
             "chat_template",
             "reasoning_effort",
             "openrouter_reasoning",
         }:
             raise InferenceConfigurationError(
-                "thinking_control must be 'kimi_api', 'chat_template', "
+                "thinking_control must be 'chat_template', "
                 "'reasoning_effort', or 'openrouter_reasoning'"
             )
         self.thinking_control = thinking_control
@@ -340,9 +339,7 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             raise InferenceRequestError(
                 "thinking_mode must be 'enabled' or 'disabled'"
             )
-        if thinking_mode is not None and self.thinking_control == "kimi_api":
-            extra_body["thinking"] = {"type": thinking_mode}
-        elif (
+        if (
             thinking_mode is not None
             and self.thinking_control == "chat_template"
         ):

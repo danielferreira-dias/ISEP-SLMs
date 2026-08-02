@@ -37,7 +37,7 @@ makes assignment independent of input row order.
 | Evaluation set | Images | Leakage groups | Diseases |
 | --- | ---: | ---: | ---: |
 | Train | 6,417 | 4,962 | 21 |
-| Validation | 1,683 | 1,063 | 21 |
+| Validation | 1,000 | 646 | 21 |
 | Internal test | 1,722 | 1,063 | 21 |
 | Internal paired benchmark | 1,000 | 1,000 | 21 |
 | External DDI | 300 | 299 | 8 |

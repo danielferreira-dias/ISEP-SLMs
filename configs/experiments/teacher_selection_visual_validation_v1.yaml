@@ -24,9 +24,6 @@ models:
   - config: configs/models/qwen_3_6_27b.yaml
     enabled: true
 
-  - config: configs/models/kimi_k2_6.yaml
-    enabled: true
-
   - config: configs/models/gpt_5_6_luna.yaml
     enabled: true
 
@@ -40,12 +37,6 @@ models:
     enabled: true
 
   - config: configs/models/gemma_4_e4b_it.yaml
-    enabled: true
-
-  - config: configs/models/minicpm_v_4_6.yaml
-    enabled: true
-
-  - config: configs/models/medgemma_1_5_4b.yaml
     enabled: true
 
 selection_policy:
@@ -72,7 +63,6 @@ teacher_selection:
   selected_model_id: null
   candidate_model_ids:
     - qwen_3_6_27b
-    - kimi_k2_6
     - gpt_5_6_luna
     - gemma_4_31b_it
   primary_metrics:

@@ -91,16 +91,19 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
             "gemma_4_31b_it.yaml",
         ]:
             config = _load_model(filename)
+            expected_generation = {
+                "profile": "gemma_4_recommended",
+                "do_sample": True,
+                "temperature": 1.0,
+                "top_p": 0.95,
+                "top_k": 64,
+                "repetition_penalty": 1.0,
+            }
+            if filename == "gemma_4_31b_it.yaml":
+                expected_generation["thinking_mode"] = "disabled"
             self.assertEqual(
                 config["generation"],
-                {
-                    "profile": "gemma_4_recommended",
-                    "do_sample": True,
-                    "temperature": 1.0,
-                    "top_p": 0.95,
-                    "top_k": 64,
-                    "repetition_penalty": 1.0,
-                },
+                expected_generation,
             )
             if filename == "gemma_4_31b_it.yaml":
                 self.assertEqual(
@@ -119,55 +122,6 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
                 config["reasoning"]["exclude_from_structured_output"]
             )
 
-    def test_minicpm_uses_managed_vllm_profile(self) -> None:
-        config = _load_model("minicpm_v_4_6.yaml")
-        self.assertEqual(
-            config["source"]["repo_id"],
-            "openbmb/MiniCPM-V-4.6",
-        )
-        profile = config["backend"]["profiles"]["vllm"]
-        self.assertEqual(config["backend"]["default_profile"], "vllm")
-        self.assertEqual(profile["engine"], "vllm")
-        self.assertEqual(profile["max_model_len"], 16384)
-        self.assertEqual(profile["limit_images_per_prompt"], 1)
-        self.assertFalse(config["security"]["trust_remote_code"])
-        self.assertEqual(config["processor"]["image"]["downsample_mode"], "4x")
-        self.assertEqual(
-            config["generation"],
-            {
-                "profile": "official_default",
-                "do_sample": True,
-                "temperature": 0.7,
-                "top_p": 1.0,
-                "top_k": 0,
-                "repetition_penalty": 1.0,
-            },
-        )
-
-    def test_medgemma_keeps_its_official_greedy_decoding(self) -> None:
-        config = _load_model("medgemma_1_5_4b.yaml")
-        self.assertEqual(config["model"]["family"], "medgemma")
-        self.assertEqual(config["model"]["domain"], "medical")
-        self.assertEqual(
-            config["capabilities"]["structured_output_modes"],
-            ["prompt_only"],
-        )
-        self.assertEqual(
-            config["backend"]["profiles"]["vllm"]["engine"],
-            "vllm",
-        )
-        self.assertEqual(
-            config["reasoning"]["content_parser"],
-            "medgemma_special_tokens",
-        )
-        self.assertEqual(
-            config["generation"],
-            {
-                "profile": "official_greedy",
-                "do_sample": False,
-            },
-        )
-
     def test_zero_shot_experiment_includes_remaining_models(self) -> None:
         experiment = yaml.safe_load(
             (
@@ -179,8 +133,6 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
             {
                 "configs/models/gemma_4_31b_it.yaml",
                 "configs/models/gemma_4_e4b_it.yaml",
-                "configs/models/minicpm_v_4_6.yaml",
-                "configs/models/medgemma_1_5_4b.yaml",
             }.issubset(paths)
         )
         teacher_selection = yaml.safe_load(
@@ -213,11 +165,11 @@ class OtherMultimodalModelConfigTests(unittest.TestCase):
 
 
 class TypedModelConfigTests(unittest.TestCase):
-    def test_all_nine_models_load_into_frozen_typed_configs(self) -> None:
+    def test_all_models_load_into_frozen_typed_configs(self) -> None:
         configs = list_model_configs(root=ROOT)
 
-        self.assertEqual(len(configs), 9)
-        self.assertEqual(len({item.model.id for item in configs}), 9)
+        self.assertEqual(len(configs), 7)
+        self.assertEqual(len({item.model.id for item in configs}), 7)
         local = [
             item
             for item in configs
@@ -228,7 +180,7 @@ class TypedModelConfigTests(unittest.TestCase):
             for item in configs
             if isinstance(item, AzureModelConfig)
         ]
-        self.assertEqual(len(local), 7)
+        self.assertEqual(len(local), 5)
         self.assertEqual(len(api), 2)
         for config in local:
             profile = config.backend.active_profile
@@ -239,7 +191,6 @@ class TypedModelConfigTests(unittest.TestCase):
 
     def test_small_modal_models_support_vllm_json_schema_mode(self) -> None:
         for config_id in (
-            "minicpm_v_4_6",
             "gemma_4_e4b_it",
             "qwen_3_5_4b",
         ):
@@ -249,52 +200,6 @@ class TypedModelConfigTests(unittest.TestCase):
                     "json_schema",
                     model.capabilities.structured_output_modes,
                 )
-
-    def test_kimi_profiles_and_azure_credentials_are_independent(self) -> None:
-        kimi = load_model_config("kimi_k2_6", root=ROOT)
-        gpt = load_model_config("gpt_5_6_luna", root=ROOT)
-
-        self.assertEqual(
-            kimi.backend.active_profile.api_style,
-            "chat_completions",
-        )
-        self.assertEqual(
-            gpt.backend.active_profile.api_style,
-            "responses",
-        )
-        self.assertNotEqual(kimi.endpoint_env, gpt.endpoint_env)
-        self.assertNotEqual(kimi.api_key_env, gpt.api_key_env)
-        self.assertIsNone(kimi.backend.active_profile.api_version_env)
-        self.assertIsNone(gpt.backend.active_profile.api_version_env)
-        self.assertIsNone(kimi.generation.reasoning_effort)
-        self.assertEqual(kimi.generation.thinking_mode, "disabled")
-        self.assertEqual(
-            kimi.backend.profile("azure").thinking_control,
-            "reasoning_effort",
-        )
-        self.assertEqual(kimi.generation.profile, "kimi_instant")
-        self.assertEqual(kimi.generation.temperature, 0.6)
-        self.assertEqual(kimi.generation.top_p, 0.95)
-        self.assertEqual(gpt.generation.reasoning_effort, "high")
-        self.assertEqual(gpt.generation.profile, "provider_default")
-        for config in (kimi, gpt):
-            self.assertIsNone(config.generation.do_sample)
-            self.assertIsNone(config.generation.seed)
-        self.assertIsNone(gpt.generation.temperature)
-        self.assertIsNone(gpt.generation.top_p)
-        endpoint = load_model_config(
-            "kimi_k2_6",
-            root=ROOT,
-            backend_profile="vllm_endpoint",
-        )
-        self.assertEqual(
-            endpoint.backend.active_profile.engine,
-            "vllm_endpoint",
-        )
-        self.assertEqual(
-            endpoint.backend.active_profile.api_style,
-            "chat_completions",
-        )
 
     def test_openrouter_profiles_use_explicit_provider_model_slugs(self) -> None:
         expected = {
@@ -336,30 +241,6 @@ class TypedModelConfigTests(unittest.TestCase):
             root=ROOT,
         )
         self.assertEqual(config.model.id, "qwen_3_5_4b")
-
-    def test_qwen_2b_smoke_config_is_multimodal_and_not_shortlisted(
-        self,
-    ) -> None:
-        config = load_model_config(
-            "configs/models/smoke/qwen_3_5_2b.yaml",
-            root=ROOT,
-        )
-
-        self.assertEqual(config.model.id, "qwen_3_5_2b_smoke")
-        self.assertEqual(config.source.repo_id, "Qwen/Qwen3.5-2B")
-        self.assertIn("image", config.capabilities.modalities)
-        self.assertEqual(config.reasoning.parser, "qwen3")
-        self.assertFalse(
-            config.reasoning.chat_template_kwargs.enable_thinking
-        )
-        self.assertNotIn(
-            config.model.id,
-            {
-                item.model.id
-                for item in list_model_configs(root=ROOT)
-            },
-        )
-
 
 def _load_model(filename: str) -> dict:
     return yaml.safe_load(

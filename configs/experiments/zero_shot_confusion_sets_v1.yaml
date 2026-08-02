@@ -20,8 +20,6 @@ benchmark:
 models:
   - config: configs/models/qwen_3_6_27b.yaml
     enabled: true
-  - config: configs/models/kimi_k2_6.yaml
-    enabled: true
   - config: configs/models/gpt_5_6_luna.yaml
     enabled: true
   - config: configs/models/gemma_4_31b_it.yaml
@@ -32,11 +30,6 @@ models:
     enabled: true
   - config: configs/models/gemma_4_e4b_it.yaml
     enabled: true
-  - config: configs/models/minicpm_v_4_6.yaml
-    enabled: true
-  - config: configs/models/medgemma_1_5_4b.yaml
-    enabled: true
-
 repetitions:
   count: 1
   seeds:

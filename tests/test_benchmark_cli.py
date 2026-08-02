@@ -84,6 +84,54 @@ class BenchmarkCliTests(unittest.TestCase):
         self.assertEqual(payload["selected_tasks"], 1)
         self.assertFalse(payload["network_or_model_called"])
 
+    def test_open_ended_dry_run_accepts_audited_prompt_override(self) -> None:
+        stdout = StringIO()
+        stderr = StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            status = main(
+                [
+                    "run",
+                    "--model",
+                    "gpt_5_6_luna",
+                    "--benchmark",
+                    "open_ended_diagnosis",
+                    "--evaluation-set",
+                    "validation",
+                    "--limit",
+                    "1",
+                    "--prompt-override",
+                    "src/benchmark/resources/open_ended_diagnosis/"
+                    "model_prompt_v1_1_0.yaml",
+                    "--dry-run",
+                ],
+                root=ROOT,
+            )
+        self.assertEqual(status, 0, stderr.getvalue())
+        self.assertEqual(json.loads(stdout.getvalue())["selected_tasks"], 1)
+
+    def test_prompt_override_is_rejected_for_other_benchmarks(self) -> None:
+        stdout = StringIO()
+        stderr = StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            status = main(
+                [
+                    "run",
+                    "--model",
+                    "gpt_5_6_luna",
+                    "--benchmark",
+                    "evidence_grounded_diagnosis",
+                    "--limit",
+                    "1",
+                    "--prompt-override",
+                    "src/benchmark/resources/open_ended_diagnosis/"
+                    "model_prompt_v1_1_0.yaml",
+                    "--dry-run",
+                ],
+                root=ROOT,
+            )
+        self.assertEqual(status, 2)
+        self.assertIn("only for open_ended_diagnosis", stderr.getvalue())
+
     def test_dry_run_reads_an_image_without_calling_a_model(self) -> None:
         stdout = StringIO()
         stderr = StringIO()

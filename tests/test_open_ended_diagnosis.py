@@ -16,6 +16,7 @@ from src.benchmark.open_ended_judge import (
     _judge_one,
     _judge_request,
     _parse_judgment,
+    _validate_judgment_semantics,
     compute_judge_metrics,
     judge_run,
 )
@@ -83,13 +84,62 @@ def _valid_judgment() -> dict:
 
 
 class OpenEndedDiagnosisTests(unittest.TestCase):
+    def test_dermatologist_vision_candidate_is_separate_from_frozen_prompt(self) -> None:
+        frozen = yaml.safe_load(
+            (
+                ROOT
+                / "src/benchmark/resources/open_ended_diagnosis/model_prompt.yaml"
+            ).read_text(encoding="utf-8")
+        )
+        candidate = yaml.safe_load(
+            (
+                ROOT
+                / "src/benchmark/resources/open_ended_diagnosis/"
+                "model_prompt_v1_3_0_candidate.yaml"
+            ).read_text(encoding="utf-8")
+        )
+
+        self.assertEqual(frozen["version"], "1.1.0")
+        self.assertEqual(candidate["version"], "1.3.0-candidate.1")
+        self.assertNotEqual(candidate, frozen)
+        normalized = " ".join(candidate["system_prompt"].split())
+        self.assertIn("global impression", normalized)
+        self.assertIn("strongest plausible visual mimic", normalized)
+
+    def test_open_ended_model_prompt_is_frozen_and_embedded(self) -> None:
+        resource = yaml.safe_load(
+            (
+                ROOT
+                / "src/benchmark/resources/open_ended_diagnosis/model_prompt.yaml"
+            ).read_text(encoding="utf-8")
+        )
+        artifact = yaml.safe_load(
+            (
+                RELEASE / "artifacts/prompts/open_ended_diagnosis.yaml"
+            ).read_text(encoding="utf-8")
+        )
+        task = _first_row(
+            RELEASE / "tasks/open_ended_diagnosis",
+            "validation",
+        )
+        metadata = json.loads((RELEASE / "release.json").read_text())["release"]
+
+        self.assertEqual(resource, artifact)
+        self.assertEqual(resource["version"], "1.1.0")
+        self.assertEqual(task["system_prompt"], resource["system_prompt"])
+        self.assertEqual(task["user_prompt"], resource["user_template"])
+        self.assertEqual(
+            metadata["open_ended_protocol_update"]["status"],
+            "frozen",
+        )
+
     def test_release_is_balanced_leakage_safe_and_reference_isolated(self) -> None:
         summary = validate_open_ended_release(
             ROOT,
             output_path=Path("data/benchmarks/ISEPDermaBench"),
         )
 
-        self.assertEqual(summary["version"], "1.1.0")
+        self.assertEqual(summary["version"], "1.5.0")
         self.assertEqual(summary["splits"]["validation"]["tasks"], 100)
         self.assertEqual(
             summary["splits"]["internal_benchmark"]["tasks"],
@@ -246,6 +296,27 @@ class OpenEndedDiagnosisTests(unittest.TestCase):
             "previous JSON judgment was invalid",
             backend.requests[1].user_prompt,
         )
+
+    def test_rank_one_with_material_limitations_can_be_partial(self) -> None:
+        judgment = _valid_judgment() | {
+            "diagnosis_correctness": 3,
+            "overall_verdict": "partially_correct",
+            "unsupported_claim_count": 1,
+            "unsupported_claim_examples": ["Invented symptom."],
+        }
+
+        _validate_judgment_semantics(judgment)
+
+    def test_rank_specific_diagnosis_scores_are_enforced(self) -> None:
+        with self.assertRaisesRegex(ValueError, "rank 2 requires"):
+            _validate_judgment_semantics(
+                _valid_judgment()
+                | {
+                    "reference_diagnosis_rank": 2,
+                    "diagnosis_correctness": 2,
+                    "overall_verdict": "partially_correct",
+                }
+            )
 
     def test_fallback_trigger_is_limited_to_content_policy_codes(self) -> None:
         self.assertTrue(

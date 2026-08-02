@@ -109,7 +109,7 @@ class EvidenceGroundedReleaseTests(unittest.TestCase):
         self.assertFalse(
             experiment["selection_policy"]["teacher_selection_allowed"]
         )
-        self.assertEqual(len(experiment["models"]), 9)
+        self.assertEqual(len(experiment["models"]), 6)
         for model in experiment["models"]:
             self.assertTrue((ROOT / model["config"]).is_file())
         self.assertEqual(

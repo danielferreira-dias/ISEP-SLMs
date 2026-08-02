@@ -24,6 +24,13 @@ import yaml
 
 
 RELEASE_VERSION = "1.1.0"
+SUPPORTED_RELEASE_VERSIONS = {
+    RELEASE_VERSION,
+    "1.2.0",
+    "1.3.0",
+    "1.4.0",
+    "1.5.0",
+}
 SELECTION_SEED = 42
 VALIDATION_SIZE = 100
 INTERNAL_SIZE = 300
@@ -637,7 +644,7 @@ def validate_open_ended_release(
 ) -> dict[str, Any]:
     output = root.resolve() / output_path
     release = json.loads((output / "release.json").read_text(encoding="utf-8"))["release"]
-    if release["version"] != RELEASE_VERSION:
+    if release["version"] not in SUPPORTED_RELEASE_VERSIONS:
         raise ValueError("Unexpected ISEPDermaBench release version")
     result: dict[str, Any] = {"version": release["version"], "splits": {}}
     split_groups: dict[str, set[str]] = {}

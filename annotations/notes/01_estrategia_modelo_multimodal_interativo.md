@@ -229,7 +229,7 @@ As partições atuais são adequadas:
 | --- | ---: | ---: | ---: |
 | Train original | 6.417 | 4.962 | 21 |
 | Train multimodal aumentado | 81.787 | 34.326 | 21 classes + OOD + description-only |
-| Validation | 1.683 | 1.063 | 21 |
+| Validation | 1.000 | 646 | 21 |
 | Internal test | 1.722 | 1.063 | 21 |
 | Internal benchmark | 1.000 | 1.000 | 21 |
 | Internal test reserve | 63 | 63 | 21 |

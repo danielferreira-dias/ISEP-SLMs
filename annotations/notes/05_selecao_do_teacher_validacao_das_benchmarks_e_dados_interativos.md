@@ -90,7 +90,7 @@ A estratificação procura preservar:
 - combinação de doença e dataset;
 - secundariamente, suporte demográfico e de tom de pele.
 
-O resultado atual é:
+O resultado original da partição, antes do rebalanceamento da release, era:
 
 | Split | Imagens | Grupos independentes | Classes |
 | --- | ---: | ---: | ---: |
@@ -98,8 +98,9 @@ O resultado atual é:
 | Validation | 1.683 | 1.063 | 21 |
 | Internal Test | 1.722 | 1.063 | 21 |
 
-A Validation tem 1.683 imagens porque preserva todas as imagens pertencentes
-aos seus 1.063 grupos. Alguns grupos possuem mais do que uma imagem.
+A release operacional ISEPDermaBench 1.2.0 mantém 1.000 dessas imagens em 646
+grupos completos. As restantes 683 imagens pertencem a 417 grupos completos
+e passaram para ISEPDermData Train; nenhum grupo foi dividido.
 
 ## 4. Porque o Internal Benchmark tem exatamente 1.000 casos
 
@@ -116,17 +117,14 @@ Por isso:
 
 | Ficheiro | Imagens | Grupos | Explicação |
 | --- | ---: | ---: | --- |
-| `validation.parquet` | 1.683 | 1.063 | Desenvolvimento; pode ter várias imagens do mesmo grupo |
+| `visual_top_k/validation` | 1.000 | 646 | Desenvolvimento; grupos completos e proteção das outras tasks |
 | `internal_test.parquet` | 1.722 | 1.063 | Teste interno completo e selado |
 | `internal_benchmark_1000.parquet` | 1.000 | 1.000 | Um caso por grupo para comparação emparelhada |
 | `internal_test_reserve.parquet` | 63 | 63 | Um representante dos grupos não escolhidos para os 1.000 |
 
-Assim, executar Visual Top-K em Validation utiliza atualmente 1.683 imagens,
-não menos de 1.000. Para reduzir custo durante o screening inicial pode usar-
-se um `--limit` determinístico. Para uma comparação exatamente simétrica com
-o teste final, também se poderia materializar futuramente uma vista de 1.000
-grupos da Validation. Isso seria uma otimização operacional, não uma nova
-partição.
+Assim, executar Visual Top-K em Validation utiliza atualmente exatamente
+1.000 imagens. Durante o screening inicial continua a ser possível usar um
+`--limit` determinístico menor.
 
 ### 4.1 A confusão original entre Validation e Internal Benchmark
 
@@ -183,7 +181,7 @@ Cada uma destas tarefas pode depois usar conjuntos com funções diferentes:
 
 ### 4.3 Fluxo progressivo dentro da Validation
 
-Os 1.683 casos não devem ser executados depois de cada pequena alteração. A
+Os 1.000 casos não devem ser executados depois de cada pequena alteração. A
 Validation funciona como um pool de desenvolvimento com etapas progressivas:
 
 ```text
@@ -215,6 +213,12 @@ produzem estimativas de desenvolvimento; a execução completa da Validation é
 uma confirmação final da escolha e não um ciclo repetido de prompt tuning.
 
 ### 4.4 Proposta para reduzir a Validation para 1.000 casos
+
+> Estado: implementado em ISEPDermaBench 1.2.0 e ISEPDermData 1.3.0.
+> O texto abaixo preserva o raciocínio anterior à materialização. A seleção
+> final mantém 1.000 imagens de 646 grupos e transfere 683 imagens de 417
+> grupos completos para Train. Os 504 grupos necessários às restantes tasks
+> de Validation foram obrigatoriamente preservados.
 
 É razoável reduzir a superfície operacional da Validation para 1.000 casos.
 No entanto, a unidade de separação é o `leakage_group_id`, não a row individual.

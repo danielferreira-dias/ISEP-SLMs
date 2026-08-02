@@ -106,7 +106,7 @@ from a `_references` configuration in a model request.
 
 | Benchmark | Split | Tasks | Unique images | Leakage groups |
 | --- | --- | ---: | ---: | ---: |
-| visual_top_k | validation | 1,683 | 1,683 | 1,063 |
+| visual_top_k | validation | 1,000 | 1,000 | 646 |
 | visual_top_k | internal_benchmark | 1,000 | 1,000 | 1,000 |
 | visual_top_k | external_ddi | 300 | 300 | 299 |
 | visual_top_k | external_skindisnet | 1,365 | 1,365 | 333 |
@@ -145,6 +145,10 @@ description, or JSON schema. A separate stage uses GPT-5.6 Luna as the primary
 judge and may use Qwen 3.7 Flash only when Luna returns a content-policy
 violation. Each response still receives one final judgment; there is no voting.
 
+## Open-ended prompt protocol
+
+Release 1.5.0 freezes model prompt 1.1.0 after a paired 50-case A/B test against the more prescriptive prompt 1.2.1. The selected prompt retains natural clinical prose, explicit Top-3 ordering, visible-evidence grounding, and no prose example. Judge prompt 1.2.0 and its four-verdict rubric remain unchanged.
+
 ## Input schema
 
 Task configurations begin with the multimodal input columns:
@@ -170,6 +174,10 @@ Reference configurations contain the correct disease, morphology concepts,
 reference description, scoring flags, and evaluation-only subgroup metadata.
 The task Parquets contain no `reference_disease_id`, morphology gold labels,
 or reference clinical descriptions.
+
+## Validation rebalance
+
+Release 1.2.0 reduces visual Top-K Validation from 1,683 to 1,000 image tasks using whole leakage groups. All groups required by the other Validation tasks remain protected. The 683 released images are promoted to ISEPDermData Train under the auditable `group_safe_validation_to_train_v1` policy.
 
 ## Split policy
 

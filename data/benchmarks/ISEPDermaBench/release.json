@@ -1,72 +1,48 @@
 {
   "release": {
     "id": "ISEPDermaBench",
-    "version": "1.1.0",
+    "version": "1.5.0",
     "schema_version": "1.0.0",
     "visibility": "private",
     "created_at": "2026-08-01",
     "reference_isolation": true,
     "image_preprocessing_profile": "dermatology_api_safe_rgb_jpeg_v1",
-    "embedded_image_bytes": 253742386,
+    "embedded_image_bytes": 227907511,
     "splits": [
       {
         "benchmark": "visual_top_k",
         "benchmark_id": "visual_top_k_closed_set",
         "split": "validation",
         "source_evaluation_set": "validation",
-        "task_count": 1683,
-        "sample_count": 1683,
-        "group_count": 1063,
+        "task_count": 1000,
+        "sample_count": 1000,
+        "group_count": 646,
         "task_shards": [
           {
-            "path": "tasks/visual_top_k/validation-00000-of-00004.parquet",
+            "path": "tasks/visual_top_k/validation-00000-of-00002.parquet",
             "rows": 512,
-            "bytes": 19395693,
-            "sha256": "461538665cbef0fea08cc244831e416a2e47fea7b8f0fb89d2235facf4dbc2f8"
+            "bytes": 18990925,
+            "sha256": "5b23f21eb4b71aafd46a8ee6f3bee1be7a1c02bb86067929de5595ccd129b172"
           },
           {
-            "path": "tasks/visual_top_k/validation-00001-of-00004.parquet",
-            "rows": 512,
-            "bytes": 18908442,
-            "sha256": "25056086314b936583df558e2f5473df90606bf024e89d9eaf0a21f25ba67876"
-          },
-          {
-            "path": "tasks/visual_top_k/validation-00002-of-00004.parquet",
-            "rows": 512,
-            "bytes": 18866443,
-            "sha256": "a420b2211e3c7039f04ef2d5c6d8de3ce1678c0f28935f88abc084c077b197fa"
-          },
-          {
-            "path": "tasks/visual_top_k/validation-00003-of-00004.parquet",
-            "rows": 147,
-            "bytes": 5565473,
-            "sha256": "31ac5e4691e1ef3ddd56a16aaef060f8a4059621fc211d5848d33ec97f8eb356"
+            "path": "tasks/visual_top_k/validation-00001-of-00002.parquet",
+            "rows": 488,
+            "bytes": 17689435,
+            "sha256": "ab277557c1093cc00505cac2515e4100814e020b587a9bae6bbeac0ea10f8786"
           }
         ],
         "reference_shards": [
           {
-            "path": "references/visual_top_k/validation-00000-of-00004.parquet",
+            "path": "references/visual_top_k/validation-00000-of-00002.parquet",
             "rows": 512,
-            "bytes": 61863,
-            "sha256": "66ef0b0b4a8ab8ab572741eb7a3e702eb21542791c5011953d603c755fd01a2b"
+            "bytes": 56928,
+            "sha256": "5fe8a3a54992f84b40d274d9706dfdeefc230f5b705440676b0ec22a0bc85608"
           },
           {
-            "path": "references/visual_top_k/validation-00001-of-00004.parquet",
-            "rows": 512,
-            "bytes": 62834,
-            "sha256": "41aef825bb0d53ef1b7108001f1f594d861a6f51c4a4adc02f454ab0c953f1c2"
-          },
-          {
-            "path": "references/visual_top_k/validation-00002-of-00004.parquet",
-            "rows": 512,
-            "bytes": 61509,
-            "sha256": "96e96a20b15d36caaff8a58697e6b7359f263bb1f65135e023a606e3ba41b103"
-          },
-          {
-            "path": "references/visual_top_k/validation-00003-of-00004.parquet",
-            "rows": 147,
-            "bytes": 29648,
-            "sha256": "2386fc2410a48ae3e01ae9f838a588393a929c380d7bb2580489112c0c3a9a35"
+            "path": "references/visual_top_k/validation-00001-of-00002.parquet",
+            "rows": 488,
+            "bytes": 54551,
+            "sha256": "fa81c47e710a123d2c147f0b24a85ce915c3ab152b12fc0c17bf1a4df23c16a7"
           }
         ]
       },
@@ -358,8 +334,8 @@
           {
             "path": "tasks/open_ended_diagnosis/validation-00000-of-00001.parquet",
             "rows": 100,
-            "bytes": 3465680,
-            "sha256": "6ca02fa99eef4709a77a3e97a77ac0b7f7c0d529bd4f96d584a0aca68f432abf"
+            "bytes": 3463320,
+            "sha256": "fcaafb538ba7a6fd7127982de2dc33e4ea569f90524801d98a0ba71be39a1eff"
           }
         ],
         "reference_shards": [
@@ -387,8 +363,8 @@
           {
             "path": "tasks/open_ended_diagnosis/internal_benchmark-00000-of-00001.parquet",
             "rows": 300,
-            "bytes": 10700767,
-            "sha256": "184315850a7c780969fb8f153f47d55d2ea9a948a06d33a702f4e631b5a41b85"
+            "bytes": 10698407,
+            "sha256": "a320f8937915caba7f572ccc73684c5e75b243ad726005467637e4a0b58d838e"
           }
         ],
         "reference_shards": [
@@ -465,12 +441,12 @@
       {
         "path": "artifacts/prompts/open_ended_diagnosis.yaml",
         "source": "src/benchmark/resources/open_ended_diagnosis/model_prompt.yaml",
-        "sha256": "2da9eb9ab12ece105963276f718840f556737c67235e7ac85ba8d77da10dc79b"
+        "sha256": "6ee209413287dd317cc2d3ea1b121040589340cc54943b714fe241ead122ceaf"
       },
       {
         "path": "artifacts/judges/open_ended_diagnosis_judge.yaml",
         "source": "src/benchmark/resources/open_ended_diagnosis/judge_prompt.yaml",
-        "sha256": "5563b6c2fcc4805259fff9345b9090029da524e09d16016d65806498eded3cea"
+        "sha256": "0662acfaa0b0eb1c4c7a68022c75be699d2193473662ef7a836ec2839c1a5a57"
       },
       {
         "path": "artifacts/schemas/open_ended_diagnosis_judge.schema.json",
@@ -489,6 +465,49 @@
       "second_judge": false,
       "human_review": false,
       "input_policy": "image_reference_final_response_only"
+    },
+    "validation_rebalance": {
+      "original_tasks": 1683,
+      "original_groups": 1063,
+      "kept_tasks": 1000,
+      "kept_groups": 646,
+      "released_images": 683,
+      "released_groups": 417,
+      "mandatory_tasks": 766,
+      "mandatory_groups": 504,
+      "selection_seed": 42,
+      "policy": "group_safe_validation_to_train_v1",
+      "audit_file": "metadata/visual_top_k_validation_to_train.csv",
+      "audit_sha256": "65116aad3a9bf70ea76f44f58e7a3b468e8041c9436ad218fa0779a35d44b5fc",
+      "other_validation_tasks_preserved": [
+        "visual_confusion_sets",
+        "evidence_grounded_diagnosis",
+        "open_ended_diagnosis"
+      ]
+    },
+    "open_ended_protocol_update": {
+      "policy": "example_free_natural_ranked_prose_v1",
+      "status": "frozen",
+      "frozen_on": "2026-08-02",
+      "model_prompt_version": "1.1.0",
+      "judge_prompt_version": "1.2.0",
+      "model_prompt_sha256": "6ee209413287dd317cc2d3ea1b121040589340cc54943b714fe241ead122ceaf",
+      "judge_prompt_sha256": "0662acfaa0b0eb1c4c7a68022c75be699d2193473662ef7a836ec2839c1a5a57",
+      "acceptance_run": {
+        "model_id": "gpt_5_6_luna",
+        "split": "validation",
+        "sample_size": 50,
+        "seed": 42,
+        "valid_response_rate": 0.94,
+        "judge_coverage": 1.0,
+        "safety_refusal_count": 3,
+        "top_1_accuracy": 0.32,
+        "top_3_accuracy": 0.44,
+        "unsupported_claim_rate": 0.16,
+        "mean_evidence_grounding": 3.42,
+        "ab_winner": "model_prompt_v1.1.0",
+        "ab_comparator": "model_prompt_v1.2.1"
+      }
     }
   }
 }

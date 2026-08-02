@@ -22,7 +22,7 @@ configs:
 
 # ISEPDermData
 
-ISEPDermData is a private, research-only collection of 6,858
+ISEPDermData is a private, research-only collection of 7,541
 clinical dermatology images mapped to the 21-class ISEP thesis taxonomy.
 The release is intended as the source pool for teacher annotation and later
 multimodal student fine-tuning.
@@ -31,8 +31,8 @@ multimodal student fine-tuning.
 
 | Statistic | Value |
 | --- | ---: |
-| Images | 6,858 |
-| Leakage-safe groups | 5,254 |
+| Images | 7,541 |
+| Leakage-safe groups | 5,671 |
 | Active disease classes | 21 |
 | Split | `train` (unsplit source pool) |
 
@@ -72,36 +72,36 @@ are intentionally excluded from this release.
 
 | Source | Images |
 | --- | ---: |
-| Fitzpatrick17k-C | 3,026 |
+| Fitzpatrick17k-C | 3,226 |
 | HIBA | 318 |
-| PAD-UFES-20 | 1,556 |
-| SCIN | 1,958 |
+| PAD-UFES-20 | 1,629 |
+| SCIN | 2,368 |
 
 ## Class distribution
 
 | Disease ID | Label | Images | Groups |
 | --- | --- | ---: | ---: |
-| D001 | melanoma | 283 | 268 |
+| D001 | melanoma | 298 | 281 |
 | D002 | melanocytic_nevus | 215 | 169 |
-| D003 | psoriasis | 660 | 595 |
-| D004 | basal_cell_carcinoma | 929 | 699 |
-| D005 | squamous_cell_carcinoma | 434 | 390 |
-| D006 | seborrheic_keratosis | 217 | 174 |
-| D007 | actinic_keratosis | 682 | 531 |
-| D009 | contact_dermatitis | 564 | 389 |
-| D011 | acne_vulgaris | 367 | 328 |
+| D003 | psoriasis | 697 | 611 |
+| D004 | basal_cell_carcinoma | 1,006 | 753 |
+| D005 | squamous_cell_carcinoma | 451 | 405 |
+| D006 | seborrheic_keratosis | 222 | 179 |
+| D007 | actinic_keratosis | 693 | 541 |
+| D009 | contact_dermatitis | 682 | 458 |
+| D011 | acne_vulgaris | 403 | 361 |
 | D012 | rosacea | 95 | 75 |
-| D013 | vitiligo | 81 | 79 |
-| D014 | eczema | 736 | 406 |
+| D013 | vitiligo | 93 | 91 |
+| D014 | eczema | 892 | 487 |
 | D015 | seborrheic_dermatitis | 105 | 90 |
-| D016 | folliculitis | 303 | 201 |
-| D017 | urticaria | 340 | 213 |
-| D018 | scabies | 170 | 154 |
-| D019 | pityriasis_rosea | 146 | 114 |
-| D022 | prurigo_nodularis | 92 | 73 |
-| D023 | granuloma_annulare | 131 | 109 |
+| D016 | folliculitis | 351 | 227 |
+| D017 | urticaria | 403 | 245 |
+| D018 | scabies | 193 | 173 |
+| D019 | pityriasis_rosea | 166 | 131 |
+| D022 | prurigo_nodularis | 106 | 82 |
+| D023 | granuloma_annulare | 150 | 125 |
 | D024 | erythema_multiforme | 120 | 113 |
-| D025 | drug_eruption | 188 | 145 |
+| D025 | drug_eruption | 200 | 154 |
 
 ## Provenance and licences
 
@@ -112,8 +112,10 @@ PAD-UFES-20, SCIN, and HIBA. Derm1M was removed in release 1.1.0 after a
 label-quality audit identified source-derived entity-linking errors and
 context-dependent images unsuitable as direct image-classification targets.
 Release 1.2.0 promotes 123 images from 63 previously unrepresented internal
-reserve groups into Train. Images from groups represented by Validation or the
-sealed Internal Benchmark remain excluded from training.
+reserve groups into Train. Release 1.3.0 additionally promotes 683 images from
+417 whole groups released when visual Top-K Validation was reduced to 1,000
+tasks. Images from groups still represented by Validation or the sealed
+Internal Benchmark remain excluded from training.
 See `metadata/source_licenses.json` and the upstream dataset documentation
 before any redistribution, commercial use, or publication of derived
 artifacts.

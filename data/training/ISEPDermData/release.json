@@ -1,18 +1,18 @@
 {
   "release": {
     "id": "ISEPDermData",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "schema_version": "1.0.0",
     "visibility": "private",
     "split": "train",
-    "image_count": 6858,
-    "leakage_group_count": 5254,
+    "image_count": 7541,
+    "leakage_group_count": 5671,
     "class_count": 21,
     "source_count": 4,
-    "embedded_image_bytes": 5177046763,
+    "embedded_image_bytes": 5813334041,
     "source_manifest": "data/training/dermatology_multimodal_v1/train_images.parquet",
     "source_manifest_sha256": "27cd70a80e35abe7db257f4772058776d635c4d2702ab73fa5b45f070b56b3cb",
-    "selection": "training_role == 'in_domain_diagnosis' and dataset_id not in {'derm1m'}, plus 63 wholly unrepresented internal-reserve groups",
+    "selection": "training_role == 'in_domain_diagnosis' and dataset_id not in {'derm1m'}, plus 63 wholly unrepresented internal-reserve groups, plus 417 whole groups released from visual Top-K Validation",
     "internal_reserve_promotion": {
       "policy": "internal_test_reserve_unrepresented_group_to_train_v1",
       "image_count": 123,
@@ -23,14 +23,24 @@
         "scin": 60
       },
       "protected_evaluation_tasks": [
-        "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/validation-00000-of-00004.parquet",
-        "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/validation-00001-of-00004.parquet",
-        "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/validation-00002-of-00004.parquet",
-        "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/validation-00003-of-00004.parquet",
+        "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/validation-00000-of-00002.parquet",
+        "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/validation-00001-of-00002.parquet",
         "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/internal_benchmark-00000-of-00002.parquet",
         "data/benchmarks/ISEPDermaBench/tasks/visual_top_k/internal_benchmark-00001-of-00002.parquet"
       ],
       "audit_file": "metadata/promoted_reserve_groups.csv"
+    },
+    "validation_promotion": {
+      "policy": "group_safe_validation_to_train_v1",
+      "image_count": 683,
+      "group_count": 417,
+      "source_counts": {
+        "fitzpatrick17k_c": 200,
+        "pad_ufes_20": 73,
+        "scin": 410
+      },
+      "source_audit_file": "data/benchmarks/ISEPDermaBench/metadata/visual_top_k_validation_to_train.csv",
+      "audit_file": "metadata/promoted_validation_groups.csv"
     },
     "excluded_sources": {
       "derm1m": "Removed after label-quality audit: source-derived entity-linking errors and context-dependent images."
@@ -51,88 +61,94 @@
     "shard_size": 512,
     "shards": [
       {
-        "path": "data/train-00000-of-00014.parquet",
-        "bytes": 41305482,
-        "sha256": "76d15b8e3216132e54c0bc8ffe1cb1d384cd67f6a135f4fd19a20b0b02195e3e",
+        "path": "data/train-00000-of-00015.parquet",
+        "bytes": 43140395,
+        "sha256": "ab4802c2273e4f1c22b1bee36c80932edb096ddf719bfe66ea3c73fd125c0096",
         "rows": 512
       },
       {
-        "path": "data/train-00001-of-00014.parquet",
-        "bytes": 39923415,
-        "sha256": "f8d7d139fe8fa1a773886cc5dac9571d29c2d0f488858f74fe8773e108d3884b",
+        "path": "data/train-00001-of-00015.parquet",
+        "bytes": 39977018,
+        "sha256": "6dbdd6b77f893ebf7f811fb6a994f596a67f3243de248117b5924ed7f0416b4b",
         "rows": 512
       },
       {
-        "path": "data/train-00002-of-00014.parquet",
-        "bytes": 41162687,
-        "sha256": "205ae3aee8e8a232461c56caf6209f0a2fa3b902b41d6855693c7bc5ec92d3cf",
+        "path": "data/train-00002-of-00015.parquet",
+        "bytes": 44954141,
+        "sha256": "6b22751adb537dbbb17256a7a7cb56bc2bc7f7a02ea71b079492ccfccf7d6a28",
         "rows": 512
       },
       {
-        "path": "data/train-00003-of-00014.parquet",
-        "bytes": 46008551,
-        "sha256": "32ba7a40fd2ee4b43d88b7ef9571fc14e4f760c013f0cccb8c39fc9febd129cc",
+        "path": "data/train-00003-of-00015.parquet",
+        "bytes": 45182412,
+        "sha256": "218a7223c4c0a01a13aceefd450798aadc5e91bb448bf44b9b942e69e05253b2",
         "rows": 512
       },
       {
-        "path": "data/train-00004-of-00014.parquet",
-        "bytes": 45629949,
-        "sha256": "126e9499abe59df95905b5ad9c8c50dde8712dd6f26b7eeb4f88906fd0accc49",
+        "path": "data/train-00004-of-00015.parquet",
+        "bytes": 46795291,
+        "sha256": "6acf044d45b7bf48c59ca36ad8e6dbca1c35c01c950fc0a8b28b580ed104cd74",
         "rows": 512
       },
       {
-        "path": "data/train-00005-of-00014.parquet",
-        "bytes": 43185647,
-        "sha256": "80047f67d5e389fe6432a4981ad7e190791383cc1b28d164918fb0bb94752020",
+        "path": "data/train-00005-of-00015.parquet",
+        "bytes": 41389286,
+        "sha256": "b6368c033e06d5621147ac4d08034f0e62e29fc1b3ef0952548ecddd281ca119",
         "rows": 512
       },
       {
-        "path": "data/train-00006-of-00014.parquet",
-        "bytes": 345081919,
-        "sha256": "dec56c1c2ca741c398f68d78d93ec669b0e50260a3d7f30c62ec18733c8ff265",
+        "path": "data/train-00006-of-00015.parquet",
+        "bytes": 79334207,
+        "sha256": "0fa64f34ad4110b52ad590bea918ff452300dacaefbaffbec359b16c1ff96c14",
         "rows": 512
       },
       {
-        "path": "data/train-00007-of-00014.parquet",
-        "bytes": 880179267,
-        "sha256": "70910a3bb7a247b04205a8f34f9414ba8980cb729340f5656aeee71d14fba52f",
+        "path": "data/train-00007-of-00015.parquet",
+        "bytes": 789385533,
+        "sha256": "c2cf1b3bc2e8c195fec9c4d26728eb5621c3b118c8438ecbec511613f6bb8311",
         "rows": 512
       },
       {
-        "path": "data/train-00008-of-00014.parquet",
-        "bytes": 755019253,
-        "sha256": "60c48a3d9b318eaf381966ddf47d7ca50f34a04566029190e149e99f7a3deb14",
+        "path": "data/train-00008-of-00015.parquet",
+        "bytes": 839730961,
+        "sha256": "e75cab267c129f0b65f8e39c3f67dbed226f5e197e634ad95e88500cb08e4d07",
         "rows": 512
       },
       {
-        "path": "data/train-00009-of-00014.parquet",
-        "bytes": 761906408,
-        "sha256": "54b37ace9f7dccffdd490f7f1c2173ce4f1d46900e456a8cce827f88e4df408f",
+        "path": "data/train-00009-of-00015.parquet",
+        "bytes": 837482201,
+        "sha256": "ab27d70c727e7a2ed85998bae2e783f9876fb76a321e186aa0c2d8c60531282e",
         "rows": 512
       },
       {
-        "path": "data/train-00010-of-00014.parquet",
-        "bytes": 635608035,
-        "sha256": "3191bb8c8390f93a295217956a57909216ece9d898ce1c2ee62f810ca91ef380",
+        "path": "data/train-00010-of-00015.parquet",
+        "bytes": 617564630,
+        "sha256": "18749caf1f1a3bcc003fab8f7c83f30bae33f5d0c69ca1de610fba320ead32d9",
         "rows": 512
       },
       {
-        "path": "data/train-00011-of-00014.parquet",
-        "bytes": 653795365,
-        "sha256": "d8bfbee43a95e1518de70b81de3c6c374edd4ab5dca4eb851be0262094404e08",
+        "path": "data/train-00011-of-00015.parquet",
+        "bytes": 624406696,
+        "sha256": "e2e23437dd4f171ced6f35cf8e4b77ba43b9211868ceb0bb2b561ed1c3041514",
         "rows": 512
       },
       {
-        "path": "data/train-00012-of-00014.parquet",
-        "bytes": 652151818,
-        "sha256": "0da6274dccdb05f7301ebb13cfdf6cacd31802e56c08c8990c8be7927568c276",
+        "path": "data/train-00012-of-00015.parquet",
+        "bytes": 672925117,
+        "sha256": "63aab540fe9438f319158c23c8c5a6f7db0bd3d260b1ff994ddf1471de1c2457",
         "rows": 512
       },
       {
-        "path": "data/train-00013-of-00014.parquet",
-        "bytes": 235643779,
-        "sha256": "4b72f1581a04b6b42f11128eb2b6b21c4d86d7825cecd7b8900f7ef4a56078dd",
-        "rows": 202
+        "path": "data/train-00013-of-00015.parquet",
+        "bytes": 650871720,
+        "sha256": "e4517a99e2d6a3a7505c5498c3cddfbc8713e72bf141637a74a0f07d243ca413",
+        "rows": 512
+      },
+      {
+        "path": "data/train-00014-of-00015.parquet",
+        "bytes": 439773307,
+        "sha256": "9327220050125447f693e2a9320a60a4594c01f4ee892000288a865da6222a83",
+        "rows": 373
       }
     ]
   }

@@ -144,16 +144,11 @@ machine.
 | `qwen_3_6_27b` | vLLM | Yes | Qwen reasoning parser; requires substantially more GPU memory |
 | `gemma_4_e4b_it` | vLLM | Yes | Gemma 4 reasoning parser and sampling recipe |
 | `gemma_4_31b_it` | vLLM | Yes | Gemma 4 reasoning parser; large-model GPU requirements |
-| `minicpm_v_4_6` | vLLM | Yes | MiniCPM image processor arguments are forwarded |
-| `medgemma_1_5_4b` | vLLM | Yes | Gated weights; image-first prompt and no separate system role |
-| `kimi_k2_6` | Azure Chat Completions | No | Optional existing `vllm_endpoint` profile |
 | `gpt_5_6_luna` | Azure Responses | No | Official reasoning summary only |
 
 “Managed” means the CLI may start and stop `vllm serve`. It does not mean the
-repository downloads a model in advance or provisions a GPU. Kimi's optional
-vLLM profile points to an already hosted OpenAI-compatible endpoint because
-the checked-in source is a provider model, not a local Hugging Face weight
-repository. GPT uses the Azure Responses API and cannot use vLLM.
+repository downloads a model in advance or provisions a GPU. GPT uses the
+Azure Responses API and cannot use vLLM.
 
 See [the inference package](../inference/README.md) for transport and
 multimodal message details.
@@ -184,10 +179,6 @@ vLLM 0.23 and the current Unsloth release require incompatible
 Torch/Transformers combinations. Benchmark inference and fine-tuning should
 therefore use separate virtual environments rather than an unreproducible
 mixture of both stacks.
-
-Accept the MedGemma terms on Hugging Face before running that model, and make
-`HF_TOKEN` available to the vLLM process. Never place tokens in YAML files or
-command-line arguments.
 
 ## Discover configurations
 
@@ -326,6 +317,21 @@ Then run the primary/fallback judge command above on each completed directory.
 The selected 50-case subset covers all 21 diseases in the frozen local release.
 Do not change the seed between models.
 
+During prompt development only, an isolated prompt variant can be tested
+without mutating the frozen release:
+
+```bash
+uv run python -m src.benchmark.cli run \
+  --model gpt_5_6_luna \
+  --benchmark open_ended_diagnosis \
+  --evaluation-set validation \
+  --task-ids-file outputs/prompt_ab/task_ids.txt \
+  --prompt-override path/to/model_prompt.yaml
+```
+
+The override path and hash are captured in the run identity and config
+snapshot. This option is rejected for every other benchmark.
+
 ## Run against an existing vLLM server
 
 Start vLLM separately with the model and arguments represented by its YAML,
@@ -353,91 +359,19 @@ On a compatible Linux CUDA machine:
 
 ```bash
 uv run python -m src.benchmark.cli run \
-  --model medgemma_1_5_4b \
-  --benchmark evidence_grounded_diagnosis \
+  --model qwen_3_5_4b \
+  --benchmark visual_top_k_closed_set \
   --limit 100 \
   --server-mode managed \
   --startup-timeout 900
 ```
 
 The exact argument vector is built without a shell. Dtype, tensor parallelism,
-context length, GPU-memory utilization, image limits, reasoning parser, and
-MiniCPM processor options come from the model YAML. Server stdout and stderr
+context length, GPU-memory utilization, image limits, and reasoning parser
+come from the model YAML. Server stdout and stderr
 are written to `vllm_server.log` inside the run directory.
 
-### Qwen3.5-2B pipeline smoke test
-
-`src/test_qwen.py` runs a real one-case `visual_top_k` test through the same
-configuration loader, dataset selection, prompt rendering, vLLM backend,
-response validation, metrics, and result writer used by full benchmark runs.
-The 2B model has a smoke-only config and is not restored to the main teacher
-shortlist.
-
-Validate everything except model inference:
-
-```bash
-uv run src/test_qwen.py --dry-run
-```
-
-Run direct inference on Apple MPS with thinking disabled while preserving the
-configured general-task sampling parameters:
-
-```bash
-uv run src/test_qwen.py --transformers --limit 10
-```
-
-Start and stop vLLM automatically on a compatible Linux CUDA machine:
-
-```bash
-uv run --extra gpu src/test_qwen.py
-```
-
-Alternatively, use an existing vLLM server:
-
-```bash
-vllm serve Qwen/Qwen3.5-2B \
-  --max-model-len 16384 \
-  --reasoning-parser qwen3 \
-  --limit-mm-per-prompt '{"image": 1}'
-
-uv run src/test_qwen.py --base-url http://127.0.0.1:8000/v1
-```
-
 ## Provider APIs
-
-Kimi's default Azure Chat Completions profile uses:
-
-```text
-KIMI_K2_6_AZURE_ENDPOINT
-KIMI_K2_6_AZURE_API_KEY
-KIMI_K2_6_AZURE_DEPLOYMENT
-KIMI_K2_6_AZURE_API_VERSION
-```
-
-Run it with:
-
-```bash
-uv run python -m src.benchmark.cli run \
-  --model kimi_k2_6 \
-  --benchmark visual_top_k_closed_set \
-  --limit 100
-```
-
-Its optional existing vLLM endpoint uses:
-
-```text
-KIMI_K2_6_VLLM_BASE_URL
-KIMI_K2_6_VLLM_API_KEY
-KIMI_K2_6_VLLM_MODEL
-```
-
-```bash
-uv run python -m src.benchmark.cli run \
-  --model kimi_k2_6 \
-  --backend-profile vllm_endpoint \
-  --benchmark visual_top_k_closed_set \
-  --limit 100
-```
 
 GPT's Azure Responses profile uses:
 
@@ -455,13 +389,7 @@ uv run python -m src.benchmark.cli run \
   --limit 100
 ```
 
-Kimi K2.6 runs without extended thinking, with temperature `0.6` and top-p
-`0.95`. Moonshot's API uses `thinking: {type: disabled}`, but the tested
-Direct-from-Azure gateway rejects that field and accepts
-`reasoning_effort: none`; the model YAML records this profile-specific
-mapping. Its vLLM endpoint maps disabled thinking to
-`chat_template_kwargs.thinking: false`. GPT uses `reasoning_effort: high`,
-sent as `reasoning.effort` to Responses.
+GPT uses `reasoning_effort: high`, sent as `reasoning.effort` to Responses.
 
 Use `--structured-output json_schema` for a separate constrained-output Luna
 run. This does not alter the default prompt-only comparison track. The
@@ -556,12 +484,6 @@ The answer used by validators is stored separately in
 as the benchmark schema and never contributes to a metric. Keep the same
 capture setting across compared runs, because requesting a provider summary
 can change cost or latency.
-
-For MedGemma, a configured model-specific parser separates content enclosed
-by `<unused94>` and `<unused95>` before benchmark validation. The extracted
-text is retained under `response.reasoning`; only text outside that complete
-block is eligible to become the final JSON answer. Reasoning is never used to
-repair or infer a missing diagnosis.
 
 Use `--reasoning-capture none` if the output may contain sensitive material.
 Run outputs are ignored by Git by default.

@@ -19,7 +19,7 @@ Fontes originais
     +-- split interno já congelado -------------------------------+
     |       |                                                     |
     |       +-- train original: 6.417 imagens                     |
-    |       +-- validation: 1.683 imagens                         |
+    |       +-- validation: 1.000 imagens / 646 grupos            |
     |       +-- internal test: 1.722 imagens (selado)             |
     |               +-- internal benchmark: 1.000 casos          |
     |               +-- reserve: 63 grupos restantes             |

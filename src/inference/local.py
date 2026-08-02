@@ -108,15 +108,7 @@ class LocalBackend(InferenceBackend):
                 )
                 or 300.0
             ),
-            supports_system_role=(
-                _nested_attr(
-                    config,
-                    "model",
-                    "family",
-                    default=None,
-                )
-                != "medgemma"
-            ),
+            supports_system_role=True,
         )
 
     @property

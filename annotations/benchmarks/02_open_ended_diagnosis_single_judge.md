@@ -1,5 +1,9 @@
 # Open-ended diagnosis with a single blinded judge
 
+The complete prompt-development chronology, excerpts, calibration evidence,
+and scientific rationale are recorded in
+[`notes/12_open_ended_model_and_judge_prompt_decision_record.md`](../notes/12_open_ended_model_and_judge_prompt_decision_record.md).
+
 ## Objective
 
 Add a fourth ISEPDermaBench task that measures whether a multimodal model can
