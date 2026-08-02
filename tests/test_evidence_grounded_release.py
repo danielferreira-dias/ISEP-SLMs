@@ -92,7 +92,7 @@ class EvidenceGroundedReleaseTests(unittest.TestCase):
 
         self.assertEqual(refs["reference_disease_id"].nunique(), 19)
 
-    def test_external_experiment_references_benchmark_and_all_models(
+    def test_external_experiment_references_benchmark_and_selected_models(
         self,
     ) -> None:
         experiment = yaml.safe_load(
@@ -109,7 +109,7 @@ class EvidenceGroundedReleaseTests(unittest.TestCase):
         self.assertFalse(
             experiment["selection_policy"]["teacher_selection_allowed"]
         )
-        self.assertEqual(len(experiment["models"]), 6)
+        self.assertEqual(len(experiment["models"]), 5)
         for model in experiment["models"]:
             self.assertTrue((ROOT / model["config"]).is_file())
         self.assertEqual(

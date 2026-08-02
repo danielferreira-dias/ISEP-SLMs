@@ -21,20 +21,13 @@ benchmark:
 models:
   - config: configs/models/qwen_3_6_27b.yaml
     enabled: true
-
-  - config: configs/models/gpt_5_6_luna.yaml
-    enabled: true
-
-  - config: configs/models/gemma_4_31b_it.yaml
-    enabled: true
-
-  - config: configs/models/qwen_small_9b.yaml
-    enabled: true
-
   - config: configs/models/qwen_small_4b.yaml
     enabled: true
-
-  - config: configs/models/gemma_4_e4b_it.yaml
+  - config: configs/models/qwen_3_7_flash_openrouter.yaml
+    enabled: true
+  - config: configs/models/minimax_m3_openrouter.yaml
+    enabled: true
+  - config: configs/models/mimo_v2_5_openrouter.yaml
     enabled: true
 
 selection_policy:
