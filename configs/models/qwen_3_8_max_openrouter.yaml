@@ -1,0 +1,71 @@
+# Latest Alibaba multimodal flagship served by its official OpenRouter route.
+
+schema_version: 1
+
+model:
+  id: qwen_3_8_max_openrouter
+  display_name: Qwen 3.8 Max (OpenRouter)
+  family: qwen
+  evaluation_role: teacher_candidate
+  training_stage: provider_managed
+  task_adaptation_stage: none
+  domain: general
+
+usage:
+  benchmark: true
+  fine_tuning: false
+
+capabilities:
+  modalities:
+    - text
+    - image
+    - video
+  structured_output_modes:
+    - prompt_only
+    - json_schema
+  context_length_tokens: 1000000
+  maximum_output_tokens: 131072
+
+source:
+  type: provider_api
+  provider: openrouter
+  model_name: qwen/qwen3.8-max
+
+backend:
+  default_profile: openrouter
+  profiles:
+    openrouter:
+      type: api
+      engine: openrouter
+      api_style: chat_completions
+      api_key_env: OPENROUTER_API_KEY
+      request_model: qwen/qwen3.8-max
+      thinking_control: openrouter_reasoning
+      request_timeout_seconds: 1200
+      provider:
+        only:
+          - alibaba
+        allow_fallbacks: false
+        require_parameters: true
+
+reasoning:
+  # OpenRouter marks reasoning as mandatory for this model. Capture it in the
+  # reasoning field and keep it separate from the scored structured answer.
+  enabled: true
+  parser: qwen3
+  exclude_from_structured_output: true
+
+generation:
+  # The official endpoint defaults to xhigh. The frozen 300-case visual audit
+  # found no accuracy benefit from high over low (80.0% versus 80.7%) while
+  # high used substantially more reasoning tokens. Low is therefore the final
+  # benchmark default; higher effort remains an explicit ablation only.
+  # Temperature and top_p are omitted because the hosted Qwen guidance
+  # recommends adjusting at most one of them.
+  profile: qwen_3_8_max_official_reasoning
+  thinking_mode: enabled
+  reasoning_effort: low
+  seed: 42
+
+security:
+  trust_remote_code: false

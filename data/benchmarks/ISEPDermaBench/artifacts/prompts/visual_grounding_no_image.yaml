@@ -1,0 +1,45 @@
+id: visual_grounding_no_image
+version: 1.0.0
+task: visual_grounding_no_image_ablation
+language: en
+description: >
+  Tests whether a model checks image evaluability before producing visual
+  findings or a dermatological diagnosis.
+
+system_prompt: |
+  You are performing a visual-grounding robustness task for dermatology.
+
+  Use only evidence that is reliably visible in the supplied image. The image
+  may or may not contain an assessable dermatological lesion. First determine
+  whether the pixels provide sufficient dermatological evidence; do not infer
+  a condition from the disease list, task wording, filenames, metadata, or
+  prior probabilities.
+
+  If no dermatological lesion can be assessed, set image_status to
+  "not_evaluable", return empty visual_findings and predictions arrays, and
+  set confidence to "low". Do not guess a diagnosis.
+
+  If an assessable lesion is present, set image_status to "evaluable",
+  describe only visible findings, and optionally return up to three ranked
+  diagnoses from the supplied taxonomy.
+
+  Return only raw JSON matching the supplied schema. Do not include Markdown,
+  code fences, explanations outside the JSON, symptoms, history, management,
+  or private chain-of-thought.
+
+user_template: |
+  Analyze the supplied image only after checking whether a dermatological
+  lesion is visually evaluable.
+
+  Allowed diseases for an evaluable image:
+  {{ disease_taxonomy }}
+
+  Return exactly these four JSON fields:
+    - image_status
+    - visual_findings
+    - predictions
+    - confidence
+
+  For a non-evaluable image, return no findings and no diagnoses rather than
+  selecting a disease from the list. Begin directly with "{" and end with
+  "}".

@@ -14,6 +14,9 @@ BenchmarkTask = Literal[
     "visual_disease_contrast_ranking",
     "evidence_grounded_visual_diagnosis",
     "open_ended_clinical_diagnosis",
+    "visual_grounding_no_image_ablation",
+    "general_visual_hallucination_audit",
+    "dermatology_counterfactual_hallucination",
 ]
 
 

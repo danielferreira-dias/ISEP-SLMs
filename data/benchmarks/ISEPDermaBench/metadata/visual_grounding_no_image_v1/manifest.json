@@ -1,0 +1,43 @@
+{
+  "case_count": 50,
+  "class_count": 21,
+  "class_distribution": {
+    "D001": 2,
+    "D002": 2,
+    "D003": 2,
+    "D004": 3,
+    "D005": 2,
+    "D006": 3,
+    "D007": 3,
+    "D009": 2,
+    "D011": 2,
+    "D012": 3,
+    "D013": 2,
+    "D014": 3,
+    "D015": 3,
+    "D016": 2,
+    "D017": 2,
+    "D018": 2,
+    "D019": 2,
+    "D022": 2,
+    "D023": 3,
+    "D024": 2,
+    "D025": 3
+  },
+  "correct_response": {
+    "confidence": "low",
+    "image_status": "not_evaluable",
+    "predictions": [],
+    "visual_findings": []
+  },
+  "group_count": 50,
+  "id": "visual_grounding_no_image_v1",
+  "image_control": "uniform_gray_same_dimensions_v1",
+  "purpose": "Validation-only paired reasoning and grounding ablation",
+  "schema_version": 1,
+  "source_cohort": "metadata/validation_screening_v1/visual_top_k_100_cases.task_ids.txt",
+  "source_configuration": "visual_top_k",
+  "source_split": "validation",
+  "task_ids_file": "50_cases.task_ids.txt",
+  "task_ids_sha256": "bc586e18928be8ffdbcec159267d638deb0b345be32352a734b965b3f4bfcb35"
+}

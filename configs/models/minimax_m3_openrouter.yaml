@@ -42,6 +42,13 @@ backend:
       request_model: minimax/minimax-m3
       thinking_control: openrouter_reasoning
       request_timeout_seconds: 1200
+      # The official MiniMax endpoint does not advertise the seed parameter.
+      supports_seed: false
+      provider:
+        only:
+          - minimax
+        allow_fallbacks: false
+        require_parameters: true
 
 reasoning:
   enabled: false

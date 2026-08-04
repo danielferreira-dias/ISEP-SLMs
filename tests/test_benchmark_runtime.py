@@ -104,6 +104,9 @@ class DeterministicSelectionTests(unittest.TestCase):
             ("visual_disease_confusion_sets", None, 4),
             ("evidence_grounded_diagnosis", None, 2),
             ("open_ended_diagnosis", None, 2),
+            ("visual_grounding_no_image", None, 2),
+            ("general_visual_hallucination_audit", None, 2),
+            ("dermatology_counterfactual_hallucination", None, 2),
         ]
         for benchmark_id, evaluation_set, expected_tasks in cases:
             with self.subTest(benchmark_id=benchmark_id):
@@ -322,6 +325,17 @@ class BenchmarkExecutorTests(unittest.TestCase):
             self.assertNotIn(
                 "Private model-provided reasoning.",
                 record["response"]["final_text"],
+            )
+            execution_metadata = summary.predictions[0].response.metadata[
+                "_execution"
+            ]
+            self.assertEqual(
+                execution_metadata["reasoning_token_count"],
+                5,
+            )
+            self.assertEqual(
+                execution_metadata["reasoning_character_count"],
+                len("Private model-provided reasoning."),
             )
 
 

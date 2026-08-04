@@ -24,6 +24,7 @@ from src.inference.base import (
     InferenceBackend,
     InferenceResult,
     InferenceSafetyRefusal,
+    InferenceTransportError,
     ReasoningTrace,
 )
 from src.benchmark.runner import BenchmarkSample
@@ -139,7 +140,7 @@ class OpenEndedDiagnosisTests(unittest.TestCase):
             output_path=Path("data/benchmarks/ISEPDermaBench"),
         )
 
-        self.assertEqual(summary["version"], "1.5.0")
+        self.assertEqual(summary["version"], "1.8.0")
         self.assertEqual(summary["splits"]["validation"]["tasks"], 100)
         self.assertEqual(
             summary["splits"]["internal_benchmark"]["tasks"],
@@ -479,6 +480,73 @@ class OpenEndedDiagnosisTests(unittest.TestCase):
             self.assertEqual(
                 metrics["judge_usage_distribution"],
                 {"qwen_3_7_flash_openrouter": 1},
+            )
+
+    def test_failed_safety_fallback_remains_disclosed_refusal(self) -> None:
+        task = _first_row(
+            RELEASE / "tasks/open_ended_diagnosis",
+            "validation",
+        )
+        primary = _ScriptedBackend(
+            [
+                InferenceSafetyRefusal(
+                    "Image blocked.",
+                    details={"code": "content_policy_violation"},
+                )
+            ]
+        )
+        fallback = _ScriptedBackend(
+            [InferenceTransportError("Provider error.")] * 3
+        )
+        with TemporaryDirectory() as directory:
+            run = Path(directory)
+            (run / "run_manifest.yaml").write_text(
+                yaml.safe_dump(
+                    {
+                        "benchmark": {"id": "open_ended_diagnosis"},
+                        "evaluation": {"evaluation_set": "validation"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (run / "predictions.jsonl").write_text(
+                json.dumps(
+                    {
+                        "task_id": task["task_id"],
+                        "sample_id": task["sample_id"],
+                        "status": "ok",
+                        "response": {"final_text": "A ranked differential."},
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            result = asyncio.run(
+                judge_run(
+                    root=ROOT,
+                    run_directory=run,
+                    backend=primary,
+                    fallback_judge_model_id=(
+                        "qwen_3_7_flash_openrouter"
+                    ),
+                    fallback_backend=fallback,
+                )
+            )
+
+            record = json.loads(
+                Path(result["judgments_path"])
+                .read_text(encoding="utf-8")
+                .splitlines()[0]
+            )
+            self.assertEqual(record["status"], "judge_safety_refusal")
+            self.assertTrue(record["fallback_used"])
+            self.assertIsNone(record["judge_used"])
+            self.assertIn("Provider error", record["fallback_judge_error"])
+            self.assertEqual(result["metrics"]["judge_coverage"], 0.0)
+            self.assertEqual(
+                result["metrics"]["judge_safety_refusal_count"],
+                1,
             )
 
     def test_retry_invalid_rejudges_only_the_invalid_record(self) -> None:

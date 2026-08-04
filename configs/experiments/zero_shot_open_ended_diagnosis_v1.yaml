@@ -17,6 +17,20 @@ benchmark:
   source: auto
   repository: danielfdias98/ISEPDermaBench
 
+models:
+  - config: configs/models/qwen_3_6_27b.yaml
+    enabled: true
+  - config: configs/models/qwen_small_4b.yaml
+    enabled: true
+  - config: configs/models/qwen_3_7_flash_openrouter.yaml
+    enabled: true
+  - config: configs/models/qwen_3_8_max_openrouter.yaml
+    enabled: true
+  - config: configs/models/minimax_m3_openrouter.yaml
+    enabled: true
+  - config: configs/models/mimo_v2_5_openrouter.yaml
+    enabled: true
+
 judge:
   model: configs/models/gpt_5_6_luna.yaml
   count: 1

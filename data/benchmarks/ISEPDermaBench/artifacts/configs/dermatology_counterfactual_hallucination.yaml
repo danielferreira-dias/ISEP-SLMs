@@ -1,0 +1,66 @@
+benchmark:
+  id: dermatology_counterfactual_hallucination
+  version: 1.1.0
+  task: dermatology_counterfactual_hallucination
+  status: development_validation
+  description: >
+    A nested 200-case dermatology grounding audit containing 50 deterministic
+    pixel-shuffled controls and 150 disease-mismatched hard-negative image
+    swaps derived from group-unique validation cases.
+
+prompt:
+  path: artifacts/prompts/dermatology_counterfactual_hallucination.yaml
+
+schema:
+  path: artifacts/schemas/dermatology_counterfactual_hallucination.schema.json
+
+taxonomy:
+  path: artifacts/taxonomies/diseases.yaml
+
+dataset:
+  default_evaluation_set: validation
+  evaluation_sets:
+    validation:
+      role: development_counterfactual_audit
+      expected_tasks: 200
+  source_task: visual_top_k/validation
+  source_cohort: metadata/dermatology_counterfactual_v2/case_provenance.json
+  selection_seed: 42
+  conditions:
+    pixel_shuffle: 50
+    hard_negative_image_swap: 150
+
+metrics:
+  primary: full_counterfactual_success_rate
+  secondary:
+    - counterfactual_grounding_accuracy
+    - pixel_shuffle_correct_abstention_rate
+    - pixel_shuffle_hallucinated_visual_finding_rate
+    - pixel_shuffle_hallucinated_diagnosis_rate
+    - hard_negative_top_1_accuracy
+    - hard_negative_top_3_accuracy
+    - hard_negative_source_label_persistence_rate
+    - json_validity_rate
+    - schema_compliance_rate
+
+execution:
+  max_output_tokens: 8192
+  batch_size: 8
+  resume: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  fail_fast_on_invalid_output: false
+
+image_preprocessing:
+  profile: dermatology_counterfactual_v1
+  max_edge_pixels: 768
+  max_encoded_bytes: 45000
+  jpeg_quality: 95
+  minimum_jpeg_quality: 95
+  minimum_edge_pixels: 1
+
+structured_output:
+  mode: prompt_only
+
+output:
+  directory: outputs/benchmark_runs

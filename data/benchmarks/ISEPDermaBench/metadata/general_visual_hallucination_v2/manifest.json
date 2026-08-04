@@ -1,0 +1,33 @@
+{
+  "case_count": 300,
+  "condition_distribution": {
+    "false_premises": 100,
+    "insufficient_context": 100,
+    "visual_challenge": 100
+  },
+  "free_text_answer_correctness": "not_scored_without_semantic_judge",
+  "id": "general_visual_hallucination_audit_v2",
+  "image_type_distribution": {
+    "generated": 174,
+    "real": 126
+  },
+  "parent_case_count": 100,
+  "parent_selection": "general_visual_hallucination_audit_v1",
+  "primary_scope": "answerability_and_premise_grounding",
+  "schema_version": 2,
+  "selected_cases_file": "selected_cases.json",
+  "selected_cases_sha256": "7fd5929ae7a11aafdddae01d08ad958b324c15c751db7debd8ad2ca86fad0faa",
+  "selection_policy": "nested_condition_balanced_max_unique_image_sha256_v2",
+  "selection_seed": 42,
+  "source": "google/haloquest eval",
+  "source_csv_sha256": "6c88c8d6eb6d0a98881ec3e50ae52b5919247b53a47b7c723819603621b838b4",
+  "unavailable_expansion_image_count": 5,
+  "unavailable_expansion_images": {
+    "3_2718_4502888288_e4860b29c3_o.jpg": "Could not download HaloQuest image https://c1.staticflickr.com/3/2718/4502888288_e4860b29c3_o.jpg: HTTP Error 410: Gone",
+    "4_3256_2789033013_c2f79a2bec_o.jpg": "Could not download HaloQuest image https://c8.staticflickr.com/4/3256/2789033013_c2f79a2bec_o.jpg: HTTP Error 404: Not Found",
+    "5616_15602534299_2c05a69cdf_o.jpg": "Could not download HaloQuest image https://farm2.staticflickr.com/5616/15602534299_2c05a69cdf_o.jpg: HTTP Error 410: Gone",
+    "7_6238_6299463695_a7e9d2fbfe_o.jpg": "Could not download HaloQuest image https://c1.staticflickr.com/7/6238/6299463695_a7e9d2fbfe_o.jpg: HTTP Error 410: Gone",
+    "9_8451_8032464156_50e0b58cd9_o.jpg": "Could not download HaloQuest image https://c8.staticflickr.com/9/8451/8032464156_50e0b58cd9_o.jpg: HTTP Error 410: Gone"
+  },
+  "unique_image_count": 295
+}

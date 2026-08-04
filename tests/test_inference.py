@@ -233,6 +233,11 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
             client=client,
             generation={"reasoning_effort": "high"},
             thinking_control="openrouter_reasoning",
+            provider_routing={
+                "only": ["alibaba"],
+                "allow_fallbacks": False,
+                "require_parameters": True,
+            },
             image_first=False,
             include_extended_sampling=False,
         )
@@ -249,6 +254,14 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         self.assertEqual(
             payload["extra_body"]["reasoning"],
             {"effort": "high", "exclude": False},
+        )
+        self.assertEqual(
+            payload["extra_body"]["provider"],
+            {
+                "only": ["alibaba"],
+                "allow_fallbacks": False,
+                "require_parameters": True,
+            },
         )
         self.assertEqual(
             payload["messages"][-1]["content"][0]["type"],
@@ -395,6 +408,35 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
                 "exclude": False,
             },
         )
+
+    def test_provider_can_omit_unsupported_seed(self) -> None:
+        response = SimpleNamespace(
+            choices=[
+                SimpleNamespace(
+                    finish_reason="stop",
+                    message=SimpleNamespace(content="{}"),
+                )
+            ],
+            usage=None,
+        )
+        client = _FakeClient(chat_response=response)
+        backend = OpenAICompatibleChatBackend(
+            model_id="provider-without-seed",
+            client=client,
+            generation={"seed": 42, "temperature": 1.0},
+            include_seed=False,
+        )
+
+        backend.generate_result(
+            system_prompt="System",
+            user_prompt="User",
+            image_bytes=b"image",
+            schema={},
+        )
+
+        payload = client.chat_create.payload
+        self.assertNotIn("seed", payload)
+        self.assertEqual(payload["temperature"], 1.0)
 
 
     def test_azure_fallback_maps_disabled_thinking_to_no_effort(self) -> None:

@@ -1,0 +1,802 @@
+[
+  {
+    "source_row_index": 167,
+    "image_name": "iamcc_The_inflatable_chair_with_its_durable_transparent_nylon_f_00ee3d03-c2ca-4c92-a490-7e34dc891668.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/iamcc_The_inflatable_chair_with_its_durable_transparent_nylon_f_00ee3d03-c2ca-4c92-a490-7e34dc891668.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0167"
+  },
+  {
+    "source_row_index": 17,
+    "image_name": "a5f20628-f410-4c03-9ad3-041609c79718.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/a5f20628-f410-4c03-9ad3-041609c79718.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0017"
+  },
+  {
+    "source_row_index": 566,
+    "image_name": "4_3176_2937232246_76477801f7_o.jpg",
+    "image_url": "https://c1.staticflickr.com/4/3176/2937232246_76477801f7_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0566"
+  },
+  {
+    "source_row_index": 123,
+    "image_name": "Dai_Another_Dave_an_enormous_crocodile_dinosaur_eating_school_c_339d1668-2d30-4172-9029-3c09b4551d10.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Dai_Another_Dave_an_enormous_crocodile_dinosaur_eating_school_c_339d1668-2d30-4172-9029-3c09b4551d10.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0123"
+  },
+  {
+    "source_row_index": 25,
+    "image_name": "ahmed.serbest_traditional_oil_painting_hamsters_eating_in_a_ram_538ebaf7-b5ed-4366-804c-258663f960d8.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/ahmed.serbest_traditional_oil_painting_hamsters_eating_in_a_ram_538ebaf7-b5ed-4366-804c-258663f960d8.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0025"
+  },
+  {
+    "source_row_index": 352,
+    "image_name": "killer_Giant_dinosaur_in_Rabat_Morocco_20cad992-3534-450c-b450-64126cb838f8.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/killer_Giant_dinosaur_in_Rabat_Morocco_20cad992-3534-450c-b450-64126cb838f8.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0352"
+  },
+  {
+    "source_row_index": 9,
+    "image_name": "cd862a7c-3537-4004-ae19-d3cee0e7db9a.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/cd862a7c-3537-4004-ae19-d3cee0e7db9a.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0009"
+  },
+  {
+    "source_row_index": 51,
+    "image_name": "a001241e-009b-40fa-8c1c-af34bfcdfcfb.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/a001241e-009b-40fa-8c1c-af34bfcdfcfb.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0051"
+  },
+  {
+    "source_row_index": 372,
+    "image_name": "3_2324_2467246951_60a97fdb38_o.jpg",
+    "image_url": "https://c2.staticflickr.com/3/2324/2467246951_60a97fdb38_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0372"
+  },
+  {
+    "source_row_index": 185,
+    "image_name": "_corridor_with_white_walls_0e46bd9b-b3a2-40fa-80ba-6139fb890c93.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/_corridor_with_white_walls_0e46bd9b-b3a2-40fa-80ba-6139fb890c93.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0185"
+  },
+  {
+    "source_row_index": 257,
+    "image_name": "elvin.midjourney_liminal_space_empty_room_with_chairs_pitch_bla_8828e048-afdb-498e-92e9-475034391413.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/elvin.midjourney_liminal_space_empty_room_with_chairs_pitch_bla_8828e048-afdb-498e-92e9-475034391413.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0257"
+  },
+  {
+    "source_row_index": 517,
+    "image_name": "8056_8360452051_eefc461dd1_o.jpg",
+    "image_url": "https://farm8.staticflickr.com/8056/8360452051_eefc461dd1_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0517"
+  },
+  {
+    "source_row_index": 547,
+    "image_name": "4066_4642626275_d2a12576a4_o.jpg",
+    "image_url": "https://farm1.staticflickr.com/4066/4642626275_d2a12576a4_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0547"
+  },
+  {
+    "source_row_index": 469,
+    "image_name": "8_7498_15097202343_a3bbd776c4_o.jpg",
+    "image_url": "https://c1.staticflickr.com/8/7498/15097202343_a3bbd776c4_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0469"
+  },
+  {
+    "source_row_index": 77,
+    "image_name": "7a423d4d-6f3c-49b3-87cd-5a8d48f75079.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/7a423d4d-6f3c-49b3-87cd-5a8d48f75079.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0077"
+  },
+  {
+    "source_row_index": 391,
+    "image_name": "3774_9421418963_c3002bd2de_o.jpg",
+    "image_url": "https://farm7.staticflickr.com/3774/9421418963_c3002bd2de_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0391"
+  },
+  {
+    "source_row_index": 244,
+    "image_name": "John_Cena_Prime_Atmospheric_Mild_Dark_and_Cyberpunk_big_city_ov_e5e0496c-cc2f-45cf-8dc3-9a0344c86593.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/John_Cena_Prime_Atmospheric_Mild_Dark_and_Cyberpunk_big_city_ov_e5e0496c-cc2f-45cf-8dc3-9a0344c86593.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0244"
+  },
+  {
+    "source_row_index": 607,
+    "image_name": "mehdiberbs_a_mid-century_modern_cantilevered_brutalist_house_de_22524805-7cbd-4b58-8c65-e3a0fc6c8dc1.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/mehdiberbs_a_mid-century_modern_cantilevered_brutalist_house_de_22524805-7cbd-4b58-8c65-e3a0fc6c8dc1.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0607"
+  },
+  {
+    "source_row_index": 183,
+    "image_name": "kinopablo_a_wall_of_cassette_tapes_008cf92d-8f9f-4e93-bf47-e7da5c2ea3f5.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/kinopablo_a_wall_of_cassette_tapes_008cf92d-8f9f-4e93-bf47-e7da5c2ea3f5.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0183"
+  },
+  {
+    "source_row_index": 208,
+    "image_name": "TrickyLoki_Justin_Trudeau_falling_off_a_building_high-quality_H_11d9dce6-1d08-4fa2-8cf1-5d5ef8231f53.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/TrickyLoki_Justin_Trudeau_falling_off_a_building_high-quality_H_11d9dce6-1d08-4fa2-8cf1-5d5ef8231f53.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0208"
+  },
+  {
+    "source_row_index": 395,
+    "image_name": "2621_3714865100_6334cdc1b1_o.jpg",
+    "image_url": "https://farm3.staticflickr.com/2621/3714865100_6334cdc1b1_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0395"
+  },
+  {
+    "source_row_index": 172,
+    "image_name": "soufianeraja_Drawing_make_by_a_kid_26c7e6c7-81cc-4def-8c27-c7aade0b7aea.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/soufianeraja_Drawing_make_by_a_kid_26c7e6c7-81cc-4def-8c27-c7aade0b7aea.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0172"
+  },
+  {
+    "source_row_index": 316,
+    "image_name": "hadar1981_still_from_hongdae_in_Seoul_hot_day_35mm_96c39f31-c9be-461f-8504-78c7655ee78c.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/hadar1981_still_from_hongdae_in_Seoul_hot_day_35mm_96c39f31-c9be-461f-8504-78c7655ee78c.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0316"
+  },
+  {
+    "source_row_index": 75,
+    "image_name": "Groucho_a_painting_of_a_head_that_has_an_eye_in_the_style_of_co_72b0a918-b12c-4e52-a737-b22b6c12b78b.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/Groucho_a_painting_of_a_head_that_has_an_eye_in_the_style_of_co_72b0a918-b12c-4e52-a737-b22b6c12b78b.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0075"
+  },
+  {
+    "source_row_index": 339,
+    "image_name": "Ray_Adeon_delicate_humanoid_alien_lifeform_meeting_the_first_hu_644af6b9-40ed-449d-b252-67a837f0727b.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Ray_Adeon_delicate_humanoid_alien_lifeform_meeting_the_first_hu_644af6b9-40ed-449d-b252-67a837f0727b.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0339"
+  },
+  {
+    "source_row_index": 14,
+    "image_name": "bobroberts_army_of_cats_with_guns_wearing_tactical_gear_08e83359-154e-41c3-a822-05dd3621e118.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/bobroberts_army_of_cats_with_guns_wearing_tactical_gear_08e83359-154e-41c3-a822-05dd3621e118.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0014"
+  },
+  {
+    "source_row_index": 598,
+    "image_name": "Thomas_Talawa_Presto_Large_dinosours_in_caracas_city_venezuela__d89165b9-1d6b-4137-94ad-52fa937418a0.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Thomas_Talawa_Presto_Large_dinosours_in_caracas_city_venezuela__d89165b9-1d6b-4137-94ad-52fa937418a0.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0598"
+  },
+  {
+    "source_row_index": 131,
+    "image_name": "andersonmarquesphotography_paper_quilling_of_a_house_72c02328-e2e3-49c6-9599-dedbc4ae550b.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/andersonmarquesphotography_paper_quilling_of_a_house_72c02328-e2e3-49c6-9599-dedbc4ae550b.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0131"
+  },
+  {
+    "source_row_index": 287,
+    "image_name": "_A_white_room_with_three_doors_on_the_front_right_and_left_and__caa0f5ee-a32a-44f6-9259-0cb401b4ecec.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/_A_white_room_with_three_doors_on_the_front_right_and_left_and__caa0f5ee-a32a-44f6-9259-0cb401b4ecec.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0287"
+  },
+  {
+    "source_row_index": 379,
+    "image_name": "8_7617_16767947440_68d558453b_o.jpg",
+    "image_url": "https://c1.staticflickr.com/8/7617/16767947440_68d558453b_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0379"
+  },
+  {
+    "source_row_index": 327,
+    "image_name": "DaSick1_award_winning_street_photography_of_flagship_gothic_sto_3e254f68-9ec2-4b46-92d9-09caedca0630.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/DaSick1_award_winning_street_photography_of_flagship_gothic_sto_3e254f68-9ec2-4b46-92d9-09caedca0630.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0327"
+  },
+  {
+    "source_row_index": 196,
+    "image_name": "prikhodkop_the_infinite_sequence_of_children_concerts_one_after_60d00b77-306c-4a9b-9895-ba9737c76f6e.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/prikhodkop_the_infinite_sequence_of_children_concerts_one_after_60d00b77-306c-4a9b-9895-ba9737c76f6e.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0196"
+  },
+  {
+    "source_row_index": 111,
+    "image_name": "Maxence_newyork_in_flames_1349218a-32a0-448e-89df-9781b622f115.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Maxence_newyork_in_flames_1349218a-32a0-448e-89df-9781b622f115.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0111"
+  },
+  {
+    "source_row_index": 393,
+    "image_name": "1_28_56770890_253e998737_o.jpg",
+    "image_url": "https://c5.staticflickr.com/1/28/56770890_253e998737_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0393"
+  },
+  {
+    "source_row_index": 530,
+    "image_name": "5582_18233009494_029b52ca79_o.jpg",
+    "image_url": "https://farm5.staticflickr.com/5582/18233009494_029b52ca79_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0530"
+  },
+  {
+    "source_row_index": 4,
+    "image_name": "adventures_at_Maku_Pixar_brown_and_white_pitbull_smiling_on_a_w_e0b029f4-6de4-4fdd-b560-bb3c36c1fd91.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/adventures_at_Maku_Pixar_brown_and_white_pitbull_smiling_on_a_w_e0b029f4-6de4-4fdd-b560-bb3c36c1fd91.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0004"
+  },
+  {
+    "source_row_index": 238,
+    "image_name": "philippe_httpmoroux.nltd.jpg_fisherman_on_his_boat_with_nets_an_033c4f05-e634-4a25-b6bd-4a84bf1cf740.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/philippe_httpmoroux.nltd.jpg_fisherman_on_his_boat_with_nets_an_033c4f05-e634-4a25-b6bd-4a84bf1cf740.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0238"
+  },
+  {
+    "source_row_index": 135,
+    "image_name": "Lxf2022a_Christmas_balloons._24b2def7-aeef-4c3a-9982-a1fe27145695.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Lxf2022a_Christmas_balloons._24b2def7-aeef-4c3a-9982-a1fe27145695.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0135"
+  },
+  {
+    "source_row_index": 204,
+    "image_name": "NewJoha_fashionable_portrait_of_Balloons_minimalistic_design_fa_2b3adc3a-b822-432d-a4a3-68e161bf520a.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/NewJoha_fashionable_portrait_of_Balloons_minimalistic_design_fa_2b3adc3a-b822-432d-a4a3-68e161bf520a.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0204"
+  },
+  {
+    "source_row_index": 323,
+    "image_name": "Rocambole_a_sick_3D_sketchbook_black_book_white_ink_plush_love__8639c510-1c52-4b2f-ac69-150318ab91ee.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Rocambole_a_sick_3D_sketchbook_black_book_white_ink_plush_love__8639c510-1c52-4b2f-ac69-150318ab91ee.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0323"
+  },
+  {
+    "source_row_index": 602,
+    "image_name": "CB_A_vintage_photograph_of_a_street_in_Paris_a_woman_on_a_side__a20b7a2b-3e40-4bd8-b372-4c37280be818.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/CB_A_vintage_photograph_of_a_street_in_Paris_a_woman_on_a_side__a20b7a2b-3e40-4bd8-b372-4c37280be818.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0602"
+  },
+  {
+    "source_row_index": 34,
+    "image_name": "adventures_at_Maku_pixar_white_cat_seating_down_crossing_legs_m_953fe9c9-a339-4c42-851e-58b34abfa219.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/adventures_at_Maku_pixar_white_cat_seating_down_crossing_legs_m_953fe9c9-a339-4c42-851e-58b34abfa219.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0034"
+  },
+  {
+    "source_row_index": 7,
+    "image_name": "cWaveDave_A_BMW_Motorbike_and_a_KTM_Motorbike_facing_off_agains_a31a9387-3380-497e-82d4-4b029c51ed22.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/cWaveDave_A_BMW_Motorbike_and_a_KTM_Motorbike_facing_off_agains_a31a9387-3380-497e-82d4-4b029c51ed22.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0007"
+  },
+  {
+    "source_row_index": 353,
+    "image_name": "hasi96_A_group_of_children_singing_carols_whole_figures_in_the__12788fb3-5f45-4590-8a6d-f5a94b6d242c.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/hasi96_A_group_of_children_singing_carols_whole_figures_in_the__12788fb3-5f45-4590-8a6d-f5a94b6d242c.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0353"
+  },
+  {
+    "source_row_index": 141,
+    "image_name": "Peybro_Norse_fisher_man_5a817bd1-1fe1-4394-8696-1437cc7438e0.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Peybro_Norse_fisher_man_5a817bd1-1fe1-4394-8696-1437cc7438e0.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0141"
+  },
+  {
+    "source_row_index": 54,
+    "image_name": "57e617f7-0674-4d17-b0b6-7e06edea3005.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/57e617f7-0674-4d17-b0b6-7e06edea3005.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0054"
+  },
+  {
+    "source_row_index": 462,
+    "image_name": "5070_5674798089_baed7dec1b_o.jpg",
+    "image_url": "https://farm7.staticflickr.com/5070/5674798089_baed7dec1b_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0462"
+  },
+  {
+    "source_row_index": 146,
+    "image_name": "bbbba__Okinawa_the_size_of_the_dragon_is_about_the_same_as_a_no_5033760c-dfa8-4a3c-81d4-e9d5bd399796.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/bbbba__Okinawa_the_size_of_the_dragon_is_about_the_same_as_a_no_5033760c-dfa8-4a3c-81d4-e9d5bd399796.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0146"
+  },
+  {
+    "source_row_index": 27,
+    "image_name": "b9e77bd2-0168-416a-ab79-9aa673278deb.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/b9e77bd2-0168-416a-ab79-9aa673278deb.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0027"
+  },
+  {
+    "source_row_index": 291,
+    "image_name": "Snowboy_Realistic_vintage_camper_123050cd-c3d4-4672-ab54-fe3b53cfcd1c.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Snowboy_Realistic_vintage_camper_123050cd-c3d4-4672-ab54-fe3b53cfcd1c.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0291"
+  },
+  {
+    "source_row_index": 32,
+    "image_name": "byt3_m3chanic_realistic_felt_puppet_detailed_full_body_foam_cra_355a541b-03ad-4661-8e5b-ddf9d37c92de.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/byt3_m3chanic_realistic_felt_puppet_detailed_full_body_foam_cra_355a541b-03ad-4661-8e5b-ddf9d37c92de.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0032"
+  },
+  {
+    "source_row_index": 267,
+    "image_name": "il_finding_joy_in_the_mundane_d1a83e0e-0f8b-40b2-bd65-25ffa0c2ea30.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/il_finding_joy_in_the_mundane_d1a83e0e-0f8b-40b2-bd65-25ffa0c2ea30.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0267"
+  },
+  {
+    "source_row_index": 174,
+    "image_name": "Shulkerh_The_ancient_town_in_the_south_of_the_Yangtze_River_wit_54a3c332-e2db-41d9-bac2-9c3c669b4849.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Shulkerh_The_ancient_town_in_the_south_of_the_Yangtze_River_wit_54a3c332-e2db-41d9-bac2-9c3c669b4849.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0174"
+  },
+  {
+    "source_row_index": 122,
+    "image_name": "Jurra_scandinavian_style_of_the_Miami_city_68067c5d-52c1-42ea-b7c3-99b61c6727f8.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Jurra_scandinavian_style_of_the_Miami_city_68067c5d-52c1-42ea-b7c3-99b61c6727f8.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0122"
+  },
+  {
+    "source_row_index": 120,
+    "image_name": "haleypoling2665_older_woman_smiling_at_herself_in_the_mirror_4fc594af-d689-410d-8b08-4b81800cfffa.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/haleypoling2665_older_woman_smiling_at_herself_in_the_mirror_4fc594af-d689-410d-8b08-4b81800cfffa.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0120"
+  },
+  {
+    "source_row_index": 583,
+    "image_name": "a730be4d-6338-4c88-8e4e-29d7b2321b3c.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/a730be4d-6338-4c88-8e4e-29d7b2321b3c.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0583"
+  },
+  {
+    "source_row_index": 356,
+    "image_name": "Sensai_fashion_wallpaper_a0efc004-a61a-4e93-bef0-bf35ab8e8984.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Sensai_fashion_wallpaper_a0efc004-a61a-4e93-bef0-bf35ab8e8984.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0356"
+  },
+  {
+    "source_row_index": 29,
+    "image_name": "adventures_at_Maku_Pixar_brown_and_white_pitbull_smiling_on_a_w_2ae3a44e-cc55-4a40-ab4a-713d3eb6de35.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/adventures_at_Maku_Pixar_brown_and_white_pitbull_smiling_on_a_w_2ae3a44e-cc55-4a40-ab4a-713d3eb6de35.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0029"
+  },
+  {
+    "source_row_index": 363,
+    "image_name": "4_3750_9031823026_48ebe4d436_o.jpg",
+    "image_url": "https://c3.staticflickr.com/4/3750/9031823026_48ebe4d436_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0363"
+  },
+  {
+    "source_row_index": 67,
+    "image_name": "RexxThunder_male_scifi_charactor_portrait_74fabbe7-5463-4e23-a59e-b7c4e5d465fb.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/RexxThunder_male_scifi_charactor_portrait_74fabbe7-5463-4e23-a59e-b7c4e5d465fb.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0067"
+  },
+  {
+    "source_row_index": 49,
+    "image_name": "agapak_ethereal_Bohemian_Waxwing_bird_Bombycilla_garrulus_a21d76a4-dc99-486f-9994-def7021bd6dd.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/agapak_ethereal_Bohemian_Waxwing_bird_Bombycilla_garrulus_a21d76a4-dc99-486f-9994-def7021bd6dd.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0049"
+  },
+  {
+    "source_row_index": 384,
+    "image_name": "4047_4685736311_cf385a849a_o.jpg",
+    "image_url": "https://farm6.staticflickr.com/4047/4685736311_cf385a849a_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0384"
+  },
+  {
+    "source_row_index": 74,
+    "image_name": "Hanzo_the_eyes_of_a_man_is_near_the_entrance_of_some_sort_of_ar_7d0aad4f-ef10-48d3-99fe-90c9d5b7560d.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/Hanzo_the_eyes_of_a_man_is_near_the_entrance_of_some_sort_of_ar_7d0aad4f-ef10-48d3-99fe-90c9d5b7560d.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0074"
+  },
+  {
+    "source_row_index": 11,
+    "image_name": "c52c5a52-3883-4cdc-94ea-a482c7050d6f.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/c52c5a52-3883-4cdc-94ea-a482c7050d6f.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0011"
+  },
+  {
+    "source_row_index": 78,
+    "image_name": "7748e21b-1ea5-4e7f-8bdb-162cea585a41.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/7748e21b-1ea5-4e7f-8bdb-162cea585a41.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0078"
+  },
+  {
+    "source_row_index": 103,
+    "image_name": "Naggar_Woman_Alexandria_Sea_waves_magichour_raining__dramatic___e6e3922b-e3f9-4a8f-9587-ee88aafcb49d.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/Naggar_Woman_Alexandria_Sea_waves_magichour_raining__dramatic___e6e3922b-e3f9-4a8f-9587-ee88aafcb49d.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0103"
+  },
+  {
+    "source_row_index": 514,
+    "image_name": "4_3093_2884286087_cda4db9ee2_o.jpg",
+    "image_url": "https://c6.staticflickr.com/4/3093/2884286087_cda4db9ee2_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0514"
+  },
+  {
+    "source_row_index": 304,
+    "image_name": "Ophiax_group_photo_Santa_clause_extremely_fat_lips_children_are_252ce8e9-fb05-4288-85f9-fc44f83ad48c.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Ophiax_group_photo_Santa_clause_extremely_fat_lips_children_are_252ce8e9-fb05-4288-85f9-fc44f83ad48c.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0304"
+  },
+  {
+    "source_row_index": 568,
+    "image_name": "3609_3338003957_691f6c0186_o.jpg",
+    "image_url": "https://farm1.staticflickr.com/3609/3338003957_691f6c0186_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0568"
+  },
+  {
+    "source_row_index": 345,
+    "image_name": "MORPHEUS2023_toy_car_decaying_in_a_bed_of_mushrooms_f6c941b4-4c7a-4d3c-98a4-e9b9d03080a9.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/MORPHEUS2023_toy_car_decaying_in_a_bed_of_mushrooms_f6c941b4-4c7a-4d3c-98a4-e9b9d03080a9.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0345"
+  },
+  {
+    "source_row_index": 578,
+    "image_name": "a62b28f4-779d-4325-a794-8848b0500b1d.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/a62b28f4-779d-4325-a794-8848b0500b1d.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0578"
+  },
+  {
+    "source_row_index": 388,
+    "image_name": "4052_4241923013_b7c09bd53b_o.jpg",
+    "image_url": "https://farm7.staticflickr.com/4052/4241923013_b7c09bd53b_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0388"
+  },
+  {
+    "source_row_index": 147,
+    "image_name": "m0us316_A_group_of_ancient_Egyptian_male_warriors_huddled_toget_0a4fa258-472f-4429-b84f-60f390547f65.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/m0us316_A_group_of_ancient_Egyptian_male_warriors_huddled_toget_0a4fa258-472f-4429-b84f-60f390547f65.png",
+    "image_type": "generated",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0147"
+  },
+  {
+    "source_row_index": 414,
+    "image_name": "3_2543_3827171739_1fc4796bb9_o.jpg",
+    "image_url": "https://c7.staticflickr.com/3/2543/3827171739_1fc4796bb9_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0414"
+  },
+  {
+    "source_row_index": 557,
+    "image_name": "9_8279_8754650331_18bb51ef11_o.jpg",
+    "image_url": "https://c6.staticflickr.com/9/8279/8754650331_18bb51ef11_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0557"
+  },
+  {
+    "source_row_index": 373,
+    "image_name": "6_5499_10245691204_98dce75b5a_o.jpg",
+    "image_url": "https://c7.staticflickr.com/6/5499/10245691204_98dce75b5a_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0373"
+  },
+  {
+    "source_row_index": 97,
+    "image_name": "Visual_Poetry_a_35_year_old_father_and_his_14_year_old_daughter_b2847a99-b2e8-42a0-9533-00abb93ff7c6.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/Visual_Poetry_a_35_year_old_father_and_his_14_year_old_daughter_b2847a99-b2e8-42a0-9533-00abb93ff7c6.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0097"
+  },
+  {
+    "source_row_index": 380,
+    "image_name": "3873_14152766838_f978e4b93e_o.jpg",
+    "image_url": "https://farm4.staticflickr.com/3873/14152766838_f978e4b93e_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0380"
+  },
+  {
+    "source_row_index": 564,
+    "image_name": "6_5055_5400541754_534ef77ce1_o.jpg",
+    "image_url": "https://c5.staticflickr.com/6/5055/5400541754_534ef77ce1_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0564"
+  },
+  {
+    "source_row_index": 400,
+    "image_name": "4070_4450951388_32ce3c2f00_o.jpg",
+    "image_url": "https://farm4.staticflickr.com/4070/4450951388_32ce3c2f00_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0400"
+  },
+  {
+    "source_row_index": 455,
+    "image_name": "5_4005_4407322859_8551f46e36_o.jpg",
+    "image_url": "https://c1.staticflickr.com/5/4005/4407322859_8551f46e36_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0455"
+  },
+  {
+    "source_row_index": 401,
+    "image_name": "4123_4870877980_65232452ff_o.jpg",
+    "image_url": "https://farm7.staticflickr.com/4123/4870877980_65232452ff_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0401"
+  },
+  {
+    "source_row_index": 404,
+    "image_name": "2_1284_1351151649_09a1f84036_o.jpg",
+    "image_url": "https://c7.staticflickr.com/2/1284/1351151649_09a1f84036_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0404"
+  },
+  {
+    "source_row_index": 260,
+    "image_name": "danaburns_spring_grain_rain_season_Captured_in_a_tilt_-_shift_s_f32f7139-12dd-4891-82c7-c6c267739008.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/danaburns_spring_grain_rain_season_Captured_in_a_tilt_-_shift_s_f32f7139-12dd-4891-82c7-c6c267739008.png",
+    "image_type": "generated",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0260"
+  },
+  {
+    "source_row_index": 508,
+    "image_name": "3_2566_5735901463_997b964890_o.jpg",
+    "image_url": "https://c6.staticflickr.com/3/2566/5735901463_997b964890_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0508"
+  },
+  {
+    "source_row_index": 470,
+    "image_name": "3042_3081529024_0fa9b4c216_o.jpg",
+    "image_url": "https://farm5.staticflickr.com/3042/3081529024_0fa9b4c216_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0470"
+  },
+  {
+    "source_row_index": 456,
+    "image_name": "4066_4588653749_f82bff3de5_o.jpg",
+    "image_url": "https://farm7.staticflickr.com/4066/4588653749_f82bff3de5_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "false premises",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0456"
+  },
+  {
+    "source_row_index": 487,
+    "image_name": "2836_9172803468_7d7914b287_o.jpg",
+    "image_url": "https://farm4.staticflickr.com/2836/9172803468_7d7914b287_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0487"
+  },
+  {
+    "source_row_index": 109,
+    "image_name": "778834e9-9346-4012-bdee-03db0ca7124a.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/778834e9-9346-4012-bdee-03db0ca7124a.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0109"
+  },
+  {
+    "source_row_index": 275,
+    "image_name": "prikhodkop_the_infinite_sequence_of_children_concerts_one_after_588efc8e-d757-4bdb-a5ff-ccfb20825a3c.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/prikhodkop_the_infinite_sequence_of_children_concerts_one_after_588efc8e-d757-4bdb-a5ff-ccfb20825a3c.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0275"
+  },
+  {
+    "source_row_index": 574,
+    "image_name": "5_4107_5086438039_936555496e_o.jpg",
+    "image_url": "https://c7.staticflickr.com/5/4107/5086438039_936555496e_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0574"
+  },
+  {
+    "source_row_index": 421,
+    "image_name": "1_189_503566223_c6aa98d87d_o.jpg",
+    "image_url": "https://c5.staticflickr.com/1/189/503566223_c6aa98d87d_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0421"
+  },
+  {
+    "source_row_index": 293,
+    "image_name": "Adore_LaMour_Valentines_Day_candy_6a071903-c4b6-4e2f-bbfc-18446f2ed5f7.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/Adore_LaMour_Valentines_Day_candy_6a071903-c4b6-4e2f-bbfc-18446f2ed5f7.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0293"
+  },
+  {
+    "source_row_index": 548,
+    "image_name": "2221_2445354540_63849cdcc5_o.jpg",
+    "image_url": "https://farm4.staticflickr.com/2221/2445354540_63849cdcc5_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0548"
+  },
+  {
+    "source_row_index": 370,
+    "image_name": "7_6044_6233842848_76f650fae6_o.jpg",
+    "image_url": "https://c7.staticflickr.com/7/6044/6233842848_76f650fae6_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0370"
+  },
+  {
+    "source_row_index": 394,
+    "image_name": "3427_3275699772_c81e9c47e1_o.jpg",
+    "image_url": "https://farm6.staticflickr.com/3427/3275699772_c81e9c47e1_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0394"
+  },
+  {
+    "source_row_index": 436,
+    "image_name": "8_7562_15662826305_3d84f5317f_o.jpg",
+    "image_url": "https://c3.staticflickr.com/8/7562/15662826305_3d84f5317f_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0436"
+  },
+  {
+    "source_row_index": 98,
+    "image_name": "2c80a6c6-43a8-4c1f-b50b-5ebfed7dd25f.png",
+    "image_url": "https://midjourney-image.s3.amazonaws.com/2c80a6c6-43a8-4c1f-b50b-5ebfed7dd25f.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0098"
+  },
+  {
+    "source_row_index": 490,
+    "image_name": "4_3333_3588154094_115014b1e9_o.jpg",
+    "image_url": "https://c4.staticflickr.com/4/3333/3588154094_115014b1e9_o.jpg",
+    "image_type": "real",
+    "haloquest_condition": "insufficient context",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0490"
+  },
+  {
+    "source_row_index": 277,
+    "image_name": "m0us316_A_gang_of_dangerous_gritty_dirty_outlaw_criminal_cowboy_0b247dad-9950-4f96-bff9-f2b7d4e8ed62.png",
+    "image_url": "https://imagen-parti-images.s3.amazonaws.com/m0us316_A_gang_of_dangerous_gritty_dirty_outlaw_criminal_cowboy_0b247dad-9950-4f96-bff9-f2b7d4e8ed62.png",
+    "image_type": "generated",
+    "haloquest_condition": "visual challenge",
+    "task_id": "general_visual_hallucination_audit:validation:HALOQUEST_EVAL_0277"
+  }
+]

@@ -1,0 +1,63 @@
+benchmark:
+  id: general_visual_hallucination_audit
+  version: 1.1.0
+  task: general_visual_hallucination_audit
+  status: development_validation
+  description: >
+    A nested 300-case HaloQuest subset measuring whether a multimodal model
+    distinguishes answerable questions, false premises, and questions whose
+    answer is not visible in the supplied image.
+
+prompt:
+  path: artifacts/prompts/general_visual_hallucination_audit.yaml
+
+schema:
+  path: artifacts/schemas/general_visual_hallucination_audit.schema.json
+
+taxonomy:
+  path: artifacts/taxonomies/diseases.yaml
+
+dataset:
+  default_evaluation_set: validation
+  evaluation_sets:
+    validation:
+      role: development_hallucination_audit
+      expected_tasks: 300
+  source_dataset: google/haloquest
+  source_split: eval
+  selection_seed: 42
+  selection_policy: nested_condition_balanced_max_unique_image_sha256_v2
+
+metrics:
+  primary: question_status_accuracy
+  secondary:
+    - unanswerable_detection_accuracy
+    - false_premise_rejection_accuracy
+    - insufficient_context_recognition_accuracy
+    - visual_challenge_answerability_accuracy
+    - unanswerable_hallucination_rate
+    - overconfidence_on_unanswerable_rate
+    - json_validity_rate
+    - schema_compliance_rate
+
+execution:
+  max_output_tokens: 8192
+  batch_size: 8
+  resume: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  fail_fast_on_invalid_output: false
+
+image_preprocessing:
+  profile: haloquest_rgb_jpeg_v1
+  max_edge_pixels: 1024
+  max_encoded_bytes: 1000000
+  jpeg_quality: 92
+  minimum_jpeg_quality: 80
+  minimum_edge_pixels: 384
+
+structured_output:
+  mode: prompt_only
+
+output:
+  directory: outputs/benchmark_runs

@@ -58,12 +58,14 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         use_json_schema: bool = False,
         chat_template_kwargs: Any | None = None,
         thinking_control: str | None = None,
+        provider_routing: Any | None = None,
         supports_system_role: bool = True,
         timeout_seconds: float = 300.0,
         max_retries: int = 2,
         stream_responses: bool = False,
         image_first: bool = True,
         include_extended_sampling: bool = True,
+        include_seed: bool = True,
     ) -> None:
         self._model_id = model_id
         self.request_model = request_model or model_id
@@ -93,12 +95,14 @@ class OpenAICompatibleChatBackend(InferenceBackend):
                 "'reasoning_effort', or 'openrouter_reasoning'"
             )
         self.thinking_control = thinking_control
+        self.provider_routing = provider_routing
         self.supports_system_role = supports_system_role
         self.timeout_seconds = timeout_seconds
         self.max_retries = max_retries
         self.stream_responses = stream_responses
         self.image_first = image_first
         self.include_extended_sampling = include_extended_sampling
+        self.include_seed = include_seed
 
     @property
     def model_id(self) -> str:
@@ -325,6 +329,7 @@ class OpenAICompatibleChatBackend(InferenceBackend):
                 self.thinking_control != "openrouter_reasoning"
             ),
             include_extended_sampling=self.include_extended_sampling,
+            include_seed=self.include_seed,
         )
         extra_body = dict(payload.get("extra_body", {}))
         template_kwargs = dict(self.chat_template_kwargs)
@@ -398,6 +403,33 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             # close at the budget while allowing generation of the final answer
             # to continue within the overall max_tokens limit.
             extra_body["thinking_token_budget"] = reasoning_max_tokens
+        if self.provider_routing is not None:
+            only = getattr(self.provider_routing, "only", None)
+            allow_fallbacks = getattr(
+                self.provider_routing,
+                "allow_fallbacks",
+                None,
+            )
+            require_parameters = getattr(
+                self.provider_routing,
+                "require_parameters",
+                None,
+            )
+            if isinstance(self.provider_routing, dict):
+                only = self.provider_routing.get("only", only)
+                allow_fallbacks = self.provider_routing.get(
+                    "allow_fallbacks",
+                    allow_fallbacks,
+                )
+                require_parameters = self.provider_routing.get(
+                    "require_parameters",
+                    require_parameters,
+                )
+            extra_body["provider"] = {
+                "only": list(only or ()),
+                "allow_fallbacks": bool(allow_fallbacks),
+                "require_parameters": bool(require_parameters),
+            }
         if template_kwargs:
             extra_body["chat_template_kwargs"] = template_kwargs
         if extra_body:
@@ -717,6 +749,7 @@ def _apply_chat_generation(
     *,
     include_reasoning_effort: bool = True,
     include_extended_sampling: bool = True,
+    include_seed: bool = True,
 ) -> None:
     direct_fields = (
         "temperature",
@@ -728,6 +761,11 @@ def _apply_chat_generation(
     )
     if include_reasoning_effort:
         direct_fields = ("reasoning_effort", *direct_fields)
+    if not include_seed:
+        direct_fields = tuple(
+            field_name for field_name in direct_fields
+            if field_name != "seed"
+        )
     for field_name in direct_fields:
         value = generation.get(field_name)
         if value is not None:

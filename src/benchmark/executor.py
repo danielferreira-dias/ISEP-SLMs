@@ -425,6 +425,26 @@ def _record_to_prediction(record: dict[str, Any]) -> BenchmarkPrediction:
     response_value = record.get("response", {})
     if not isinstance(response_value, dict):
         response_value = {}
+    response_metadata = (
+        dict(response_value.get("metadata", {}))
+        if isinstance(response_value.get("metadata"), dict)
+        else {}
+    )
+    reasoning_value = response_value.get("reasoning", {})
+    usage_value = response_value.get("usage", {})
+    reasoning_mapping = (
+        reasoning_value if isinstance(reasoning_value, dict) else {}
+    )
+    usage_mapping = usage_value if isinstance(usage_value, dict) else {}
+    reasoning_text = reasoning_mapping.get("text")
+    response_metadata["_execution"] = {
+        "reasoning_availability": reasoning_mapping.get("availability"),
+        "reasoning_token_count": reasoning_mapping.get("token_count"),
+        "reasoning_character_count": (
+            len(reasoning_text) if isinstance(reasoning_text, str) else 0
+        ),
+        "output_token_count": usage_mapping.get("output_tokens"),
+    }
     response = ModelResponse(
         model_id=str(record.get("model_id", "")),
         raw_text=str(response_value.get("final_text", "")),
@@ -463,11 +483,7 @@ def _record_to_prediction(record: dict[str, Any]) -> BenchmarkPrediction:
             str(value)
             for value in response_value.get("validation_errors", [])
         ],
-        metadata=(
-            dict(response_value.get("metadata", {}))
-            if isinstance(response_value.get("metadata"), dict)
-            else {}
-        ),
+        metadata=response_metadata,
     )
     metadata = record.get("metadata", {})
     return BenchmarkPrediction(

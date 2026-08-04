@@ -12,6 +12,7 @@ from src.benchmark.runner import BenchmarkSample
 from src.benchmark.task_adapters import (
     ConfusionSetTaskAdapter,
     EvidenceGroundedTaskAdapter,
+    VisualGroundingNoImageTaskAdapter,
     VisualTopKTaskAdapter,
     build_task_adapter,
 )
@@ -92,6 +93,27 @@ class BenchmarkTaskAdapterTests(unittest.TestCase):
             6,
         )
 
+    def test_no_image_adapter_accepts_explicit_abstention(self) -> None:
+        adapter = _adapter("visual_grounding_no_image", self.diseases)
+        self.assertIsInstance(adapter, VisualGroundingNoImageTaskAdapter)
+        prepared = adapter.prepare(_sample())
+        response = adapter.parse_response(
+            "test",
+            json.dumps(
+                {
+                    "image_status": "not_evaluable",
+                    "visual_findings": [],
+                    "predictions": [],
+                    "confidence": "low",
+                }
+            ),
+            prepared_task=prepared,
+        )
+
+        self.assertIn("may or may not", prepared.system_prompt)
+        self.assertTrue(response.schema_valid)
+        self.assertTrue(response.metadata["semantic_valid"])
+
 
 def _adapter(
     key: str,
@@ -105,6 +127,7 @@ def _adapter(
         "visual_top_k": "top_k",
         "visual_confusion_sets": "confusion_sets",
         "evidence_grounded_diagnosis": "evidence_grounded_diagnosis",
+        "visual_grounding_no_image": "visual_grounding_no_image",
     }[key]
     prompt = _yaml(
         f"data/benchmarks/ISEPDermaBench/artifacts/prompts/{prompt_name}.yaml"

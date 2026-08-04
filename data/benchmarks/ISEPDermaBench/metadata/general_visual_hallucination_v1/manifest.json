@@ -1,0 +1,23 @@
+{
+  "case_count": 100,
+  "condition_distribution": {
+    "false_premises": 50,
+    "insufficient_context": 20,
+    "visual_challenge": 30
+  },
+  "free_text_answer_correctness": "not_scored_without_semantic_judge",
+  "id": "general_visual_hallucination_audit_v1",
+  "image_type_distribution": {
+    "generated": 64,
+    "real": 36
+  },
+  "primary_scope": "answerability_and_premise_grounding",
+  "schema_version": 1,
+  "selected_cases_file": "selected_cases.json",
+  "selected_cases_sha256": "3cfb92c6ae4ed23bf1a69830c6bfe91ebddd03166a1d75f849c8b57526110dac",
+  "selection_policy": "stratified_unique_image_sha256_v1",
+  "selection_seed": 42,
+  "source": "google/haloquest eval",
+  "source_csv_sha256": "6c88c8d6eb6d0a98881ec3e50ae52b5919247b53a47b7c723819603621b838b4",
+  "unique_image_count": 100
+}

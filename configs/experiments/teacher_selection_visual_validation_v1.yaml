@@ -27,6 +27,8 @@ models:
     enabled: true
   - config: configs/models/qwen_3_7_flash_openrouter.yaml
     enabled: true
+  - config: configs/models/qwen_3_8_max_openrouter.yaml
+    enabled: true
   - config: configs/models/minimax_m3_openrouter.yaml
     enabled: true
   - config: configs/models/mimo_v2_5_openrouter.yaml
@@ -57,6 +59,7 @@ teacher_selection:
   candidate_model_ids:
     - qwen_3_6_27b
     - qwen_3_7_flash_openrouter
+    - qwen_3_8_max_openrouter
     - minimax_m3_openrouter
     - mimo_v2_5_openrouter
   primary_metrics:

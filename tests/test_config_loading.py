@@ -26,7 +26,7 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
     def test_all_benchmarks_have_defaults_budgets_and_prompt_only(self) -> None:
         configs = list_isep_dermabench_configs(root=ROOT)
 
-        self.assertEqual(len(configs), 4)
+        self.assertEqual(len(configs), 7)
         by_id = {item.benchmark.id: item for item in configs}
         self.assertEqual(
             by_id[
@@ -47,6 +47,12 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
             "internal_benchmark",
         )
         self.assertEqual(
+            by_id[
+                "visual_grounding_no_image"
+            ].dataset.default_evaluation_set,
+            "validation",
+        )
+        self.assertEqual(
             by_id["visual_top_k_closed_set"].max_output_tokens,
             8192,
         )
@@ -62,13 +68,34 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
         )
         for config in configs:
             self.assertEqual(config.structured_output.mode, "prompt_only")
+            expected_profile = (
+                "no_image_gray_same_dimensions_v1"
+                if config.benchmark.id == "visual_grounding_no_image"
+                else (
+                    "haloquest_rgb_jpeg_v1"
+                    if config.benchmark.id
+                    == "general_visual_hallucination_audit"
+                    else (
+                        "dermatology_counterfactual_v1"
+                        if config.benchmark.id
+                        == "dermatology_counterfactual_hallucination"
+                        else "dermatology_api_safe_rgb_jpeg_v1"
+                    )
+                )
+            )
             self.assertEqual(
                 config.image_preprocessing.profile,
-                "dermatology_api_safe_rgb_jpeg_v1",
+                expected_profile,
+            )
+            expected_bytes = (
+                1_000_000
+                if config.benchmark.id
+                == "general_visual_hallucination_audit"
+                else 45_000
             )
             self.assertEqual(
                 config.image_preprocessing.max_encoded_bytes,
-                45_000,
+                expected_bytes,
             )
             self.assertTrue(config.dataset.default.manifest.is_dir())
             self.assertEqual(

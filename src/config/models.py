@@ -136,6 +136,15 @@ class SecurityConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class OpenRouterProviderConfig:
+    """Pinned OpenRouter upstream-provider routing."""
+
+    only: tuple[str, ...]
+    allow_fallbacks: bool
+    require_parameters: bool
+
+
+@dataclass(frozen=True, slots=True)
 class BackendProfileConfig:
     """One executable local or API backend profile."""
 
@@ -151,6 +160,7 @@ class BackendProfileConfig:
     gpu_memory_utilization: float | None = None
     limit_images_per_prompt: int | None = None
     request_timeout_seconds: float | None = None
+    supports_seed: bool = True
     managed: bool | None = None
     managed_allowed: bool | None = None
     endpoint_env: str | None = None
@@ -160,6 +170,7 @@ class BackendProfileConfig:
     model_env: str | None = None
     request_model: str | None = None
     api_version_env: str | None = None
+    provider: OpenRouterProviderConfig | None = None
 
     @property
     def limit_mm_per_prompt_image(self) -> int | None:
@@ -327,6 +338,7 @@ _PROFILE_KEYS = {
     "gpu_memory_utilization",
     "limit_images_per_prompt",
     "request_timeout_seconds",
+    "supports_seed",
     "managed",
     "managed_allowed",
     "endpoint_env",
@@ -336,6 +348,7 @@ _PROFILE_KEYS = {
     "model_env",
     "request_model",
     "api_version_env",
+    "provider",
 }
 _REASONING_KEYS = {
     "enabled",
@@ -775,6 +788,11 @@ def _parse_backend_profile(
         value.get("request_timeout_seconds"),
         f"{section}.request_timeout_seconds",
     )
+    supports_seed = value.get("supports_seed", True)
+    if not isinstance(supports_seed, bool):
+        raise ModelConfigError(
+            f"{section}.supports_seed must be a boolean"
+        )
     managed = _optional_boolean(
         value.get("managed"), f"{section}.managed"
     )
@@ -798,6 +816,11 @@ def _parse_backend_profile(
         managed_allowed = (
             False if managed_allowed is None else managed_allowed
         )
+    provider = _parse_openrouter_provider(
+        value.get("provider"),
+        section=section,
+        engine=engine,
+    )
     return BackendProfileConfig(
         name=name,
         type=backend_type,
@@ -813,6 +836,7 @@ def _parse_backend_profile(
         gpu_memory_utilization=gpu_memory_utilization,
         limit_images_per_prompt=limit_images_per_prompt,
         request_timeout_seconds=request_timeout_seconds,
+        supports_seed=supports_seed,
         managed=managed,
         managed_allowed=managed_allowed,
         endpoint_env=_optional_text(
@@ -837,6 +861,52 @@ def _parse_backend_profile(
             value.get("api_version_env"),
             f"{section}.api_version_env",
         ),
+        provider=provider,
+    )
+
+
+def _parse_openrouter_provider(
+    raw_value: Any,
+    *,
+    section: str,
+    engine: str,
+) -> OpenRouterProviderConfig | None:
+    if raw_value is None:
+        return None
+    if engine != "openrouter":
+        raise ModelConfigError(
+            f"{section}.provider is only valid for OpenRouter profiles"
+        )
+    provider_section = f"{section}.provider"
+    value = _mapping(raw_value, provider_section)
+    _reject_unknown(
+        value,
+        {"only", "allow_fallbacks", "require_parameters"},
+        provider_section,
+    )
+    raw_only = value.get("only")
+    if not isinstance(raw_only, list) or not raw_only:
+        raise ModelConfigError(
+            f"{provider_section}.only must be a non-empty list"
+        )
+    only = tuple(
+        _text(item, f"{provider_section}.only[{index}]")
+        for index, item in enumerate(raw_only)
+    )
+    allow_fallbacks = value.get("allow_fallbacks", True)
+    require_parameters = value.get("require_parameters", False)
+    if not isinstance(allow_fallbacks, bool):
+        raise ModelConfigError(
+            f"{provider_section}.allow_fallbacks must be a boolean"
+        )
+    if not isinstance(require_parameters, bool):
+        raise ModelConfigError(
+            f"{provider_section}.require_parameters must be a boolean"
+        )
+    return OpenRouterProviderConfig(
+        only=only,
+        allow_fallbacks=allow_fallbacks,
+        require_parameters=require_parameters,
     )
 
 

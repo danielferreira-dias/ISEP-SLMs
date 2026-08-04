@@ -1,0 +1,65 @@
+benchmark:
+  id: visual_grounding_no_image
+  version: 1.0.0
+  task: visual_grounding_no_image_ablation
+  status: validation_ablation
+  description: >
+    Measures whether a multimodal model remains grounded when a dermatology
+    case image is replaced with a uniform gray control of identical pixel
+    dimensions. The correct behaviour is explicit abstention without visual
+    findings or a diagnosis.
+
+prompt:
+  path: artifacts/prompts/visual_grounding_no_image.yaml
+
+schema:
+  path: artifacts/schemas/visual_grounding_no_image.schema.json
+
+taxonomy:
+  path: artifacts/taxonomies/diseases.yaml
+
+dataset:
+  default_evaluation_set: validation
+  evaluation_sets:
+    validation:
+      role: development_reasoning_ablation
+      expected_tasks: 50
+  source_task: visual_top_k/validation
+  source_cohort: metadata/validation_screening_v1/visual_top_k_100_cases.task_ids.txt
+  selection_seed: 42
+  selection_policy: two_per_class_then_balanced_fill_group_unique_v1
+  image_control: uniform_gray_same_dimensions_v1
+
+metrics:
+  primary: correct_abstention_rate
+  secondary:
+    - hallucinated_visual_finding_rate
+    - hallucinated_diagnosis_rate
+    - unsupported_clinical_assertion_rate
+    - overconfidence_rate
+    - json_validity_rate
+    - schema_compliance_rate
+    - reasoning_token_reporting_rate
+    - mean_reasoning_tokens_reported
+
+execution:
+  max_output_tokens: 8192
+  batch_size: 8
+  resume: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  fail_fast_on_invalid_output: false
+
+image_preprocessing:
+  profile: no_image_gray_same_dimensions_v1
+  max_edge_pixels: 768
+  max_encoded_bytes: 45000
+  jpeg_quality: 95
+  minimum_jpeg_quality: 95
+  minimum_edge_pixels: 1
+
+structured_output:
+  mode: prompt_only
+
+output:
+  directory: outputs/benchmark_runs

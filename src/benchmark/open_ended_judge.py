@@ -701,7 +701,11 @@ async def judge_run(
             create_backend(
                 fallback_model,
                 reasoning_capture="none",
-                use_json_schema=True,
+                # The official Qwen 3.7 OpenRouter route does not advertise
+                # provider-native JSON Schema decoding. The frozen local
+                # parser and schema validator still enforce the exact same
+                # judgment contract after prompt-only generation.
+                use_json_schema=False,
             )
             if fallback_model
             else None
@@ -743,6 +747,25 @@ async def judge_run(
                 schema=schema,
                 semaphore=semaphore,
             )
+            if fallback_result.get("status") == "judge_error":
+                # The primary judgment remains unavailable because of its
+                # content-policy refusal. A transport failure in the optional
+                # coverage fallback must therefore remain a disclosed safety
+                # coverage failure, rather than an endlessly resumable
+                # generic judge error.
+                return task_id, {
+                    **primary_result,
+                    "status": "judge_safety_refusal",
+                    "attempts": int(primary_result.get("attempts", 0))
+                    + int(fallback_result.get("attempts", 0)),
+                    "primary_attempts": primary_result.get("attempts", 0),
+                    "fallback_attempts": fallback_result.get("attempts", 0),
+                    "primary_judge": judge_model_id,
+                    "judge_used": None,
+                    "fallback_used": True,
+                    "fallback_reason": "content_policy_violation",
+                    "fallback_judge_error": fallback_result.get("error"),
+                }
             return task_id, {
                 **fallback_result,
                 "attempts": int(primary_result.get("attempts", 0))

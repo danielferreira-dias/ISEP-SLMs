@@ -43,6 +43,13 @@ backend:
       request_model: xiaomi/mimo-v2.5
       thinking_control: openrouter_reasoning
       request_timeout_seconds: 1200
+      # The official Xiaomi endpoint does not advertise the seed parameter.
+      supports_seed: false
+      provider:
+        only:
+          - xiaomi
+        allow_fallbacks: false
+        require_parameters: true
 
 reasoning:
   enabled: false

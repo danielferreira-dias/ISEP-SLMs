@@ -119,8 +119,12 @@ class AzureBackend(InferenceBackend):
                         profile,
                         "thinking_control",
                     ),
+                    provider_routing=_attr(profile, "provider"),
                     image_first=engine != "openrouter",
                     include_extended_sampling=engine != "openrouter",
+                    include_seed=bool(
+                        _attr(profile, "supports_seed", default=True)
+                    ),
                     timeout_seconds=(
                         _attr(profile, "request_timeout_seconds") or 300.0
                     ),

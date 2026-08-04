@@ -41,6 +41,11 @@ backend:
       request_model: qwen/qwen3.7-flash
       thinking_control: openrouter_reasoning
       request_timeout_seconds: 600
+      provider:
+        only:
+          - alibaba
+        allow_fallbacks: false
+        require_parameters: true
 
 reasoning:
   enabled: false

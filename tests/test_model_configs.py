@@ -77,8 +77,8 @@ class TypedModelConfigTests(unittest.TestCase):
     def test_all_models_load_into_frozen_typed_configs(self) -> None:
         configs = list_model_configs(root=ROOT)
 
-        self.assertEqual(len(configs), 6)
-        self.assertEqual(len({item.model.id for item in configs}), 6)
+        self.assertEqual(len(configs), 7)
+        self.assertEqual(len({item.model.id for item in configs}), 7)
         local = [
             item
             for item in configs
@@ -90,12 +90,12 @@ class TypedModelConfigTests(unittest.TestCase):
             if isinstance(item, AzureModelConfig)
         ]
         self.assertEqual(len(local), 2)
-        self.assertEqual(len(api), 4)
+        self.assertEqual(len(api), 5)
         for config in local:
             profile = config.backend.active_profile
             self.assertEqual(profile.engine, "vllm")
         self.assertTrue(profile.managed)
-        self.assertEqual(profile.max_model_len, 16384)
+        self.assertEqual(profile.max_model_len, 32768)
         self.assertEqual(profile.limit_images_per_prompt, 1)
 
     def test_official_student_supports_vllm_json_schema_mode(self) -> None:
@@ -143,6 +143,44 @@ class TypedModelConfigTests(unittest.TestCase):
         self.assertIsNone(judge.generation.temperature)
         self.assertEqual(judge.generation.top_p, 0.95)
         self.assertEqual(judge.generation.presence_penalty, 0.0)
+        self.assertEqual(
+            judge.backend.active_profile.provider.only,
+            ("alibaba",),
+        )
+        self.assertFalse(
+            judge.backend.active_profile.provider.allow_fallbacks
+        )
+        self.assertTrue(
+            judge.backend.active_profile.provider.require_parameters
+        )
+
+        max_model = load_model_config(
+            "qwen_3_8_max_openrouter",
+            root=ROOT,
+        )
+        self.assertEqual(
+            max_model.backend.active_profile.request_model,
+            "qwen/qwen3.8-max",
+        )
+        self.assertEqual(
+            max_model.backend.active_profile.provider.only,
+            ("alibaba",),
+        )
+        self.assertFalse(
+            max_model.backend.active_profile.provider.allow_fallbacks
+        )
+        self.assertTrue(
+            max_model.backend.active_profile.provider.require_parameters
+        )
+        self.assertIn("image", max_model.capabilities.modalities)
+        self.assertIn(
+            "json_schema",
+            max_model.capabilities.structured_output_modes,
+        )
+        self.assertTrue(max_model.reasoning.enabled)
+        self.assertEqual(max_model.generation.thinking_mode, "enabled")
+        self.assertEqual(max_model.generation.reasoning_effort, "high")
+        self.assertIsNone(max_model.generation.reasoning_max_tokens)
 
     def test_new_openrouter_reasoning_candidates_match_capabilities(self) -> None:
         minimax = load_model_config(
@@ -158,6 +196,14 @@ class TypedModelConfigTests(unittest.TestCase):
         self.assertEqual(minimax.generation.temperature, 1.0)
         self.assertEqual(minimax.generation.top_p, 0.95)
         self.assertEqual(minimax.generation.reasoning_max_tokens, 10_240)
+        self.assertEqual(
+            minimax.backend.active_profile.provider.only,
+            ("minimax",),
+        )
+        self.assertFalse(
+            minimax.backend.active_profile.provider.allow_fallbacks
+        )
+        self.assertFalse(minimax.backend.active_profile.supports_seed)
 
         mimo = load_model_config("mimo_v2_5_openrouter", root=ROOT)
         self.assertTrue(mimo.usage.benchmark)
@@ -173,6 +219,14 @@ class TypedModelConfigTests(unittest.TestCase):
         self.assertEqual(mimo.generation.temperature, 1.0)
         self.assertEqual(mimo.generation.top_p, 0.95)
         self.assertEqual(mimo.generation.reasoning_max_tokens, 10_240)
+        self.assertEqual(
+            mimo.backend.active_profile.provider.only,
+            ("xiaomi",),
+        )
+        self.assertFalse(
+            mimo.backend.active_profile.provider.allow_fallbacks
+        )
+        self.assertFalse(mimo.backend.active_profile.supports_seed)
 
     def test_model_can_be_loaded_by_repo_relative_path(self) -> None:
         config = load_model_config(

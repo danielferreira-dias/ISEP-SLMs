@@ -73,6 +73,30 @@ configs:
     path: references/open_ended_diagnosis/validation-*.parquet
   - split: internal_benchmark
     path: references/open_ended_diagnosis/internal_benchmark-*.parquet
+- config_name: visual_grounding_no_image
+  data_files:
+  - split: validation
+    path: tasks/visual_grounding_no_image/validation-*.parquet
+- config_name: visual_grounding_no_image_references
+  data_files:
+  - split: validation
+    path: references/visual_grounding_no_image/validation-*.parquet
+- config_name: general_visual_hallucination_audit
+  data_files:
+  - split: validation
+    path: tasks/general_visual_hallucination_audit/validation-*.parquet
+- config_name: general_visual_hallucination_audit_references
+  data_files:
+  - split: validation
+    path: references/general_visual_hallucination_audit/validation-*.parquet
+- config_name: dermatology_counterfactual_hallucination
+  data_files:
+  - split: validation
+    path: tasks/dermatology_counterfactual_hallucination/validation-*.parquet
+- config_name: dermatology_counterfactual_hallucination_references
+  data_files:
+  - split: validation
+    path: references/dermatology_counterfactual_hallucination/validation-*.parquet
 ---
 
 # ISEPDermaBench
@@ -117,6 +141,9 @@ from a `_references` configuration in a model request.
 | evidence_grounded_diagnosis | external_ddi | 636 | 636 | 632 |
 | open_ended_diagnosis | validation | 100 | 100 | 100 |
 | open_ended_diagnosis | internal_benchmark | 300 | 300 | 300 |
+| visual_grounding_no_image | validation | 50 | 50 | 50 |
+| general_visual_hallucination_audit | validation | 300 | 295 | 295 |
+| dermatology_counterfactual_hallucination | validation | 200 | 200 | 200 |
 
 ### `visual_top_k`
 
@@ -145,9 +172,71 @@ description, or JSON schema. A separate stage uses GPT-5.6 Luna as the primary
 judge and may use Qwen 3.7 Flash only when Luna returns a content-policy
 violation. Each response still receives one final judgment; there is no voting.
 
+### `visual_grounding_no_image`
+
+Validation-only visual-grounding ablation derived from 50 group-unique cases
+in the fixed 100-case Visual Top-K screening cohort. Each real image is
+replaced by a uniform mid-gray JPEG with the same width and height. The correct
+response is explicit `not_evaluable` abstention with no visual findings, no
+diagnosis, and low confidence.
+
+The original disease remains isolated in the reference view only to measure
+accidental text-prior matches. Matching it is not clinical success and this
+control must not be reported as diagnostic accuracy. The cohort covers all 21
+diseases with at least two unique groups per class and is intended for paired
+normal-image/no-image and thinking-off/thinking-on development comparisons.
+
+### `general_visual_hallucination_audit`
+
+A fixed 300-case subset of the official HaloQuest Evaluation
+split. It retains the original 100-case audit unchanged and adds 200 cases.
+The final condition distribution is exactly 100 false-premise questions, 100
+insufficient-context questions, and 100 answerable visual challenges. The
+selection maximizes source-image uniqueness, but permits a small number of
+different questions to share an image because exact balance, the frozen parent
+cohort, live upstream URLs, and 300 unique source images are not jointly
+feasible. The primary deterministic metric is the
+model's three-way question-status decision. False-premise rejection,
+insufficient-context recognition, unanswerable hallucination, overconfidence,
+and output validity are also reported.
+
+The original HaloQuest answers are isolated in the reference configuration.
+Free-text answer correctness for the 30 visual challenges is intentionally not
+scored by lexical similarity because that would be brittle; it requires a
+separately frozen semantic judge if it is later added. This task is a general
+visual-grounding audit and must not be reported as dermatology accuracy.
+
+### `dermatology_counterfactual_hallucination`
+
+A fixed 200-case dermatology grounding audit derived only from Visual Top-K
+Validation. It retains the original 50 cases unchanged and adds 150 new,
+group-unique cases. It contains 50 deterministic RGB pixel shuffles, where
+correct behavior is explicit low-confidence abstention, and 150 unique
+hard-negative image swaps, where the diagnosis must follow the replacement
+image rather than the hidden disease associated with the source task.
+
+Metrics separate corrupted-image hallucination from hard-negative diagnostic
+accuracy and include the rate at which a model incorrectly persists with the
+source label. The source and counterfactual diagnoses are present only in the
+reference view. This is a development robustness audit, not the sealed
+clinical benchmark.
+
 ## Open-ended prompt protocol
 
 Release 1.5.0 freezes model prompt 1.1.0 after a paired 50-case A/B test against the more prescriptive prompt 1.2.1. The selected prompt retains natural clinical prose, explicit Top-3 ordering, visible-evidence grounding, and no prose example. Judge prompt 1.2.0 and its four-verdict rubric remain unchanged.
+
+Release 1.6.0 leaves that protocol unchanged and adds only the Validation-only
+50-case no-image visual-grounding ablation.
+
+Release 1.7.0 adds the two small hallucination audits described above without
+changing any existing task, prompt, split, or reference.
+
+Release 1.8.0 expands the general audit from 100 to 300 cases and the
+dermatology counterfactual audit from 50 to 200 cases. The v1 cohorts are
+strict subsets of the expanded cohorts, allowing prior outputs to be reused.
+The expanded HaloQuest cohort contains 174 generated and 126 real cases. Five
+official Flickr URLs returned HTTP 404/410, so deterministic replacements were
+used; the resulting 300 tasks contain 295 unique source images.
 
 ## Input schema
 
@@ -212,4 +301,5 @@ python -m src.data_pipeline.open_ended_benchmark \
 python -m src.data_pipeline.open_ended_benchmark \
   --output data/benchmarks/ISEPDermaBench-v1.1.0 \
   --validate-only
+python -m src.data_pipeline.visual_grounding_no_image --validate-only
 ```

@@ -37,6 +37,11 @@ Each annotation should identify:
 3. [Validation teacher screening: thinking-off results and full disclosure](benchmarks/03_validation_teacher_screening_thinking_off.md)
 4. [Reasoning screening summary](benchmarks/04_reasoning_screening_summary.md)
 5. [Teacher/student selection and final benchmark process](benchmarks/05_teacher_student_selection_and_final_benchmark_process.md)
+6. [Visual-grounding no-image ablation](benchmarks/06_visual_grounding_no_image_ablation.md)
+7. [Small visual hallucination audits](benchmarks/07_visual_hallucination_audits.md)
+8. [Visual hallucination audit results](benchmarks/08_visual_hallucination_audit_results.md)
+9. [Expanded visual hallucination audits](benchmarks/09_expanded_visual_hallucination_audits.md)
+10. [Internal Benchmark: Qwen 3.5 4B versus Qwen 3.6 27B](benchmarks/10_internal_benchmark_qwen_3_5_vs_qwen_3_6.md)
 
 ## Notes
 
@@ -54,3 +59,5 @@ Each annotation should identify:
 12. [Open-ended model and judge prompt decision record](notes/12_open_ended_model_and_judge_prompt_decision_record.md)
 13. [Textbook-grounded dermatology reasoning](notes/13_textbook_grounded_dermatology_reasoning.md)
 14. [Synthetic dataset comparison and architecture decision](notes/14_synthetic_dataset_comparison_and_architecture_decision.md)
+15. [Reasoning, vision, and the no-image grounding ablation](notes/15_reasoning_vision_and_no_image_grounding_ablation.md)
+16. [SkinFlow and the visual-encoder strategy](notes/16_skinflow_architecture_and_visual_encoder_strategy.md)

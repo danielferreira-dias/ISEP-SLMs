@@ -1,0 +1,19 @@
+{
+  "case_count": 200,
+  "case_provenance_file": "case_provenance.json",
+  "case_provenance_sha256": "1e548d67c1d70da7e40e953f35c69df4ba8d25ce7545b165a658bd56d5cb6e19",
+  "condition_distribution": {
+    "hard_negative_image_swap": 150,
+    "pixel_shuffle": 50
+  },
+  "group_count": 200,
+  "hard_negative_policy": "unique_donor_different_disease_confusion_preferred_v1",
+  "id": "dermatology_counterfactual_hallucination_v2",
+  "parent_case_count": 50,
+  "parent_selection": "dermatology_counterfactual_hallucination_v1",
+  "pixel_shuffle_policy": "deterministic_rgb_pixel_permutation_v1",
+  "schema_version": 2,
+  "selection_policy": "nested_group_unique_200_from_visual_top_k_validation_v2",
+  "source_case_count": 200,
+  "source_class_count": 21
+}

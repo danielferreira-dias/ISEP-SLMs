@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dermatology_counterfactual_hallucination.schema.json",
+  "title": "Dermatology counterfactual grounding response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "image_status",
+    "visual_findings",
+    "predictions",
+    "confidence"
+  ],
+  "properties": {
+    "image_status": {
+      "type": "string",
+      "enum": ["not_evaluable", "evaluable"]
+    },
+    "visual_findings": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "predictions": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rank", "disease_id"],
+        "properties": {
+          "rank": {"type": "integer", "minimum": 1, "maximum": 3},
+          "disease_id": {
+            "type": "string",
+            "enum": [
+              "D001", "D002", "D003", "D004", "D005", "D006", "D007",
+              "D009", "D011", "D012", "D013", "D014", "D015", "D016",
+              "D017", "D018", "D019", "D022", "D023", "D024", "D025"
+            ]
+          }
+        }
+      }
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "moderate", "high"]
+    }
+  }
+}

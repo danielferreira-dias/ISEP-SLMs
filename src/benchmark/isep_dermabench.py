@@ -109,6 +109,27 @@ SPECS = (
         default_split="internal_benchmark",
         splits=("validation", "internal_benchmark"),
     ),
+    ISEPDermaBenchSpec(
+        key="visual_grounding_no_image",
+        benchmark_id="visual_grounding_no_image",
+        aliases=("visual_grounding_no_image.yaml",),
+        default_split="validation",
+        splits=("validation",),
+    ),
+    ISEPDermaBenchSpec(
+        key="general_visual_hallucination_audit",
+        benchmark_id="general_visual_hallucination_audit",
+        aliases=("general_visual_hallucination_audit.yaml",),
+        default_split="validation",
+        splits=("validation",),
+    ),
+    ISEPDermaBenchSpec(
+        key="dermatology_counterfactual_hallucination",
+        benchmark_id="dermatology_counterfactual_hallucination",
+        aliases=("dermatology_counterfactual_hallucination.yaml",),
+        default_split="validation",
+        splits=("validation",),
+    ),
 )
 
 
@@ -251,7 +272,7 @@ def load_isep_dermabench_config(
 
 
 def list_isep_dermabench_configs(*, root: Path) -> tuple[BenchmarkConfig, ...]:
-    """Return the four frozen benchmark protocol configs."""
+    """Return all frozen benchmark protocol configs."""
 
     return tuple(
         load_isep_dermabench_config(spec.benchmark_id, root=root)
@@ -382,7 +403,14 @@ class FrozenISEPDermaBenchAdapter:
         if sample.response_schema is None and output_mode != "free_text":
             raise ValueError("ISEPDermaBench sample has no response schema")
         candidate_ids = tuple(sample.candidate_disease_ids or ())
-        if not candidate_ids and output_mode != "free_text":
+        requires_candidates = (
+            self.delegate.benchmark_id != "general_visual_hallucination_audit"
+        )
+        if (
+            not candidate_ids
+            and output_mode != "free_text"
+            and requires_candidates
+        ):
             raise ValueError("ISEPDermaBench sample has no candidate diseases")
         benchmark_id = str(
             sample.metadata.get("benchmark_id", "")
@@ -590,6 +618,13 @@ def _prompt_filename(key: str) -> str:
         "visual_confusion_sets": "confusion_sets.yaml",
         "evidence_grounded_diagnosis": "evidence_grounded_diagnosis.yaml",
         "open_ended_diagnosis": "open_ended_diagnosis.yaml",
+        "visual_grounding_no_image": "visual_grounding_no_image.yaml",
+        "general_visual_hallucination_audit": (
+            "general_visual_hallucination_audit.yaml"
+        ),
+        "dermatology_counterfactual_hallucination": (
+            "dermatology_counterfactual_hallucination.yaml"
+        ),
     }[key]
 
 

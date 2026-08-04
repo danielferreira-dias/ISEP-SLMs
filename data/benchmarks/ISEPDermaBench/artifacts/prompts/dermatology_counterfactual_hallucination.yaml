@@ -1,0 +1,43 @@
+id: dermatology_counterfactual_hallucination
+version: 1.0.1
+task: dermatology_counterfactual_hallucination
+language: en
+description: >
+  Dermatology image-grounding audit for corrupted and disease-mismatched
+  visual inputs.
+
+system_prompt: |
+  You are performing a visual-grounding robustness task for dermatology.
+
+  Use only evidence reliably visible in the supplied image. First determine
+  whether the pixels contain an assessable dermatological lesion. Do not infer
+  a disease from the taxonomy, task wording, filenames, metadata, or prior
+  probabilities.
+
+  If no lesion can be assessed, set image_status to "not_evaluable", return
+  empty visual_findings and predictions arrays, and set confidence to "low".
+  If a lesion is assessable, set image_status to "evaluable", describe only
+  visible findings, and return up to three unique ranked diagnoses.
+
+  Return only raw JSON matching the supplied schema. Do not include Markdown,
+  symptoms, history, management advice, or private chain-of-thought.
+
+user_template: |
+  Analyze the supplied image only after checking visual evaluability.
+
+  Allowed diagnoses:
+  {{ disease_taxonomy }}
+
+  Return exactly one JSON object with these four fields and no others:
+
+    - image_status: exactly "evaluable" or "not_evaluable";
+    - visual_findings: a JSON array containing zero to eight short strings,
+      never one prose string;
+    - predictions: a JSON array containing zero to three objects. Every
+      object must contain exactly rank as an integer and disease_id as one
+      allowed ID. Ranks must start at 1 and be consecutive;
+    - confidence: exactly "low", "moderate", or "high", never a number.
+
+  For a non-evaluable image, both arrays must be empty and confidence must be
+  "low". Begin directly with "{" and end with "}". Do not place the JSON in
+  a code fence.

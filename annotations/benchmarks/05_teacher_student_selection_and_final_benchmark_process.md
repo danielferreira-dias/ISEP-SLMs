@@ -33,6 +33,7 @@ determinar grande parte da memória necessária para alojar os pesos.
 | Gemma 4 E4B | 8,00B total; 4,5B efetivos | [Model card oficial](https://huggingface.co/google/gemma-4-E4B-it); `E` significa *effective* e não MoE |
 | Gemma 4 31B | 32,68B no checkpoint; 30,7B no modelo dense | [Model card oficial](https://huggingface.co/google/gemma-4-31B-it); o checkpoint multimodal também inclui o vision encoder |
 | Qwen 3.7 Flash | Não divulgado | À data desta análise não existia um repositório oficial de pesos Qwen 3.7 Flash no Hugging Face |
+| Qwen 3.8 Max | 2,4T total; ativos não divulgados | [Anúncio oficial da Alibaba](https://www.alibabagroup.com/en-US/document-2016703577908576256); o valor foi divulgado para o Qwen 3.8 Max Preview e a versão GA sucede-lhe diretamente |
 | MiniMax M3 | 427,04B total; ~23B ativados | [Model card oficial](https://huggingface.co/MiniMaxAI/MiniMax-M3) |
 | MiMo V2.5 | 310,78B total; 15B ativados | [Model card oficial](https://huggingface.co/XiaomiMiMo/MiMo-V2.5) |
 
@@ -118,6 +119,7 @@ mais um ciclo completo ON/OFF.
 | --- | --- | --- | --- |
 | Qwen 3.6 27B (27,78B) | Melhor Top-K Top-1 do screening sem thinking e Evidence competitivo | Modelo local denso, com maior custo de hosting; thinking apresentou latência e loops extensos | **Avança como candidato local a teacher**, com thinking desligado |
 | Qwen 3.7 Flash (tamanho não divulgado) | Melhor combinação API de diagnosis, morphology e Open-ended; obteve o maior ganho com thinking | Unsupported claims elevados, semantic compliance/output exigem parsing e houve erros isolados de provider | Avança como candidato principal a teacher |
+| Qwen 3.8 Max (2,4T total; ativos não divulgados) | Flagship multimodal mais recente da Alibaba, com contexto de 1M e structured output no endpoint oficial | Não participou no screening inicial; reasoning é obrigatório e o custo é superior ao Qwen 3.7 Flash | **Novo candidato API a teacher**, sujeito à mesma Validation completa |
 | MiniMax M3 (427,04B total; ~23B ativos) | Confusion competitivo e melhoria Open-ended Top-1 com thinking | Ganhos inconsistentes, pior JSON com thinking e rationale/grounding moderados | Avança para confirmar estabilidade na Validation completa |
 | MiMo V2.5 (310,78B total; 15B ativos) | Evidence/morphology razoáveis e melhor rationale com thinking | Diagnosis ranking irregular, reasoning muito extenso, OFF não respeitado e execução lenta | Avança como candidato complementar orientado a rationale |
 
@@ -146,6 +148,9 @@ na próxima fase.
 - não será repetido outro A/B geral de thinking;
 - Qwen 3.7 avança com thinking ON, condição em que apresentou o ganho clínico
   mais consistente;
+- Qwen 3.8 Max entra posteriormente como novo candidato e usa thinking
+  obrigatório com `reasoning_effort=high`; não é possível incluí-lo numa
+  comparação ON/OFF equivalente;
 - MiniMax avança com thinking OFF solicitado, devido aos resultados mistos e à
   degradação do JSON quando ON;
 - MiMo avança inicialmente com thinking OFF solicitado para reduzir custo e
@@ -153,11 +158,11 @@ na próxima fase.
 - a configuração histórica de Luna mantém `reasoning_effort=high`, mas o
   modelo não avança para esta Validation completa;
 - Qwen 3.5 4B é congelado como **student oficial**;
-- Qwen 3.6 27B, Qwen 3.7 Flash, MiniMax M3 e MiMo V2.5 avançam como
+- Qwen 3.6 27B, Qwen 3.7 Flash, Qwen 3.8 Max, MiniMax M3 e MiMo V2.5 avançam como
   candidatos a teacher;
-- neste contexto, «todos os modelos do OpenRouter» significa os três modelos
-  cujo `backend.default_profile` é `openrouter`: Qwen 3.7 Flash, MiniMax M3 e
-  MiMo V2.5;
+- neste contexto, «todos os modelos do OpenRouter» significa os quatro modelos
+  cujo `backend.default_profile` é `openrouter`: Qwen 3.7 Flash, Qwen 3.8 Max,
+  MiniMax M3 e MiMo V2.5;
 - o teacher final só é escolhido depois da Validation completa;
 - Luna/Azure, Gemma 31B, Qwen 9B e Gemma E4B não avançam nesta passagem, mas
   os resultados de screening permanecem documentados.
@@ -175,18 +180,19 @@ desenvolvimento e seleção de modelos. Não é a benchmark interna final da tes
 | Open-ended diagnosis | 100 |
 | **Total por modelo** | **2.071 requests** |
 
-Os cinco modelos que serão executados são:
+Os seis modelos que serão executados são:
 
 | Nome no estudo | Papel nesta fase | Configuração |
 | --- | --- | --- |
 | Qwen 3.5 4B (4,66B) | Student oficial; baseline antes do treino | `configs/models/qwen_small_4b.yaml` |
 | Qwen 3.6 27B (27,78B) | Candidato local a teacher | `configs/models/qwen_3_6_27b.yaml` |
 | Qwen 3.7 Flash (tamanho não divulgado) através de OpenRouter | Candidato API a teacher | `configs/models/qwen_3_7_flash_openrouter.yaml` |
+| Qwen 3.8 Max (2,4T total; ativos não divulgados) através de OpenRouter | Candidato API a teacher; thinking obrigatório | `configs/models/qwen_3_8_max_openrouter.yaml` |
 | MiniMax M3 (427,04B total; ~23B ativos) através de OpenRouter | Candidato API a teacher | `configs/models/minimax_m3_openrouter.yaml` |
 | MiMo V2.5 (310,78B total; 15B ativos) através de OpenRouter | Candidato API a teacher | `configs/models/mimo_v2_5_openrouter.yaml` |
 
-Esta matriz compara o student oficial com um candidato local maior e três
-candidatos API do OpenRouter. Representa **cinco modelos e 10.355 requests**
+Esta matriz compara o student oficial com um candidato local maior e quatro
+candidatos API do OpenRouter. Representa **seis modelos e 12.426 requests**
 para a Validation completa. O student não concorre ao papel de teacher: a sua
 execução serve para fixar o baseline pré-treino nos mesmos casos.
 
@@ -257,8 +263,9 @@ comparação principal da tese será:
 2. student fine-tuned;
 3. teacher selecionado.
 
-Também é aceitável executar Luna, Qwen 3.7 Flash, MiniMax M3 e MiMo V2.5 uma
-única vez na benchmark interna, depois de todas as decisões estarem congeladas.
+Também é aceitável executar Luna, Qwen 3.7 Flash, Qwen 3.8 Max, MiniMax M3 e
+MiMo V2.5 uma única vez na benchmark interna, depois de todas as decisões
+estarem congeladas.
 Esses resultados funcionam como baselines adicionais e permitem contextualizar
 o student. Não podem ser usados retroativamente para mudar o teacher, o
 student, os prompts ou o treino.
@@ -273,7 +280,7 @@ Screening fixo de 100 casos
         ↓
 Congelar uma configuração por modelo
         ↓
-Validation completa: Qwen 4B base + quatro teachers candidatos
+Validation completa: Qwen 4B base + cinco teachers candidatos
         ↓
 Escolher e congelar o teacher
         ↓
@@ -288,6 +295,6 @@ Internal Benchmark completo, uma única vez
 Comparar student base vs fine-tuned vs teacher e baselines
 ```
 
-Esta sequência mantém fixa a arquitetura do student, usa quatro modelos fortes
+Esta sequência mantém fixa a arquitetura do student, usa cinco modelos fortes
 na seleção do teacher e preserva a benchmark interna como avaliação honesta da
 hipótese da tese.

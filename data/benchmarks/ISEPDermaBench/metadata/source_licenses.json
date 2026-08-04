@@ -16,6 +16,10 @@
     },
     "skindisnet": {
       "license_id": "SKINDISNET_RESEARCH_USE"
+    },
+    "haloquest": {
+      "license_id": "APACHE_2_0",
+      "notes": "HaloQuest metadata is released under Apache-2.0. Images originate from Open Images and Midjourney; preserve the upstream URL and comply with the applicable upstream image terms."
     }
   }
 }

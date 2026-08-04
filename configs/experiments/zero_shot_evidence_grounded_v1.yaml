@@ -4,17 +4,18 @@ schema_version: 1
 
 experiment:
   id: zero_shot_evidence_grounded_v1
-  version: 1.1.0
-  type: zero_shot_evaluation
+  version: 2.0.0
+  type: sealed_final_evaluation
   status: ready_for_execution
   description: >
-    Compares candidate vision-language models on controlled morphology,
-    observation-only clinical description, ranked diagnosis, evidence
-    grounding, confidence calibration, and structured-output reliability.
+    One-time internal comparison of candidate vision-language models on
+    controlled morphology, observation-only clinical description, ranked
+    diagnosis, evidence grounding, confidence calibration, and
+    structured-output reliability.
 
 benchmark:
   config: evidence_grounded_diagnosis
-  evaluation_set: external_ddi
+  evaluation_set: internal_benchmark
   source: auto
   repository: danielfdias98/ISEPDermaBench
 
@@ -25,32 +26,36 @@ models:
     enabled: true
   - config: configs/models/qwen_3_7_flash_openrouter.yaml
     enabled: true
+  - config: configs/models/qwen_3_8_max_openrouter.yaml
+    enabled: true
   - config: configs/models/minimax_m3_openrouter.yaml
     enabled: true
   - config: configs/models/mimo_v2_5_openrouter.yaml
     enabled: true
 
 selection_policy:
-  evaluation_role: external_final_evaluation
+  evaluation_role: internal_final_evaluation
   teacher_selection_allowed: false
   prompt_selection_allowed: false
   checkpoint_selection_allowed: false
   threshold_selection_allowed: false
+  parser_selection_allowed: false
+  generation_setting_selection_allowed: false
   reason: >
-    DDI is a held-out external evaluation dataset. Using its results to select
-    a teacher, prompt, checkpoint, or threshold would leak external-test
-    information into model development.
+    internal_benchmark is a sealed final evaluation set. Its results must not
+    be used to select a teacher, prompt, checkpoint, generation setting, or
+    threshold if the study continues to describe it as held-out evaluation.
 
 cohorts:
   morphology:
     scoring_flag: score_morphology
-    expected_samples: 636
+    expected_samples: 134
   description:
     scoring_flag: score_description
-    expected_samples: 635
+    expected_samples: 119
   diagnosis:
     scoring_flag: score_diagnosis
-    expected_samples: 294
+    expected_samples: 134
 
 repetitions:
   count: 1

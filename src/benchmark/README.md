@@ -1,6 +1,6 @@
 # Multimodal benchmark pipeline
 
-This package runs the project's four frozen ISEPDermaBench protocols through
+This package runs the project's seven frozen ISEPDermaBench protocols through
 one reproducible command-line pipeline. Model YAML files are loaded into
 validated dataclasses. Benchmark images, rendered prompts, and response
 schemas come directly from the task Parquets; gold references are loaded from
@@ -18,8 +18,11 @@ or patient-care decisions.
 | `visual_disease_confusion_sets` | Rank three candidates under paired low/high-confusability conditions | `internal_benchmark` | 8,192 |
 | `evidence_grounded_diagnosis` | Findings, observation-only description, six diagnoses, confidence, and evidence links | `internal_benchmark` | 8,192 |
 | `open_ended_diagnosis` | Natural clinical prose with visible findings and an explicitly ranked Top-3 | `internal_benchmark` | 8,192 |
+| `visual_grounding_no_image` | Abstain when the image contains no assessable dermatological evidence | `validation` | 8,192 |
+| `general_visual_hallucination_audit` | Detect answerability, false premises, and missing visual evidence in 300 fixed HaloQuest cases | `validation` | 8,192 |
+| `dermatology_counterfactual_hallucination` | Resist pixel corruption and follow the replacement image in 200 dermatology counterfactual cases | `validation` | 8,192 |
 
-The three structured protocols use `prompt_only` structured output. A provider is not
+The four structured protocols use `prompt_only` structured output. A provider is not
 given constrained JSON decoding when another model cannot receive the same
 constraint. This keeps the comparison focused on the models rather than on a
 provider-specific output feature.
@@ -205,6 +208,7 @@ machine.
 | `qwen_3_6_27b` | vLLM | Yes | Qwen reasoning parser; requires substantially more GPU memory |
 | `gpt_5_6_luna` | Azure Responses | No | Official reasoning summary only |
 | `qwen_3_7_flash_openrouter` | OpenRouter | No | Multimodal; Qwen reasoning sampling and a 10,240-token reasoning budget |
+| `qwen_3_8_max_openrouter` | OpenRouter | No | Multimodal; official Alibaba route with mandatory reasoning fixed at `high` |
 | `minimax_m3_openrouter` | OpenRouter | No | Multimodal; official temperature 1.0/top-p 0.95 recipe |
 | `mimo_v2_5_openrouter` | OpenRouter | No | Omnimodal; image-capable with official temperature 1.0/top-p 0.95 recipe |
 
@@ -294,7 +298,62 @@ uv run python -m src.benchmark.cli run \
   --evaluation-set validation \
   --limit 10 \
   --dry-run
+
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_5_4b \
+  --benchmark visual_grounding_no_image \
+  --evaluation-set validation \
+  --dry-run
+
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_7_flash_openrouter \
+  --benchmark general_visual_hallucination_audit \
+  --evaluation-set validation \
+  --dry-run
+
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_7_flash_openrouter \
+  --benchmark dermatology_counterfactual_hallucination \
+  --evaluation-set validation \
+  --dry-run
 ```
+
+## No-image visual-grounding reasoning ablation
+
+`visual_grounding_no_image` contains exactly 50 Validation controls. They are
+drawn from the fixed Visual Top-K 100-case screening cohort using unique
+leakage groups and all 21 diseases, but their images have been replaced by
+uniform gray images of the original dimensions. A grounded response must
+abstain rather than infer findings or a diagnosis from the taxonomy or prior
+probabilities.
+
+Run the exact same 50 task IDs with thinking disabled and enabled. The runner
+stores final output, any provider-reported reasoning, token usage, and the
+following principal metrics: correct abstention, hallucinated findings,
+hallucinated diagnosis, unsupported clinical assertions, overconfidence,
+JSON validity, schema compliance, and reasoning availability. The hidden
+source diagnosis is used only for a shortcut-match audit and is never scored
+as the correct answer to a gray image.
+
+```bash
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_7_flash_openrouter \
+  --benchmark visual_grounding_no_image \
+  --evaluation-set validation \
+  --thinking-mode disabled \
+  --output-root outputs/visual_grounding_no_image/thinking_off
+
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_7_flash_openrouter \
+  --benchmark visual_grounding_no_image \
+  --evaluation-set validation \
+  --thinking-mode enabled \
+  --max-output-tokens 14336 \
+  --output-root outputs/visual_grounding_no_image/thinking_on
+```
+
+This is a development robustness test, not an Internal Benchmark or a measure
+of dermatological diagnostic accuracy.
 
 ## Open-ended diagnosis and single-judge scoring
 
@@ -473,10 +532,10 @@ project contract.
 
 ### OpenRouter profiles
 
-The API-native Qwen 3.7 Flash, MiniMax M3, and MiMo V2.5 configurations use
-OpenRouter directly. `gpt_5_6_luna` also defines an optional `openrouter`
-profile. Every OpenRouter profile uses the OpenAI-compatible Chat Completions
-endpoint and requires:
+The API-native Qwen 3.7 Flash, Qwen 3.8 Max, MiniMax M3, and MiMo V2.5
+configurations use OpenRouter directly. `gpt_5_6_luna` also defines an
+optional `openrouter` profile. Every OpenRouter profile uses the
+OpenAI-compatible Chat Completions endpoint and requires:
 
 ```text
 OPENROUTER_API_KEY
@@ -487,6 +546,7 @@ defaults. The image-benchmark eligible native routes are:
 
 ```text
 qwen/qwen3.7-flash
+qwen/qwen3.8-max
 minimax/minimax-m3
 xiaomi/mimo-v2.5
 ```
@@ -498,14 +558,26 @@ maps the configured high effort to `reasoning: {effort: high}`. Qwen 3.7 Flash p
 top-p `0.95` and presence penalty `0.0` for reasoning evaluation. Temperature
 is omitted because Qwen's hosted API advises changing only one of temperature
 and top-p; the documented top-k `20` default cannot be forwarded because this
-OpenRouter route does not expose `top_k`. MiniMax M3 uses its published
-temperature `1.0` and top-p `0.95` evaluation recipe. An explicit thinking-on
-run for these models maps the configured numeric budget to
+OpenRouter route does not expose `top_k`. Qwen 3.8 Max uses Alibaba's official
+route with fallbacks disabled and mandatory reasoning explicitly reduced from
+the provider's `xhigh` default to `high`. MiniMax M3 uses its published
+temperature `1.0` and top-p `0.95`
+evaluation recipe. An explicit thinking-on run for models with a numeric
+budget maps it to
 `reasoning: {enabled: true, max_tokens: 10240, exclude: false}`.
 
 MiMo V2.5 is a native omnimodal route and is therefore eligible for all four
 ISEPDermaBench image tasks. It uses the published temperature `1.0` and top-p
 `0.95` settings.
+
+Upstream routing is pinned with OpenRouter provider slugs (`alibaba`,
+`minimax`, and `xiaomi`), fallbacks are disabled, and supported-parameter
+checking remains enabled. The official MiniMax and Xiaomi endpoints do not
+advertise support for a generation `seed`; their profiles therefore set
+`supports_seed: false`. The runner still uses the CLI seed for deterministic
+task selection and ordering but omits the unsupported request parameter for
+those two endpoints. The limitation is preserved in each configuration
+snapshot and must be disclosed when discussing response reproducibility.
 
 Parameter and capability provenance:
 

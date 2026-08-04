@@ -23,11 +23,21 @@ from src.benchmark.metrics import (
     compute_confusion_set_metrics,
     compute_metrics,
 )
+from src.benchmark.hallucination import (
+    compute_dermatology_counterfactual_metrics,
+    compute_general_visual_hallucination_metrics,
+    parse_dermatology_counterfactual_response,
+    parse_general_visual_hallucination_response,
+)
 from src.benchmark.runner import (
     BenchmarkPrediction,
     BenchmarkSample,
     ModelResponse,
     parse_and_validate_response,
+)
+from src.benchmark.visual_grounding import (
+    compute_visual_grounding_metrics,
+    parse_and_validate_visual_grounding_response,
 )
 
 
@@ -460,6 +470,171 @@ class OpenEndedDiagnosisTaskAdapter:
         }
 
 
+class VisualGroundingNoImageTaskAdapter:
+    """Adapter for the validation-only uniform-gray grounding control."""
+
+    def __init__(
+        self,
+        *,
+        benchmark_id: str,
+        system_prompt_template: str,
+        user_prompt_template: str,
+        schema: Mapping[str, Any],
+        disease_taxonomy_items: Sequence[Mapping[str, Any]],
+    ) -> None:
+        self._benchmark_id = benchmark_id
+        self.system_prompt_template = system_prompt_template
+        self.user_prompt_template = user_prompt_template
+        self.schema = deepcopy(dict(schema))
+        self.disease_taxonomy_items = _validate_taxonomy_items(
+            disease_taxonomy_items,
+            taxonomy_name="disease",
+        )
+        self._taxonomy_by_id = {
+            str(item["id"]): item for item in self.disease_taxonomy_items
+        }
+
+    @property
+    def benchmark_id(self) -> str:
+        return self._benchmark_id
+
+    def prepare(self, sample: BenchmarkSample) -> PreparedTask:
+        candidate_ids = (
+            list(sample.candidate_disease_ids)
+            if sample.candidate_disease_ids is not None
+            else list(self._taxonomy_by_id)
+        )
+        _validate_candidates(
+            candidate_ids,
+            allowed_ids=set(self._taxonomy_by_id),
+        )
+        values = {
+            "disease_taxonomy": _render_taxonomy(
+                candidate_ids,
+                taxonomy_by_id=self._taxonomy_by_id,
+            ),
+        }
+        return PreparedTask(
+            benchmark_id=self.benchmark_id,
+            task_id=sample.task_id or sample.sample_id,
+            sample_id=sample.sample_id,
+            system_prompt=_render_template(
+                self.system_prompt_template,
+                **values,
+            ),
+            user_prompt=_render_template(
+                self.user_prompt_template,
+                **values,
+            ),
+            schema=deepcopy(self.schema),
+            allowed_disease_ids=tuple(candidate_ids),
+        )
+
+    def parse_response(
+        self,
+        model_id: str,
+        raw_text: str,
+        prepared_task: PreparedTask,
+        reasoning_text: str | None = None,
+    ) -> ModelResponse:
+        _require_matching_benchmark(prepared_task, self.benchmark_id)
+        return parse_and_validate_visual_grounding_response(
+            model_id=model_id,
+            raw_text=raw_text,
+            reasoning_text=reasoning_text,
+            allowed_disease_ids=set(prepared_task.allowed_disease_ids),
+        )
+
+    def compute_metrics(
+        self,
+        predictions: Iterable[BenchmarkPrediction],
+    ) -> dict[str, Any]:
+        return compute_visual_grounding_metrics(predictions)
+
+
+class GeneralVisualHallucinationTaskAdapter:
+    """Adapter for the fixed HaloQuest answerability audit."""
+
+    def __init__(
+        self,
+        *,
+        benchmark_id: str,
+        system_prompt_template: str,
+        user_prompt_template: str,
+        schema: Mapping[str, Any],
+    ) -> None:
+        self._benchmark_id = benchmark_id
+        self.system_prompt_template = system_prompt_template
+        self.user_prompt_template = user_prompt_template
+        self.schema = deepcopy(dict(schema))
+
+    @property
+    def benchmark_id(self) -> str:
+        return self._benchmark_id
+
+    def prepare(self, sample: BenchmarkSample) -> PreparedTask:
+        question = sample.metadata.get("question")
+        if not isinstance(question, str) or not question.strip():
+            raise ValueError("General hallucination task requires a question")
+        return PreparedTask(
+            benchmark_id=self.benchmark_id,
+            task_id=sample.task_id or sample.sample_id,
+            sample_id=sample.sample_id,
+            system_prompt=self.system_prompt_template,
+            user_prompt=_render_template(
+                self.user_prompt_template,
+                question=question.strip(),
+            ),
+            schema=deepcopy(self.schema),
+            allowed_disease_ids=(),
+        )
+
+    def parse_response(
+        self,
+        model_id: str,
+        raw_text: str,
+        prepared_task: PreparedTask,
+        reasoning_text: str | None = None,
+    ) -> ModelResponse:
+        _require_matching_benchmark(prepared_task, self.benchmark_id)
+        return parse_general_visual_hallucination_response(
+            model_id=model_id,
+            raw_text=raw_text,
+            reasoning_text=reasoning_text,
+        )
+
+    def compute_metrics(
+        self,
+        predictions: Iterable[BenchmarkPrediction],
+    ) -> dict[str, Any]:
+        return compute_general_visual_hallucination_metrics(predictions)
+
+
+class DermatologyCounterfactualTaskAdapter(VisualGroundingNoImageTaskAdapter):
+    """Adapter for pixel-corruption and hard-negative dermatology cases."""
+
+    def parse_response(
+        self,
+        model_id: str,
+        raw_text: str,
+        prepared_task: PreparedTask,
+        reasoning_text: str | None = None,
+    ) -> ModelResponse:
+        _require_matching_benchmark(prepared_task, self.benchmark_id)
+        return parse_dermatology_counterfactual_response(
+            model_id=model_id,
+            raw_text=raw_text,
+            reasoning_text=reasoning_text,
+            allowed_disease_ids=set(prepared_task.allowed_disease_ids),
+        )
+
+    def compute_metrics(
+        self,
+        predictions: Iterable[BenchmarkPrediction],
+    ) -> dict[str, Any]:
+        return compute_dermatology_counterfactual_metrics(predictions)
+
+
 def build_task_adapter(
     *,
     benchmark_config: Mapping[str, Any],
@@ -568,6 +743,17 @@ def build_task_adapter(
             system_prompt_template=str(prompt_config["system_prompt"]),
             user_prompt_template=str(prompt_config["user_template"]),
         )
+    if task == "visual_grounding_no_image_ablation":
+        return VisualGroundingNoImageTaskAdapter(**common)
+    if task == "general_visual_hallucination_audit":
+        return GeneralVisualHallucinationTaskAdapter(
+            benchmark_id=benchmark_id,
+            system_prompt_template=str(prompt_config["system_prompt"]),
+            user_prompt_template=str(prompt_config["user_template"]),
+            schema=schema,
+        )
+    if task == "dermatology_counterfactual_hallucination":
+        return DermatologyCounterfactualTaskAdapter(**common)
     raise ValueError(f"Unsupported benchmark task: {task}")
 
 

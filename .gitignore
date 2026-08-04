@@ -14,6 +14,8 @@ doc/docs/
 # Local dataset payloads (documentation and manifests remain trackable)
 configs/datasets/*/data/
 data/benchmarks/DermoBench/release/dermobench_release_imgs.zip
+data/benchmarks/DermoBench/release/images/
+data/benchmarks/DermoBench/release/image_index.json
 
 # Generated dataset artifacts
 data/manifests/*.parquet

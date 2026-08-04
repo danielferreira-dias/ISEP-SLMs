@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ISEPDermaBenchLoaderTests(unittest.TestCase):
-    def test_lists_the_four_frozen_protocols(self) -> None:
+    def test_lists_all_frozen_protocols(self) -> None:
         configs = list_isep_dermabench_configs(root=ROOT)
         self.assertEqual(
             {config.benchmark.id for config in configs},
@@ -30,8 +30,66 @@ class ISEPDermaBenchLoaderTests(unittest.TestCase):
                 "visual_disease_confusion_sets",
                 "evidence_grounded_diagnosis",
                 "open_ended_diagnosis",
+                "visual_grounding_no_image",
+                "general_visual_hallucination_audit",
+                "dermatology_counterfactual_hallucination",
             },
         )
+
+    def test_hallucination_audits_have_frozen_development_cohorts(self) -> None:
+        expected = {
+            "general_visual_hallucination_audit": 300,
+            "dermatology_counterfactual_hallucination": 200,
+        }
+        for benchmark_id, count in expected.items():
+            with self.subTest(benchmark_id=benchmark_id):
+                config = load_isep_dermabench_config(benchmark_id, root=ROOT)
+                loaded = load_isep_dermabench_dataset(
+                    root=ROOT,
+                    benchmark=config,
+                    evaluation_set="validation",
+                    limit=None,
+                    seed=42,
+                    source="local",
+                )
+                self.assertEqual(len(loaded.samples), count)
+                self.assertNotIn(
+                    "reference_disease_id", loaded.frame.columns
+                )
+
+    def test_no_image_control_is_validation_only_and_reference_isolated(
+        self,
+    ) -> None:
+        config = load_isep_dermabench_config(
+            "visual_grounding_no_image",
+            root=ROOT,
+        )
+        loaded = load_isep_dermabench_dataset(
+            root=ROOT,
+            benchmark=config,
+            evaluation_set="validation",
+            limit=None,
+            seed=42,
+            source="local",
+        )
+
+        self.assertEqual(len(loaded.samples), 50)
+        self.assertEqual(
+            len(
+                {
+                    sample.metadata["leakage_group_id"]
+                    for sample in loaded.samples
+                }
+            ),
+            50,
+        )
+        for sample in loaded.samples:
+            self.assertEqual(
+                sample.metadata["condition"],
+                "uniform_gray_no_image",
+            )
+            self.assertEqual(len(sample.candidate_disease_ids or ()), 21)
+        self.assertNotIn("reference_disease_id", loaded.frame.columns)
 
     def test_open_ended_inputs_do_not_expose_scoring_references(self) -> None:
         config = load_isep_dermabench_config(
@@ -129,6 +187,36 @@ class ISEPDermaBenchLoaderTests(unittest.TestCase):
         self.assertEqual(prepared.system_prompt, sample.system_prompt)
         self.assertEqual(prepared.user_prompt, sample.user_prompt)
         self.assertEqual(prepared.schema, sample.response_schema)
+
+    def test_general_hallucination_accepts_no_disease_candidates(self) -> None:
+        config = load_isep_dermabench_config(
+            "general_visual_hallucination_audit", root=ROOT
+        )
+        raw = yaml.safe_load(config.config_path.read_text(encoding="utf-8"))
+        prompt = yaml.safe_load(config.prompt_path.read_text(encoding="utf-8"))
+        schema = json.loads(config.schema_path.read_text(encoding="utf-8"))
+        taxonomy = yaml.safe_load(
+            config.taxonomy.disease_path.read_text(encoding="utf-8")
+        )
+        delegate = build_task_adapter(
+            benchmark_config=raw,
+            prompt_config=prompt,
+            schema=schema,
+            disease_taxonomy_items=taxonomy["diseases"],
+        )
+        loaded = load_isep_dermabench_dataset(
+            root=ROOT,
+            benchmark=config,
+            evaluation_set="validation",
+            limit=1,
+            seed=42,
+            source="local",
+        )
+        prepared = FrozenISEPDermaBenchAdapter(delegate).prepare(
+            loaded.samples[0]
+        )
+        self.assertEqual(prepared.allowed_disease_ids, ())
+        self.assertTrue(prepared.schema)
 
 
 if __name__ == "__main__":

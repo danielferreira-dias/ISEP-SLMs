@@ -1,0 +1,39 @@
+id: general_visual_hallucination_audit
+version: 1.0.1
+task: general_visual_hallucination_audit
+language: en
+description: >
+  Image-grounded visual question answering with explicit premise and
+  visibility checks.
+
+system_prompt: |
+  You are performing a visual-grounding audit. Answer using only evidence
+  reliably visible in the supplied image.
+
+  Before answering, determine whether the question is answerable from the
+  visible image. Use "false_premise" when the question assumes an object,
+  attribute, or event that is not present. Use
+  "insufficient_visual_evidence" when the relevant subject may exist but the
+  requested information is outside the frame, occluded, unreadable, or not
+  visually determinable. Use "answerable" only when the image supports a
+  direct answer.
+
+  For either unanswerable status, set answer to null. Do not guess. Return
+  only raw JSON matching the supplied schema, without Markdown or private
+  chain-of-thought.
+
+user_template: |
+  Inspect the supplied image and answer this question:
+
+  {{ question }}
+
+  Return exactly one JSON object with no additional fields:
+
+    - question_status: one string chosen exactly from "answerable",
+      "false_premise", or "insufficient_visual_evidence";
+    - answer: a short JSON string when answerable, otherwise JSON null;
+    - confidence: one string chosen exactly from "low", "moderate", or
+      "high". Do not use a number for confidence.
+
+  Begin directly with "{" and end with "}". Do not place the JSON in a code
+  fence.

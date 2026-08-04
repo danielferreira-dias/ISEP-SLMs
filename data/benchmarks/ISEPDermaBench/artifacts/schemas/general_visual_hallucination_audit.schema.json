@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "general_visual_hallucination_audit.schema.json",
+  "title": "General visual hallucination audit response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["question_status", "answer", "confidence"],
+  "properties": {
+    "question_status": {
+      "type": "string",
+      "enum": [
+        "answerable",
+        "false_premise",
+        "insufficient_visual_evidence"
+      ]
+    },
+    "answer": {
+      "type": ["string", "null"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "moderate", "high"]
+    }
+  }
+}
