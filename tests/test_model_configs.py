@@ -77,8 +77,8 @@ class TypedModelConfigTests(unittest.TestCase):
     def test_all_models_load_into_frozen_typed_configs(self) -> None:
         configs = list_model_configs(root=ROOT)
 
-        self.assertEqual(len(configs), 7)
-        self.assertEqual(len({item.model.id for item in configs}), 7)
+        self.assertEqual(len(configs), 8)
+        self.assertEqual(len({item.model.id for item in configs}), 8)
         local = [
             item
             for item in configs
@@ -90,7 +90,7 @@ class TypedModelConfigTests(unittest.TestCase):
             if isinstance(item, AzureModelConfig)
         ]
         self.assertEqual(len(local), 2)
-        self.assertEqual(len(api), 5)
+        self.assertEqual(len(api), 6)
         for config in local:
             profile = config.backend.active_profile
             self.assertEqual(profile.engine, "vllm")
@@ -179,7 +179,7 @@ class TypedModelConfigTests(unittest.TestCase):
         )
         self.assertTrue(max_model.reasoning.enabled)
         self.assertEqual(max_model.generation.thinking_mode, "enabled")
-        self.assertEqual(max_model.generation.reasoning_effort, "high")
+        self.assertEqual(max_model.generation.reasoning_effort, "low")
         self.assertIsNone(max_model.generation.reasoning_max_tokens)
 
     def test_new_openrouter_reasoning_candidates_match_capabilities(self) -> None:
@@ -227,6 +227,34 @@ class TypedModelConfigTests(unittest.TestCase):
             mimo.backend.active_profile.provider.allow_fallbacks
         )
         self.assertFalse(mimo.backend.active_profile.supports_seed)
+
+        gemini = load_model_config(
+            "gemini_3_5_flash_lite_openrouter",
+            root=ROOT,
+        )
+        self.assertTrue(gemini.usage.benchmark)
+        self.assertIn("image", gemini.capabilities.modalities)
+        self.assertEqual(
+            gemini.backend.active_profile.request_model,
+            "google/gemini-3.5-flash-lite",
+        )
+        self.assertEqual(
+            gemini.backend.active_profile.provider.only,
+            ("google-ai-studio",),
+        )
+        self.assertFalse(
+            gemini.backend.active_profile.provider.allow_fallbacks
+        )
+        self.assertTrue(
+            gemini.backend.active_profile.provider.require_parameters
+        )
+        self.assertTrue(gemini.reasoning.enabled)
+        self.assertEqual(gemini.generation.thinking_mode, "enabled")
+        self.assertEqual(gemini.generation.reasoning_effort, "minimal")
+        self.assertIsNone(gemini.generation.reasoning_max_tokens)
+        self.assertIsNone(gemini.generation.temperature)
+        self.assertIsNone(gemini.generation.top_p)
+        self.assertIsNone(gemini.generation.seed)
 
     def test_model_can_be_loaded_by_repo_relative_path(self) -> None:
         config = load_model_config(

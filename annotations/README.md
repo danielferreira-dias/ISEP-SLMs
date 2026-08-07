@@ -41,7 +41,7 @@ Each annotation should identify:
 7. [Small visual hallucination audits](benchmarks/07_visual_hallucination_audits.md)
 8. [Visual hallucination audit results](benchmarks/08_visual_hallucination_audit_results.md)
 9. [Expanded visual hallucination audits](benchmarks/09_expanded_visual_hallucination_audits.md)
-10. [Internal Benchmark: Qwen 3.5 4B versus Qwen 3.6 27B](benchmarks/10_internal_benchmark_qwen_3_5_vs_qwen_3_6.md)
+10. [Internal Benchmark: complete pre-training model comparison](benchmarks/10_internal_benchmark_qwen_3_5_vs_qwen_3_6.md)
 
 ## Notes
 

@@ -33,6 +33,7 @@ SUPPORTED_RELEASE_VERSIONS = {
     "1.6.0",
     "1.7.0",
     "1.8.0",
+    "1.9.0",
 }
 SELECTION_SEED = 42
 VALIDATION_SIZE = 100

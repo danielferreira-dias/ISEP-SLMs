@@ -80,6 +80,13 @@ SPECS = (
         split_aliases=(("internal_benchmark_1000", "internal_benchmark"),),
     ),
     ISEPDermaBenchSpec(
+        key="clinical_context_ablation",
+        benchmark_id="clinical_context_ablation",
+        aliases=("clinical_context_ablation.yaml",),
+        default_split="internal_benchmark",
+        splits=("validation", "internal_benchmark"),
+    ),
+    ISEPDermaBenchSpec(
         key="visual_confusion_sets",
         benchmark_id="visual_disease_confusion_sets",
         aliases=("visual_confusion_sets", "visual_confusion_sets.yaml"),
@@ -338,7 +345,7 @@ def load_isep_dermabench_dataset(
     unit_column = (
         "pair_id"
         if benchmark.benchmark.task
-        == "visual_disease_contrast_ranking"
+        in {"visual_disease_contrast_ranking", "clinical_context_ablation"}
         else "task_id"
     )
     selected, selection = select_units(
@@ -616,6 +623,7 @@ def _prompt_filename(key: str) -> str:
     return {
         "visual_top_k": "top_k.yaml",
         "visual_confusion_sets": "confusion_sets.yaml",
+        "clinical_context_ablation": "clinical_context_ablation.yaml",
         "evidence_grounded_diagnosis": "evidence_grounded_diagnosis.yaml",
         "open_ended_diagnosis": "open_ended_diagnosis.yaml",
         "visual_grounding_no_image": "visual_grounding_no_image.yaml",

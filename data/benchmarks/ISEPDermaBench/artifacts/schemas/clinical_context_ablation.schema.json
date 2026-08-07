@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clinical_context_ablation.schema.json",
+  "title": "Clinical Context Ablation Top-6 Predictions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["predictions"],
+  "properties": {
+    "predictions": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rank", "disease_id"],
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 6
+          },
+          "disease_id": {
+            "type": "string",
+            "enum": [
+              "D001", "D002", "D003", "D004", "D005", "D006", "D007",
+              "D009", "D011", "D012", "D013", "D014", "D015", "D016",
+              "D017", "D018", "D019", "D022", "D023", "D024", "D025"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

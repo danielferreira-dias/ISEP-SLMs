@@ -1,0 +1,6 @@
+id: dermobench_upstream_task_labels
+version: 1.0.0
+diseases: []
+notes:
+  - DermoBench MCQ options are defined independently in each task row.
+  - Open-ended references remain isolated in prediction metadata for scoring.

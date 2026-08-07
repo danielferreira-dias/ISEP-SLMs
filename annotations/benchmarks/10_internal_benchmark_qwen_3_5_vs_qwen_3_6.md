@@ -1,4 +1,4 @@
-# Internal Benchmark: Qwen 3.5 4B versus Qwen 3.6 27B
+# Internal Benchmark: complete pre-training model comparison
 
 ## Status and objective
 
@@ -7,12 +7,27 @@ official student, Qwen 3.5 4B, and the larger local comparison model, Qwen 3.6
 27B. Both models completed the same 2,262 benchmark cases with thinking
 disabled.
 
+It was subsequently extended with the same 2,262 cases for Qwen 3.8 Max
+through the official Alibaba OpenRouter provider. Qwen 3.8 uses mandatory
+reasoning, so it was evaluated with the frozen `reasoning_effort=low` setting
+selected by the preceding hallucination audit. Its results are reported in a
+separate section because this is not a controlled thinking-off comparison.
+
+MiniMax M3 and MiMo V2.5 subsequently completed the same benchmark through
+their official OpenRouter providers with thinking requested as disabled. The
+provider still returned residual reasoning for some responses, so this label
+describes the request configuration rather than a guarantee of zero internal
+reasoning. Gemini 3.5 Flash-Lite subsequently completed the same benchmark
+through Google AI Studio with provider-default decoding and its mandatory
+`minimal` thinking level. The six completed models are compared below using the frozen
+prompts, parsers, metrics, and blinded-judge protocol.
+
 The purpose of this run was to measure the student's starting point and to
 determine how much performance is gained by scaling the same model family
-before any dermatology-specific fine-tuning. This result does not yet select a
-teacher: the API candidates still require the same full Internal Benchmark.
-The open-ended responses in this local-model comparison have now been scored
-with the frozen blinded-judge protocol.
+before any dermatology-specific fine-tuning. These results do not yet complete
+teacher selection: Qwen 3.7 Flash has not run the full Internal Benchmark. All
+open-ended responses documented here have been scored with the frozen
+blinded-judge protocol.
 
 Because the Internal Benchmark has now been inspected, these results must be
 treated as a frozen pre-training baseline. Future prompt, parser, and inference
@@ -50,7 +65,7 @@ metrics.
 | Visual Confusion Sets | 828 | 414 paired low/high-confusability cases |
 | Evidence-Grounded Diagnosis | 134 | Diagnosis, visible findings, and evidence links |
 | Open-Ended Diagnosis | 300 | Free-text top-three differential and rationale |
-| **Total** | **2,262** | **Same cases for both models** |
+| **Total** | **2,262** | **Same cases for all six completed models** |
 
 ## Headline results
 
@@ -79,6 +94,55 @@ coverage are disclosed separately.
 | Open-ended — judge Top-1 | 16.78% | **24.21%** | +7.43 pp |
 | Open-ended — judge Top-3 | 38.11% | **51.23%** | +13.12 pp |
 | Open-ended — judge MRR | 26.34% | **35.85%** | +9.51 pp |
+
+### Consolidated six-model results
+
+The following table combines the completed local and API runs. Structured
+metrics use every assigned case as the denominator. Open-ended metrics use the
+scored outcomes reported by the judge pipeline, including explicit model
+failures where present; judge coverage is therefore shown alongside them.
+
+| Task and metric | Qwen 3.5 4B | Qwen 3.6 27B | Qwen 3.8 Max | MiniMax M3 | MiMo V2.5 | Gemini 3.5 Flash-Lite |
+|---|---:|---:|---:|---:|---:|---:|
+| Top-K — Top-1 | 33.00% | 42.90% | **52.50%** | 29.70% | 32.20% | 50.70% |
+| Top-K — Top-3 | 62.50% | 74.30% | 79.70% | 60.70% | 59.50% | **80.00%** |
+| Top-K — Top-6 | 76.60% | 88.60% | 87.70% | 78.20% | 77.20% | **90.90%** |
+| Top-K — MRR | 49.03% | 60.08% | **66.31%** | 46.77% | 47.94% | 65.79% |
+| Confusion — raw Top-1 | 68.84% | 76.21% | 80.43% | 56.04% | 49.40% | **81.04%** |
+| Confusion — canonical Top-1 | 69.32% | 77.29% | 80.43% | 69.93% | 68.36% | **82.25%** |
+| Confusion — canonical Top-2 | 87.80% | 93.72% | 91.43% | 89.01% | 88.65% | **95.05%** |
+| Confusion — raw MRR | 81.80% | 86.33% | 87.50% | 66.38% | 60.29% | **88.97%** |
+| Evidence — Top-1 | 41.79% | 46.27% | **58.96%** | 38.81% | 41.79% | 52.99% |
+| Evidence — Top-3 | 61.19% | 69.40% | **76.12%** | 61.19% | 62.69% | 72.39% |
+| Evidence — Top-6 | 71.64% | 81.34% | 83.58% | 73.13% | 76.87% | **87.31%** |
+| Evidence — MRR | 52.24% | 59.29% | **68.48%** | 50.83% | 54.47% | 64.22% |
+| Evidence — semantic compliance | 38.81% | 49.25% | 59.70% | 64.18% | 52.99% | **82.84%** |
+| Evidence — grounded Top-1 success | **15.67%** | 7.46% | 5.22% | 5.97% | 5.97% | 11.19% |
+| Open-ended — judge coverage | **95.33%** | 95.00% | 87.00% | 84.67% | 94.00% | 90.00% |
+| Open-ended — Top-1 | 16.78% | 24.21% | **42.15%** | 23.62% | 24.11% | 41.48% |
+| Open-ended — Top-3 | 38.11% | 51.23% | **65.52%** | 43.70% | 47.16% | 61.48% |
+| Open-ended — MRR | 26.34% | 35.85% | **52.49%** | 32.22% | 33.69% | 50.12% |
+| Clinical rationale, 0–4 | 1.49 | 1.95 | **2.55** | 1.87 | 2.00 | 2.41 |
+| Evidence grounding, 0–4 | 1.74 | 2.17 | **2.62** | 1.98 | 2.29 | 2.58 |
+| Unsupported-claim rate | 94.76% | 88.77% | **70.50%** | 95.67% | 81.56% | 77.04% |
+
+`Raw` Confusion metrics preserve strict format failures in the denominator.
+`Canonical` metrics apply only the frozen deterministic parser and therefore
+show the clinical ranking recoverable from the response; they do not erase the
+strict-format failure disclosed below. Qwen 3.8 leads most diagnostic and
+open-ended measures, while Gemini leads Top-K Top-3/Top-6, the paired
+Confusion metrics, Evidence Top-6, and Evidence semantic compliance. MiniMax
+no longer has the highest semantic-compliance score once Gemini is included.
+
+Judge recovery was not perfectly symmetric: the two local Qwen runs had three
+historical `--retry-invalid` passes after an initial concurrent run encountered
+Azure rate limits, whereas Qwen 3.8, MiniMax, and MiMo each received one
+controlled retry after their initial sequential pass. Gemini used one judge
+pass without an invalid-judgment retry. No evaluated-model
+answer was regenerated, but open-ended coverage differs across models.
+Judge-dependent scores must therefore always be read with the coverage and
+conservative all-300-case rates, rather than compared as if every response had
+an independent human rating.
 
 Qwen 3.6 27B is consistently stronger on disease ranking. The most important
 exception is `grounded_top_1_success`, a strict conjunction requiring a correct
@@ -292,18 +356,381 @@ These are operational measurements, not a controlled throughput benchmark.
 The two servers shared one GPU and overlapped during part of the execution, so
 the timings should not be used as isolated model-speed estimates.
 
+## Qwen 3.8 Max API comparator
+
+Qwen 3.8 Max received exactly the same task IDs, images, prompts, candidate
+classes, response schemas, and references as the two local Qwen models. The
+request was restricted to OpenRouter's official Alibaba provider with provider
+fallbacks disabled. The model used mandatory reasoning at `low` effort; its
+reasoning was captured separately and excluded from the scored final answer.
+The benchmark output limit remained 8,192 tokens and no successful response
+was marked as truncated or as a safety refusal.
+
+### Diagnostic and grounding results
+
+All structured-task percentages use every assigned case as the denominator.
+Consequently, the provider failures described below count as unsuccessful
+predictions and reduce accuracy.
+
+| Task and metric | Qwen 3.8 Max |
+|---|---:|
+| Visual Top-K — Top-1 | 52.50% |
+| Visual Top-K — Top-3 | 79.70% |
+| Visual Top-K — Top-6 | 87.70% |
+| Visual Top-K — MRR | 66.31% |
+| Visual Top-K — macro F1, Top-1 | 50.95% |
+| Confusion Sets — Top-1 | 80.43% |
+| Confusion Sets — Top-2 | 91.43% |
+| Confusion Sets — MRR | 87.50% |
+| Confusion Sets — macro F1 | 81.95% |
+| Confusion Sets — low-confusability Top-1 | 88.89% |
+| Confusion Sets — high-confusability Top-1 | 71.98% |
+| Confusion Sets — confusability gap | 16.91 pp |
+| Evidence — Top-1 | 58.96% |
+| Evidence — Top-3 | 76.12% |
+| Evidence — Top-6 | 83.58% |
+| Evidence — MRR | 68.48% |
+| Evidence — macro F1, Top-1 | 55.57% |
+| Evidence — semantic compliance | 59.70% |
+| Evidence — grounded Top-1 success | 5.22% |
+
+Qwen 3.8 is substantially stronger than both local baselines in primary
+diagnostic ranking. It also has the smallest confusion-set gap. Evidence
+grounding remains a weakness: the model obtained 50.21% finding F1, 53.65%
+visible-evidence precision, and a 57.65% unsupported-finding rate. Its
+description concept F1 was 48.85%, while 59.80% of description concepts were
+classified as unsupported. A strong diagnosis score therefore must not be
+interpreted as equally strong visual grounding.
+
+### Skin-tone slices
+
+Skin-tone metadata was available for 955 cases. These are raw, descriptive
+Top-1 results and remain confounded by disease and source composition.
+
+| Skin-tone aggregation | Cases | Top-1 |
+|---|---:|---:|
+| Fitzpatrick 1–2 | 312 | 52.56% |
+| Fitzpatrick 3–4 | 214 | 56.54% |
+| Fitzpatrick 5–6 | 116 | 53.45% |
+| Monk 1–3 | 205 | 48.78% |
+| Monk 4–6 | 90 | 46.67% |
+| Monk 7–10 | 18 | 44.44% |
+| Unknown | 45 | 62.22% |
+
+The 18-case Monk 7–10 group is below the predefined support threshold and must
+not be used to claim demographic fairness. The supported fine-grained-group
+Top-1 gap was 13.38 percentage points.
+
+### Open-ended blinded-judge results
+
+The same frozen judge protocol was used: GPT-5.6 Luna was the primary judge,
+with Qwen 3.7 Flash invoked only after a Luna content-policy violation. A
+single controlled `--retry-invalid` pass retried judge failures without
+changing or selectively regenerating any Qwen 3.8 model response.
+
+| Judge metric | Qwen 3.8 Max |
+|---|---:|
+| Valid clinical judgments | 243 / 300 |
+| Model-response failures retained as failures | 18 / 300 |
+| Persistent judge-invalid cases | 39 / 300 |
+| Scored-outcome coverage, including model failures | 261 / 300 (87.00%) |
+| Top-1 over 261 scored outcomes | 42.15% |
+| Top-3 over 261 scored outcomes | 65.52% |
+| MRR over 261 scored outcomes | 52.49% |
+| Conservative Top-1 over all 300 | 36.67% |
+| Conservative Top-3 over all 300 | 57.00% |
+| Diagnosis correctness, 0–4 | 2.31 |
+| Visible-findings correctness, 0–4 | 2.74 |
+| Evidence grounding, 0–4 | 2.62 |
+| Clinical-rationale quality, 0–4 | 2.55 |
+| Differential quality, 0–4 | 2.76 |
+| Unsupported-claim rate | 70.50% |
+| Mean unsupported-claim count | 1.78 |
+
+The aggregate judge metrics count the 18 failed model responses as failed
+scored outcomes. Of the 243 valid judge objects, 240 came from Luna and three
+from the Qwen fallback. Luna triggered the content-policy fallback 11 times;
+eight fallback attempts remained judge-invalid. The verdict distribution over
+the 261 scored outcomes was 61 `correct`, 44 `mostly_correct`, 66
+`partially_correct`, and 90 `incorrect`.
+
+The persistent 39 judge-invalid cases are missing judge measurements, not
+correct model responses. They remain explicitly disclosed rather than being
+silently removed or assigned a favourable score. The conservative 300-case
+rates are included to show the lower bound when every uncovered case is
+treated as unsuccessful.
+
+### Complete output-integrity disclosure
+
+| Integrity outcome across 2,262 cases | Qwen 3.8 Max |
+|---|---:|
+| OK | 2,113 |
+| Semantic noncompliance | 47 |
+| Backend error | 102 |
+| Format invalid | 0 |
+| Schema invalid | 0 |
+| Safety refusal | 0 |
+| Image error | 0 |
+| Truncated | 0 |
+
+The 102 backend errors were HTTP 400 provider failures distributed across
+Visual Top-K (45), Confusion Sets (32), Evidence (7), and Open-ended (18).
+They account for 4.51% of all assigned cases. They were not selectively rerun,
+because doing so after inspecting the benchmark would create a different retry
+policy from the local baselines. For successful structured responses, raw JSON
+validity was 95.50% in Top-K, 96.14% in Confusion Sets, and 94.78% in Evidence;
+these apparent invalidity rates are entirely explained by the corresponding
+backend failures rather than malformed returned JSON.
+
+## MiniMax M3 and MiMo V2.5 API comparators
+
+Both models were routed only to their official OpenRouter providers, with
+provider fallbacks disabled. Thinking was requested as disabled according to
+the frozen configuration chosen after the screening experiment. OpenRouter
+still returned residual reasoning on some requests, so these runs are denoted
+`thinking off requested`, not proven reasoning-free inference. Neither model
+produced a backend error, safety refusal, image error, or truncation during the
+2,262 evaluated-model requests.
+
+### Structured clinical metrics
+
+| Metric | MiniMax M3 | MiMo V2.5 |
+|---|---:|---:|
+| Top-K Top-1 / Top-3 / Top-6 | 29.70 / 60.70 / 78.20% | **32.20** / 59.50 / 77.20% |
+| Top-K MRR | 46.77% | **47.94%** |
+| Top-K strict JSON | 100.00% | 100.00% |
+| Confusion raw Top-1 / Top-2 | **56.04 / 71.50%** | 49.40 / 65.46% |
+| Confusion canonical Top-1 / Top-2 | **69.93 / 89.01%** | 68.36 / 88.65% |
+| Confusion low-confusability Top-1 | **67.39%** | 61.35% |
+| Confusion high-confusability Top-1 | **44.69%** | 37.44% |
+| Confusion gap | **22.71 pp** | 23.91 pp |
+| Confusion strict JSON | **79.35%** | 74.03% |
+| Confusion recoverable JSON | 100.00% | 100.00% |
+| Evidence Top-1 / Top-3 / Top-6 | 38.81 / 61.19 / 73.13% | **41.79 / 62.69 / 76.87%** |
+| Evidence MRR | 50.83% | **54.47%** |
+| Evidence Top-1 macro F1 | 31.88% | **35.91%** |
+| Evidence semantic compliance | **64.18%** | 52.99% |
+| Evidence grounded Top-1 success | 5.97% | 5.97% |
+| Finding F1 | 44.29% | **53.09%** |
+| Visible-evidence precision | 46.49% | **54.56%** |
+| Unsupported-finding rate | 63.33% | **53.64%** |
+| Description concept F1 | 44.88% | **53.40%** |
+| Unsupported description-concept rate | 62.32% | **54.35%** |
+| Evidence strict JSON | 47.01% | **68.66%** |
+| Evidence recoverable JSON | 100.00% | 100.00% |
+| Evidence schema compliance | **95.52%** | 94.78% |
+
+MiniMax is stronger on the paired confusion task and semantic compliance.
+MiMo is stronger on Top-K Top-1, Evidence diagnosis, morphology, visible
+evidence, and strict output format. The large raw-to-canonical Confusion gap
+for both models shows why diagnostic ability and interface reliability must be
+reported separately.
+
+### Skin-tone slices
+
+The same 955 Top-K cases had skin-tone metadata for both models. The values are
+unadjusted Top-1 accuracy and remain descriptive rather than causal fairness
+measurements.
+
+| Skin-tone aggregation | Cases | MiniMax M3 | MiMo V2.5 |
+|---|---:|---:|---:|
+| Fitzpatrick 1–2 | 312 | 30.13% | **35.58%** |
+| Fitzpatrick 3–4 | 214 | 32.24% | **33.18%** |
+| Fitzpatrick 5–6 | 116 | **34.48%** | 31.03% |
+| Monk 1–3 | 205 | 26.34% | **26.83%** |
+| Monk 4–6 | 90 | 20.00% | **28.89%** |
+| Monk 7–10 | 18 | **16.67%** | 11.11% |
+| Unknown | 45 | 42.22% | **46.67%** |
+
+The Monk 7–10 and unknown rows are below the predefined support threshold.
+Differences between rows may reflect class and source composition rather than
+skin tone itself.
+
+### Open-ended blinded-judge results
+
+Each model received one initial judge pass and one controlled
+`--retry-invalid` pass. No evaluated-model response was regenerated. Luna
+remained the primary judge, and Qwen 3.7 Flash was invoked only after a Luna
+content-policy violation.
+
+| Judge metric | MiniMax M3 | MiMo V2.5 |
+|---|---:|---:|
+| Scored outcomes | 254 / 300 | **282 / 300** |
+| Judge coverage | 84.67% | **94.00%** |
+| Persistent judge-invalid | 38 | **10** |
+| Uncovered safety refusals | 8 | 8 |
+| Model-response failures | 0 | 0 |
+| Top-1 | 23.62% | **24.11%** |
+| Top-3 | 43.70% | **47.16%** |
+| MRR | 32.22% | **33.69%** |
+| Diagnosis correctness, 0–4 | 1.49 | **1.54** |
+| Visible-findings correctness, 0–4 | 2.26 | **2.44** |
+| Evidence grounding, 0–4 | 1.98 | **2.29** |
+| Clinical-rationale quality, 0–4 | 1.87 | **2.00** |
+| Differential quality, 0–4 | 1.95 | **2.14** |
+| Unsupported-claim rate | 95.67% | **81.56%** |
+| Mean unsupported-claim count | 3.77 | **2.29** |
+
+MiniMax produced 14 `correct`, 37 `mostly_correct`, 61
+`partially_correct`, and 142 `incorrect` scored outcomes. MiMo produced 34,
+25, 74, and 149, respectively. The different judge coverage means small score
+differences between the models should not be over-interpreted. Conservative
+Top-1 over all 300 cases is 20.00% for MiniMax and 22.67% for MiMo;
+conservative Top-3 is 37.00% and 44.33%, respectively.
+
+### Output-integrity disclosure
+
+| Integrity outcome across 2,262 requests | MiniMax M3 | MiMo V2.5 |
+|---|---:|---:|
+| OK | 1,995 | 1,963 |
+| Format invalid | 242 | 257 |
+| Schema invalid | 3 | 5 |
+| Semantic noncompliance | 22 | 37 |
+| Backend error | 0 | 0 |
+| Safety refusal | 0 | 0 |
+| Image error | 0 | 0 |
+| Truncated | 0 | 0 |
+
+The parser recovered every format-invalid response. Recovery allows canonical
+clinical scoring, but the original format failure remains counted in JSON and
+schema disclosure metrics. This is especially important if either model is
+considered as a synthetic-data teacher: a downstream generation pipeline
+would need deterministic parsing and validation before accepting annotations.
+
+## Gemini 3.5 Flash-Lite API comparator
+
+Gemini 3.5 Flash-Lite received the same 2,262 Internal Benchmark requests via
+OpenRouter's official Google AI Studio provider, with fallbacks disabled. The
+request deliberately omitted temperature, top-p, and seed so that decoding
+used the provider defaults. The only explicit reasoning control was
+`reasoning.effort=minimal`, which is also Google's documented default for this
+model. OpenRouter reported zero reasoning tokens for every successful case and
+returned no reasoning text; in this run, `minimal` therefore behaved like an
+operational no-thinking condition.
+
+### Structured clinical metrics
+
+| Metric | Gemini 3.5 Flash-Lite |
+|---|---:|
+| Top-K Top-1 / Top-3 / Top-6 | 50.70 / 80.00 / 90.90% |
+| Top-K MRR / macro F1 Top-1 | 65.79 / 48.11% |
+| Top-K strict JSON / schema compliance | 99.90 / 99.80% |
+| Confusion raw Top-1 / Top-2 | 81.04 / 93.84% |
+| Confusion canonical Top-1 / Top-2 | 82.25 / 95.05% |
+| Confusion raw MRR / macro F1 Top-1 | 88.97 / 81.44% |
+| Confusion low / high confusability Top-1 | 92.03 / 70.05% |
+| Confusion gap | 21.98 pp |
+| Confusion strict / recoverable JSON | 98.79 / 100.00% |
+| Evidence Top-1 / Top-3 / Top-6 | 52.99 / 72.39 / 87.31% |
+| Evidence MRR / macro F1 Top-1 | 64.22 / 48.45% |
+| Evidence semantic compliance | 82.84% |
+| Evidence grounded Top-1 success | 11.19% |
+| Finding F1 / visible-evidence precision | 60.69 / 62.85% |
+| Unsupported-finding rate | 45.20% |
+| Description concept F1 | 60.60% |
+| Unsupported description-concept rate | 45.63% |
+| Evidence strict / recoverable JSON | 87.31 / 100.00% |
+| Evidence schema compliance | 98.51% |
+| Top-1 Brier score / expected calibration error | 25.97 / 24.09% |
+
+The model is close to Qwen 3.8 Max on diagnostic ranking, leads all six models
+on Top-K Top-3/Top-6, canonical Confusion Top-1/Top-2, Evidence Top-6, and
+Evidence semantic compliance, and has materially better output reliability.
+Qwen 3.8 remains stronger on Top-K Top-1/MRR, Evidence Top-1/Top-3/MRR, and
+most blinded open-ended measures.
+
+### Skin-tone slices
+
+These are unadjusted Top-1 results on the same fixed Top-K cases and should be
+read with the existing source/class-composition caveat.
+
+| Skin-tone aggregation | Cases | Top-1 |
+|---|---:|---:|
+| Fitzpatrick 1–2 | 312 | 52.56% |
+| Fitzpatrick 3–4 | 214 | 56.07% |
+| Fitzpatrick 5–6 | 116 | 53.45% |
+| Monk 1–3 | 205 | 43.90% |
+| Monk 4–6 | 90 | 51.11% |
+| Monk 7–10 | 18 | 38.89% |
+| Unknown | 45 | 40.00% |
+
+The Monk 7–10 and unknown rows are below the predefined support threshold.
+The supported fine-grained-group Top-1 gap was 23.09 percentage points; this
+descriptive gap is confounded by diagnosis and dataset-source composition and
+is not evidence of a causal skin-tone effect.
+
+### Open-ended blinded-judge results
+
+The frozen Luna-primary/Qwen-fallback protocol produced 270 scored outcomes,
+including the single evaluated-model failure, for 90.00% coverage.
+
+| Judge metric | Gemini 3.5 Flash-Lite |
+|---|---:|
+| Scored outcomes | 270 / 300 |
+| Valid judge objects | 269 / 300 |
+| Model-response failures retained as failures | 1 / 300 |
+| Persistent judge-invalid | 23 / 300 |
+| Uncovered safety refusals | 7 / 300 |
+| Top-1 / Top-3 | 41.48 / 61.48% |
+| MRR | 50.12% |
+| Conservative Top-1 / Top-3 over all 300 | 37.33 / 55.33% |
+| Diagnosis correctness, 0–4 | 2.21 |
+| Visible-findings correctness, 0–4 | 2.74 |
+| Evidence grounding, 0–4 | 2.58 |
+| Clinical-rationale quality, 0–4 | 2.41 |
+| Differential quality, 0–4 | 2.50 |
+| Unsupported-claim rate | 77.04% |
+| Mean unsupported-claim count | 1.90 |
+
+Luna triggered 19 content-policy fallbacks. The final valid judgments comprise
+267 Luna outputs and two Qwen 3.7 fallback outputs; uncovered fallback
+failures remain invalid rather than being imputed. The verdict distribution
+over 270 scored outcomes was 51 `correct`, 44 `mostly_correct`, 72
+`partially_correct`, and 103 `incorrect`.
+
+### Output integrity, token use, and cost
+
+| Integrity outcome across 2,262 requests | Gemini 3.5 Flash-Lite |
+|---|---:|
+| OK | 2,208 |
+| Format invalid | 27 |
+| Schema invalid | 6 |
+| Semantic noncompliance | 19 |
+| Backend error | 2 |
+| Safety refusal | 0 |
+| Image error | 0 |
+| Truncated | 0 |
+
+The two backend errors correspond to the same Fitzpatrick image in Top-K and
+Open-ended: OpenRouter returned a response without a `choices` item. No scored
+answer was manufactured or selectively regenerated. Across evaluated-model
+inference, the provider reported 3,596,693 input tokens, 242,017 output tokens,
+and zero reasoning tokens. At the published OpenRouter list prices of $0.30
+per million input tokens and $2.50 per million output tokens, this is an
+estimated $1.68 for Gemini inference before caching and excluding the separate
+Luna/Qwen judge calls.
+
 ## Interpretation and decision gate
 
 1. Qwen 3.6 27B is the stronger zero-shot local model for disease ranking on
    all three scored structured tasks.
 2. Qwen 3.5 4B remains the official student. Its lower baseline establishes the
    improvement target for dermatology-specific fine-tuning and distillation.
-3. Evidence grounding is the principal weakness for both models. Better Top-K
-   diagnosis alone does not solve unsupported visual claims or semantic
-   noncompliance.
-4. Qwen 3.6 is also materially stronger in the judged open-ended task, but
-   teacher selection must still wait for the complete API-model comparison.
-5. Any further prompt or parser development should use the unused Validation
+3. Evidence grounding remains a principal weakness across all six models.
+   Better Top-K diagnosis alone does not solve unsupported visual claims or
+   semantic noncompliance.
+4. Qwen 3.8 Max remains narrowly strongest in primary diagnostic and judged
+   open-ended quality, while Gemini 3.5 Flash-Lite is the strongest operational
+   challenger: it is much cheaper, has fewer provider failures, and leads
+   several coverage, confusion, semantic-compliance, and Top-6 measures.
+5. MiMo is a more credible teacher candidate than MiniMax in this comparison:
+   it has better Evidence morphology, open-ended grounding, output format, and
+   fewer unsupported claims. MiniMax's strengths are semantic compliance and
+   paired confusion cases.
+6. The final teacher decision should compare Qwen 3.8's small quality lead
+   against Gemini's much stronger reliability/cost profile, and should still
+   disclose that the Qwen 3.7 full-benchmark comparison is incomplete.
+7. Any further prompt or parser development should use the unused Validation
    cases. The Internal Benchmark should now remain fixed for the post-training
    comparison.
 
@@ -312,7 +739,9 @@ the timings should not be used as isolated model-speed estimates.
 The complete predictions, manifests, deterministic metrics, judge metrics,
 and HTML reports are stored under:
 
-`outputs/internal_benchmark_full_v1/thinking_off/`
+`outputs/internal_benchmark_full_v1/thinking_off/` and
+`outputs/internal_benchmark_full_v1/qwen_3_8_max_low/`, with Gemini under
+`outputs/internal_benchmark_full_v1/gemini_3_5_flash_lite_minimal/final/`.
 
 The output directory is intentionally excluded from Git because it contains
 large, reproducible run artifacts. This annotation preserves the protocol and

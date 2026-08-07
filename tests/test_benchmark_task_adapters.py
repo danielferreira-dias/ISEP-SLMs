@@ -10,6 +10,7 @@ import yaml
 
 from src.benchmark.runner import BenchmarkSample
 from src.benchmark.task_adapters import (
+    ClinicalContextAblationTaskAdapter,
     ConfusionSetTaskAdapter,
     EvidenceGroundedTaskAdapter,
     VisualGroundingNoImageTaskAdapter,
@@ -114,6 +115,19 @@ class BenchmarkTaskAdapterTests(unittest.TestCase):
         self.assertTrue(response.schema_valid)
         self.assertTrue(response.metadata["semantic_valid"])
 
+    def test_context_ablation_renders_explicit_context(self) -> None:
+        adapter = _adapter("clinical_context_ablation", self.diseases)
+        self.assertIsInstance(adapter, ClinicalContextAblationTaskAdapter)
+        sample = _sample(
+            metadata={
+                "clinical_context": "- Reported lesion symptoms: itching."
+            }
+        )
+        prepared = adapter.prepare(sample)
+
+        self.assertIn("Reported lesion symptoms: itching", prepared.user_prompt)
+        self.assertEqual(len(prepared.allowed_disease_ids), 21)
+
 
 def _adapter(
     key: str,
@@ -128,6 +142,7 @@ def _adapter(
         "visual_confusion_sets": "confusion_sets",
         "evidence_grounded_diagnosis": "evidence_grounded_diagnosis",
         "visual_grounding_no_image": "visual_grounding_no_image",
+        "clinical_context_ablation": "clinical_context_ablation",
     }[key]
     prompt = _yaml(
         f"data/benchmarks/ISEPDermaBench/artifacts/prompts/{prompt_name}.yaml"
@@ -148,6 +163,7 @@ def _adapter(
 def _sample(
     *,
     candidates: tuple[str, ...] | None = None,
+    metadata: dict | None = None,
 ) -> BenchmarkSample:
     return BenchmarkSample(
         sample_id="S1",
@@ -155,7 +171,7 @@ def _sample(
         image_uri="image.jpg",
         disease_id="D001",
         candidate_disease_ids=candidates,
-        metadata={},
+        metadata=metadata or {},
     )
 
 

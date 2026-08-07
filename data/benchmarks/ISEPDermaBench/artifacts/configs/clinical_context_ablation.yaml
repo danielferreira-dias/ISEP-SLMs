@@ -1,0 +1,79 @@
+# Paired SCIN patient-context ablation for closed-set dermatology diagnosis.
+
+benchmark:
+  id: clinical_context_ablation
+  version: 1.0.0
+  task: clinical_context_ablation
+  description: >
+    Measures the paired change in diagnostic ranking when the same model sees
+    the same SCIN image with versus without explicitly reported clinical
+    context. Gold diagnoses, related-category fields, and dermatologist
+    annotations are never included in the prompt.
+  top_k: 6
+
+prompt:
+  path: artifacts/prompts/clinical_context_ablation.yaml
+
+schema:
+  path: artifacts/schemas/clinical_context_ablation.schema.json
+
+taxonomy:
+  path: artifacts/taxonomies/diseases.yaml
+  id_field: id
+  label_field: display_name
+  expected_size: 21
+
+metrics:
+  - id: top_1_accuracy_by_condition
+    higher_is_better: true
+  - id: top_3_accuracy_by_condition
+    higher_is_better: true
+  - id: top_6_accuracy_by_condition
+    higher_is_better: true
+  - id: mean_reciprocal_rank_by_condition
+    higher_is_better: true
+  - id: paired_top_1_accuracy_delta
+    description: image_plus_context minus image_only on identical cases
+    higher_is_better: true
+  - id: mcnemar_exact_p_value
+    description: exact paired test over improved and worsened Top-1 outcomes
+    higher_is_better: false
+  - id: json_validity_rate_by_condition
+    higher_is_better: true
+  - id: schema_compliance_rate_by_condition
+    higher_is_better: true
+
+comparison:
+  paired_by: pair_id
+  conditions:
+    - image_only
+    - image_plus_context
+  require_identical_image_bytes: true
+  require_identical_model_settings: true
+  confidence_interval:
+    method: paired_bootstrap
+    confidence_level: 0.95
+    resamples: 10000
+    seed: 42
+
+image_preprocessing:
+  profile: dermatology_api_safe_rgb_jpeg_v1
+  max_edge_pixels: 768
+  max_encoded_bytes: 45000
+  jpeg_quality: 85
+  minimum_jpeg_quality: 40
+  minimum_edge_pixels: 224
+
+execution:
+  max_output_tokens: 8192
+  batch_size: 8
+  resume: true
+  save_raw_responses: true
+  save_rendered_prompts: true
+  fail_fast_on_invalid_output: false
+
+structured_output:
+  mode: prompt_only
+
+output:
+  directory: outputs/benchmark_runs

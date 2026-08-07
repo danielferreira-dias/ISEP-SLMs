@@ -140,7 +140,7 @@ class OpenEndedDiagnosisTests(unittest.TestCase):
             output_path=Path("data/benchmarks/ISEPDermaBench"),
         )
 
-        self.assertEqual(summary["version"], "1.8.0")
+        self.assertEqual(summary["version"], "1.9.0")
         self.assertEqual(summary["splits"]["validation"]["tasks"], 100)
         self.assertEqual(
             summary["splits"]["internal_benchmark"]["tasks"],

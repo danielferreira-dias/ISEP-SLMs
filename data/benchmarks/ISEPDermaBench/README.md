@@ -33,6 +33,18 @@ configs:
     path: references/visual_top_k/external_ddi-*.parquet
   - split: external_skindisnet
     path: references/visual_top_k/external_skindisnet-*.parquet
+- config_name: clinical_context_ablation
+  data_files:
+  - split: validation
+    path: tasks/clinical_context_ablation/validation-*.parquet
+  - split: internal_benchmark
+    path: tasks/clinical_context_ablation/internal_benchmark-*.parquet
+- config_name: clinical_context_ablation_references
+  data_files:
+  - split: validation
+    path: references/clinical_context_ablation/validation-*.parquet
+  - split: internal_benchmark
+    path: references/clinical_context_ablation/internal_benchmark-*.parquet
 - config_name: visual_confusion_sets
   data_files:
   - split: validation
@@ -134,6 +146,8 @@ from a `_references` configuration in a model request.
 | visual_top_k | internal_benchmark | 1,000 | 1,000 | 1,000 |
 | visual_top_k | external_ddi | 300 | 300 | 299 |
 | visual_top_k | external_skindisnet | 1,365 | 1,365 | 333 |
+| clinical_context_ablation | validation | 494 (247 pairs) | 247 | 109 |
+| clinical_context_ablation | internal_benchmark | 522 (261 pairs) | 261 | 261 |
 | visual_confusion_sets | validation | 834 | 417 | 417 |
 | visual_confusion_sets | internal_benchmark | 828 | 414 | 414 |
 | evidence_grounded_diagnosis | validation | 137 | 137 | 137 |
@@ -150,6 +164,26 @@ from a `_references` configuration in a model request.
 Closed-set ranking of exactly six diseases from the frozen 21-class taxonomy.
 It includes Validation, the 1,000-case internal paired benchmark, DDI external
 evaluation, and SkinDisNet external evaluation.
+
+### `clinical_context_ablation`
+
+A paired SCIN ablation measuring whether explicitly reported clinical context
+changes closed-set diagnostic ranking. Every case appears twice with identical
+image bytes, taxonomy, schema, model settings, and base prompt: once without
+patient context and once with participant-reported duration, body location,
+lesion texture, lesion symptoms, and other symptoms.
+
+Validation contains 247 pairs and Internal Benchmark contains 261 pairs. Only
+cases with an explicit response in at least one SCIN `condition_symptoms_*`
+field are included. `related_category`, dermatologist labels/confidence, and
+demographic attributes are excluded from the model prompt. Missing fields mean
+“not reported,” never “clinically absent.”
+
+Primary analysis is within-model and paired: Top-1/3/6, MRR, macro F1, JSON
+validity, and schema compliance are reported per condition. Context-minus-
+image-only deltas use a paired bootstrap interval and an exact McNemar test.
+SCIN labels are retrospective dermatologist differentials informed by
+self-report, not uniformly pathology-confirmed diagnoses.
 
 ### `visual_confusion_sets`
 
@@ -238,6 +272,10 @@ The expanded HaloQuest cohort contains 174 generated and 126 real cases. Five
 official Flickr URLs returned HTTP 404/410, so deterministic replacements were
 used; the resulting 300 tasks contain 295 unique source images.
 
+Release 1.9.0 adds the paired SCIN clinical-context ablation without changing
+existing task rows, prompts, schemas, or references. Every new pair is checked
+against ISEPDermData Train by source-image SHA-256 and leakage group.
+
 ## Input schema
 
 Task configurations begin with the multimodal input columns:
@@ -302,4 +340,5 @@ python -m src.data_pipeline.open_ended_benchmark \
   --output data/benchmarks/ISEPDermaBench-v1.1.0 \
   --validate-only
 python -m src.data_pipeline.visual_grounding_no_image --validate-only
+python -m src.data_pipeline.clinical_context_ablation --validate-only
 ```

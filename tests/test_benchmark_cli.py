@@ -12,6 +12,7 @@ import unittest
 
 from src.benchmark.cli import (
     _execute_and_close_backend,
+    _override_temperature,
     _override_thinking_mode,
     main,
 )
@@ -85,6 +86,40 @@ class BenchmarkCliTests(unittest.TestCase):
 
         self.assertEqual(enabled.generation.reasoning_max_tokens, 10_240)
         self.assertIsNone(disabled.generation.reasoning_max_tokens)
+
+    def test_temperature_override_updates_effective_model_only(self) -> None:
+        model = load_model_config("qwen_3_6_27b", root=ROOT)
+
+        overridden = _override_temperature(model, 0.6)
+
+        self.assertEqual(model.generation.temperature, 1.0)
+        self.assertEqual(overridden.generation.temperature, 0.6)
+
+    def test_dry_run_records_temperature_override(self) -> None:
+        stdout = StringIO()
+        stderr = StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            status = main(
+                [
+                    "run",
+                    "--model",
+                    "qwen_3_6_27b",
+                    "--benchmark",
+                    "visual_top_k_closed_set",
+                    "--evaluation-set",
+                    "internal_benchmark",
+                    "--limit",
+                    "1",
+                    "--temperature",
+                    "0.6",
+                    "--dry-run",
+                ],
+                root=ROOT,
+            )
+
+        self.assertEqual(status, 0, stderr.getvalue())
+        payload = json.loads(stdout.getvalue())
+        self.assertEqual(payload["generation"]["temperature"], 0.6)
 
     def test_async_backend_closes_on_request_event_loop(self) -> None:
         class Executor:

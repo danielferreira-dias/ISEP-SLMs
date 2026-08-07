@@ -1,0 +1,67 @@
+# Low-cost Google multimodal candidate served through OpenRouter.
+
+schema_version: 1
+
+model:
+  id: gemini_3_5_flash_lite_openrouter
+  display_name: Gemini 3.5 Flash-Lite (OpenRouter)
+  family: gemini
+  evaluation_role: teacher_candidate
+  training_stage: provider_managed
+  task_adaptation_stage: none
+  domain: general
+
+usage:
+  benchmark: true
+  fine_tuning: false
+
+capabilities:
+  modalities:
+    - text
+    - image
+    - video
+    - audio
+  structured_output_modes:
+    - prompt_only
+    - json_schema
+  context_length_tokens: 1048576
+  maximum_output_tokens: 65536
+
+source:
+  type: provider_api
+  provider: openrouter
+  model_name: google/gemini-3.5-flash-lite
+
+backend:
+  default_profile: openrouter
+  profiles:
+    openrouter:
+      type: api
+      engine: openrouter
+      api_style: chat_completions
+      api_key_env: OPENROUTER_API_KEY
+      request_model: google/gemini-3.5-flash-lite
+      thinking_control: openrouter_reasoning
+      request_timeout_seconds: 600
+      provider:
+        only:
+          - google-ai-studio
+        allow_fallbacks: false
+        require_parameters: true
+
+reasoning:
+  enabled: true
+  # Reasoning is returned by the provider in a dedicated response field. The
+  # parser name records that provenance; no embedded answer text is parsed.
+  parser: provider_reasoning
+  exclude_from_structured_output: true
+
+generation:
+  # Google documents minimal as this model's native default. Sampling fields
+  # are deliberately omitted so the provider's default decoding is preserved.
+  profile: gemini_3_5_flash_lite_default_minimal
+  thinking_mode: enabled
+  reasoning_effort: minimal
+
+security:
+  trust_remote_code: false

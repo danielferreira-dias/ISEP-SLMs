@@ -26,7 +26,7 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
     def test_all_benchmarks_have_defaults_budgets_and_prompt_only(self) -> None:
         configs = list_isep_dermabench_configs(root=ROOT)
 
-        self.assertEqual(len(configs), 7)
+        self.assertEqual(len(configs), 8)
         by_id = {item.benchmark.id: item for item in configs}
         self.assertEqual(
             by_id[
@@ -43,6 +43,12 @@ class BenchmarkConfigLoaderTests(unittest.TestCase):
         self.assertEqual(
             by_id[
                 "evidence_grounded_diagnosis"
+            ].dataset.default_evaluation_set,
+            "internal_benchmark",
+        )
+        self.assertEqual(
+            by_id[
+                "clinical_context_ablation"
             ].dataset.default_evaluation_set,
             "internal_benchmark",
         )

@@ -1,13 +1,13 @@
 {
   "release": {
     "id": "ISEPDermaBench",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "schema_version": "1.0.0",
     "visibility": "private",
     "created_at": "2026-08-01",
     "reference_isolation": true,
     "image_preprocessing_profile": "dermatology_api_safe_rgb_jpeg_v1",
-    "embedded_image_bytes": 319322864,
+    "embedded_image_bytes": 358216120,
     "splits": [
       {
         "benchmark": "visual_top_k",
@@ -453,6 +453,80 @@
             "sha256": "028cc3b3585af48d62b3bee6069b69522d5f2d8b94f613ab40aecbe9d518dca8"
           }
         ]
+      },
+      {
+        "benchmark": "clinical_context_ablation",
+        "benchmark_id": "clinical_context_ablation",
+        "split": "validation",
+        "source_evaluation_set": "visual_top_k/validation",
+        "task_count": 494,
+        "sample_count": 247,
+        "pair_count": 247,
+        "group_count": 109,
+        "condition_counts": {
+          "image_only": 247,
+          "image_plus_context": 247
+        },
+        "embedded_image_bytes": 18811680,
+        "task_shards": [
+          {
+            "path": "tasks/clinical_context_ablation/validation-00000-of-00001.parquet",
+            "rows": 494,
+            "bytes": 17122887,
+            "sha256": "5e7a9cf5714d296920a2b6b39c6930f5203e3d125b55bcf4b343d1ba620d69f1"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/clinical_context_ablation/validation-00000-of-00001.parquet",
+            "rows": 494,
+            "bytes": 43090,
+            "sha256": "e9d2db4de8c20b94d5879afaf0a151a295d3d626be33916bec60e9707abe08b2"
+          }
+        ]
+      },
+      {
+        "benchmark": "clinical_context_ablation",
+        "benchmark_id": "clinical_context_ablation",
+        "split": "internal_benchmark",
+        "source_evaluation_set": "visual_top_k/internal_benchmark",
+        "task_count": 522,
+        "sample_count": 261,
+        "pair_count": 261,
+        "group_count": 261,
+        "condition_counts": {
+          "image_only": 261,
+          "image_plus_context": 261
+        },
+        "embedded_image_bytes": 20081576,
+        "task_shards": [
+          {
+            "path": "tasks/clinical_context_ablation/internal_benchmark-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 18301526,
+            "sha256": "f9c386a219cd7361c50655673d3fffaf84ff14a811314e546ffa969df0a03669"
+          },
+          {
+            "path": "tasks/clinical_context_ablation/internal_benchmark-00001-of-00002.parquet",
+            "rows": 10,
+            "bytes": 227087,
+            "sha256": "3b0596478a84699052174788560f720742e839e505544144c7c3edf03d11ad4a"
+          }
+        ],
+        "reference_shards": [
+          {
+            "path": "references/clinical_context_ablation/internal_benchmark-00000-of-00002.parquet",
+            "rows": 512,
+            "bytes": 64797,
+            "sha256": "49a781efc2ddc4285c17bc60e7c38dba63ff978749702c7afff9d1caeed2147b"
+          },
+          {
+            "path": "references/clinical_context_ablation/internal_benchmark-00001-of-00002.parquet",
+            "rows": 10,
+            "bytes": 17154,
+            "sha256": "63ef5f3ef2e30b6978592810bab07c3329691155ac49abfff089554a629f43d3"
+          }
+        ]
       }
     ],
     "artifacts": [
@@ -575,6 +649,21 @@
         "path": "artifacts/schemas/dermatology_counterfactual_hallucination.schema.json",
         "source": "data/benchmarks/ISEPDermaBench/artifacts/schemas/dermatology_counterfactual_hallucination.schema.json",
         "sha256": "30e057261303feaf2b9ba95542bce7caeb269f285031b8280d61546975a00113"
+      },
+      {
+        "path": "artifacts/configs/clinical_context_ablation.yaml",
+        "source": "artifacts/configs/clinical_context_ablation.yaml",
+        "sha256": "e5110bf07ffdc48d12c52ab48806212a02b77fef69c5e34470a60d96bc907db9"
+      },
+      {
+        "path": "artifacts/prompts/clinical_context_ablation.yaml",
+        "source": "artifacts/prompts/clinical_context_ablation.yaml",
+        "sha256": "9c4ee56f89d14d0224b2995881a84fa2c6cc51ed6bb0b71227ed0eb51aecde9b"
+      },
+      {
+        "path": "artifacts/schemas/clinical_context_ablation.schema.json",
+        "source": "artifacts/schemas/clinical_context_ablation.schema.json",
+        "sha256": "0b0c657d7a123ed208394da988f9430c448c8efdfa358cf634c09d7a1786c825"
       }
     ],
     "source_licenses": {
@@ -736,6 +825,37 @@
       "free_text_answer_correctness": "not_scored_without_semantic_judge",
       "status": "development_validation",
       "must_not_be_reported_as_dermatology_accuracy": true
+    },
+    "clinical_context_ablation": {
+      "schema_version": 1,
+      "id": "clinical_context_ablation_v1",
+      "source": "SCIN participant self-report",
+      "conditions": [
+        "image_only",
+        "image_plus_context"
+      ],
+      "selection": "Held-out SCIN Visual Top-K cases with an explicit response in at least one condition_symptoms field",
+      "included_context_categories": [
+        "condition_duration",
+        "self_reported_texture",
+        "self_reported_body_location",
+        "condition_symptoms",
+        "other_symptoms"
+      ],
+      "excluded_context_categories": [
+        "related_category",
+        "dermatologist_labels",
+        "dermatologist_confidence",
+        "demographics"
+      ],
+      "null_policy": "not_reported_not_negative",
+      "validation_pair_count": 247,
+      "internal_benchmark_pair_count": 261,
+      "selected_cases_path": "metadata/clinical_context_ablation_v1/selected_cases.json",
+      "selected_cases_sha256": "337aa28bb10ef3f746846af056fb3b77ec730e7fd6cc97f32f98dc6299911045",
+      "reference_caveat": "SCIN labels are retrospective dermatologist differentials created with access to self-report and are not uniformly pathology-confirmed.",
+      "status": "paired_development_and_internal_evaluation",
+      "primary_analysis": "within_model_paired_context_delta"
     }
   }
 }

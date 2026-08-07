@@ -1,0 +1,18 @@
+id: dermobench_official_model_prompts
+version: 1.0.0
+source:
+  repository: https://github.com/mendicant04/DermoGPT
+  document: prompts.md
+protocol:
+  preserve_upstream_user_prompt: true
+  remove_image_placeholder: true
+  mcq_suffix: "NOTE: Respond with ONLY the letter of your choice."
+  task_1_1_system_prompt: none
+  task_1_2_system_prompt: schema_selected_from_image_modality
+  task_3_1_system_prompt: official_two_block_reasoning_prompt
+  task_3_2_system_prompt: schema_selected_from_image_modality
+  other_system_prompt: none
+notes:
+  - Rendered system and user prompts are saved for every benchmark run.
+  - Clinical images use SkinCon; dermoscopic images use Derm7pt.
+  - The adapter does not expose the reference answer to the evaluated model.

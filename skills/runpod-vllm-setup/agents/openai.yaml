@@ -1,0 +1,4 @@
+interface:
+  display_name: "RunPod vLLM Setup"
+  short_description: "Prepare and verify RunPod vLLM endpoints"
+  default_prompt: "Use $runpod-vllm-setup to prepare this RunPod and serve the selected model YAML through vLLM."

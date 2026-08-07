@@ -9,9 +9,24 @@ import unittest
 import zipfile
 
 from src.data_pipeline.dermobench import prepare_dermobench
+from src.data_pipeline.dermobench_evaluation import (
+    validate_filtered_dermobench,
+)
 
 
 class DermoBenchSetupTests(unittest.TestCase):
+    def test_checked_in_filtered_release_is_valid_when_available(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        release = root / "data/benchmarks/DermoBench/evaluation/release.json"
+        if not release.is_file():
+            self.skipTest("Gated DermoBench evaluation view is unavailable")
+        result = validate_filtered_dermobench(root)
+        self.assertEqual(result["evaluation"]["task_count"], 29099)
+        self.assertEqual(
+            result["judge"]["model"],
+            "google/gemini-3.5-flash-lite",
+        )
+
     def test_extracts_images_and_indexes_filename_variants(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             release = Path(directory)

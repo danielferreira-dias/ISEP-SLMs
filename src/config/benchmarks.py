@@ -17,6 +17,9 @@ BenchmarkTask = Literal[
     "visual_grounding_no_image_ablation",
     "general_visual_hallucination_audit",
     "dermatology_counterfactual_hallucination",
+    "clinical_context_ablation",
+    "dermobench_mcq",
+    "dermobench_open_ended",
 ]
 
 

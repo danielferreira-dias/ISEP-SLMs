@@ -16,6 +16,20 @@ import yaml
 from src.benchmark.datasets import (
     LoadedBenchmarkDataset,
 )
+from src.benchmark.dermobench import (
+    DermoBenchTaskAdapter,
+    is_dermobench_config,
+    list_dermobench_configs,
+    load_dermobench_config,
+    load_dermobench_dataset,
+    resolve_dermobench_spec,
+)
+from src.benchmark.dermobench_judge import (
+    DEFAULT_BATCH_MODEL,
+    fetch_batch as fetch_dermobench_judge_batch,
+    prepare_batch as prepare_dermobench_judge_batch,
+    submit_batch as submit_dermobench_judge_batch,
+)
 from src.benchmark.environment import collect_environment
 from src.benchmark.executor import (
     BenchmarkExecutor,
@@ -71,7 +85,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m src.benchmark.cli",
         description=(
-            "Run model YAMLs against the frozen ISEPDermaBench release."
+            "Run model YAMLs against ISEPDermaBench or DermoBench."
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -109,7 +123,8 @@ def build_parser() -> argparse.ArgumentParser:
         default="auto",
         help=(
             "Load ISEPDermaBench from the local mirror when available or "
-            "directly from Hugging Face (default: auto)."
+            "directly from Hugging Face (default: auto). DermoBench uses "
+            "only its verified local mirror."
         ),
     )
     run_parser.add_argument(
@@ -237,6 +252,15 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     run_parser.add_argument(
+        "--temperature",
+        type=_non_negative_float,
+        help=(
+            "Development-only decoding-temperature override. The effective "
+            "generation settings are recorded in the run identity, manifest, "
+            "and config snapshot."
+        ),
+    )
+    run_parser.add_argument(
         "--request-interval-seconds",
         type=_non_negative_float,
         default=0.0,
@@ -314,6 +338,45 @@ def build_parser() -> argparse.ArgumentParser:
             "new judgments before recomputing metrics."
         ),
     )
+
+    dermobench_judge_parser = subparsers.add_parser(
+        "dermobench-judge-batch",
+        help=(
+            "Prepare, submit, or collect a text-only OpenRouter batch for "
+            "one completed open-ended DermoBench run."
+        ),
+    )
+    dermobench_judge_parser.add_argument(
+        "--run",
+        type=Path,
+        required=True,
+        help="Completed open-ended DermoBench run directory.",
+    )
+    dermobench_judge_parser.add_argument(
+        "--submit",
+        action="store_true",
+        help="Prepare and immediately submit the batch.",
+    )
+    dermobench_judge_parser.add_argument(
+        "--batch-id",
+        help=(
+            "Fetch this existing batch; completed results are collected "
+            "automatically."
+        ),
+    )
+    dermobench_judge_parser.add_argument(
+        "--judge-model",
+        default=DEFAULT_BATCH_MODEL,
+        help=(
+            "OpenRouter batch model slug used during preparation "
+            f"(default: {DEFAULT_BATCH_MODEL})."
+        ),
+    )
+    dermobench_judge_parser.add_argument(
+        "--api-key-env",
+        default="OPENROUTER_API_KEY",
+        help="API key environment variable (default: OPENROUTER_API_KEY).",
+    )
     return parser
 
 
@@ -357,6 +420,33 @@ def main(
             )
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0
+        if args.command == "dermobench-judge-batch":
+            run_directory = args.run
+            if not run_directory.is_absolute():
+                run_directory = project_root / run_directory
+            if args.submit and args.batch_id:
+                raise ValueError("--submit cannot be combined with --batch-id")
+            if args.batch_id:
+                result = fetch_dermobench_judge_batch(
+                    run_directory=run_directory,
+                    batch_id=args.batch_id,
+                    api_key_env=args.api_key_env,
+                )
+            else:
+                result = prepare_dermobench_judge_batch(
+                    run_directory=run_directory,
+                    model=args.judge_model,
+                )
+                if args.submit:
+                    result = {
+                        "prepared": result,
+                        "submitted": submit_dermobench_judge_batch(
+                            run_directory=run_directory,
+                            api_key_env=args.api_key_env,
+                        ),
+                    }
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
         parser.error(f"Unsupported command: {args.command}")
     except KeyboardInterrupt:
         print("Benchmark interrupted.", file=sys.stderr)
@@ -374,7 +464,21 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         backend_profile=args.backend_profile,
     )
     model = _override_thinking_mode(model, args.thinking_mode)
-    benchmark = load_isep_dermabench_config(args.benchmark, root=root)
+    model = _override_temperature(model, args.temperature)
+    dermobench = is_dermobench_config(args.benchmark)
+    if dermobench:
+        if args.benchmark_source == "hub":
+            raise ValueError(
+                "DermoBench runs require the verified local release; "
+                "--benchmark-source hub is not supported"
+            )
+        if args.prompt_override is not None:
+            raise ValueError(
+                "--prompt-override is not available for DermoBench"
+            )
+        benchmark = load_dermobench_config(args.benchmark, root=root)
+    else:
+        benchmark = load_isep_dermabench_config(args.benchmark, root=root)
     configured_max_output_tokens = benchmark.execution.max_output_tokens
     if args.max_output_tokens is not None:
         benchmark = replace(
@@ -421,22 +525,34 @@ def _run_command(args: argparse.Namespace, *, root: Path) -> int:
         structured_output_mode=args.structured_output,
     )
     _validate_runtime_options(args=args, model=model)
-    source_adapter = build_task_adapter(
-        benchmark_config=raw_benchmark,
-        prompt_config=prompt,
-        schema=schema,
-        disease_taxonomy_items=disease_items,
-    )
-    adapter = FrozenISEPDermaBenchAdapter(source_adapter)
-    dataset = load_isep_dermabench_dataset(
-        root=root,
-        benchmark=benchmark,
-        evaluation_set=args.evaluation_set,
-        limit=None if args.task_ids_file is not None else args.limit,
-        seed=args.seed,
-        source=args.benchmark_source,
-        repo_id=args.benchmark_repo,
-    )
+    if dermobench:
+        adapter = DermoBenchTaskAdapter(
+            resolve_dermobench_spec(args.benchmark)
+        )
+        dataset = load_dermobench_dataset(
+            root=root,
+            benchmark=benchmark,
+            evaluation_set=args.evaluation_set,
+            limit=None if args.task_ids_file is not None else args.limit,
+            seed=args.seed,
+        )
+    else:
+        source_adapter = build_task_adapter(
+            benchmark_config=raw_benchmark,
+            prompt_config=prompt,
+            schema=schema,
+            disease_taxonomy_items=disease_items,
+        )
+        adapter = FrozenISEPDermaBenchAdapter(source_adapter)
+        dataset = load_isep_dermabench_dataset(
+            root=root,
+            benchmark=benchmark,
+            evaluation_set=args.evaluation_set,
+            limit=None if args.task_ids_file is not None else args.limit,
+            seed=args.seed,
+            source=args.benchmark_source,
+            repo_id=args.benchmark_repo,
+        )
     if args.task_ids_file is not None:
         task_ids_path = args.task_ids_file
         if not task_ids_path.is_absolute():
@@ -793,6 +909,22 @@ def _override_thinking_mode(
     return replace(model, reasoning=reasoning, generation=generation)
 
 
+def _override_temperature(
+    model: ModelConfig,
+    requested: float | None,
+) -> ModelConfig:
+    """Apply an explicit, auditable decoding-temperature override."""
+
+    if requested is None:
+        return model
+    if requested < 0:
+        raise ValueError("Temperature must be non-negative")
+    return replace(
+        model,
+        generation=replace(model.generation, temperature=requested),
+    )
+
+
 def _select_explicit_task_ids(
     dataset: LoadedBenchmarkDataset,
     *,
@@ -1092,6 +1224,8 @@ def _run_manifest(
             "effective_reasoning_max_tokens": (
                 model.generation.reasoning_max_tokens
             ),
+            "effective_temperature": model.generation.temperature,
+            "temperature_overridden": args.temperature is not None,
             "structured_output": args.structured_output,
             "request_interval_seconds": args.request_interval_seconds,
         },
@@ -1141,6 +1275,7 @@ def _dry_run_summary(
         },
         "execution_transport": "asyncio_v1",
         "structured_output": structured_output_mode,
+        "generation": asdict(model.generation),
         "max_output_tokens": benchmark.execution.max_output_tokens,
         "gpu_available": environment["gpu"]["available"],
         "credential_environment": environment["credentials"],
@@ -1207,6 +1342,19 @@ def _print_models(root: Path) -> None:
 def _print_benchmarks(root: Path) -> None:
     rows = []
     for config in list_isep_dermabench_configs(root=root):
+        evaluation_sets = ",".join(
+            item.id for item in config.dataset.evaluation_sets
+        )
+        rows.append(
+            (
+                config.benchmark.id,
+                config.benchmark.version,
+                config.benchmark.task,
+                config.dataset.default_evaluation_set,
+                evaluation_sets,
+            )
+        )
+    for config in list_dermobench_configs(root=root):
         evaluation_sets = ",".join(
             item.id for item in config.dataset.evaluation_sets
         )

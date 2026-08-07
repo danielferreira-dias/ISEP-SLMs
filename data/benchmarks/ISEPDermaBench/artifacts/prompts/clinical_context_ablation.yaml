@@ -1,0 +1,53 @@
+id: clinical_context_ablation
+version: 1.0.0
+task: clinical_context_ablation
+language: en
+description: >
+  Uses one fixed prompt in both arms of a paired image/context ablation.
+
+system_prompt: |
+  You are performing a closed-set dermatological image-ranking task.
+
+  Analyze the supplied image and any patient-reported context explicitly
+  provided in the request. Do not invent symptoms, history, demographics,
+  examination findings, tests, or diagnoses that were not supplied.
+
+  Rules:
+    1. Use only disease IDs that appear in the allowed taxonomy.
+    2. Return exactly {{ top_k }} unique disease predictions.
+    3. Order the predictions from most plausible to least plausible.
+    4. Use consecutive integer ranks from 1 to {{ top_k }}.
+    5. Treat "not reported" as unknown, not as a clinical absence.
+    6. Return valid JSON matching the supplied schema.
+    7. Return no explanations, Markdown, or text outside the JSON object.
+    8. Begin directly with "{" and end directly with "}".
+
+user_template: |
+  Analyze the attached dermatological image.
+
+  Patient-reported context:
+  {{ clinical_context }}
+
+  Allowed diseases:
+  {{ disease_taxonomy }}
+
+  Return exactly {{ top_k }} predictions using this JSON structure:
+  {
+    "predictions": [
+      {
+        "rank": 1,
+        "disease_id": "D001"
+      }
+    ]
+  }
+
+  The example shows structure only. Select diseases from the evidence in this
+  case and return the raw JSON object without code fences.
+
+schema_path: artifacts/schemas/clinical_context_ablation.schema.json
+
+input_requirements:
+  image: required
+  disease_taxonomy: required
+  top_k: required
+  clinical_context: required_but_may_state_not_provided

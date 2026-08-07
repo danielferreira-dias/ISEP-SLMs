@@ -1,0 +1,192 @@
+{
+  "benchmark": "DermoBench",
+  "evaluation": {
+    "excluded_cases": {
+      "path": "excluded_cases.jsonl",
+      "rows": 2900,
+      "sha256": "ca571e290f8ac386ab0d7ebc46e57777a323648fc160f7d1ffe36fc723f4314f"
+    },
+    "excluded_image_source_counts": {
+      "f17k": 43,
+      "isic": 2,
+      "pad": 125,
+      "scin": 87,
+      "skincon": 606
+    },
+    "excluded_task_count": 2900,
+    "excluded_unique_image_count": 863,
+    "files": [
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 783,
+        "evaluation_sha256": "23dd748c3e6392e40f51286595bcb5595d26bceb09e8730334664c2c5c361b95",
+        "excluded_rows": 117,
+        "path": "task1/1_1_description_wo_morph/task1_1_final.jsonl",
+        "scoring": "llm_as_a_judge",
+        "upstream_rows": 900,
+        "upstream_sha256": "4f942c8c6c8a0649ef41c7568da184f154938272244156c376549033a04a37d9"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 783,
+        "evaluation_sha256": "ad08db2b25a3e8b0a38b90a4fd071b372150fb792b39730f79ba08f49a1dba7f",
+        "excluded_rows": 117,
+        "path": "task1/1_2_description_w_morph/task1_2_final.jsonl",
+        "scoring": "llm_as_a_judge",
+        "upstream_rows": 900,
+        "upstream_sha256": "5bcfc92d60288b48fc44c9519fc8f6a1c4e21fbaafe6d30e7786d00b04b4d7d2"
+      },
+      {
+        "duplicate_task_id_count": 21,
+        "evaluation_rows": 5530,
+        "evaluation_sha256": "744344c81d55c1728eb23565cff29e20458389007571da27a39e5e62cb3547ab",
+        "excluded_rows": 0,
+        "path": "task1/1_3_mcq_derm7pt/derm7pt_test_mcq.json",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 5530,
+        "upstream_sha256": "8c7bcde2b1febfc23d66bdc1f7e7bd9d1d5a215c053c248045d27bde3ccea20c"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 9736,
+        "evaluation_sha256": "1f4ecacd36fc5fe3da592a3d839985ee6ab0c5b002703e156344386d4ba5e9ab",
+        "excluded_rows": 1946,
+        "path": "task1/1_4_mcq_skincon/skincon_all_mcq.json",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 11682,
+        "upstream_sha256": "49817ff43d17825e3d37255b07a6c2bf5273dfee5e7770982ae83cbfe25220a5"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 1757,
+        "evaluation_sha256": "6051514b435fe9eebd1fe5836fdde58b2985543fb286a8a16f55f847b669d3c7",
+        "excluded_rows": 243,
+        "path": "task2/2_1_mcq/25_choices/task2.1_25choices_test_2k_non_uniform_sample_final.json",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 2000,
+        "upstream_sha256": "616083f0177150ff0f019f92e9d83d2f3c14ad24c4ca6376a40c9af9207c241a"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 1757,
+        "evaluation_sha256": "a916a029da0c84b7fbcd17e5cb4118718dc6f556c80c2b193e5023aba75f9070",
+        "excluded_rows": 243,
+        "path": "task2/2_1_mcq/4_choices/task2.1_test_2k_non_uniform_sample_final.json",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 2000,
+        "upstream_sha256": "85b6cfa125ab2a4667776c4d3bb9d05dadeea593a9a5ab6040337109052e4f50"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 656,
+        "evaluation_sha256": "c06b3e32e725c961336edb5f3f7c665a7b056acd5c63badabb261a3c63420100",
+        "excluded_rows": 0,
+        "path": "task2/2_1_mcq/ddi/task2.1_ddi_4choices.json",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 656,
+        "upstream_sha256": "97f137062c91b898ccec7a40d7747740d75e37138f836adfbf94106e51f90bbf"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 3615,
+        "evaluation_sha256": "0b2ab1dfc72b35c7c134401320bcd568c57fc71b168bcbf55eda5e2525ca03d7",
+        "excluded_rows": 0,
+        "path": "task2/2_1_mcq/derm1m_edu/task2.1_derm1m_edu_final.json",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 3615,
+        "upstream_sha256": "0b2ab1dfc72b35c7c134401320bcd568c57fc71b168bcbf55eda5e2525ca03d7"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 2022,
+        "evaluation_sha256": "8ee5f6c064249933be4ef6f0b818f31a22c94de725a317dc7a19aac90c1078d5",
+        "excluded_rows": 0,
+        "path": "task2/2_1_mcq/derm7pt/task2.1_derm7pt_4choices.json",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 2022,
+        "upstream_sha256": "6d363ea258d1c0cc3a0a3fe51409086a72ff89a3cd2a5cb65b9b958293f5f01e"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 240,
+        "evaluation_sha256": "391aa342d3a70e8be969e435a5ba7b5ae46a98d06f9e7ced65a68b8e9fccffc2",
+        "excluded_rows": 0,
+        "path": "task2/2_1_mcq/snu134/task2.1_snu134_4choices.json",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 240,
+        "upstream_sha256": "b6616a28820f89e020dd617a8a48997abf2622ee2f288d980eb9bcd21ea0d35e"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 783,
+        "evaluation_sha256": "46f790e5d0db69ce36cc29b3e0d107df2ed68965ae6a4020e10b80f2ea2e26fa",
+        "excluded_rows": 117,
+        "path": "task3/3_1/task3_1_final.jsonl",
+        "scoring": "llm_as_a_judge",
+        "upstream_rows": 900,
+        "upstream_sha256": "3d4d7854b1822eb97519423ea1716bc8876df4adf131f42b4212838751f6fdce"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 783,
+        "evaluation_sha256": "7310ba9aa2a38d99754bd389f26ce2d0a146cdee88c5111417762645f7f1b47b",
+        "excluded_rows": 117,
+        "path": "task3/3_2/task3_2_final.jsonl",
+        "scoring": "llm_as_a_judge",
+        "upstream_rows": 900,
+        "upstream_sha256": "6cd400d879594894659c2bf25a06df0dbb9084343cea5af0c19aacbd28c58a25"
+      },
+      {
+        "duplicate_task_id_count": 0,
+        "evaluation_rows": 654,
+        "evaluation_sha256": "4ed1435d5b74e37b1f67771a8f6d022c1245eaed681bd6e78fff3b0f7de42f98",
+        "excluded_rows": 0,
+        "path": "task4/ddi_4choices_final.jsonl",
+        "scoring": "deterministic_exact_choice",
+        "upstream_rows": 654,
+        "upstream_sha256": "4ed1435d5b74e37b1f67771a8f6d022c1245eaed681bd6e78fff3b0f7de42f98"
+      }
+    ],
+    "overlap_reason_counts": {
+      "exact_image_sha256": 861,
+      "fitzpatrick17k_c_source_image_id": 43,
+      "hiba_patient_group": 2,
+      "pad_ufes_20_patient_group": 125,
+      "pad_ufes_20_source_image_id": 125,
+      "scin_case_group": 86
+    },
+    "policy": "exclude_isepdermdata_train_image_or_source_group_v1",
+    "task_count": 29099,
+    "task_root": "tasks"
+  },
+  "judge": {
+    "applies_to": [
+      "task1/1_1_description_wo_morph/task1_1_final.jsonl",
+      "task1/1_2_description_w_morph/task1_2_final.jsonl",
+      "task3/3_1/task3_1_final.jsonl",
+      "task3/3_2/task3_2_final.jsonl"
+    ],
+    "comparability": "Judge-based scores must be reported as a new Flash-Lite protocol and are not directly comparable with the paper's Gemini 2.5 Pro judge scores.",
+    "model": "google/gemini-3.5-flash-lite",
+    "model_config": "configs/models/gemini_3_5_flash_lite_openrouter.yaml",
+    "protocol": "upstream_text_only_task_specific_judge_prompts",
+    "provider": "google-ai-studio",
+    "upstream_baseline_judge": "gemini-2.5-pro"
+  },
+  "schema_version": 1,
+  "training_release": {
+    "image_count": 7541,
+    "leakage_group_count": 5671,
+    "path": "data/training/ISEPDermData",
+    "release_sha256": "7ec21a150496c0da944ec3eaeeaae25d76f491b18b411b43700a1c5580f58a5a",
+    "unique_image_sha256_count": 7541
+  },
+  "upstream": {
+    "annotation_file_count": 13,
+    "image_archive_sha256": "6c892e02ec0d793508bc4989ae7319a9cfc42bfcbbea03d86c92cd487cb2d3a7",
+    "release_root": "../release",
+    "repo_id": "mendicant04/DermoBench",
+    "task_count": 31999,
+    "unique_image_references": 12371
+  }
+}

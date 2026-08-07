@@ -33,6 +33,7 @@ class ISEPDermaBenchLoaderTests(unittest.TestCase):
                 "visual_grounding_no_image",
                 "general_visual_hallucination_audit",
                 "dermatology_counterfactual_hallucination",
+                "clinical_context_ablation",
             },
         )
 
@@ -155,6 +156,41 @@ class ISEPDermaBenchLoaderTests(unittest.TestCase):
         self.assertTrue(
             all(pair_ids.count(pair_id) == 2 for pair_id in set(pair_ids))
         )
+
+    def test_context_limit_selects_complete_identical_image_pairs(self) -> None:
+        config = load_isep_dermabench_config(
+            "clinical_context_ablation",
+            root=ROOT,
+        )
+        loaded = load_isep_dermabench_dataset(
+            root=ROOT,
+            benchmark=config,
+            evaluation_set="internal_benchmark",
+            limit=2,
+            seed=42,
+            source="local",
+        )
+        self.assertEqual(len(loaded.samples), 4)
+        pairs: dict[str, list] = {}
+        for sample in loaded.samples:
+            pairs.setdefault(sample.metadata["pair_id"], []).append(sample)
+        self.assertEqual(len(pairs), 2)
+        for pair in pairs.values():
+            self.assertEqual(
+                {sample.metadata["condition"] for sample in pair},
+                {"image_only", "image_plus_context"},
+            )
+            self.assertEqual(len({sample.image_bytes for sample in pair}), 1)
+            context_sample = next(
+                sample
+                for sample in pair
+                if sample.metadata["condition"] == "image_plus_context"
+            )
+            self.assertIn(
+                "Patient-reported context:",
+                context_sample.user_prompt or "",
+            )
+        self.assertNotIn("reference_disease_id", loaded.frame.columns)
 
     def test_adapter_uses_row_frozen_prompt_and_schema(self) -> None:
         config = load_isep_dermabench_config(

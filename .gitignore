@@ -16,6 +16,8 @@ configs/datasets/*/data/
 data/benchmarks/DermoBench/release/dermobench_release_imgs.zip
 data/benchmarks/DermoBench/release/images/
 data/benchmarks/DermoBench/release/image_index.json
+data/benchmarks/DermoBench/evaluation/tasks/
+data/benchmarks/DermoBench/evaluation/excluded_cases.jsonl
 
 # Generated dataset artifacts
 data/manifests/*.parquet

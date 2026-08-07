@@ -20,8 +20,8 @@ EXPORT = ROOT / "data/benchmarks/ISEPDermaBench"
 class HuggingFaceBenchmarkExportTests(unittest.TestCase):
     def test_materialized_release_is_valid(self) -> None:
         result = validate_huggingface_benchmark_export(ROOT)
-        self.assertEqual(result["split_count"], 14)
-        self.assertEqual(result["task_count"], 7_184)
+        self.assertEqual(result["split_count"], 16)
+        self.assertEqual(result["task_count"], 8_200)
         self.assertGreater(result["embedded_image_bytes"], 0)
 
     def test_expected_task_counts_are_frozen(self) -> None:
@@ -58,6 +58,11 @@ class HuggingFaceBenchmarkExportTests(unittest.TestCase):
                     "dermatology_counterfactual_hallucination",
                     "validation",
                 ): 200,
+                ("clinical_context_ablation", "validation"): 494,
+                (
+                    "clinical_context_ablation",
+                    "internal_benchmark",
+                ): 522,
             },
         )
 

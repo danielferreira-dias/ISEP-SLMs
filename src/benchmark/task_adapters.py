@@ -20,6 +20,7 @@ from src.benchmark.evidence_validation import (
     parse_and_validate_evidence_response,
 )
 from src.benchmark.metrics import (
+    compute_clinical_context_ablation_metrics,
     compute_confusion_set_metrics,
     compute_metrics,
 )
@@ -238,6 +239,63 @@ class ConfusionSetTaskAdapter(VisualTopKTaskAdapter):
         predictions: Iterable[BenchmarkPrediction],
     ) -> dict[str, Any]:
         return compute_confusion_set_metrics(
+            predictions,
+            allowed_disease_ids=list(self._taxonomy_by_id),
+            bootstrap_resamples=self.bootstrap_resamples,
+            bootstrap_seed=self.bootstrap_seed,
+            confidence_level=self.confidence_level,
+        )
+
+
+class ClinicalContextAblationTaskAdapter(VisualTopKTaskAdapter):
+    """Adapter for paired image-only and patient-context diagnosis tasks."""
+
+    def __init__(
+        self,
+        *,
+        bootstrap_resamples: int = 10000,
+        bootstrap_seed: int = 42,
+        confidence_level: float = 0.95,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(**kwargs)
+        self.bootstrap_resamples = bootstrap_resamples
+        self.bootstrap_seed = bootstrap_seed
+        self.confidence_level = confidence_level
+
+    def prepare(self, sample: BenchmarkSample) -> PreparedTask:
+        candidate_ids = self._candidate_ids(sample)
+        context = sample.metadata.get("clinical_context")
+        if not isinstance(context, str) or not context.strip():
+            raise ValueError("Context-ablation task requires clinical_context")
+        values = {
+            "top_k": self.top_k,
+            "disease_taxonomy": _render_taxonomy(
+                candidate_ids,
+                taxonomy_by_id=self._taxonomy_by_id,
+            ),
+            "clinical_context": context.strip(),
+        }
+        return PreparedTask(
+            benchmark_id=self.benchmark_id,
+            task_id=sample.task_id or sample.sample_id,
+            sample_id=sample.sample_id,
+            system_prompt=_render_template(self.system_prompt_template, **values),
+            user_prompt=_render_template(self.user_prompt_template, **values),
+            schema=_narrow_ranked_schema(
+                self.schema,
+                candidate_ids=candidate_ids,
+                prediction_count=self.top_k,
+                array_field="predictions",
+            ),
+            allowed_disease_ids=tuple(candidate_ids),
+        )
+
+    def compute_metrics(
+        self,
+        predictions: Iterable[BenchmarkPrediction],
+    ) -> dict[str, Any]:
+        return compute_clinical_context_ablation_metrics(
             predictions,
             allowed_disease_ids=list(self._taxonomy_by_id),
             bootstrap_resamples=self.bootstrap_resamples,
@@ -696,6 +754,20 @@ def build_task_adapter(
             confidence_level=float(
                 interval.get("confidence_level", 0.95)
             ),
+        )
+    if task == "clinical_context_ablation":
+        comparison = benchmark_config.get("comparison", {})
+        interval = (
+            comparison.get("confidence_interval", {})
+            if isinstance(comparison, Mapping)
+            else {}
+        )
+        return ClinicalContextAblationTaskAdapter(
+            **common,
+            top_k=int(benchmark["top_k"]),
+            bootstrap_resamples=int(interval.get("resamples", 10000)),
+            bootstrap_seed=int(interval.get("seed", 42)),
+            confidence_level=float(interval.get("confidence_level", 0.95)),
         )
     if task == "evidence_grounded_visual_diagnosis":
         morphology_items = morphology_taxonomy_items

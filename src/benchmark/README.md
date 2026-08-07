@@ -1,6 +1,6 @@
 # Multimodal benchmark pipeline
 
-This package runs the project's seven frozen ISEPDermaBench protocols through
+This package runs the project's eight frozen ISEPDermaBench protocols through
 one reproducible command-line pipeline. Model YAML files are loaded into
 validated dataclasses. Benchmark images, rendered prompts, and response
 schemas come directly from the task Parquets; gold references are loaded from
@@ -9,6 +9,11 @@ the scorer.
 
 The pipeline is intended for thesis experiments, not for clinical deployment
 or patient-care decisions.
+
+The same CLI also has a dedicated adapter for the external,
+training-overlap-filtered DermoBench release. DermoBench has 13 separately
+selectable tasks with row-specific prompts and MCQ option sets. Run
+`list-benchmarks` to view their `dermobench_*` IDs.
 
 ## What can be run
 
@@ -128,6 +133,33 @@ final prose + image + isolated reference
                  └──> single blinded Luna judge ──> judge metrics + HTML
 ```
 
+The four open-ended DermoBench tasks use a different second stage. Their judge
+rubrics compare the reference and candidate text without seeing the image.
+This makes those requests eligible for OpenRouter's asynchronous, text-only
+Batch API:
+
+```text
+multimodal model inference (synchronous) ──> candidate text
+                                                   │
+reference text + task rubric + candidate text      │
+                          └──> OpenRouter Batch ────┘
+                                   │
+                    per-vote JSON + aggregate metrics
+```
+
+Prepare first so the complete request can be audited before spending credits:
+
+```bash
+python -m src.benchmark.cli dermobench-judge-batch \
+  --run outputs/dermobench/<benchmark>/<model>/<run>
+```
+
+Add `--submit` to send it and later pass `--batch-id <id>` to poll. Completed
+results are collected into `dermobench_judge/judgments.jsonl` and
+`dermobench_judge/metrics.json`. The model defaults to
+`google/gemini-3.5-flash-lite:batch`. Do not send evaluated-model images through
+this path: the OpenRouter Batch API currently rejects multimodal inputs.
+
 The subset is selected by the lowest SHA-256 scores derived from the benchmark
 release hash, seed, and case ID. It never depends on the model ID. For the
 confusion benchmark, `--limit N` selects `N` image pairs and therefore runs
@@ -208,9 +240,10 @@ machine.
 | `qwen_3_6_27b` | vLLM | Yes | Qwen reasoning parser; requires substantially more GPU memory |
 | `gpt_5_6_luna` | Azure Responses | No | Official reasoning summary only |
 | `qwen_3_7_flash_openrouter` | OpenRouter | No | Multimodal; Qwen reasoning sampling and a 10,240-token reasoning budget |
-| `qwen_3_8_max_openrouter` | OpenRouter | No | Multimodal; official Alibaba route with mandatory reasoning fixed at `high` |
+| `qwen_3_8_max_openrouter` | OpenRouter | No | Multimodal; official Alibaba route with mandatory reasoning fixed at `low` |
 | `minimax_m3_openrouter` | OpenRouter | No | Multimodal; official temperature 1.0/top-p 0.95 recipe |
 | `mimo_v2_5_openrouter` | OpenRouter | No | Omnimodal; image-capable with official temperature 1.0/top-p 0.95 recipe |
+| `gemini_3_5_flash_lite_openrouter` | OpenRouter | No | Google multimodal route; provider-default decoding with mandatory reasoning fixed at `minimal` |
 
 “Managed” means the CLI may start and stop `vllm serve`. It does not mean the
 repository downloads a model in advance or provisions a GPU. GPT uses the
@@ -465,6 +498,20 @@ uv run python -m src.benchmark.cli run \
 The override path and hash are captured in the run identity and config
 snapshot. This option is rejected for every other benchmark.
 
+For a controlled decoding ablation, `--temperature` overrides only the
+effective in-memory generation configuration. The source model YAML remains
+unchanged, while the effective temperature and complete generation settings
+are retained in the run identity, manifest, and configuration snapshot:
+
+```bash
+uv run python -m src.benchmark.cli run \
+  --model qwen_3_6_27b \
+  --benchmark visual_top_k_closed_set \
+  --evaluation-set internal_benchmark \
+  --thinking-mode disabled \
+  --temperature 0.6
+```
+
 ## Run against an existing vLLM server
 
 Start vLLM separately with the model and arguments represented by its YAML,
@@ -532,8 +579,8 @@ project contract.
 
 ### OpenRouter profiles
 
-The API-native Qwen 3.7 Flash, Qwen 3.8 Max, MiniMax M3, and MiMo V2.5
-configurations use OpenRouter directly. `gpt_5_6_luna` also defines an
+The API-native Qwen 3.7 Flash, Qwen 3.8 Max, MiniMax M3, MiMo V2.5, and
+Gemini 3.5 Flash-Lite configurations use OpenRouter directly. `gpt_5_6_luna` also defines an
 optional `openrouter` profile. Every OpenRouter profile uses the
 OpenAI-compatible Chat Completions endpoint and requires:
 
@@ -549,6 +596,7 @@ qwen/qwen3.7-flash
 qwen/qwen3.8-max
 minimax/minimax-m3
 xiaomi/mimo-v2.5
+google/gemini-3.5-flash-lite
 ```
 
 OpenRouter receives text before the base64 image, its unified
@@ -560,7 +608,7 @@ is omitted because Qwen's hosted API advises changing only one of temperature
 and top-p; the documented top-k `20` default cannot be forwarded because this
 OpenRouter route does not expose `top_k`. Qwen 3.8 Max uses Alibaba's official
 route with fallbacks disabled and mandatory reasoning explicitly reduced from
-the provider's `xhigh` default to `high`. MiniMax M3 uses its published
+the provider's `xhigh` default to `low`. MiniMax M3 uses its published
 temperature `1.0` and top-p `0.95`
 evaluation recipe. An explicit thinking-on run for models with a numeric
 budget maps it to
@@ -570,8 +618,14 @@ MiMo V2.5 is a native omnimodal route and is therefore eligible for all four
 ISEPDermaBench image tasks. It uses the published temperature `1.0` and top-p
 `0.95` settings.
 
+Gemini 3.5 Flash-Lite uses Google AI Studio with fallbacks disabled. Its
+mandatory thinking level is explicitly fixed at `minimal`, which is also the
+Google default for this model. Temperature, top-p, and seed are omitted so
+that all remaining decoding behavior is provider-default rather than a
+project-defined sampling recipe.
+
 Upstream routing is pinned with OpenRouter provider slugs (`alibaba`,
-`minimax`, and `xiaomi`), fallbacks are disabled, and supported-parameter
+`minimax`, `xiaomi`, and `google-ai-studio`), fallbacks are disabled, and supported-parameter
 checking remains enabled. The official MiniMax and Xiaomi endpoints do not
 advertise support for a generation `seed`; their profiles therefore set
 `supports_seed: false`. The runner still uses the CLI seed for deterministic
@@ -588,7 +642,14 @@ Parameter and capability provenance:
   for multimodality, thinking control, and sampling;
 - [MiMo model hyperparameters](https://mimo.mi.com/docs/en-US/api/guidance/model-hyperparameters)
   and [MiMo V2.5 model card](https://huggingface.co/XiaomiMiMo/MiMo-V2.5)
-  for its multimodal interface and recommended sampling settings.
+  for its multimodal interface and recommended sampling settings;
+- [Google latest-model guide](https://ai.google.dev/gemini-api/docs/latest-model)
+  and [Gemini thinking guide](https://ai.google.dev/gemini-api/docs/thinking)
+  for Gemini 3.5 Flash-Lite context, output, default thinking level, and
+  provider-default sampling guidance;
+- [OpenRouter Gemini 3.5 Flash-Lite model page](https://openrouter.ai/google/gemini-3.5-flash-lite)
+  and [reasoning controls](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens)
+  for the normalized model slug and `reasoning.effort=minimal` transport.
 
 Reproduce an image-level provider refusal with the frozen benchmark task:
 

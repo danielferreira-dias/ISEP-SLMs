@@ -203,6 +203,178 @@ def compute_metrics(
     }
 
 
+def compute_clinical_context_ablation_metrics(
+    predictions: Iterable[BenchmarkPrediction],
+    *,
+    allowed_disease_ids: list[str],
+    bootstrap_resamples: int = 10000,
+    bootstrap_seed: int = 42,
+    confidence_level: float = 0.95,
+) -> dict[str, Any]:
+    """Compute paired image-only versus image-plus-context performance."""
+
+    rows = list(predictions)
+    if bootstrap_resamples <= 0:
+        raise ValueError("bootstrap_resamples must be positive")
+    if not 0 < confidence_level < 1:
+        raise ValueError("confidence_level must be between zero and one")
+    conditions = {"image_only", "image_plus_context"}
+    by_condition = {
+        condition: [
+            row
+            for row in rows
+            if str(row.metadata.get("condition", "")) == condition
+        ]
+        for condition in sorted(conditions)
+    }
+    if any(not values for values in by_condition.values()):
+        raise ValueError("Context ablation requires both benchmark conditions")
+    condition_metrics = {
+        condition: compute_metrics(
+            values,
+            allowed_disease_ids=allowed_disease_ids,
+        )
+        for condition, values in by_condition.items()
+    }
+
+    pairs: dict[str, dict[str, BenchmarkPrediction]] = defaultdict(dict)
+    for row in rows:
+        pair_id = str(row.metadata.get("pair_id", ""))
+        condition = str(row.metadata.get("condition", ""))
+        if not pair_id or condition not in conditions:
+            raise ValueError(
+                "Context ablation requires pair_id and a valid condition"
+            )
+        if condition in pairs[pair_id]:
+            raise ValueError(f"Duplicate context condition for pair {pair_id}")
+        pairs[pair_id][condition] = row
+    incomplete = [pair_id for pair_id, pair in pairs.items() if set(pair) != conditions]
+    if incomplete:
+        raise ValueError(f"Incomplete context-ablation pair: {incomplete[0]}")
+
+    strict_deltas: list[float] = []
+    canonical_deltas: list[float] = []
+    improved = worsened = unchanged_correct = unchanged_incorrect = 0
+    for pair in pairs.values():
+        image_only = pair["image_only"]
+        with_context = pair["image_plus_context"]
+        if image_only.ground_truth_disease_id != with_context.ground_truth_disease_id:
+            raise ValueError("Paired context tasks have different references")
+        image_only_hit = _top_one_hit(image_only, canonical=False)
+        context_hit = _top_one_hit(with_context, canonical=False)
+        canonical_image_only_hit = _top_one_hit(image_only, canonical=True)
+        canonical_context_hit = _top_one_hit(with_context, canonical=True)
+        strict_deltas.append(float(context_hit - image_only_hit))
+        canonical_deltas.append(
+            float(canonical_context_hit - canonical_image_only_hit)
+        )
+        if image_only_hit == 0 and context_hit == 1:
+            improved += 1
+        elif image_only_hit == 1 and context_hit == 0:
+            worsened += 1
+        elif image_only_hit == 1:
+            unchanged_correct += 1
+        else:
+            unchanged_incorrect += 1
+
+    lower, upper = _paired_bootstrap_mean_interval(
+        strict_deltas,
+        resamples=bootstrap_resamples,
+        seed=bootstrap_seed,
+        confidence_level=confidence_level,
+    )
+    canonical_lower, canonical_upper = _paired_bootstrap_mean_interval(
+        canonical_deltas,
+        resamples=bootstrap_resamples,
+        seed=bootstrap_seed,
+        confidence_level=confidence_level,
+    )
+    metric_ids = (
+        "top_1_accuracy",
+        "top_3_accuracy",
+        "top_6_accuracy",
+        "mean_reciprocal_rank",
+        "macro_f1_top_1",
+        "canonical_top_1_accuracy",
+        "canonical_top_3_accuracy",
+        "canonical_top_6_accuracy",
+        "canonical_mean_reciprocal_rank",
+        "canonical_macro_f1_top_1",
+        "json_validity_rate",
+        "schema_compliance_rate",
+        "canonical_schema_compliance_rate",
+    )
+    deltas = {
+        metric: (
+            float(condition_metrics["image_plus_context"][metric])
+            - float(condition_metrics["image_only"][metric])
+        )
+        for metric in metric_ids
+    }
+    return {
+        "sample_count": len(rows),
+        "pair_count": len(pairs),
+        "by_condition": condition_metrics,
+        "context_minus_image_only": deltas,
+        "paired_top_1": {
+            "improved_pair_count": improved,
+            "worsened_pair_count": worsened,
+            "unchanged_correct_pair_count": unchanged_correct,
+            "unchanged_incorrect_pair_count": unchanged_incorrect,
+            "accuracy_delta": sum(strict_deltas) / len(strict_deltas),
+            "confidence_interval_lower": lower,
+            "confidence_interval_upper": upper,
+            "mcnemar_exact_p_value": _mcnemar_exact_p_value(improved, worsened),
+        },
+        "paired_canonical_top_1": {
+            "accuracy_delta": sum(canonical_deltas) / len(canonical_deltas),
+            "confidence_interval_lower": canonical_lower,
+            "confidence_interval_upper": canonical_upper,
+        },
+    }
+
+
+def _top_one_hit(row: BenchmarkPrediction, *, canonical: bool) -> int:
+    response = row.response
+    if canonical:
+        ranked = _ranked_disease_ids(
+            response.canonical_output
+            if response.canonical_schema_valid
+            else None
+        )
+    else:
+        ranked = _ranked_disease_ids(
+            response.parsed_output if response.schema_valid else None
+        )
+    return int(bool(ranked) and ranked[0] == row.ground_truth_disease_id)
+
+
+def _paired_bootstrap_mean_interval(
+    values: list[float],
+    *,
+    resamples: int,
+    seed: int,
+    confidence_level: float,
+) -> tuple[float, float]:
+    array = np.asarray(values, dtype=float)
+    generator = np.random.default_rng(seed)
+    indices = generator.integers(0, len(array), size=(resamples, len(array)))
+    means = array[indices].mean(axis=1)
+    tail = (1.0 - confidence_level) / 2.0
+    return float(np.quantile(means, tail)), float(np.quantile(means, 1.0 - tail))
+
+
+def _mcnemar_exact_p_value(improved: int, worsened: int) -> float:
+    discordant = improved + worsened
+    if discordant == 0:
+        return 1.0
+    smaller = min(improved, worsened)
+    probability = sum(
+        math.comb(discordant, value) for value in range(smaller + 1)
+    ) / (2**discordant)
+    return min(1.0, 2.0 * probability)
+
+
 def _ranked_disease_ids(output: Any) -> list[str]:
     """Return ranked disease IDs from one canonical output object."""
 
