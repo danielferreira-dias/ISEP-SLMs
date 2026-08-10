@@ -512,6 +512,21 @@ uv run python -m src.benchmark.cli run \
   --temperature 0.6
 ```
 
+To apply the same temperature override sequentially to all four
+ISEPDermaBench Internal Benchmark tasks through one existing endpoint, use
+the repository wrapper:
+
+```bash
+uv run python scripts/run_internal_parameter_ablation.py \
+  --model qwen_3_6_27b \
+  --base-url http://127.0.0.1:8000/v1 \
+  --temperature 0.6 \
+  --output-root outputs/parameter_ablation_temp_0_6/full
+```
+
+Add `--case-limit 10` for a smoke test. Confusion-set limits are converted to
+paired units by the wrapper, preserving low/high-confusability pairing.
+
 ## Run against an existing vLLM server
 
 Start vLLM separately with the model and arguments represented by its YAML,
@@ -767,6 +782,49 @@ taxonomy, dataset, selected IDs, output cap, backend profile, endpoint
 binding, batch size, reasoning policy, or seed has changed. A truncated final
 JSONL line from an interrupted write is ignored; malformed earlier records
 remain a hard error.
+
+### Durable local outputs for RunPod
+
+Do not launch a long RunPod evaluation with the in-pod orchestrator alone.
+`predictions.jsonl` is flushed and `fsync`-ed after every terminal response,
+but that only protects the file inside the pod. A deleted ephemeral pod can
+still remove the complete run.
+
+Use the workstation-side controller instead. It keeps both vLLM endpoints on
+the pod loopback interface, runs the benchmark beside the image releases, and
+pulls only result artifacts into the local repository every 15 seconds:
+
+```bash
+uv run python scripts/runpod_benchmark_controller.py \
+  --host RUNPOD_DIRECT_TCP_HOST \
+  --ssh-port RUNPOD_DIRECT_TCP_PORT \
+  --identity-file /absolute/path/to/id_ed25519 \
+  --known-hosts-file /absolute/path/to/runpod_known_hosts \
+  --local-project-root /absolute/path/to/ISEP \
+  --temperature 0.6 \
+  --batch-size 8 \
+  --sync-interval-seconds 15
+```
+
+The controller requires ports 8000 and 8002 to pass `/health` through SSH
+before it starts inference. During the run it mirrors these directories
+without deleting local files:
+
+```text
+outputs/dermobench_full_v1/temp_0_6_thinking_off/
+outputs/clinical_context_ablation_v1/temp_0_6_thinking_off/
+```
+
+The remote runner stream is also saved locally at
+`runs/benchmarks/dermobench_then_context_controller.log`. If a replacement pod
+has no remote checkpoint but the local directory exists, the controller seeds
+the new pod from the local checkpoint before starting. If both copies exist,
+the remote copy is pulled first and the older local checkpoint never
+overwrites newer remote progress. No mirror command uses `--delete`.
+
+The controller performs three final synchronization attempts after inference.
+Treat a benchmark as complete only after the final local checkpoint succeeds;
+only then stop the RunPod in the control plane.
 
 ## Deterministic scoring
 

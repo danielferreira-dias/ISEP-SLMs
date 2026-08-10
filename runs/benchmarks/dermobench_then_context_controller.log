@@ -1,0 +1,528 @@
+STAGE 1/2: filtered DermoBench
+START: qwen_3_5_4b / dermobench_task_1_1_description_without_morphology
+START: qwen_3_6_27b / dermobench_task_1_1_description_without_morphology
+Benchmark error: FileNotFoundError: [Errno 2] No such file or directory: '/workspace/ISEP/configs/datasets/dermobench/config.yaml'
+Benchmark error: FileNotFoundError: [Errno 2] No such file or directory: '/workspace/ISEP/configs/datasets/dermobench/config.yaml'
+Traceback (most recent call last):
+  File "/workspace/ISEP/scripts/run_dermobench_and_context.py", line 260, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/workspace/ISEP/scripts/run_dermobench_and_context.py", line 221, in main
+    run_stage(
+  File "/workspace/ISEP/scripts/run_dermobench_and_context.py", line 207, in run_stage
+    raise RuntimeError("; ".join(failures))
+RuntimeError: qwen_3_6_27b: RuntimeError: Benchmark failed (2): qwen_3_6_27b / dermobench_task_1_1_description_without_morphology; qwen_3_5_4b: RuntimeError: Benchmark failed (2): qwen_3_5_4b / dermobench_task_1_1_description_without_morphology
+STAGE 1/2: filtered DermoBench
+START: qwen_3_5_4b / dermobench_task_1_1_description_without_morphology
+START: qwen_3_6_27b / dermobench_task_1_1_description_without_morphology
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 783,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 783,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_1_description_without_morphology/qwen_3_5_4b/20260808T222739Z_9664cee7/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_1_description_without_morphology/qwen_3_5_4b/20260808T222739Z_9664cee7/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_1_description_without_morphology/qwen_3_5_4b/20260808T222739Z_9664cee7",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_1_2_description_with_morphology
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 783,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 783,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_2_description_with_morphology/qwen_3_5_4b/20260808T225419Z_e80ce445/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_2_description_with_morphology/qwen_3_5_4b/20260808T225419Z_e80ce445/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_2_description_with_morphology/qwen_3_5_4b/20260808T225419Z_e80ce445",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_1_3_derm7pt_morphology_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 5530,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 5530,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_3_derm7pt_morphology_mcq/qwen_3_5_4b/20260808T230251Z_fa4ccbe7/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_3_derm7pt_morphology_mcq/qwen_3_5_4b/20260808T230251Z_fa4ccbe7/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_3_derm7pt_morphology_mcq/qwen_3_5_4b/20260808T230251Z_fa4ccbe7",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_1_4_skincon_morphology_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 9736,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 9736,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_4_skincon_morphology_mcq/qwen_3_5_4b/20260808T230905Z_f0893ef4/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_4_skincon_morphology_mcq/qwen_3_5_4b/20260808T230905Z_f0893ef4/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_4_skincon_morphology_mcq/qwen_3_5_4b/20260808T230905Z_f0893ef4",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_2_1_diagnosis_mcq_25_choices
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 1,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 1749,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 1757,
+    "truncated_output": 7
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_25_choices/qwen_3_5_4b/20260808T232133Z_57c072d6/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_25_choices/qwen_3_5_4b/20260808T232133Z_57c072d6/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_25_choices/qwen_3_5_4b/20260808T232133Z_57c072d6",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_2_1_diagnosis_mcq_4_choices
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 1756,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 1757,
+    "truncated_output": 1
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_4_choices/qwen_3_5_4b/20260808T232908Z_ecc5a71f/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_4_choices/qwen_3_5_4b/20260808T232908Z_ecc5a71f/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_4_choices/qwen_3_5_4b/20260808T232908Z_ecc5a71f",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_2_1_ddi_diagnosis_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 654,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 656,
+    "truncated_output": 2
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_ddi_diagnosis_mcq/qwen_3_5_4b/20260808T233629Z_723c5e38/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_ddi_diagnosis_mcq/qwen_3_5_4b/20260808T233629Z_723c5e38/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_ddi_diagnosis_mcq/qwen_3_5_4b/20260808T233629Z_723c5e38",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_2_1_derm1m_edu_diagnosis_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 1,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 3609,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 3615,
+    "truncated_output": 5
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm1m_edu_diagnosis_mcq/qwen_3_5_4b/20260808T233800Z_62653b12/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm1m_edu_diagnosis_mcq/qwen_3_5_4b/20260808T233800Z_62653b12/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm1m_edu_diagnosis_mcq/qwen_3_5_4b/20260808T233800Z_62653b12",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_2_1_derm7pt_diagnosis_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 2022,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 2022,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm7pt_diagnosis_mcq/qwen_3_5_4b/20260808T234303Z_8fe3a554/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm7pt_diagnosis_mcq/qwen_3_5_4b/20260808T234303Z_8fe3a554/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm7pt_diagnosis_mcq/qwen_3_5_4b/20260808T234303Z_8fe3a554",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_2_1_snu134_diagnosis_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 240,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 240,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_snu134_diagnosis_mcq/qwen_3_5_4b/20260808T234603Z_14d33d79/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_snu134_diagnosis_mcq/qwen_3_5_4b/20260808T234603Z_14d33d79/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_snu134_diagnosis_mcq/qwen_3_5_4b/20260808T234603Z_14d33d79",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_3_1_diagnostic_reasoning_without_morphology
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 783,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 783,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_1_description_without_morphology/qwen_3_6_27b/20260808T222739Z_eadfc09a/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_1_description_without_morphology/qwen_3_6_27b/20260808T222739Z_eadfc09a/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_1_description_without_morphology/qwen_3_6_27b/20260808T222739Z_eadfc09a",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_1_2_description_with_morphology
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 783,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 783,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_3_1_diagnostic_reasoning_without_morphology/qwen_3_5_4b/20260808T234707Z_d67c3fc8/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_3_1_diagnostic_reasoning_without_morphology/qwen_3_5_4b/20260808T234707Z_d67c3fc8/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_3_1_diagnostic_reasoning_without_morphology/qwen_3_5_4b/20260808T234707Z_d67c3fc8",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_3_2_diagnostic_reasoning_with_morphology
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 783,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 783,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_2_description_with_morphology/qwen_3_6_27b/20260808T235228Z_388a3de8/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_2_description_with_morphology/qwen_3_6_27b/20260808T235228Z_388a3de8/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_2_description_with_morphology/qwen_3_6_27b/20260808T235228Z_388a3de8",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_1_3_derm7pt_morphology_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 781,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 783,
+    "truncated_output": 2
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_3_2_diagnostic_reasoning_with_morphology/qwen_3_5_4b/20260809T000842Z_d8c6bb00/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_3_2_diagnostic_reasoning_with_morphology/qwen_3_5_4b/20260809T000842Z_d8c6bb00/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_3_2_diagnostic_reasoning_with_morphology/qwen_3_5_4b/20260809T000842Z_d8c6bb00",
+  "status": "completed"
+}
+START: qwen_3_5_4b / dermobench_task_4_ddi_fairness_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 654,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 654,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_4_ddi_fairness_mcq/qwen_3_5_4b/20260809T003627Z_001681cb/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_4_ddi_fairness_mcq/qwen_3_5_4b/20260809T003627Z_001681cb/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_4_ddi_fairness_mcq/qwen_3_5_4b/20260809T003627Z_001681cb",
+  "status": "completed"
+}
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 58,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 5464,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 5530,
+    "truncated_output": 8
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_3_derm7pt_morphology_mcq/qwen_3_6_27b/20260809T002151Z_1912f3ca/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_3_derm7pt_morphology_mcq/qwen_3_6_27b/20260809T002151Z_1912f3ca/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_3_derm7pt_morphology_mcq/qwen_3_6_27b/20260809T002151Z_1912f3ca",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_1_4_skincon_morphology_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 814,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 8922,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 9736,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_4_skincon_morphology_mcq/qwen_3_6_27b/20260809T003802Z_a3b52043/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_4_skincon_morphology_mcq/qwen_3_6_27b/20260809T003802Z_a3b52043/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_4_skincon_morphology_mcq/qwen_3_6_27b/20260809T003802Z_a3b52043",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_2_1_diagnosis_mcq_25_choices
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 57,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 572,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 1757,
+    "truncated_output": 1128
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_25_choices/qwen_3_6_27b/20260809T005456Z_402edcf9/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_25_choices/qwen_3_6_27b/20260809T005456Z_402edcf9/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_25_choices/qwen_3_6_27b/20260809T005456Z_402edcf9",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_2_1_diagnosis_mcq_4_choices
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 9,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 1748,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 1757,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_4_choices/qwen_3_6_27b/20260809T012221Z_983b7240/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_4_choices/qwen_3_6_27b/20260809T012221Z_983b7240/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_4_choices/qwen_3_6_27b/20260809T012221Z_983b7240",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_2_1_ddi_diagnosis_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 54,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 602,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 656,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_ddi_diagnosis_mcq/qwen_3_6_27b/20260809T013203Z_8b84e57e/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_ddi_diagnosis_mcq/qwen_3_6_27b/20260809T013203Z_8b84e57e/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_ddi_diagnosis_mcq/qwen_3_6_27b/20260809T013203Z_8b84e57e",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_2_1_derm1m_edu_diagnosis_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 24,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 3591,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 3615,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm1m_edu_diagnosis_mcq/qwen_3_6_27b/20260809T013357Z_1f16c5e3/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm1m_edu_diagnosis_mcq/qwen_3_6_27b/20260809T013357Z_1f16c5e3/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm1m_edu_diagnosis_mcq/qwen_3_6_27b/20260809T013357Z_1f16c5e3",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_2_1_derm7pt_diagnosis_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 204,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 1818,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 2022,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm7pt_diagnosis_mcq/qwen_3_6_27b/20260809T013909Z_c1e7d1c7/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm7pt_diagnosis_mcq/qwen_3_6_27b/20260809T013909Z_c1e7d1c7/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm7pt_diagnosis_mcq/qwen_3_6_27b/20260809T013909Z_c1e7d1c7",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_2_1_snu134_diagnosis_mcq
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 240,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 240,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_snu134_diagnosis_mcq/qwen_3_6_27b/20260809T014320Z_982764ec/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_snu134_diagnosis_mcq/qwen_3_6_27b/20260809T014320Z_982764ec/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_snu134_diagnosis_mcq/qwen_3_6_27b/20260809T014320Z_982764ec",
+  "status": "completed"
+}
+START: qwen_3_6_27b / dermobench_task_3_1_diagnostic_reasoning_without_morphology
+Traceback (most recent call last):
+  File "/workspace/ISEP/scripts/run_dermobench_and_context.py", line 260, in <module>
+    {
+      
+  File "/workspace/ISEP/scripts/run_dermobench_and_context.py", line 221, in main
+    def main() -> int:
+        ^^^^^^^^^^^^^^
+  File "/workspace/ISEP/scripts/run_dermobench_and_context.py", line 207, in run_stage
+    pending = {
+    ^^^^^^^^^^^^
+RuntimeError: qwen_3_6_27b: RuntimeError: Benchmark failed (-15): qwen_3_6_27b / dermobench_task_3_1_diagnostic_reasoning_without_morphology
+STAGE 1/2: filtered DermoBench
+SKIP requested DermoBench tasks: task_3_1_diagnostic_reasoning_without_morphology, task_3_2_diagnostic_reasoning_with_morphology
+SKIP complete: qwen_3_6_27b / dermobench_task_1_1_description_without_morphology / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_1_description_without_morphology/qwen_3_6_27b/20260808T222739Z_eadfc09a
+SKIP complete: qwen_3_5_4b / dermobench_task_1_1_description_without_morphology / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_1_description_without_morphology/qwen_3_5_4b/20260808T222739Z_9664cee7
+SKIP complete: qwen_3_6_27b / dermobench_task_1_2_description_with_morphology / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_2_description_with_morphology/qwen_3_6_27b/20260808T235228Z_388a3de8
+SKIP complete: qwen_3_5_4b / dermobench_task_1_2_description_with_morphology / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_2_description_with_morphology/qwen_3_5_4b/20260808T225419Z_e80ce445
+SKIP complete: qwen_3_6_27b / dermobench_task_1_3_derm7pt_morphology_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_3_derm7pt_morphology_mcq/qwen_3_6_27b/20260809T002151Z_1912f3ca
+SKIP complete: qwen_3_5_4b / dermobench_task_1_3_derm7pt_morphology_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_3_derm7pt_morphology_mcq/qwen_3_5_4b/20260808T230251Z_fa4ccbe7
+SKIP complete: qwen_3_6_27b / dermobench_task_1_4_skincon_morphology_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_4_skincon_morphology_mcq/qwen_3_6_27b/20260809T003802Z_a3b52043
+SKIP complete: qwen_3_5_4b / dermobench_task_1_4_skincon_morphology_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_1_4_skincon_morphology_mcq/qwen_3_5_4b/20260808T230905Z_f0893ef4
+SKIP complete: qwen_3_6_27b / dermobench_task_2_1_diagnosis_mcq_25_choices / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_25_choices/qwen_3_6_27b/20260809T005456Z_402edcf9
+SKIP complete: qwen_3_5_4b / dermobench_task_2_1_diagnosis_mcq_25_choices / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_25_choices/qwen_3_5_4b/20260808T232133Z_57c072d6
+SKIP complete: qwen_3_6_27b / dermobench_task_2_1_diagnosis_mcq_4_choices / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_4_choices/qwen_3_6_27b/20260809T012221Z_983b7240
+SKIP complete: qwen_3_5_4b / dermobench_task_2_1_diagnosis_mcq_4_choices / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_diagnosis_mcq_4_choices/qwen_3_5_4b/20260808T232908Z_ecc5a71f
+SKIP complete: qwen_3_6_27b / dermobench_task_2_1_ddi_diagnosis_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_ddi_diagnosis_mcq/qwen_3_6_27b/20260809T013203Z_8b84e57e
+SKIP complete: qwen_3_5_4b / dermobench_task_2_1_ddi_diagnosis_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_ddi_diagnosis_mcq/qwen_3_5_4b/20260808T233629Z_723c5e38
+SKIP complete: qwen_3_6_27b / dermobench_task_2_1_derm1m_edu_diagnosis_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm1m_edu_diagnosis_mcq/qwen_3_6_27b/20260809T013357Z_1f16c5e3
+SKIP complete: qwen_3_5_4b / dermobench_task_2_1_derm1m_edu_diagnosis_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm1m_edu_diagnosis_mcq/qwen_3_5_4b/20260808T233800Z_62653b12
+SKIP complete: qwen_3_6_27b / dermobench_task_2_1_derm7pt_diagnosis_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm7pt_diagnosis_mcq/qwen_3_6_27b/20260809T013909Z_c1e7d1c7
+SKIP complete: qwen_3_5_4b / dermobench_task_2_1_derm7pt_diagnosis_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_derm7pt_diagnosis_mcq/qwen_3_5_4b/20260808T234303Z_8fe3a554
+SKIP complete: qwen_3_6_27b / dermobench_task_2_1_snu134_diagnosis_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_snu134_diagnosis_mcq/qwen_3_6_27b/20260809T014320Z_982764ec
+SKIP complete: qwen_3_5_4b / dermobench_task_2_1_snu134_diagnosis_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_2_1_snu134_diagnosis_mcq/qwen_3_5_4b/20260808T234603Z_14d33d79
+START: qwen_3_6_27b / dermobench_task_4_ddi_fairness_mcq
+SKIP complete: qwen_3_5_4b / dermobench_task_4_ddi_fairness_mcq / /workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_4_ddi_fairness_mcq/qwen_3_5_4b/20260809T003627Z_001681cb
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 9,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 645,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 654,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_4_ddi_fairness_mcq/qwen_3_6_27b/20260809T021930Z_f2c04bff/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_4_ddi_fairness_mcq/qwen_3_6_27b/20260809T021930Z_f2c04bff/report.html",
+  "run_directory": "/workspace/ISEP/outputs/dermobench_full_v1/temp_0_6_thinking_off/dermobench_task_4_ddi_fairness_mcq/qwen_3_6_27b/20260809T021930Z_f2c04bff",
+  "status": "completed"
+}
+STAGE 2/2: paired clinical context ablation
+START: qwen_3_6_27b / clinical_context_ablation
+SKIP complete: qwen_3_5_4b / clinical_context_ablation / /workspace/ISEP/outputs/clinical_context_ablation_v1/temp_0_6_thinking_off/clinical_context_ablation/qwen_3_5_4b/20260809T021227Z_97da7300
+{
+  "counts": {
+    "backend_error": 0,
+    "format_invalid": 0,
+    "image_error": 0,
+    "invalid_output": 0,
+    "ok": 522,
+    "safety_refusal": 0,
+    "schema_invalid": 0,
+    "semantic_noncompliant": 0,
+    "total": 522,
+    "truncated_output": 0
+  },
+  "metrics_path": "/workspace/ISEP/outputs/clinical_context_ablation_v1/temp_0_6_thinking_off/clinical_context_ablation/qwen_3_6_27b/20260809T022123Z_160e854a/metrics.json",
+  "report_path": "/workspace/ISEP/outputs/clinical_context_ablation_v1/temp_0_6_thinking_off/clinical_context_ablation/qwen_3_6_27b/20260809T022123Z_160e854a/report.html",
+  "run_directory": "/workspace/ISEP/outputs/clinical_context_ablation_v1/temp_0_6_thinking_off/clinical_context_ablation/qwen_3_6_27b/20260809T022123Z_160e854a",
+  "status": "completed"
+}
+All inference stages completed.

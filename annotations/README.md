@@ -42,6 +42,7 @@ Each annotation should identify:
 8. [Visual hallucination audit results](benchmarks/08_visual_hallucination_audit_results.md)
 9. [Expanded visual hallucination audits](benchmarks/09_expanded_visual_hallucination_audits.md)
 10. [Internal Benchmark: complete pre-training model comparison](benchmarks/10_internal_benchmark_qwen_3_5_vs_qwen_3_6.md)
+11. [Internal Benchmark temperature sensitivity](benchmarks/11_internal_benchmark_temperature_sensitivity.md)
 
 ## Notes
 

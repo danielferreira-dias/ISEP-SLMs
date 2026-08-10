@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import lru_cache
 import json
 import math
 from pathlib import Path
@@ -480,7 +481,9 @@ def _normalize_row(
         raise ValueError(
             f"Image index has no mapping for {upstream_image!r}"
         )
-    image_path = release_root / image_root / actual
+    image_path = _resolve_release_image_path(
+        release_root / image_root / actual
+    )
     if not image_path.is_file():
         raise FileNotFoundError(f"DermoBench image is missing: {image_path}")
     human, reference = _conversation_pair(row)
@@ -519,6 +522,51 @@ def _normalize_row(
         "skin_tone_system": "Fitzpatrick grouped" if skin_tone else None,
         "skin_tone": skin_tone,
     }
+
+
+def _resolve_release_image_path(image_path: Path) -> Path:
+    """Resolve archive paths whose case differs on case-sensitive hosts.
+
+    The official Derm7pt archive contains directory and filename casing that
+    differs from some entries in DermoBench's image index. macOS resolves
+    those entries transparently, whereas Linux inference hosts do not. Exact
+    paths remain the fast path; only missing paths use a component-wise,
+    case-insensitive lookup against the extracted archive.
+    """
+
+    if image_path.is_file():
+        return image_path
+
+    anchor = Path(image_path.anchor)
+    current = anchor
+    for part in image_path.parts[1:]:
+        exact = current / part
+        if exact.exists():
+            current = exact
+            continue
+        match = _casefold_children(current).get(part.casefold())
+        if match is None:
+            return image_path
+        current = current / match
+    return current
+
+
+@lru_cache(maxsize=None)
+def _casefold_children(directory: Path) -> dict[str, str]:
+    """Cache a case-insensitive name index for one archive directory."""
+
+    if not directory.is_dir():
+        return {}
+    children: dict[str, str] = {}
+    for child in directory.iterdir():
+        key = child.name.casefold()
+        if key in children and children[key] != child.name:
+            raise ValueError(
+                f"Ambiguous case-insensitive DermoBench path in {directory}: "
+                f"{children[key]!r} and {child.name!r}"
+            )
+        children[key] = child.name
+    return children
 
 
 def _conversation_pair(row: dict[str, Any]) -> tuple[str, str]:
