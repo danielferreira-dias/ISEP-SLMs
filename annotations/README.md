@@ -44,6 +44,10 @@ Each annotation should identify:
 10. [Internal Benchmark: complete pre-training model comparison](benchmarks/10_internal_benchmark_qwen_3_5_vs_qwen_3_6.md)
 11. [Internal Benchmark temperature sensitivity](benchmarks/11_internal_benchmark_temperature_sensitivity.md)
 
+## Training steps
+
+1. [E1 label-only: frozen vision versus Vision LoRA](training_steps/01_e1_label_only_vision_lora_ablation.md)
+
 ## Notes
 
 1. [Interactive multimodal dermatology model strategy](notes/01_estrategia_modelo_multimodal_interativo.md)
@@ -62,3 +66,4 @@ Each annotation should identify:
 14. [Synthetic dataset comparison and architecture decision](notes/14_synthetic_dataset_comparison_and_architecture_decision.md)
 15. [Reasoning, vision, and the no-image grounding ablation](notes/15_reasoning_vision_and_no_image_grounding_ablation.md)
 16. [SkinFlow and the visual-encoder strategy](notes/16_skinflow_architecture_and_visual_encoder_strategy.md)
+17. [Visual attribution, lesion localization, and diagnostic accuracy](notes/17_visual_attribution_localization_vs_diagnostic_accuracy.md)

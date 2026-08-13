@@ -1,0 +1,18 @@
+{
+  "audit": {
+    "assignment_sha256": "3a2b9970937b29c2bf5de339dc8a4f85c917a457eb4e1182426e1c71e43befcd",
+    "class_count": 21,
+    "dev_group_count": 851,
+    "dev_image_count": 1229,
+    "dev_panel_group_count": 210,
+    "dev_panel_image_count": 210,
+    "group_overlap_count": 0,
+    "release_id": "e1_label_v1",
+    "source_count": 4,
+    "source_group_count": 5671,
+    "source_image_count": 7541,
+    "source_release_sha256": "7ec21a150496c0da944ec3eaeeaae25d76f491b18b411b43700a1c5580f58a5a",
+    "train_group_count": 4820,
+    "train_image_count": 6312
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "release": {
+    "artifacts": {
+      "assignments.parquet": "b379a0a67a26bfc6e9e67e429e9b1a3296bc2a9d397db519886e26cfcaed0a04",
+      "dev_panel.parquet": "34cc99311cf5882321dd2676f26d3efcc218b5a2229b07075022fbc767a35a38",
+      "metadata/audit.json": "6cc59eab087870f3be88fdbd53cb9391ad54d7640a155775755e6e5ebaa8bf69",
+      "metadata/class_distribution.csv": "6dfcc5c878b7dcba76d2d47b27b5b26ac1bb0436b8299c1bcc926e079fddaf46",
+      "metadata/source_distribution.csv": "5f77bb56829300ef303af9b73f590b779b88422de534c6bc287e596782acdf27",
+      "sft_dev.parquet": "6e8649f3a7291113045778427968ca2b0ac9a9b9ca169b76792b005f419fc031",
+      "sft_train.parquet": "d061a8a65f5af1083aba9c6b15888bce99609c0c45177c3965c1f223a9ae3649"
+    },
+    "audit": {
+      "assignment_sha256": "3a2b9970937b29c2bf5de339dc8a4f85c917a457eb4e1182426e1c71e43befcd",
+      "class_count": 21,
+      "dev_group_count": 851,
+      "dev_image_count": 1229,
+      "dev_panel_group_count": 210,
+      "dev_panel_image_count": 210,
+      "group_overlap_count": 0,
+      "release_id": "e1_label_v1",
+      "source_count": 4,
+      "source_group_count": 5671,
+      "source_image_count": 7541,
+      "source_release_sha256": "7ec21a150496c0da944ec3eaeeaae25d76f491b18b411b43700a1c5580f58a5a",
+      "train_group_count": 4820,
+      "train_image_count": 6312
+    },
+    "created_at_utc": "2026-08-11T23:09:57.924327+00:00",
+    "hub_repo_id": "danielfdias98/ISEPDermData",
+    "hub_revision": "f7403f817376de0dea0048bd3c490e294a0ccaca",
+    "id": "e1_label_v1",
+    "identity": {
+      "assignment_sha256": "3a2b9970937b29c2bf5de339dc8a4f85c917a457eb4e1182426e1c71e43befcd",
+      "data_config_sha256": "9449ac0eafa45a6f8dc25bc053227a9cbd1d24605d5928eb0023f1a02441aaf8",
+      "source_release_sha256": "7ec21a150496c0da944ec3eaeeaae25d76f491b18b411b43700a1c5580f58a5a"
+    },
+    "panel_groups_per_class": 10,
+    "panel_seed": 1042,
+    "phase": "e1_label",
+    "schema_version": "1.0.0",
+    "split_algorithm": "greedy_multilabel_group_stratification_v1",
+    "split_seed": 42,
+    "taxonomy_id": "dermatology_diseases"
+  }
+}

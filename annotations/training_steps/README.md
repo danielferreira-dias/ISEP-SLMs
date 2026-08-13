@@ -1,0 +1,18 @@
+# Training-step annotations
+
+This directory records the execution, validation, interpretation, and decision
+gates of each model-training phase. Raw predictions, checkpoints, telemetry,
+TensorBoard events, and automatically generated reports remain under
+`outputs/training/`; the annotations here provide the thesis-facing account and
+point to the preserved evidence.
+
+## Reports
+
+1. [E1 label-only: frozen vision versus Vision LoRA](01_e1_label_only_vision_lora_ablation.md)
+
+## Figure policy
+
+Figures selected for the dissertation are stored under `figures/` as both PNG
+and SVG. Every curated figure must have an adjacent CSV containing its source
+values. The full automatically generated figure set remains inside each run's
+`outputs/training/<experiment>/<run-id>/figures/` directory.

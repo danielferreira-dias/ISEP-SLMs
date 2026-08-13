@@ -1,0 +1,65 @@
+# Google multimodal API comparator with its native medium reasoning profile.
+
+schema_version: 1
+
+model:
+  id: gemini_3_7_flash_medium_openrouter
+  display_name: Gemini 3.7 Flash Medium (OpenRouter)
+  family: gemini
+  evaluation_role: teacher_candidate
+  training_stage: provider_managed
+  task_adaptation_stage: none
+  domain: general
+
+usage:
+  benchmark: true
+  fine_tuning: false
+
+capabilities:
+  modalities:
+    - text
+    - image
+    - video
+    - audio
+  structured_output_modes:
+    - prompt_only
+    - json_schema
+  context_length_tokens: 1048576
+  maximum_output_tokens: 65536
+
+source:
+  type: provider_api
+  provider: openrouter
+  model_name: google/gemini-3.7-flash
+
+backend:
+  default_profile: openrouter
+  profiles:
+    openrouter:
+      type: api
+      engine: openrouter
+      api_style: chat_completions
+      api_key_env: OPENROUTER_API_KEY
+      request_model: google/gemini-3.7-flash
+      thinking_control: openrouter_reasoning
+      request_timeout_seconds: 600
+      provider:
+        only:
+          - google-ai-studio
+        allow_fallbacks: false
+        require_parameters: true
+
+reasoning:
+  enabled: true
+  parser: provider_reasoning
+  exclude_from_structured_output: true
+
+generation:
+  # Sampling fields are intentionally omitted so Google provider defaults are
+  # retained, matching the Gemini 3.5 Flash-Lite comparator protocol.
+  profile: gemini_3_7_flash_native_medium
+  thinking_mode: enabled
+  reasoning_effort: medium
+
+security:
+  trust_remote_code: false

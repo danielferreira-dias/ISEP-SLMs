@@ -1,0 +1,25 @@
+# Local merged E1 Vision-LoRA checkpoint used only by visual attribution.
+
+schema_version: 1
+
+model:
+  id: qwen_3_5_4b_e1_vision_lora_attribution
+  display_name: Qwen 3.5 4B E1 Vision LoRA (epoch 3)
+  family: qwen
+  evaluation_role: candidate
+  training_stage: post_trained
+  task_adaptation_stage: e1_label_vision_lora
+
+source:
+  type: local
+  repo_id: outputs/merged_models/qwen_3_5_4b_e1_vision_lora_epoch3
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  access: private
+  license: apache-2.0
+
+processor:
+  repo_id: Qwen/Qwen3.5-4B
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+
+security:
+  trust_remote_code: false

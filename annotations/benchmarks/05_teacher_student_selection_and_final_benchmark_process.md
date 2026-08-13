@@ -273,6 +273,33 @@ student, os prompts ou o treino.
 O resultado central continuará a ser a diferença emparelhada entre o mesmo
 student antes e depois do fine-tuning, usando exatamente os mesmos casos.
 
+### 11.1 Benchmarks textuais complementares após fine-tuning e distilação
+
+Depois de congelar o checkpoint vencedor de uma fase, pode ser executada uma
+avaliação complementar em MedQA, no subconjunto expert-labeled do PubMedQA
+(`PQA-L`) e nos cinco domínios médicos de MMLU (`anatomy`,
+`clinical_knowledge`, `college_medicine`, `medical_genetics` e
+`professional_medicine`). O objetivo é medir retenção de conhecimento médico,
+catastrophic forgetting e transferência de conhecimento entre um teacher
+open-weight e o student; estes resultados não medem visão dermatológica.
+
+O PubMedQA é uma tarefa determinística `yes/no/maybe` baseada em abstracts
+biomédicos ([Jin et al., 2019](https://arxiv.org/abs/1909.06146)). A release,
+o split, o prompt e o parser de todas estas tarefas devem ser congelados antes
+da primeira execução confirmatória.
+
+Devem ser comparados o Qwen 3.5 4B base, os vencedores de fase relevantes, o
+teacher open-weight e o student distilled final com a mesma release, prompt,
+decoding e parser. MedQA, PubMedQA e MMLU não podem selecionar checkpoints ou
+alterar hiperparâmetros. O seu uso para tuning invalidaria a interpretação
+como avaliação externa. Os resultados permanecem separados do ISEPDermaBench
+e do DermoBench e incluem uma ressalva de possível contaminação por pretraining,
+dado serem benchmarks públicos amplamente usados.
+
+Assim, a ordem é: `SFT Dev -> checkpoint selection -> checkpoint congelado ->
+MedQA/PubMedQA/MMLU`. Os benchmarks públicos quantificam retenção e
+transferência; não reabrem a seleção do checkpoint.
+
 ## 12. Flow final
 
 ```text

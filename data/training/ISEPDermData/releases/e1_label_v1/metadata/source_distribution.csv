@@ -1,0 +1,9 @@
+split,source,image_count,group_count,dev_panel_count
+sft_dev,fitzpatrick17k_c,492,491,133
+sft_dev,hiba,64,25,6
+sft_dev,pad_ufes_20,271,150,29
+sft_dev,scin,402,185,42
+sft_train,fitzpatrick17k_c,2734,2725,0
+sft_train,hiba,254,204,0
+sft_train,pad_ufes_20,1358,959,0
+sft_train,scin,1966,932,0

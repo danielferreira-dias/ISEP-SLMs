@@ -1,0 +1,70 @@
+schema_version: 1
+
+analysis_id: qwen_3_5_4b_e0_cuda_bf16_visual_attribution_v1
+model_config: configs/models/qwen_small_4b.yaml
+model_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+
+dataset:
+  root: data/benchmarks/ISEPDermaBench
+  split: validation
+  taxonomy: data/benchmarks/ISEPDermaBench/artifacts/taxonomies/diseases.yaml
+  prediction_file: outputs/validation_screening_v1/thinking_off/visual_top_k_closed_set/qwen_3_5_4b/20260802T015426Z_94ab387b/predictions.jsonl
+
+# The cases and diagnostic targets are identical to the frozen E0 pilot and the
+# E1 Vision-LoRA analysis. This run changes only device/precision to match E1.
+cases:
+  - task_id: SCIN_966663640331506400_IMAGE_2
+    cohort: correct_top1
+    gold_disease_id: D011
+    predicted_disease_id: D011
+    benchmark_image_sha256: b57730ec6a8a56fef8ef848e94be78559a9e15d84dbecb4cd1afd3edda653ba3
+
+  - task_id: SCIN_-1306019410543480387_IMAGE_2
+    cohort: wrong_gold_in_top6
+    gold_disease_id: D017
+    predicted_disease_id: D003
+    benchmark_image_sha256: e67ffbe2a708c8a893bbd13e3d4f7dd1bb1af62a005fb2e8bb99672e2b063241
+
+  - task_id: FITZPATRICK17K_C_89a3cd4bb9ceae04b10e410dd9567f9e
+    cohort: wrong_gold_absent_top6
+    gold_disease_id: D025
+    predicted_disease_id: D005
+    benchmark_image_sha256: 4a50be5248659eb0068b5a30da0d50c874dd53c7d162ac739b9352b127505022
+
+method:
+  id: blurred_patch_occlusion
+  grid_size: 3
+  blur_radius_fraction: 0.08
+
+prompts:
+  system_prompt: |
+    You are performing a closed-set dermatological image-classification task.
+    Use only evidence visible in the supplied image. Do not infer symptoms,
+    history, demographics, pathology, or tests. Return exactly one disease ID
+    and no other text.
+
+  user_prompt: |
+    Select the single most plausible diagnosis from this taxonomy:
+    - D001: Melanoma
+    - D002: Melanocytic nevus
+    - D003: Psoriasis
+    - D004: Basal cell carcinoma
+    - D005: Squamous cell carcinoma
+    - D006: Seborrheic keratosis
+    - D007: Actinic keratosis
+    - D009: Contact dermatitis
+    - D011: Acne vulgaris
+    - D012: Rosacea
+    - D013: Vitiligo
+    - D014: Eczema
+    - D015: Seborrheic dermatitis
+    - D016: Folliculitis
+    - D017: Urticaria
+    - D018: Scabies
+    - D019: Pityriasis rosea
+    - D022: Prurigo nodularis
+    - D023: Granuloma annulare
+    - D024: Erythema multiforme
+    - D025: Drug eruption
+
+    Return only the disease ID.

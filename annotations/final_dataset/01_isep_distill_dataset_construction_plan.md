@@ -165,16 +165,20 @@ licença permite o uso?
 
 O protocolo de benchmark e isolamento de referências está documentado em [ISEPDermaBench Hugging Face release](../dataset_pipeline/13_isep_dermabench_huggingface_release.md). A publicação do dataset de treino não deve conter tabelas de referência, respostas corretas ou artefactos privados dos benchmarks.
 
-## 6. Modelo lógico: um caso, várias tarefas
+## 6. Modelo lógico: um caso, várias imagens possíveis e várias tarefas
 
-O desenho recomendado tem um registo canónico por imagem e várias tabelas derivadas. A imagem pode aparecer visualmente em várias linhas do Dataset Viewer, mas essas linhas representam perguntas diferentes.
+O desenho recomendado mantém uma imagem por linha na primeira release, mas distingue explicitamente o caso clínico do asset visual. Um caso, lesão ou doente pode ter várias fotografias; cada fotografia conserva o seu `sample_id` e `image_asset_id`, enquanto todas partilham o mesmo `case_id` e `leakage_group_id`. Desta forma, as imagens continuam simples para o trainer sem serem incorretamente tratadas como observações clínicas independentes durante os splits.
+
+A mesma imagem pode aparecer visualmente em várias linhas do Dataset Viewer quando essas linhas representam perguntas diferentes. Fotografias diferentes do mesmo caso também podem originar linhas próprias, desde que a relação entre elas permaneça explícita.
 
 Esta separação por capacidade é sustentada por resultados convergentes, embora nenhum estudo imponha este schema de Hugging Face. O SkinGPT-4 separou alinhamento de conceitos e diálogo clínico ([Zhou et al., 2024](https://doi.org/10.1038/s41467-024-50043-3)); MAKE decompôs texto dermatológico em aspetos clínicos alinháveis à imagem ([Yan et al., 2025](https://arxiv.org/abs/2505.09372)); e DermoGPT criou trajetórias distintas para morfologia e diagnóstico ([Ru et al., 2026](https://arxiv.org/abs/2601.01868)). O plano traduz esse princípio numa decisão de dados: uma imagem pode ensinar várias capacidades, mas cada linha deve deixar claro qual capacidade está a ser supervisionada. A forma exata das configurações abaixo é uma opção de engenharia da tese.
 
 ```text
 canonical_sample (privado/controlo)
   sample_id
+  case_id
   image_asset_id
+  view_type
   source + source_id
   leakage_group_id
   gold_diagnosis + provenance
@@ -188,7 +192,7 @@ canonical_sample (privado/controlo)
         +-- preferences     resposta aceite/rejeitada, opcional
 ```
 
-Isto não significa armazenar cinco ficheiros de imagem originais. Deve existir um único `image_asset_id` e um único ficheiro canónico sempre que o formato de publicação o permitir. Os exports Parquet que materializam bytes podem aumentar o tamanho. Esse trade-off deve ser medido no builder em vez de assumido.
+Isto não significa armazenar cinco cópias do mesmo ficheiro original. Cada fotografia distinta tem um único `image_asset_id` e um único ficheiro canónico sempre que o formato de publicação o permitir. Os exports Parquet que materializam bytes podem aumentar o tamanho. Esse trade-off deve ser medido no builder em vez de assumido.
 
 ### 6.1 Configurações Hugging Face
 
@@ -205,12 +209,26 @@ A primeira release pode publicar apenas as cinco configurações supervisionadas
 
 ### 6.2 Chaves e cardinalidade
 
-- `sample_id` identifica o caso canónico e é igual em todas as configurações.
-- `task_id` identifica uma pergunta concreta para esse caso.
+- `sample_id` identifica uma fotografia canónica e é igual em todas as configurações derivadas dessa fotografia.
+- `case_id` identifica o caso clínico, lesão ou contribuição de origem e pode ligar várias fotografias.
+- `task_id` identifica uma pergunta concreta para essa fotografia ou caso.
 - `generation_id` identifica uma execução do teacher.
 - `image_asset_id` identifica o ficheiro de imagem canónico.
 - `sample_id + task_id + target_variant` deve ser único.
 - Um `sample_id` pode ter muitas tarefas e várias gerações candidatas, mas apenas uma versão aceite de cada target entra numa release congelada.
+- Todos os `sample_id` associados ao mesmo `case_id`, doente ou lesão devem partilhar uma unidade de split indivisível através de `leakage_group_id`.
+
+### 6.3 Casos com várias fotografias
+
+A release v1 não necessita de colocar várias imagens na mesma linha. A representação principal deve continuar a ser uma imagem por exemplo:
+
+| `sample_id` | `case_id` | `image_asset_id` | `view_type` | `leakage_group_id` |
+| --- | --- | --- | --- | --- |
+| `SCIN_123_IMG_1` | `SCIN_123` | `overview.jpg` | `overview` | `SCIN_123` |
+| `SCIN_123_IMG_2` | `SCIN_123` | `closeup.jpg` | `close_up` | `SCIN_123` |
+| `SCIN_123_IMG_3` | `SCIN_123` | `angled.jpg` | `oblique` | `SCIN_123` |
+
+Esta decisão permite usar todas as fotografias como exemplos single-image, mas impede que vistas da mesma lesão sejam divididas entre treino, desenvolvimento e avaliação. Quando a aplicação suportar uma conversa em que o modelo pede uma segunda fotografia e a recebe num turno posterior, pode ser adicionada uma configuração opcional `multi_view` ou `interactive_follow_up`. Nessa configuração, uma linha pode conter `image_asset_ids[]`, `view_types[]` e vários turnos multimodais. Essa extensão não deve ser requisito para o primeiro SFT.
 
 ## 7. Schema canónico
 
@@ -221,7 +239,9 @@ O registo canónico deve conter mais informação do que aquela mostrada ao mode
 | Campo | Conteúdo |
 | --- | --- |
 | `sample_id` | identificador estável, sem semântica clínica |
+| `case_id` | identificador que liga fotografias do mesmo caso, lesão ou contribuição |
 | `image_asset_id` | ligação ao asset canónico |
+| `view_type` | `overview`, `close_up`, `oblique`, `dermoscopic`, `unknown` ou outro valor controlado |
 | `image_sha256` | deteção exata de duplicados e integridade |
 | `perceptual_group_id` | grupo de imagens visualmente equivalentes |
 | `leakage_group_id` | unidade indivisível de split |
@@ -327,6 +347,20 @@ RECOMMEND_CONFIRMATORY_TEST
 ABSTAIN_POOR_QUALITY
 ABSTAIN_OUT_OF_DOMAIN
 ```
+
+#### 7.4.1 Supervisão das decisões adaptativas
+
+As ações acima não serão aprendidas apenas com exemplos em que toda a imagem termina numa das 21 doenças. O dataset deve conter tarefas com um target de ação explícito e apenas a informação necessária para justificar essa ação:
+
+| Situação observada | Target principal | Regra de construção |
+| --- | --- | --- |
+| imagem avaliável e evidência suficientemente discriminativa | `DIAGNOSE_PROVISIONALLY` | usar diagnóstico gold e rationale visual aceite |
+| hipóteses visualmente próximas que dependem de história | `REQUEST_CLINICAL_CONTEXT` | pedir uma única informação que discrimine o diferencial; preferir contexto real de SCIN/PAD-UFES |
+| desfoque, distância, corte, oclusão ou iluminação inadequada | `REQUEST_OVERVIEW_IMAGE`, `REQUEST_CLOSEUP_IMAGE` ou `ABSTAIN_POOR_QUALITY` | usar imagens de qualidade insuficiente ou degradações controladas; manter original e derivadas no mesmo `leakage_group_id` |
+| fotografia sem lesão dermatológica avaliável ou condição fora do âmbito suportado | `ABSTAIN_OUT_OF_DOMAIN` | distinguir não dermatológico de doença dermatológica fora das 21 classes |
+| fotografia e contexto insuficientes para uma conclusão segura | `REQUEST_IN_PERSON_EXAM`, `REQUEST_DERMOSCOPY` ou `RECOMMEND_CONFIRMATORY_TEST` | não forçar uma label apenas porque existe no registo privado |
+
+Uma row adaptativa deve ensinar uma ação principal, uma pergunta curta quando aplicável e uma rationale verificável; não deve conter uma chain-of-thought longa. Respostas clínicas reais podem ser usadas como contexto quando a provenance o permite. Respostas simuladas do utilizador devem ser marcadas como sintéticas e nunca apresentadas como história real. A proporção entre diagnóstico, pedido de contexto, pedido de imagem e abstention deve ser escolhida através de um pilot na Validation, medindo tanto diagnóstico excessivo como abstention excessiva.
 
 ### 7.5 Resposta estruturada e resposta aberta
 
@@ -756,6 +790,82 @@ O dataset contribui para a visão através de supervisão explícita, mas a inve
 
 A ordem V1–V5 coloca primeiro a supervisão de conceitos porque SKINCON foi criado para explicações e debugging baseado em conceitos ([Daneshjou et al., 2022](https://papers.nips.cc/paper_files/paper/2022/hash/7318b51b52078e3af28197e725f5068a-Abstract-Datasets_and_Benchmarks.html)). Só depois introduz um teacher visual de domínio, apoiado pela escala e resultados de PanDerm ([A multimodal vision foundation model for clinical dermatology, 2025](https://doi.org/10.1038/s41591-025-03747-y)), e finalmente o operador experimental de SkinFlow ([Liu et al., 2026](https://arxiv.org/abs/2601.09136)). Deste modo, se houver melhoria, a tese consegue distinguir o efeito de melhores targets visuais do efeito de alterar a arquitetura.
 
+### 14.1 Análise visual before/after do student
+
+Além das métricas de benchmark, a tese deve incluir uma análise interpretativa reproduzível de como a atribuição visual do Qwen 3.5 4B muda ao longo do treino. Esta análise não é uma nova benchmark principal e não deve ser apresentada como prova de raciocínio interno. O objetivo é produzir uma vista programática, comparável e auditável das regiões da imagem associadas a um output clínico específico.
+
+O conjunto principal deve conter 21 casos fixos da Validation, idealmente um por classe, escolhidos antes de observar os heatmaps e equilibrados tanto quanto possível por source e tom de pele. Os mesmos bytes, prompt e target devem ser usados em todos os checkpoints:
+
+```text
+E0_base
+  -> E1_label
+  -> E2_structured
+  -> E3_hard_kd
+  -> E5_vision, se existir
+  -> E6_final
+```
+
+Para cada caso e checkpoint devem ser geradas duas atribuições:
+
+1. uma atribuição para a log-probability da mesma label gold, permitindo comparação direta entre checkpoints;
+2. uma atribuição para a label efetivamente prevista pelo checkpoint, mostrando a evidência associada ao seu comportamento real.
+
+Comparar apenas o segundo mapa pode ser enganador quando o modelo base prevê eczema e o modelo final prevê psoriasis, porque os heatmaps estariam condicionados por targets diferentes.
+
+#### Execução programática
+
+A análise deve usar PyTorch/Transformers diretamente, com o modelo em `eval()` mas gradients ativados. Não deve usar a API OpenAI-compatible do vLLM como mecanismo principal: o endpoint é adequado para geração rápida, mas não expõe de forma estável os gradients e ativações necessários. A implementação deve ser um módulo separado da pipeline de benchmark, com aproximadamente esta responsabilidade:
+
+```text
+src/vision_analysis/
+  cli.py                 seleção de casos, checkpoints e métodos
+  model_adapter.py       carregamento e hooks específicos do Qwen
+  targets.py             score teacher-forced da label gold/predita
+  attribution.py         gradient × activation e occlusion
+  layers.py              early/middle/late vision e fusão multimodal
+  render.py              overlays e painéis comparativos
+  report.py              HTML e manifest auditável
+```
+
+O fluxo por caso é:
+
+```text
+imagem + prompt congelado
+  -> forward teacher-forced da label alvo
+  -> score = soma da log-probability dos tokens da label
+  -> gradient do score relativamente aos visual patch embeddings
+  -> importância por patch
+  -> reshape para a grelha visual
+  -> interpolação para a resolução original
+  -> raw map + overlay + metadata
+```
+
+Os hooks devem observar posições normalizadas da componente visual — aproximadamente 25%, 50%, 75% e 100% dos blocos — e a representação depois da fusão visual-textual, em vez de depender de nomes frágeis de layers. A disponibilidade exata de attentions e hidden states deve ser verificada contra a implementação Transformers da revisão congelada do Qwen. O método primário deve ser `gradient × activation` sobre visual tokens, acompanhado por patch occlusion como teste de sensibilidade. Attention rollout e relevance propagation podem ser visualizações secundárias.
+
+O script deve processar um checkpoint de cada vez com batch size 1, gravar cada caso atomicamente e só depois libertar o modelo e carregar o checkpoint seguinte. Um GPU de 24 GB pode ser suficiente para o Qwen 4B e attribution simples; 48 GB oferece margem mais segura para eager attention, alta resolução e layers intermédias. Não é necessário um H100 para 21 casos. Num RunPod, os resultados devem ser sincronizados periodicamente para o workspace local, seguindo o mesmo princípio de checkpoint durável usado nas benchmarks.
+
+Outputs mínimos:
+
+```text
+outputs/vision_analysis/<analysis_id>/
+  manifest.json
+  cases/<case_id>/<checkpoint>/<target>/
+    attribution.npy
+    overlay.png
+    metadata.json
+  report.html
+```
+
+`metadata.json` deve registar checkpoint hash, model revision, processor revision, prompt hash, target textual, tokens do target, score, layer, método, normalização, resolução e seed quando aplicável. O relatório deve mostrar a imagem original ao lado dos checkpoints; o overlay nunca deve ser a única vista porque pode ocultar a própria lesão.
+
+#### Interpretação e limites
+
+[Grad-CAM](https://openaccess.thecvf.com/content_iccv_2017/html/Selvaraju_Grad-CAM_Visual_Explanations_ICCV_2017_paper.html) estabeleceu o uso de gradients para localizar regiões associadas a um conceito; para Transformers multimodais, [Chefer, Gur e Wolf (2021)](https://openaccess.thecvf.com/content/ICCV2021/html/Chefer_Generic_Attention-Model_Explainability_for_Interpreting_Bi-Modal_and_Encoder-Decoder_Transformers_ICCV_2021_paper.html) propõem relevance propagation para arquiteturas bi-modais e encoder-decoder. [Attention rollout](https://aclanthology.org/2020.acl-main.385/) permite acompanhar fluxo de informação através das layers, mas atenção bruta não deve ser confundida com uma explicação causal: [Jain e Wallace (2019)](https://aclanthology.org/N19-1357/) mostram que distribuições de atenção diferentes podem produzir previsões equivalentes, e [Adebayo et al. (2018)](https://proceedings.neurips.cc/paper/2018/hash/294a8ed24b1ad22ec2e7efea049b8737-Abstract.html) demonstram que alguns mapas visualmente plausíveis são insensíveis ao modelo ou aos dados. Patch occlusion e sanity checks são, portanto, obrigatórios para qualquer interpretação forte.
+
+Há evidência dermatológica direta para estudar alinhamento visual. [SKINCON](https://papers.nips.cc/paper/2022/hash/7318b51b52078e3af28197e725f5068a-Abstract-Datasets_and_Benchmarks.html) fornece conceitos dermatológicos para debugging e explicações baseadas em conceitos. Um sistema alinhado com regiões e características selecionadas por dermatologistas aumentou a confiança diagnóstica e a confiança no suporte, embora o primeiro estudo não tenha demonstrado ganho adicional significativo de accuracy sobre AI sem explicações ([Chanda et al., 2024](https://www.nature.com/articles/s41467-023-43095-4)); um estudo posterior com eye-tracking reportou mais 2,8 pontos percentuais de balanced accuracy com XAI ([Chanda et al., 2025](https://www.nature.com/articles/s41467-025-59532-5)). Uma comparação de 2026 encontrou correlação mediana de 0,540 entre mapas da AI e dermatologistas, face a 0,591 entre dermatologistas e 0,434 no controlo não homólogo ([Kremer et al., 2026](https://pubmed.ncbi.nlm.nih.gov/41490767/)). Estes resultados justificam a análise, mas não transformam um heatmap isolado em validação clínica.
+
+Na primeira versão, os 21 painéis são uma case study qualitativa. Se posteriormente existirem lesion masks ou regiões de conceitos anotadas, a mesma pipeline pode calcular energia dentro da lesão, pointing-game accuracy, IoU/Dice e queda do score após remoção das regiões mais salientes. Só essa versão congelada e quantitativa deve ser descrita como avaliação de localização auxiliar. A mudança de representações entre layers também pode ser estudada com CKA ([Kornblith et al., 2019](https://proceedings.mlr.press/v97/kornblith19a.html)), sem assumir que semelhança representacional equivale a grounding clínico.
+
 ## 15. Ablations obrigatórias
 
 ### 15.1 Conteúdo do dataset
@@ -850,6 +960,93 @@ Attention maps podem ser exploradas, mas não provam causalmente que o modelo us
 - parâmetros treináveis, VRAM, throughput e latência do student.
 - tamanho das configurações e artefactos de distilação.
 
+### 16.6 Retenção de conhecimento médico e geral
+
+Além do ISEPDermaBench, DermoBench, DDI e SkinDisNet, a avaliação final pode
+incluir **MedQA**, **PubMedQA** e os domínios médicos de **MMLU**. Estes
+benchmarks têm uma função diferente: não medem perceção dermatológica nem
+grounding visual; medem conhecimento médico textual, resolução de perguntas
+determinísticas e eventual perda de capacidades após especialização ou
+distilação.
+
+O MMLU original reúne 57 tarefas académicas e profissionais e foi proposto
+para medir simultaneamente conhecimento e problem solving
+([Hendrycks et al., 2021](https://arxiv.org/abs/2009.03300)). Para esta tese, o
+núcleo relevante deve ser pré-registado como `anatomy`, `clinical_knowledge`,
+`college_medicine`, `medical_genetics` e `professional_medicine`. O MMLU
+completo pode ser executado como análise secundária de retenção geral, mas não
+deve ser agregado às métricas dermatológicas.
+
+O MedQA foi construído a partir de exames médicos profissionais e inclui
+perguntas em inglês, chinês simplificado e chinês tradicional
+([Jin et al., 2020](https://arxiv.org/abs/2009.13081)). A condição principal
+deve congelar antecipadamente a variante linguística, release, split, número
+de opções, prompt e regime zero-shot/few-shot. A versão inglesa é o candidato
+natural para comparação com os restantes benchmarks, mas esta escolha só deve
+ser formalizada depois de verificar licença, formato e overlap conhecido.
+
+O PubMedQA avalia perguntas biomédicas `yes/no/maybe` a partir do abstract do
+artigo correspondente. O dataset original contém 1.000 instâncias anotadas por
+especialistas, além de subconjuntos não anotados e artificialmente gerados
+([Jin et al., 2019](https://arxiv.org/abs/1909.06146)). A avaliação da tese deve
+usar apenas o subconjunto expert-labeled (`PQA-L`) e congelar a release, o split,
+o prompt e o parser; os subconjuntos sintéticos não devem ser misturados na
+métrica principal.
+
+O fluxo correto distingue seleção interna de checkpoint e avaliação externa:
+
+```text
+Training objective
+        ↓
+Small medical MLLM
+        ↓
+SFT Dev determinístico
+(label accuracy, macro-F1, balanced accuracy e eval loss)
+        ↓
+checkpoint selection
+        ↓
+checkpoint de fase congelado
+        ↓
+┌──────────────────────────────────────┐
+│ Avaliações determinísticas externas  │
+│                                      │
+│ MedQA                                │
+│ MMLU Clinical Knowledge              │
+│ MMLU Professional Medicine           │
+│ MMLU Medical Genetics                │
+│ MMLU Anatomy / College Medicine      │
+│ PubMedQA PQA-L                       │
+└──────────────────────────────────────┘
+        ↓
+retenção, transferência e forgetting
+(sem voltar a escolher o checkpoint)
+```
+
+A comparação recomendada é:
+
+1. Qwen 3.5 4B base, antes de qualquer treino;
+2. checkpoint vencedor de cada fase relevante (`E1`, `E2`, `E3` e `E4`),
+   apenas quando essa fase for declarada concluída;
+3. teacher open-weight usado na distilação;
+4. student final distilled;
+5. opcionalmente, o modelo grande de referência sob o mesmo prompt e decoding.
+
+Esta grelha permite medir três quantidades separadas: ganho dermatológico,
+retenção de conhecimento médico e aproximação do student ao teacher. Deve ser
+reportada accuracy exact-match, taxa de outputs inválidos, resultado por
+subdomínio, diferença relativamente ao student base e diferença relativamente
+ao teacher, acompanhadas por latência, VRAM e número de parâmetros. Uma subida
+em MedQA/MMLU não prova melhoria visual; uma descida não invalida por si só o
+especialista, mas quantifica o custo da especialização.
+
+MedQA, PubMedQA e MMLU **não entram na seleção de checkpoint, learning rate,
+mistura de dados, prompt ou método de distilação**. Consultá-los repetidamente
+para tomar essas decisões transformá-los-ia em conjuntos de desenvolvimento.
+Devem ser executados apenas sobre modelos já congelados, com o mesmo protocolo
+entre teacher e student. Como são benchmarks públicos e amplamente usados, os
+resultados devem ainda ser apresentados com uma nota explícita sobre possível
+contaminação de pretraining e não como validação clínica.
+
 ## 17. Protocolo de utilização dos splits
 
 ```text
@@ -867,6 +1064,10 @@ Internal Benchmark selado
 
 DDI + SkinDisNet
   -> generalização externa, nunca geração de targets de treino
+
+MedQA + PubMedQA PQA-L + MMLU médico
+  -> retenção textual e transferência teacher-student depois de congelar cada fase
+  -> nunca seleção de checkpoint ou tuning retroativo
 ```
 
 O Internal Benchmark não deve ser consultado para escolher mistura de tarefas, prompt, temperatura, checkpoint ou arquitetura. Se for usado repetidamente, deixa de ser um teste selado e deve ser substituído ou declarado como conjunto de desenvolvimento.
@@ -923,6 +1124,8 @@ Feature KD, on-policy distillation, Vision LoRA, multi-scale ou `FDLinear` só a
 | Raw CoT longo | truncamento, exposição de artefactos e claims não verificáveis | rationale curta. Raw output privado para auditoria |
 | Teacher demasiado diferente | KD ineficiente | teacher selection pela aprendizagem do student |
 | Alteração visual prematura | custo e conclusão causal ambígua | baseline, targets visuais e alternativas simples antes de FDLinear |
+| Reutilização de MedQA/MMLU durante tuning | benchmark externo convertido em validation e resultado otimista | executar apenas modelos de fase congelados e proibir seleção retroativa |
+| Contaminação de benchmarks públicos | resultado textual sobrestima generalização | declarar risco de pretraining overlap e não interpretar como validação clínica |
 
 ## 20. Reprodutibilidade e versionamento
 
