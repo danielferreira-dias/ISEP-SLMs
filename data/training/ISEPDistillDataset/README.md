@@ -30,6 +30,12 @@ configs:
         path: data/morphology/sft_train-*.parquet
       - split: sft_dev
         path: data/morphology/sft_dev-*.parquet
+  - config_name: caption
+    data_files:
+      - split: sft_train
+        path: data/caption_v0_4_1/sft_train-*.parquet
+      - split: sft_dev
+        path: data/caption_v0_4_1/sft_dev-*.parquet
 ---
 
 # ISEPDistillDataset
@@ -37,10 +43,12 @@ configs:
 Private research repository for the multimodal training corpus used in the
 ISEP thesis on dermatology-specialized small multimodal language models.
 
-> **Status:** release `isep_distill_dataset_v0.3.0` is materialized and
-> validated. The Dataset Viewer exposes only the real `diagnosis` and
-> `morphology` Parquet configs; documentation examples and JSON schemas are not
-> interpreted as training rows.
+> **Status:** corrected additive release `isep_distill_dataset_v0.4.1` is materialized
+> and validated. It preserves the v0.3 `diagnosis` and `morphology` shards and
+> adds the authorized `caption` configuration. The frozen v0.3 manifest remains
+> at `metadata/release.json`; the current manifest is under
+> `releases/isep_distill_dataset_v0.4.1/`. v0.4.0 is withdrawn because its
+> task-local split check missed 125 cross-task train/dev group conflicts.
 
 ## Released configurations
 
@@ -48,11 +56,26 @@ ISEP thesis on dermatology-specialized small multimodal language models.
 |---|---:|---:|---:|---|
 | `diagnosis` | 6,312 | 1,229 | 7,541 | One canonical label from the frozen 21-class taxonomy |
 | `morphology` | 3,068 | 527 | 3,595 | All positive concepts from the 48-concept SKINCON ontology |
+| `caption` | 2,767 | 483 | 3,250 | Short observation-only prefix filtered from authorized SkinCAP text |
 
 `diagnosis` reproduces the frozen E1 split exactly. `morphology` excludes 271
 SKINCON rows that overlap ISEPDermaBench Validation/Internal groups. Its 606
 rows already present in E1 inherit their frozen split; remaining groups use a
 deterministic 85/15 split with seed 42.
+
+`caption` excludes 439 author-rejected cases and 243 frozen benchmark overlaps
+before transformation. A versioned high-precision transform accepts 3,250 of
+3,318 technical candidates. The source captions were produced with knowledge
+of the diagnosis, so these rows are explicitly labelled
+`human_caption_gold_conditioned_filtered`; they are not presented as
+answer-blind descriptions. Written derivative permission was attested by the
+project owner on 15 August 2026 and the permission document itself is not
+stored in this repository.
+
+Every caption group now inherits the already frozen E1 or morphology split.
+The combined `diagnosis + morphology + caption` release has zero train/dev
+overlap by `leakage_group_id`; the manifest records the source of each caption
+split. This cross-task invariant is checked by the runtime before training.
 
 ## Objective
 
@@ -75,7 +98,7 @@ diagnosis is used only after generation for filtering and partial acceptance.
 |---|---|---|---|
 | `diagnosis` **released** | One diagnostic task per image | Canonical label | Normalized gold label |
 | `morphology` **released** | One perception task per image | Visible SKINCON concepts | All eligible SKINCON |
-| `caption` | One description task per image | Short clinical caption | Eligible human text or accepted Stage A rendering |
+| `caption` **released** | One description task per image | Short visible observation | Authorized, filtered SkinCAP prefix |
 | `structured` | One complete clinical task per image | Observations, differential, evidence, uncertainty, action | Accepted Stage A and Stage B |
 | `open_response` | One open clinical task per image | Short natural-language response consistent with the canonical JSON | Rendering of the accepted structured target |
 
@@ -85,14 +108,15 @@ on-policy artifacts are not part of the first core dataset release.
 ## Dataset Viewer
 
 The release uses explicit dataset-card configs and image-aware Parquet metadata.
-The Viewer therefore offers `diagnosis` and `morphology`, each with
-`sft_train`/`sft_dev`, and renders the embedded clinical image plus nested
-`messages` and `skincon` fields.
+The Viewer therefore offers `diagnosis`, `morphology`, and `caption`, each with
+`sft_train`/`sft_dev`, and renders the embedded clinical image plus the exact
+trainer-visible prompt/target messages.
 
 | config | sample_id | image | target_text | quality_status | messages |
 |---|---|---|---|---|---:|
 | `diagnosis` | source-stable ID | embedded source image | canonical label | `accepted` | 2 |
 | `morphology` | SKINCON-stable ID | embedded source image | deterministic concept JSON | `accepted` | 2 |
+| `caption` | SkinCAP-stable ID | embedded source image | filtered visible observation | `accepted` | 2 |
 
 The synthetic examples under `examples/` document future schemas only and are
 excluded by the explicit `configs` manifest above.
@@ -102,7 +126,7 @@ excluded by the explicit `configs` manifest above.
 | Group | Fields |
 |---|---|
 | Identity | `sample_id`, `case_id`, `task_id`, `image_asset_id`, `view_type` |
-| Leakage control | `leakage_group_id`, `split`, `split_inherited_from_e1` where applicable |
+| Leakage control | `leakage_group_id`, `split`, `split_inherited_from_e1`, `split_source` where applicable |
 | Provenance | `source_dataset`, `source_sample_id`, `license_id`, `image_sha256` |
 | Gold | `disease_id`, `gold_diagnosis`, `gold_provenance`, `taxonomy_version` |
 | Human morphology | `skincon.ontology_version`, `skincon.source_subset`, `skincon.positive_concepts`, `skincon.all_concepts_annotated` |
@@ -132,14 +156,16 @@ an all-null placeholder target.
 - DDI is now admitted to morphology training. Consequently, DDI results after
   this release are in-domain/contaminated diagnostics and cannot be presented
   as independent external generalization evidence.
-- `caption` requires eligible human text or an accepted Stage A rendering.
+- `caption` contains 3,250 filtered SkinCAP observations. Raw captions,
+  diagnoses, and removed suffixes are excluded from trainer-visible shards.
 - `structured` requires accepted Stage A and Stage B components.
 - `open_response` is created only when an accepted canonical structured target
   can be rendered consistently.
 
 The release manifest reports exact shards, hashes, coverage and split counts in
-`metadata/release.json`; `metadata/quality_summary.json` records the validation
-gates.
+`metadata/release.json` for v0.3 and
+`releases/isep_distill_dataset_v0.4.1/release.json` for v0.4.1; the matching
+quality summaries record the validation gates.
 
 The frozen ontology order and the reproduced coverage audit are stored in
 `metadata/skincon_ontology.json` and `metadata/skincon_coverage.json`. A
@@ -172,15 +198,20 @@ ISEPDistillDataset/
   data/
     diagnosis/
     morphology/
+    caption/                 # withdrawn v0.4.0, retained for auditability
+    caption_v0_4_1/          # current Viewer/training shards
   examples/
   metadata/
+  releases/
+    isep_distill_dataset_v0.4.0/
+    isep_distill_dataset_v0.4.1/
   schemas/
 ```
 
 The Parquet shards were written by the versioned builder after split, license,
-leakage, schema, image-decode, and checksum gates passed. `caption`,
-`structured`, and `open_response` remain planned configs and will be exposed
-only after real accepted targets exist.
+leakage, schema, image-decode, and checksum gates passed. `diagnosis`,
+`morphology`, and `caption` are materialized; `structured` and `open_response`
+remain planned configs.
 
 ## Versioning policy
 

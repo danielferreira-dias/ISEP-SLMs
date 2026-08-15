@@ -3,7 +3,7 @@
 | Campo | Valor |
 | --- | --- |
 | Data da decisão | 2026-08-08 |
-| Estado | especificação metodológica; `diagnosis` e `morphology` v0.3.0 materializados |
+| Estado | `diagnosis` e `morphology` v0.3.0; `caption` SkinCAP corrigido em v0.4.1 |
 | Student de referência | Qwen 3.5 4B multimodal |
 | Objetivo | construir supervisão multimodal leakage-safe para especializar um modelo pequeno em perceção, descrição e diagnóstico dermatológico, mantendo cada afirmação clínica auditável |
 
@@ -127,6 +127,8 @@ O builder materializado confirmou que todas as 3.866 anotações SKINCON utiliz�
 
 O snapshot local de [SkinCaRe](../../configs/datasets/skincare/README.md) inclui 4.000 imagens SkinCAP, 3.041 imagens SkinCoT e versões textuais em inglês e chinês. SkinCAP contém 187 strings de doença e deriva de 3.345 casos Fitzpatrick17k e 655 casos DDI. A versão atual do artigo SkinCaRe unifica SkinCAP e SkinCoT: apresenta as 4.000 captions como descrições escritas por dermatologistas e os 3.041 pares de reasoning como narrativas hierárquicas verificadas por clínicos ([Shen et al., 2025](https://arxiv.org/abs/2405.18004)). Isto justifica testar captions como supervisão auxiliar de descrição e reasoning como fonte condicional de estrutura clínica; não permite assumir que todas as frases constituem ground truth visual independente.
 
+O snapshot standalone de [SkinCAP](../../configs/datasets/skincap/README.md), fixado à revisão Hub `4119044b3e14085d7439f88016d93376d433da5f`, foi auditado em 15 de agosto de 2026. Das 4.000 linhas, 439 têm `Do not consider this image = 1`; entre as 3.561 restantes, 124 intersectam Validation e 119 intersectam o Internal Benchmark congelado. Restam 3.318 candidatos técnicos, correspondentes a 3.317 grupos de leakage: 2.683 Fitzpatrick17k e 635 DDI. O transformador versionado `skincap_observation_prefix_v1` remove o sufixo desde o primeiro limite de diagnóstico, gold label, teste ou gestão e aplica guards de comprimento e leakage residual. Aceitou algoritmicamente 3.250 observações (2.649 Fitzpatrick17k e 601 DDI; mediana de 19 palavras) e rejeitou 68. Depois de o responsável pelo projeto atestar possuir autorização escrita para criar os derivados privados, estes 3.250 targets foram materializados. A v0.4.0 foi retirada ao serem encontrados 125 grupos partilhados com splits divergentes entre tarefas; a v0.4.1 corrigida herda sempre o split E1/morfologia e tem zero overlap cruzado. O documento de autorização não é armazenado no repositório.
+
 Existe uma mudança bibliográfica que deve ficar explícita na dissertação: a versão 1 de `arXiv:2405.18004`, submetida em 2024, circulou como SkinCAP e tinha Zhou como primeiro autor; a versão 2, revista em 2025, chama-se SkinCaRe e tem Shen como primeiro autor. O plano e a bibliografia abaixo citam a versão atual. No snapshot local, SkinCoT usa 23 categorias amplas e narrativas hierárquicas.
 
 O [dataset card de SkinCaRe](https://huggingface.co/datasets/yuhos16/SkinCaRe/blob/main/README.md), consultado em 8 de agosto de 2026, confirma a estrutura da release, mas apresenta termos que precisam de resolução antes do uso: a metadata indica `CC-BY-NC-SA-4.0`, o corpo menciona `CC-BY-4.0` e o acordo de acesso restringe distribuição, modificação e derivados. O artigo sustenta a motivação científica; o card e o acordo efetivamente aceite governam o acesso e a utilização dos ficheiros. Por isso, esta fonte permanece condicional mesmo que a sua metodologia seja relevante.
@@ -202,7 +204,7 @@ Isto não significa armazenar cinco cópias do mesmo ficheiro original. Cada fot
 | --- | --- | --- | --- |
 | `diagnosis` | uma pergunta diagnóstica por imagem | classe ou diferencial Top-K | gold normalizado. Teacher apenas para ranking auxiliar |
 | `morphology` | uma pergunta de perceção por imagem | conceitos e limitações observáveis | SKINCON, Etapa A aceite, revisão humana |
-| `caption` | uma pergunta de descrição por imagem | descrição clínica curta | SkinCAP elegível, Etapa A renderizada, revisão humana |
+| `caption` | uma pergunta de descrição por imagem | descrição clínica curta | SkinCAP autorizado e filtrado; Etapa A renderizada em releases futuras |
 | `structured` | uma pergunta clínica completa por imagem | JSON de observações, diferencial, evidência, incerteza e ação | Etapas A e B aceites |
 | `open_response` | uma pergunta aberta por imagem | resposta natural curta | rendering consistente do target canónico |
 | `preferences` | um par de respostas para a mesma pergunta | `chosen` e `rejected` | apenas depois de existir revisão/critério fiável |
@@ -1219,6 +1221,8 @@ Esta arquitetura de dados permite que a tese responda a perguntas causais mais l
 
 ## 24. Provenance desta nota
 
-Esta especificação sintetiza a investigação académica e os audits locais registados nas referências internas. A cobertura SKINCON foi reproduzida em 14 de agosto de 2026 e registada em `data/training/ISEPDistillDataset/metadata/skincon_coverage.json`: 3.866 anotações utilizáveis, zero labels upstream em falta, 271 overlaps internos excluídos e 3.595 linhas de morfologia publicadas. O builder versionado materializou ainda as 7.541 linhas de `diagnosis`; os counts, splits, revisões e SHA-256 dos shards ficaram congelados em `metadata/release.json`. `caption`, `structured` e `open_response` continuam por gerar e só podem ser materializados após existirem targets reais aceites.
+Esta especificação sintetiza a investigação académica e os audits locais registados nas referências internas. A cobertura SKINCON foi reproduzida em 14 de agosto de 2026 e registada em `data/training/ISEPDistillDataset/metadata/skincon_coverage.json`: 3.866 anotações utilizáveis, zero labels upstream em falta, 271 overlaps internos excluídos e 3.595 linhas de morfologia publicadas. O builder versionado materializou ainda as 7.541 linhas de `diagnosis`; os counts, splits, revisões e SHA-256 dos shards ficaram congelados em `metadata/release.json`.
+
+Em 15 de agosto de 2026, após o autor do dataset declarar possuir autorização escrita para criar derivados SkinCAP privados, foi materializada a release aditiva corrigida `isep_distill_dataset_v0.4.1`. A transformação `skincap_observation_prefix_v1` aceitou 3.250 de 3.318 candidatos técnicos: 2.767 em `sft_train` e 483 em `sft_dev`. A auditoria é conjunta sobre `diagnosis`, `morphology` e `caption`, com zero overlap de `leakage_group_id` entre train/dev. Os shards de treino não expõem a caption original, diagnóstico ou sufixo removido; conservam o target filtrado e hashes de proveniência. Como o texto humano original foi produzido com conhecimento do diagnóstico, `target_source=human_caption_gold_conditioned_filtered` e esta condição deve ser comparada como ablação, não apresentada como evidência answer-blind. `structured` e `open_response` continuam por gerar.
 
 O texto foi preparado com assistência de IA e deve ser revisto pelo autor da dissertação. Decisões clínicas, licenças e critérios de revisão especializada exigem validação humana antes da geração ou publicação do dataset.

@@ -1,7 +1,7 @@
 # ISEP training pipeline
 
-This package implements the first controlled fine-tuning phase of the thesis:
-`E1_label`. It compares two otherwise identical BF16 LoRA runs of
+This package implements the first two controlled fine-tuning phases of the
+thesis. `E1_label` compares two otherwise identical BF16 LoRA runs of
 `Qwen/Qwen3.5-4B`:
 
 - `E1_frozen_vision`: language-side LoRA with the visual encoder frozen;
@@ -11,6 +11,13 @@ This package implements the first controlled fine-tuning phase of the thesis:
 The comparison is an ablation, not two unrelated training recipes. The CLI
 checks the frozen dataset release, configuration hashes and trainable-module
 manifest so that the vision policy is the only intended scientific change.
+
+`E2_skincon` starts again from the same official Qwen base with a fresh
+Vision-LoRA adapter. The baseline mixes the frozen E1 diagnosis labels with
+all eligible human SKINCON morphology targets. A separate
+`E2_skincon_skincap` ablation adds authorized, filtered SkinCAP captions; it
+does not replace the two-task baseline. E2 contains no teacher output;
+distillation starts only in E3.
 
 ## Environment
 
@@ -34,6 +41,10 @@ isep-train validate-config \
   --config configs/training/e1_label_frozen_vision.yaml
 isep-train validate-config \
   --config configs/training/e1_label_unsloth_all.yaml
+isep-train validate-config \
+  --config configs/training/e2_skincon_unsloth_all.yaml
+isep-train validate-config \
+  --config configs/training/e2_skincon_skincap_unsloth_all.yaml
 
 # Materialize the group-safe split release once.
 isep-train prepare-data \
@@ -44,6 +55,10 @@ isep-train inspect-data \
 # Verify the full GPU path before a real experiment.
 isep-train smoke-test \
   --config configs/training/e1_label_frozen_vision.yaml
+isep-train smoke-test \
+  --config configs/training/e2_skincon_unsloth_all.yaml
+isep-train smoke-test \
+  --config configs/training/e2_skincon_skincap_unsloth_all.yaml
 
 # Run or resume a scientific experiment.
 isep-train run \
@@ -76,6 +91,18 @@ Each E1 target contains one image and one canonical diagnosis. It contains no
 teacher response, metadata or rationale. Only assistant response tokens
 contribute to the loss and Qwen thinking is disabled.
 
+The E2 baseline consumes `ISEPDistillDataset` release
+`isep_distill_dataset_v0.3.0`: 6,312 diagnosis + 3,068 morphology train rows,
+and 1,229 diagnosis + 527 morphology dev rows. The additive SkinCAP ablation
+uses corrected v0.4.1 and adds 2,767 caption train rows and 483 caption dev
+rows. The withdrawn v0.4.0 is rejected because 125 shared groups crossed task
+splits. Every
+task row appears once per epoch in a deterministic interleave. The pipeline
+verifies the pinned Hub revision, release manifest, 48-concept ontology, every
+Parquet shard and embedded image hash before using a row. Morphology rows do
+not expose diagnostic labels; caption rows expose only the filtered target and
+not the raw caption, diagnosis, or removed suffix.
+
 ## Checkpoint evaluation
 
 The base checkpoint is evaluated on the fixed development panel before the
@@ -85,6 +112,29 @@ Trainer callback while preserving the exact epoch states. After training, the
 base and all candidate checkpoints are evaluated on the complete `sft_dev`
 split. The selected checkpoint maximizes macro-F1, with balanced accuracy,
 evaluation loss and the earliest epoch as ordered tie-breakers.
+
+For E2, the same diagnosis metric selects the checkpoint so comparison with E1
+remains direct. Base and epoch checkpoints are also evaluated on the 527 human
+SKINCON dev rows using exact match, micro/macro F1, per-concept precision,
+recall and F1, Hamming loss, and invalid-JSON rate. These results produce PNG,
+SVG and source CSV figures alongside the standard training artefacts.
+
+The SkinCAP ablation also evaluates every state on its 483 caption dev rows.
+It reports clinical-format compliance, prohibited-content rate, concept
+precision/recall/F1, unsupported-concept rate, ROUGE-L, token F1 and their
+declared deterministic reference-similarity average. Caption quality is not
+called accuracy. The E2 report therefore contains both the task-specific
+metrics and a transparent `global_multitask_score`: the unweighted macro mean
+of diagnosis macro-F1, morphology macro-F1 and (when present) the SkinCAP
+caption task score. This composite is comparable only between runs containing
+the same task set and is never used to hide the disaggregated results.
+
+Optimizer-time monitoring records train/eval loss, learning rate, seconds per
+step, examples per second and tokens per second. Full generative diagnosis,
+morphology and caption metrics are computed for the base model and every epoch
+checkpoint after the optimizer run. This preserves every checkpoint state
+without contaminating step-time, energy or throughput measurements with
+generation callbacks.
 
 The smoke profile records its identity separately from a full run, validates
 finite/improving loss, verifies the assistant-only token mask, validates the
@@ -135,6 +185,20 @@ Runs are written below `outputs/training/<experiment>/<run-id>/` and include:
 - CSV and LaTeX tables;
 - a Markdown thesis summary and self-contained HTML report.
 
+The production collator also writes `logs/sample_costs.jsonl` and materializes
+`metrics/sample_costs.csv` plus `metrics/sample_costs.parquet`. Each unique
+task row contains `sample_id`, split, `leakage_group_id`, original and resized
+image geometry, original pixel count, exact visual/prompt/target token counts,
+available annotations, phase and task. Token counts come from the actual
+post-collation `input_ids`, attention mask and assistant-only loss labels, not
+from an offline estimate.
+
+`tables/resource_summary.csv` and its LaTeX counterpart report duration,
+GPU-hours, peak/average VRAM, peak/average process RAM, steps/examples/tokens
+per second, mean step time, GPU utilization, peak/mean power, integrated Wh,
+peak/mean temperature, best-checkpoint size and trainable-parameter count.
+NVML fields remain null on unsupported hardware rather than being inferred.
+
 Reports do not embed clinical images. Resource measurements are explicitly
 marked unavailable when NVML is not present; missing values are never
 fabricated.
@@ -152,6 +216,6 @@ fabricated.
   vision condition; single-seed runs are pilots. Confirmatory `compare` refuses
   any set other than the paired six runs.
 
-Only `E1_label` is executable in this version. Structured supervision,
-distillation, reinforcement learning, QLoRA, crop experiments and multi-GPU
-training require later, separately reviewed phases.
+`E1_label` and human-only `E2_skincon` are executable in this version. E3
+teacher supervision, reinforcement learning, QLoRA, crop experiments and
+multi-GPU training require later, separately reviewed phases.

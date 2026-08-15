@@ -13,7 +13,18 @@ from src.train.artifacts import (
 from src.train.backends import FineTuningBackend
 from src.train.config import TrainingConfig
 from src.train.data import load_taxonomy
-from src.train.domain import PreparedRelease, ReleaseSubset
+from src.train.domain import (
+    JsonValue,
+    PreparedRelease,
+    ReleaseSubset,
+    TrainingPhaseName,
+)
+from src.train.e2 import E2ReleaseAudit, inspect_e2_release
+from src.train.e2.caption_evaluation import evaluate_caption_development
+from src.train.e2.evaluation import (
+    evaluate_morphology_development,
+)
+from src.train.e2.multitask import persist_multitask_metrics
 from src.train.evaluate import (
     EvaluationResult,
     checkpoint_training_state,
@@ -28,6 +39,7 @@ from src.train.evaluation import (
 from src.train.execution import RunIdentity, validate_resume_checkpoint
 from src.train.phases.label_only import LabelOnlyPhase
 from src.train.reporting import build_run_report
+from src.train.resource_metrics import resource_summary
 from src.train.run_domain import TrainingRunResult
 from src.train.run_io import (
     checkpoint_directories,
@@ -35,7 +47,6 @@ from src.train.run_io import (
     load_run_config,
     open_frozen_release,
     persist_evaluation,
-    resource_summary,
 )
 from src.train.scientific import (
     config_hash,
@@ -53,11 +64,17 @@ def evaluate_run(
     config: TrainingConfig | None = None,
     release: PreparedRelease | None = None,
     smoke: bool | None = None,
+    e2_release: E2ReleaseAudit | None = None,
 ) -> TrainingRunResult:
     """Evaluate base and all checkpoints, select the best, and report."""
 
     selected_config = config or load_run_config(run_directory)
     selected_release = release or open_frozen_release(selected_config)
+    selected_e2_release = (
+        e2_release or inspect_e2_release(selected_config)
+        if selected_config.experiment.phase is TrainingPhaseName.E2_SKINCON
+        else None
+    )
     selected_backend = backend or _unsloth_backend()
     store = ArtifactStore.at(run_directory)
     execution_profile = load_execution_profile(run_directory)
@@ -71,7 +88,11 @@ def evaluate_run(
         experiment_id=selected_config.experiment.id,
         run_id=store.layout.run_id,
         config_hash=config_hash(selected_config),
-        dataset_hash=selected_release.audit.assignment_sha256,
+        dataset_hash=(
+            selected_e2_release.training_contract_sha256
+            if selected_e2_release is not None
+            else selected_release.audit.assignment_sha256
+        ),
         model_id=selected_config.model.repo_id,
         model_revision=selected_config.model.revision,
         execution_profile=execution_profile,
@@ -121,20 +142,83 @@ def evaluate_run(
         max_samples=limit,
         store=store,
     )
+    morphology_results = evaluate_morphology_development(
+        backend=selected_backend,
+        config=selected_config,
+        audit=selected_e2_release,
+        checkpoints=checkpoints,
+        max_samples=limit,
+        store=store,
+    )
+    caption_results = evaluate_caption_development(
+        backend=selected_backend,
+        config=selected_config,
+        audit=selected_e2_release,
+        checkpoints=checkpoints,
+        max_samples=limit,
+        store=store,
+    )
+    multitask_results = (
+        persist_multitask_metrics(
+            store=store,
+            diagnosis=dev_results,
+            morphology=morphology_results,
+            captions=caption_results,
+        )
+        if selected_e2_release is not None
+        else ()
+    )
     best, best_result = _select_best(dev_results)
     best_path = next(path for path in checkpoints if path.name == best.checkpoint_id)
+    best_morphology = next(
+        (
+            item
+            for item in morphology_results
+            if item.checkpoint_id == best.checkpoint_id
+        ),
+        None,
+    )
+    best_caption = next(
+        (item for item in caption_results if item.checkpoint_id == best.checkpoint_id),
+        None,
+    )
+    best_multitask = next(
+        (
+            item
+            for item in multitask_results
+            if item.checkpoint_id == best.checkpoint_id
+        ),
+        None,
+    )
+    best_payload: dict[str, JsonValue] = {
+        "checkpoint_id": best.checkpoint_id,
+        "path": str(best_path),
+        "epoch": best.epoch,
+        "eval_loss": best.eval_loss,
+        "selection_metric": "diagnosis_macro_f1",
+        "macro_f1": best.metrics.macro_f1,
+        "balanced_accuracy": best.metrics.balanced_accuracy,
+    }
+    if best_morphology is not None:
+        best_payload["morphology_micro_f1"] = best_morphology.metrics.micro_f1
+        best_payload["morphology_macro_f1"] = best_morphology.metrics.macro_f1
+        best_payload["morphology_exact_match"] = best_morphology.metrics.exact_match
+    if best_caption is not None:
+        best_payload["caption_task_score"] = best_caption.metrics.caption_task_score
+        best_payload["caption_concept_f1"] = best_caption.metrics.concept_f1
+        best_payload["caption_reference_similarity"] = (
+            best_caption.metrics.reference_similarity_mean
+        )
+        best_payload["caption_clinical_compliance"] = (
+            best_caption.metrics.clinical_compliance_rate
+        )
+    if best_multitask is not None:
+        best_payload["global_multitask_score"] = best_multitask.global_multitask_score
+        best_payload["global_metric_name"] = "macro_task_score_not_accuracy"
     store.write_json(
         "manifests",
         "best_checkpoint.json",
-        {
-            "checkpoint_id": best.checkpoint_id,
-            "path": str(best_path),
-            "epoch": best.epoch,
-            "eval_loss": best.eval_loss,
-            "selection_metric": "macro_f1",
-            "macro_f1": best.metrics.macro_f1,
-            "balanced_accuracy": best.metrics.balanced_accuracy,
-        },
+        best_payload,
     )
     _write_comparable_snapshot(
         store=store,

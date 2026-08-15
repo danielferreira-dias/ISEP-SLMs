@@ -51,6 +51,40 @@ class TrainingConfigTests(unittest.TestCase):
                     "danielfdias98/ISEP-training-checkpoints",
                 )
 
+    def test_e2_config_is_human_only_and_starts_from_base(self) -> None:
+        project_root = Path(__file__).resolve().parents[1]
+        config = load_training_config(
+            project_root / "configs" / "training" / "e2_skincon_unsloth_all.yaml"
+        )
+
+        self.assertEqual(config.experiment.phase, TrainingPhaseName.E2_SKINCON)
+        self.assertIsNone(config.continuation)
+        self.assertIsNotNone(config.e2)
+        assert config.e2 is not None
+        self.assertEqual(config.e2.expected.morphology_train, 3068)
+        self.assertEqual(config.e2.expected.morphology_concepts, 48)
+        self.assertTrue(config.e2.verify_all_shards)
+
+    def test_e2_skincap_ablation_pins_the_additive_release(self) -> None:
+        project_root = Path(__file__).resolve().parents[1]
+        config = load_training_config(
+            project_root
+            / "configs"
+            / "training"
+            / "e2_skincon_skincap_unsloth_all.yaml"
+        )
+
+        self.assertEqual(config.experiment.phase, TrainingPhaseName.E2_SKINCON)
+        self.assertIsNotNone(config.e2)
+        assert config.e2 is not None
+        self.assertEqual(config.e2.release_id, "isep_distill_dataset_v0.4.1")
+        self.assertEqual(config.e2.expected.caption_train, 2767)
+        self.assertEqual(config.e2.expected.caption_dev, 483)
+        self.assertEqual(
+            config.e2.hub_revision,
+            "b215f0474e4931b5951da768e79a0d579d26919d",
+        )
+
     def test_unknown_yaml_field_is_rejected(self) -> None:
         document = _minimal_document()
         document["unexpected"] = True
@@ -66,7 +100,7 @@ class TrainingConfigTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             TrainingConfig.model_validate(document, strict=True)
 
-    def test_only_e1_label_is_accepted(self) -> None:
+    def test_unknown_phase_is_rejected(self) -> None:
         document = _minimal_document()
         experiment = dict(document["experiment"])
         experiment["phase"] = "structured"

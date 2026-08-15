@@ -217,6 +217,7 @@ def build_sft_config(api: UnslothApi, request: FineTuneRequest) -> object:
         "report_to": "none",
         "save_only_model": False,
         "completion_only_loss": True,
+        "include_tokens_per_second": True,
     }
     scientific = frozenset(
         {
@@ -245,6 +246,7 @@ def build_sft_config(api: UnslothApi, request: FineTuneRequest) -> object:
             "gradient_checkpointing",
             "remove_unused_columns",
             "completion_only_loss",
+            "include_tokens_per_second",
         }
     )
     return invoke(api.sft_config, required_keywords=scientific, **values)

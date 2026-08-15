@@ -36,7 +36,7 @@ from src.train.execution.io import (
     read_json_object,
 )
 from src.train.reporting import _resource_points
-from src.train.run_io import resource_summary
+from src.train.resource_metrics import resource_summary
 
 
 class _Sink(MetricSink):
@@ -400,7 +400,34 @@ class TrainExecutionTests(unittest.TestCase):
                     "metrics": {
                         "train_runtime": 12.5,
                         "train_samples_per_second": 3.25,
-                    }
+                        "train_tokens_per_second": 96.0,
+                        "train_steps_per_second": 0.5,
+                    },
+                    "trainable_parameters": {"total": 123456},
+                },
+            )
+            atomic_write_text(
+                run_dir / "logs" / "resources.jsonl",
+                "\n".join(
+                    (
+                        '{"elapsed_seconds":0,"gpu_memory_used_bytes":1073741824,'
+                        '"process_rss_bytes":2147483648,"gpu_power_watts":100,'
+                        '"gpu_utilization_percent":50,"gpu_temperature_celsius":60}',
+                        '{"elapsed_seconds":3600,"gpu_memory_used_bytes":2147483648,'
+                        '"process_rss_bytes":4294967296,"gpu_power_watts":100,'
+                        '"gpu_utilization_percent":70,"gpu_temperature_celsius":70}',
+                    )
+                )
+                + "\n",
+            )
+            checkpoint = run_dir / "checkpoints" / "checkpoint-10"
+            checkpoint.mkdir(parents=True)
+            (checkpoint / "adapter.bin").write_bytes(b"x" * 1024)
+            atomic_write_json(
+                run_dir / "manifests" / "best_checkpoint.json",
+                {
+                    "checkpoint_id": "checkpoint-10",
+                    "path": "/remote/path/that/is/not/local",
                 },
             )
 
@@ -408,6 +435,18 @@ class TrainExecutionTests(unittest.TestCase):
 
             self.assertEqual(summary.duration_seconds, 12.5)
             self.assertEqual(summary.train_samples_per_second, 3.25)
+            self.assertEqual(summary.train_tokens_per_second, 96.0)
+            self.assertEqual(summary.average_step_seconds, 2.0)
+            self.assertEqual(summary.peak_vram_gib, 2.0)
+            self.assertEqual(summary.average_vram_gib, 1.5)
+            self.assertEqual(summary.peak_ram_gib, 4.0)
+            self.assertEqual(summary.average_ram_gib, 3.0)
+            self.assertEqual(summary.average_gpu_utilization_percent, 60.0)
+            self.assertEqual(summary.average_power_watts, 100.0)
+            self.assertEqual(summary.energy_wh, 100.0)
+            self.assertEqual(summary.maximum_temperature_celsius, 70.0)
+            self.assertEqual(summary.trainable_parameters, 123456)
+            self.assertAlmostEqual(summary.checkpoint_size_gib or 0.0, 1024 / 1024**3)
 
     def test_resource_points_normalize_elapsed_time_after_resume(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import json
 import math
 import sys
 import tempfile
@@ -30,6 +31,10 @@ from src.train.backends.parameters import (
 from src.train.backends.runtime import (
     RuntimeValidationError,
     validate_nvidia_bf16_runtime,
+)
+from src.train.backends.sample_costs import (
+    SampleCostAuditingCollator,
+    materialize_sample_costs,
 )
 from src.train.backends.unsloth_build import (
     apply_lora,
@@ -109,7 +114,58 @@ class _MaskCollator:
         return {"labels": [[-100, -100, 101]]}
 
 
+class _CostCollator:
+    def __call__(self, records: object) -> dict[str, list[list[int]]]:
+        assert isinstance(records, list | tuple)
+        count = len(records)
+        return {
+            "input_ids": [[10, 99, 99, 20, 0] for _ in range(count)],
+            "labels": [[-100, -100, -100, 20, -100] for _ in range(count)],
+            "attention_mask": [[1, 1, 1, 1, 0] for _ in range(count)],
+        }
+
+
 class TrainBackendContractTests(unittest.TestCase):
+    def test_cost_collator_records_exact_geometry_and_token_decomposition(self) -> None:
+        record: dict[object, object] = {
+            "sample_id": "sample-1",
+            "split": "sft_train",
+            "leakage_group_id": "group-1",
+            "image_width": 100,
+            "image_height": 50,
+            "pixel_count": 5000,
+            "resized_width": 100,
+            "resized_height": 50,
+            "annotation_availability": ["diagnosis", "caption"],
+            "phase": "e2_skincon",
+            "task": "caption",
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            collator = SampleCostAuditingCollator(
+                collator=_CostCollator(),
+                processor=object(),
+                model=SimpleNamespace(config=SimpleNamespace(image_token_id=99)),
+                jsonl_path=root / "logs" / "sample_costs.jsonl",
+            )
+
+            collator([record])
+            collator([record])
+            count = materialize_sample_costs(
+                root / "logs" / "sample_costs.jsonl",
+                root / "metrics",
+                expected_record_count=1,
+            )
+
+            self.assertEqual(count, 1)
+            self.assertTrue((root / "metrics" / "sample_costs.csv").is_file())
+            self.assertTrue((root / "metrics" / "sample_costs.parquet").is_file())
+            manifest = json.loads(
+                (root / "metrics" / "sample_costs_manifest.json").read_text()
+            )
+            self.assertTrue(manifest["coverage_complete"])
+            self.assertEqual(manifest["record_count"], 1)
+
     def test_importing_backend_does_not_import_gpu_frameworks(self) -> None:
         initially_absent = {
             name

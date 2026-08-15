@@ -7,6 +7,7 @@ import json
 from datasets import Features, Image, List, Value
 
 SCHEMA_VERSION = "0.3.0"
+CAPTION_SCHEMA_VERSION = "0.4.1"
 TAXONOMY_VERSION = "2.2.0"
 SKINCON_ONTOLOGY_VERSION = "skincon_48_v1"
 
@@ -89,6 +90,42 @@ def morphology_features() -> Features:
     )
 
 
+def caption_features() -> Features:
+    """Return the explicit schema for filtered SkinCAP observation rows."""
+
+    return Features(
+        {
+            "image": Image(decode=True),
+            "sample_id": Value("string"),
+            "case_id": Value("string"),
+            "task_id": Value("string"),
+            "image_asset_id": Value("string"),
+            "view_type": Value("string"),
+            "leakage_group_id": Value("string"),
+            "source_dataset": Value("string"),
+            "source_sample_id": Value("string"),
+            "license_id": Value("string"),
+            "split": Value("string"),
+            "split_inherited_from_e1": Value("bool"),
+            "split_source": Value("string"),
+            "image_sha256": Value("string"),
+            "source_caption_sha256": Value("string"),
+            "caption_source_revision": Value("string"),
+            "caption_variant": Value("string"),
+            "transform_version": Value("string"),
+            "boundary_kind": Value("string"),
+            "target_variant": Value("string"),
+            "target_source": Value("string"),
+            "prompt": Value("string"),
+            "prompt_sha256": Value("string"),
+            "target_text": Value("string"),
+            "schema_version": Value("string"),
+            "quality_status": Value("string"),
+            "messages": _message_feature(),
+        }
+    )
+
+
 def diagnosis_prompt(labels: tuple[str, ...]) -> str:
     """Render the exact label-only prompt used by the E1 training phase."""
 
@@ -111,6 +148,17 @@ def morphology_prompt(concepts: tuple[str, ...]) -> str:
         "Return one compact JSON object with keys positive_concepts and "
         "all_concepts_annotated; do not diagnose the disease or add prose.\n\n"
         f"Allowed concepts:\n{allowed}\n\n/no_think"
+    )
+
+
+def caption_prompt() -> str:
+    """Return the frozen answer-blind short-observation prompt."""
+
+    return (
+        "Describe only the visible dermatological findings in the clinical "
+        "image using one short clinical sentence. Do not provide a diagnosis, "
+        "differential diagnosis, testing, management, prognosis, or advice."
+        "\n\n/no_think"
     )
 
 

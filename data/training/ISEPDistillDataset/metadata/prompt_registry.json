@@ -13,6 +13,12 @@
       "config": "morphology",
       "sha256": "3f4d4b877d982578a452e9312fa042a174226b8b7d49f1f029fc21129b789959",
       "purpose": "Answer-blind 48-concept SKINCON morphology supervision"
+    },
+    {
+      "prompt_id": "skincap_observation_caption_v1",
+      "config": "caption",
+      "sha256": "eb0cd1c0b4a5086b885227b74b70d9c7a4503f89f1f96a2f7edc4463b03a3e3b",
+      "purpose": "Observation-only description from authorized filtered SkinCAP text"
     }
   ]
 }

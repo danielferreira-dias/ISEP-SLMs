@@ -105,6 +105,14 @@ class TrainingDataReleaseTests(unittest.TestCase):
         self.assertEqual(len(dataset), 4)
         self.assertIn(record["label"], {"class_a", "class_b"})
         self.assertEqual(len(record["messages"]), 2)
+        self.assertEqual(record["phase"], "e1_label")
+        self.assertEqual(record["task"], "diagnosis")
+        self.assertEqual(record["split"], "dev_panel")
+        self.assertEqual(record["annotation_availability"], ["diagnosis"])
+        self.assertEqual(record["pixel_count"], 800 * 400)
+        self.assertEqual(
+            (record["resized_width"], record["resized_height"]), (512, 256)
+        )
 
     def test_image_preprocessing_preserves_aspect_and_does_not_upscale(self) -> None:
         large = preprocess_image(Image.new("L", (1000, 500), 127), max_edge_pixels=512)

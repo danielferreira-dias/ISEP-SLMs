@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 import yaml
 
@@ -13,7 +13,6 @@ from src.config.models import (
     list_model_configs,
     load_model_config,
 )
-
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -29,11 +28,7 @@ class QwenModelConfigTests(unittest.TestCase):
             "Qwen/Qwen3.5-4B",
         )
         self.assertFalse(config["reasoning"]["enabled"])
-        self.assertFalse(
-            config["reasoning"]["chat_template_kwargs"][
-                "enable_thinking"
-            ]
-        )
+        self.assertFalse(config["reasoning"]["chat_template_kwargs"]["enable_thinking"])
         self.assertEqual(
             config["generation"],
             {
@@ -54,11 +49,7 @@ class QwenModelConfigTests(unittest.TestCase):
     ) -> None:
         config = _load_model("qwen_3_6_27b.yaml")
         self.assertFalse(config["reasoning"]["enabled"])
-        self.assertFalse(
-            config["reasoning"]["chat_template_kwargs"][
-                "enable_thinking"
-            ]
-        )
+        self.assertFalse(config["reasoning"]["chat_template_kwargs"]["enable_thinking"])
         self.assertEqual(config["generation"]["presence_penalty"], 0.0)
         self.assertEqual(config["generation"]["repetition_penalty"], 1.0)
         self.assertEqual(
@@ -67,36 +58,42 @@ class QwenModelConfigTests(unittest.TestCase):
         )
         self.assertEqual(config["generation"]["thinking_mode"], "disabled")
         self.assertEqual(
-            config["backend"]["profiles"]["vllm"][
-                "request_timeout_seconds"
-            ],
+            config["backend"]["profiles"]["vllm"]["request_timeout_seconds"],
             1200,
         )
+
 
 class TypedModelConfigTests(unittest.TestCase):
     def test_all_models_load_into_frozen_typed_configs(self) -> None:
         configs = list_model_configs(root=ROOT)
 
-        self.assertEqual(len(configs), 8)
-        self.assertEqual(len({item.model.id for item in configs}), 8)
-        local = [
-            item
-            for item in configs
-            if isinstance(item, LocalModelConfig)
-        ]
-        api = [
-            item
-            for item in configs
-            if isinstance(item, AzureModelConfig)
-        ]
-        self.assertEqual(len(local), 2)
-        self.assertEqual(len(api), 6)
+        expected_ids = {
+            "gemini_3_5_flash_lite_openrouter",
+            "gemini_3_7_flash_medium_openrouter",
+            "gpt_5_6_luna",
+            "mimo_v2_5_openrouter",
+            "minimax_m3_openrouter",
+            "qwen_3_5_4b",
+            "qwen_3_5_4b_e1_frozen_vision",
+            "qwen_3_5_4b_e1_frozen_vision_t06",
+            "qwen_3_5_4b_e1_vision_lora",
+            "qwen_3_5_4b_e1_vision_lora_attribution",
+            "qwen_3_5_4b_e1_vision_lora_t06",
+            "qwen_3_6_27b",
+            "qwen_3_7_flash_openrouter",
+            "qwen_3_8_27b",
+            "qwen_3_8_max_openrouter",
+        }
+        self.assertEqual({item.model.id for item in configs}, expected_ids)
+        local = [item for item in configs if isinstance(item, LocalModelConfig)]
+        api = [item for item in configs if isinstance(item, AzureModelConfig)]
+        self.assertEqual(len(local), 8)
+        self.assertEqual(len(api), 7)
         for config in local:
             profile = config.backend.active_profile
-            self.assertEqual(profile.engine, "vllm")
-        self.assertTrue(profile.managed)
-        self.assertEqual(profile.max_model_len, 32768)
-        self.assertEqual(profile.limit_images_per_prompt, 1)
+            self.assertIn(profile.engine, {"vllm", "transformers"})
+            self.assertEqual(profile.max_model_len, 32768)
+            self.assertEqual(profile.limit_images_per_prompt, 1)
 
     def test_official_student_supports_vllm_json_schema_mode(self) -> None:
         model = load_model_config("qwen_3_5_4b", root=ROOT)
@@ -147,12 +144,8 @@ class TypedModelConfigTests(unittest.TestCase):
             judge.backend.active_profile.provider.only,
             ("alibaba",),
         )
-        self.assertFalse(
-            judge.backend.active_profile.provider.allow_fallbacks
-        )
-        self.assertTrue(
-            judge.backend.active_profile.provider.require_parameters
-        )
+        self.assertFalse(judge.backend.active_profile.provider.allow_fallbacks)
+        self.assertTrue(judge.backend.active_profile.provider.require_parameters)
 
         max_model = load_model_config(
             "qwen_3_8_max_openrouter",
@@ -166,12 +159,8 @@ class TypedModelConfigTests(unittest.TestCase):
             max_model.backend.active_profile.provider.only,
             ("alibaba",),
         )
-        self.assertFalse(
-            max_model.backend.active_profile.provider.allow_fallbacks
-        )
-        self.assertTrue(
-            max_model.backend.active_profile.provider.require_parameters
-        )
+        self.assertFalse(max_model.backend.active_profile.provider.allow_fallbacks)
+        self.assertTrue(max_model.backend.active_profile.provider.require_parameters)
         self.assertIn("image", max_model.capabilities.modalities)
         self.assertIn(
             "json_schema",
@@ -200,9 +189,7 @@ class TypedModelConfigTests(unittest.TestCase):
             minimax.backend.active_profile.provider.only,
             ("minimax",),
         )
-        self.assertFalse(
-            minimax.backend.active_profile.provider.allow_fallbacks
-        )
+        self.assertFalse(minimax.backend.active_profile.provider.allow_fallbacks)
         self.assertFalse(minimax.backend.active_profile.supports_seed)
 
         mimo = load_model_config("mimo_v2_5_openrouter", root=ROOT)
@@ -223,9 +210,7 @@ class TypedModelConfigTests(unittest.TestCase):
             mimo.backend.active_profile.provider.only,
             ("xiaomi",),
         )
-        self.assertFalse(
-            mimo.backend.active_profile.provider.allow_fallbacks
-        )
+        self.assertFalse(mimo.backend.active_profile.provider.allow_fallbacks)
         self.assertFalse(mimo.backend.active_profile.supports_seed)
 
         gemini = load_model_config(
@@ -242,12 +227,8 @@ class TypedModelConfigTests(unittest.TestCase):
             gemini.backend.active_profile.provider.only,
             ("google-ai-studio",),
         )
-        self.assertFalse(
-            gemini.backend.active_profile.provider.allow_fallbacks
-        )
-        self.assertTrue(
-            gemini.backend.active_profile.provider.require_parameters
-        )
+        self.assertFalse(gemini.backend.active_profile.provider.allow_fallbacks)
+        self.assertTrue(gemini.backend.active_profile.provider.require_parameters)
         self.assertTrue(gemini.reasoning.enabled)
         self.assertEqual(gemini.generation.thinking_mode, "enabled")
         self.assertEqual(gemini.generation.reasoning_effort, "minimal")
@@ -263,10 +244,9 @@ class TypedModelConfigTests(unittest.TestCase):
         )
         self.assertEqual(config.model.id, "qwen_3_5_4b")
 
+
 def _load_model(filename: str) -> dict:
-    return yaml.safe_load(
-        (ROOT / "configs/models" / filename).read_text()
-    )
+    return yaml.safe_load((ROOT / "configs/models" / filename).read_text())
 
 
 if __name__ == "__main__":

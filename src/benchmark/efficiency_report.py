@@ -50,6 +50,11 @@ _TABLE_COLUMNS = (
     "gpu_seconds_per_request",
     "peak_vram_gib",
     "peak_server_ram_gib",
+    "peak_system_memory_used_gib",
+    "mean_gpu_utilization_percent",
+    "mean_gpu_power_watts",
+    "peak_gpu_power_watts",
+    "peak_gpu_temperature_celsius",
     "gpu_energy_wh",
     "idle_adjusted_gpu_energy_wh",
     "energy_wh_per_request",
@@ -145,6 +150,17 @@ def build_efficiency_report(
             ),
             "peak_vram_gib": _gib(phase.get("peak_gpu_memory_bytes")),
             "peak_server_ram_gib": _gib(phase.get("peak_server_process_rss_bytes")),
+            "peak_system_memory_used_gib": _gib(
+                phase.get("peak_system_memory_used_bytes")
+            ),
+            "mean_gpu_utilization_percent": _float_or_none(
+                phase.get("mean_gpu_utilization_percent")
+            ),
+            "mean_gpu_power_watts": _float_or_none(phase.get("mean_gpu_power_watts")),
+            "peak_gpu_power_watts": _float_or_none(phase.get("peak_gpu_power_watts")),
+            "peak_gpu_temperature_celsius": _float_or_none(
+                phase.get("peak_gpu_temperature_celsius")
+            ),
             "gpu_energy_wh": energy,
             "idle_adjusted_gpu_energy_wh": adjusted_energy,
             "energy_wh_per_request": (

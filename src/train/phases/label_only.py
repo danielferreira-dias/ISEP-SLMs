@@ -86,4 +86,11 @@ class LabelOnlyPhase:
             disease_id=sample.disease_id,
             label=sample.label,
             messages=messages,
+            subset=sample.subset,
+            source=sample.source,
+            image_width=sample.image_width,
+            image_height=sample.image_height,
+            pixel_count=sample.pixel_count,
+            resized_width=sample.resized_width,
+            resized_height=sample.resized_height,
         )

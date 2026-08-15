@@ -39,12 +39,13 @@ O estado final dos dados é:
 | Qwen 3.5 4B pré-treino | 29.099 / 29.099 | 522 / 522 | 9 tarefas determinísticas; 4 abertas sem score clínico final |
 | Qwen 3.6 27B pré-treino | 28.173 / 29.099 | 522 / 522 | 9 determinísticas; reasoning incompleto |
 | Qwen 3.8 27B pré-treino | — | 522 / 522 | Clinical Context completo; DermoBench não executado |
-| E1 Frozen, época 3 | 10.701 / 10.701 | 522 / 522 | 7 tarefas de diagnóstico selecionadas |
-| E1 Vision LoRA, época 3 | 10.701 / 10.701 | 522 / 522 | 7 tarefas de diagnóstico selecionadas |
+| E1 Frozen, época 3 | 13.833 / 13.833 | 522 / 522 | 7 tarefas de diagnóstico + 4 abertas, judge pendente |
+| E1 Vision LoRA, época 3 | 13.833 / 13.833 | 522 / 522 | 7 tarefas de diagnóstico + 4 abertas, judge pendente |
 
 O DermoBench pré-treino ainda **não tem resultados clínicos finais** para as
-quatro tarefas que requerem LLM-as-a-judge. Os checkpoints E1 não foram
-executados nessas quatro tarefas nem nas duas tarefas MCQ de morfologia.
+quatro tarefas que requerem LLM-as-a-judge. Os checkpoints E1 já completaram
+essas quatro tarefas, mas os scores clínicos do judge permanecem pendentes;
+as duas tarefas MCQ de morfologia continuam por executar.
 Por isso, esta nota apresenta:
 
 - resultados finais das nove tarefas determinísticas;
@@ -230,9 +231,8 @@ leitura, mas **não formam um leaderboard estritamente emparelhado**:
 
 As colunas T1.1, T1.2, T3.1 e T3.2 foram deliberadamente excluídas porque os
 Qwen deste projeto ainda não têm scores do judge comparáveis. Nos checkpoints
-E1, essas tarefas nem sequer foram executadas: a campanha foi deliberadamente
-limitada às tarefas determinísticas de diagnóstico visual, sem
-LLM-as-a-judge. A coluna
+E1, a inferência dessas quatro tarefas foi entretanto concluída em 15 de agosto
+de 2026, mas continua sem julgamento clínico final. A coluna
 hierárquica também foi excluída porque essa tarefa de 2.000 rows não está na
 release pública usada localmente. Finalmente, a coluna `Fair.` do artigo mede
 `min(group accuracy) / max(group accuracy)`, enquanto a nossa execução só
@@ -270,15 +270,15 @@ escolha recuperável como incorretos. Os nove testes foram corrigidos por Holm.
 
 ### 3.4 Checkpoints E1 no inventário completo de tarefas
 
-A tabela seguinte torna explícita a cobertura desigual. Os checkpoints E1
-foram avaliados apenas nas sete tarefas que pedem diretamente o diagnóstico da
-doença a partir da imagem. As células com “—” correspondem a tarefas não
-executadas ou sem julgamento clínico final.
+A tabela seguinte torna explícita a cobertura desigual. Os checkpoints E1 têm
+predições nas sete tarefas que pedem diretamente o diagnóstico da doença e nas
+quatro tarefas abertas. As células com “—” correspondem a tarefas não
+executadas ou a predições abertas ainda sem julgamento clínico final.
 
 | Tarefa DermoBench | Casos | 4B pré-treino | 27B pré-treino | E1 Frozen | E1 Vision LoRA |
 |---|---:|---:|---:|---:|---:|
-| 1.1 Description sem morphology | 783 | — | — | — | — |
-| 1.2 Description com morphology | 783 | — | — | — | — |
+| 1.1 Description sem morphology | 783 | — | — | 783/783, judge pendente | 783/783, judge pendente |
+| 1.2 Description com morphology | 783 | — | — | 783/783, judge pendente | 783/783, judge pendente |
 | 1.3 Derm7pt morphology MCQ | 5.530 | 38,35% | **52,37%** | — | — |
 | 1.4 SkinCon morphology MCQ | 9.736 | **62,53%** | 62,21% | — | — |
 | 2.1 Diagnosis MCQ, 25 opções | 1.757 | 45,53% | 21,86% | 54,47% | **56,18%** |
@@ -287,8 +287,8 @@ executadas ou sem julgamento clínico final.
 | 2.1 Derm1M EDU diagnosis MCQ | 3.615 | 40,86% | **60,33%** | 53,55% | 54,08% |
 | 2.1 Derm7pt diagnosis MCQ | 2.022 | 36,35% | 45,50% | 46,79% | **50,00%** |
 | 2.1 SNU134 diagnosis MCQ | 240 | 56,25% | **69,17%** | 58,33% | 63,75% |
-| 3.1 Diagnostic reasoning sem morphology | 783 | — | — | — | — |
-| 3.2 Diagnostic reasoning com morphology | 783 | — | — | — | — |
+| 3.1 Diagnostic reasoning sem morphology | 783 | — | — | 783/783, judge pendente | 783/783, judge pendente |
+| 3.2 Diagnostic reasoning com morphology | 783 | — | — | 783/783, judge pendente | 783/783, judge pendente |
 | 4 DDI Fairness MCQ | 654 | 49,24% | **62,54%** | 58,10% | 56,88% |
 
 Para uma comparação estritamente comum, foram agregadas apenas as mesmas sete
@@ -375,10 +375,10 @@ ausentes.
 
 | Tarefa aberta | 4B pré-treino | 27B pré-treino | E1 Frozen | E1 Vision | Comparação possível agora |
 |---|---:|---:|---:|---:|---|
-| 1.1 Description sem morphology | 783 / 783 | 783 / 783 | — | — | Apenas formato; ambos os modelos pré-treino 100% |
-| 1.2 Description com morphology | 783 / 783 | 783 / 783 | — | — | Apenas formato: 98,21% vs 100% |
-| 3.1 Reasoning sem morphology | 783 / 783 | **640 / 783** | — | — | Parcial; faltam 143 no 27B |
-| 3.2 Reasoning com morphology | 783 / 783 | **0 / 783** | — | — | Impossível comparar |
+| 1.1 Description sem morphology | 783 / 783 | 783 / 783 | 783 / 783 | 783 / 783 | Formato completo; qualidade aguarda judge |
+| 1.2 Description com morphology | 783 / 783 | 783 / 783 | 783 / 783 | 783 / 783 | Formato completo; qualidade aguarda judge |
+| 3.1 Reasoning sem morphology | 783 / 783 | **640 / 783** | 783 / 783 | 783 / 783 | 27B pré-treino continua parcial |
+| 3.2 Reasoning com morphology | 783 / 783 | **0 / 783** | 783 / 783 | 783 / 783 | 27B pré-treino continua ausente |
 
 Nos 640 IDs comuns da tarefa 3.1, a conformidade estrutural foi 77,03% no 4B e
 99,53% no 27B. Isto mede apenas a presença e ordenação dos blocos exigidos; não
@@ -519,8 +519,9 @@ Assim:
   em imagem e 47,13% em imagem mais contexto;
 - o ganho visual não é uniforme: Frozen permanece ligeiramente melhor em DDI
   e DDI Fairness, e o 27B continua melhor em quatro das sete tarefas externas;
-- como seis tarefas DermoBench não foram avaliadas nos checkpoints E1, estes
-  resultados não constituem um score global do DermoBench.
+- como as quatro tarefas abertas E1 ainda aguardam judge e as duas tarefas MCQ
+  de morfologia não foram executadas, estes resultados não constituem um score
+  global do DermoBench.
 
 ### Conclusão provisória
 
@@ -571,8 +572,9 @@ truncados antes de formar o dataset sintético.
     direta nem um ranking formal.
 13. **Estado da fonte:** o estudo DermoGPT consultado é o arXiv v1 de 5 de
     janeiro de 2026 e deve ser tratado como preprint.
-14. **Cobertura E1 parcial:** as tarefas 1.1, 1.2, 1.3, 1.4, 3.1 e 3.2 não
-    foram avaliadas nos checkpoints E1; “—” não é zero.
+14. **Cobertura E1 parcial:** as tarefas 1.1, 1.2, 3.1 e 3.2 têm inferência
+    completa, mas aguardam judge; apenas 1.3 e 1.4 não foram executadas. “—”
+    não é zero.
 15. **Uma seed E1:** esta comparação usa apenas seed 3407 de treino e uma
     geração de benchmark por caso; a estabilidade entre seeds ainda não foi
     demonstrada.
@@ -610,10 +612,10 @@ truncados antes de formar o dataset sintético.
 - `outputs/clinical_context_ablation_v1/temp_0_6_thinking_off/`
 - `outputs/qwen_3_8_27b_full_benchmarks/clinical_context_ablation/`
 - `outputs/e1_epoch3_historical_t06_benchmarks/`
-  - E1 Frozen e E1 Vision LoRA, 14 tarefas cada na campanha selecionada;
-  - cópia local verificada contra o RunPod: 227 ficheiros, 499.275.681 bytes;
-  - digest agregado SHA-256:
-    `244eaaaf27c55fa1ed6d51d8dd49a1b68de0a1eb9016ebfd1bb6c9734af574fa`.
+  - E1 Frozen e E1 Vision LoRA: sete tarefas determinísticas, quatro tarefas
+    abertas e Clinical Context por condição; as tarefas abertas foram copiadas
+    e verificadas byte a byte contra o RunPod em 2026-08-15;
+  - batches do judge preparados localmente e confirmados como text-only.
 - `runs/benchmarks/dermobench_then_context_controller.log`
 - Ru et al. (2026), arXiv:2601.01868, Tabela 3.
 - Hugging Face `mendicant04/DermoBench`, card e task manifest consultados em

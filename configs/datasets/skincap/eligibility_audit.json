@@ -1,0 +1,34 @@
+{
+  "audit_date": "2026-08-15",
+  "dataset_revision": "4119044b3e14085d7439f88016d93376d433da5f",
+  "downloaded_rows": 4000,
+  "main_image_count": 4000,
+  "not_include_image_count": 346,
+  "nonempty_caption_rows": 4000,
+  "author_excluded_rows": 439,
+  "usable_before_leakage_rows": 3561,
+  "frozen_validation_overlap_rows": 124,
+  "frozen_internal_overlap_rows": 119,
+  "technical_candidate_rows": 3318,
+  "technical_candidate_groups": 3317,
+  "technical_candidates_by_source": {
+    "fitzpatrick17k": 2683,
+    "ddi": 635
+  },
+  "caption_screen": {
+    "diagnostic_or_differential_rows": 3304,
+    "test_or_procedure_rows": 297,
+    "management_or_advice_rows": 85,
+    "any_screen_flag_rows": 3306,
+    "no_screen_flag_rows": 12,
+    "preliminary_observation_prefix_at_least_5_words_rows": 3302,
+    "versioned_transform_accepted_rows": 3250,
+    "versioned_transform_rejected_rows": 68
+  },
+  "interpretation": {
+    "technical_candidate_rows": "Eligible after source usability and frozen benchmark leakage rules.",
+    "algorithmically_accepted_observation_rows": 3250,
+    "runnable_e2_observation_rows": 3250,
+    "reason": "Written permission was attested on 2026-08-15; accepted derivatives were materialized in corrected private release v0.4.1."
+  }
+}

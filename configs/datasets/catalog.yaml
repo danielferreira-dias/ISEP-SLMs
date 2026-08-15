@@ -36,6 +36,10 @@ datasets:
     config: configs/datasets/skincare/config.yaml
     role: excluded_from_disease_coverage
 
+  - id: skincap
+    config: configs/datasets/skincap/config.yaml
+    role: excluded_from_disease_coverage
+
   - id: dermobench
     config: configs/datasets/dermobench/config.yaml
     role: external_evaluation_only

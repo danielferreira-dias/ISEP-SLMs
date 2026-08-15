@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 from collections.abc import Mapping
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from pathlib import Path
 
 from src.train.artifacts import ArtifactStore, write_prediction_files
@@ -15,21 +15,10 @@ from src.train.config import TrainingConfig
 from src.train.data import inspect_data_release, validate_source_shards
 from src.train.data.source import source_release_sha256
 from src.train.domain import JsonValue, PreparedRelease
+from src.train.e2.domain import E2ReleaseAudit
 from src.train.environment import collect_environment
 from src.train.evaluate import EvaluationResult
 from src.train.scientific import config_hash, resolved_config_document
-
-
-@dataclass(frozen=True, slots=True)
-class ResourceSummary:
-    """Measured training efficiency values used in thesis comparisons."""
-
-    duration_seconds: float | None
-    gpu_hours: float | None
-    peak_vram_gib: float | None
-    train_samples_per_second: float | None
-    maximum_power_watts: float | None
-    maximum_temperature_celsius: float | None
 
 
 def open_frozen_release(config: TrainingConfig) -> PreparedRelease:
@@ -79,6 +68,7 @@ def write_run_manifests(
     release: PreparedRelease,
     prompt: str,
     execution_profile: str,
+    e2_release: E2ReleaseAudit | None = None,
 ) -> None:
     """Persist configuration, environment, data, model, and prompt identity."""
 
@@ -114,6 +104,33 @@ def write_run_manifests(
         "dataset_audit.json",
         _json_object(asdict(release.audit), "dataset audit"),
     )
+    if e2_release is not None:
+        store.write_json(
+            "manifests",
+            "e2_dataset_release.json",
+            _json_object(
+                _read_json(e2_release.release_manifest_path),
+                "E2 dataset release",
+            ),
+        )
+        store.write_json(
+            "manifests",
+            "e2_dataset_audit.json",
+            {
+                "release_id": e2_release.release_id,
+                "schema_version": e2_release.schema_version,
+                "manifest_sha256": e2_release.manifest_sha256,
+                "ontology_sha256": e2_release.ontology_sha256,
+                "diagnosis_train": e2_release.diagnosis_train,
+                "diagnosis_dev": e2_release.diagnosis_dev,
+                "morphology_train": e2_release.morphology_train,
+                "morphology_dev": e2_release.morphology_dev,
+                "caption_train": e2_release.caption_train,
+                "caption_dev": e2_release.caption_dev,
+                "morphology_concepts": len(e2_release.ontology.concepts),
+                "shard_count": len(e2_release.shards),
+            },
+        )
     store.write_json(
         "manifests",
         "environment.json",
@@ -195,100 +212,6 @@ def checkpoint_directories(run_directory: Path) -> tuple[Path, ...]:
     )
 
 
-def resource_summary(run_directory: Path) -> ResourceSummary:
-    """Aggregate backend and NVML logs into run-level efficiency metrics."""
-
-    duration, throughput = _backend_efficiency_metrics(run_directory)
-    peak_memory = 0.0
-    maximum_power = 0.0
-    maximum_temperature = 0.0
-    observed_memory = observed_power = observed_temperature = False
-    resources_path = run_directory / "logs" / "resources.jsonl"
-    if resources_path.is_file():
-        for line in resources_path.read_text(encoding="utf-8").splitlines():
-            if not line.strip():
-                continue
-            sample = _mapping(json.loads(line), "resource sample")
-            memory = _optional_float(sample.get("gpu_memory_used_bytes"))
-            power = _optional_float(sample.get("gpu_power_watts"))
-            temperature = _optional_float(sample.get("gpu_temperature_celsius"))
-            if memory is not None:
-                observed_memory = True
-                peak_memory = max(peak_memory, memory)
-            if power is not None:
-                observed_power = True
-                maximum_power = max(maximum_power, power)
-            if temperature is not None:
-                observed_temperature = True
-                maximum_temperature = max(maximum_temperature, temperature)
-    return ResourceSummary(
-        duration_seconds=duration,
-        gpu_hours=duration / 3600.0 if duration is not None else None,
-        peak_vram_gib=(peak_memory / (1024.0**3) if observed_memory else None),
-        train_samples_per_second=throughput,
-        maximum_power_watts=maximum_power if observed_power else None,
-        maximum_temperature_celsius=(
-            maximum_temperature if observed_temperature else None
-        ),
-    )
-
-
-def _backend_efficiency_metrics(
-    run_directory: Path,
-) -> tuple[float | None, float | None]:
-    """Aggregate duration and throughput across successful backend sessions.
-
-    A resumed run produces one TRL runtime and throughput measurement per
-    backend invocation. Durations are additive, while throughput is weighted
-    by each session's duration. Runs created before ``backend_sessions.json``
-    was introduced retain their legacy latest-result behaviour.
-    """
-
-    sessions_path = run_directory / "manifests" / "backend_sessions.json"
-    if sessions_path.is_file():
-        value = _read_json(sessions_path)
-        if not isinstance(value, list):
-            raise ValueError(f"backend sessions must be an array: {sessions_path}")
-        session_metrics: list[tuple[float, float | None]] = []
-        for index, item in enumerate(value):
-            session = _mapping(item, f"backend session {index}")
-            metrics_value = session.get("metrics")
-            if not isinstance(metrics_value, Mapping):
-                continue
-            runtime = _optional_float(metrics_value.get("train_runtime"))
-            if runtime is None:
-                continue
-            throughput = _optional_float(metrics_value.get("train_samples_per_second"))
-            session_metrics.append((runtime, throughput))
-        if session_metrics:
-            total_duration = sum(runtime for runtime, _ in session_metrics)
-            weighted = tuple(
-                (runtime, throughput)
-                for runtime, throughput in session_metrics
-                if runtime > 0.0 and throughput is not None
-            )
-            total_weight = sum(runtime for runtime, _ in weighted)
-            aggregate_throughput = (
-                sum(runtime * throughput for runtime, throughput in weighted)
-                / total_weight
-                if total_weight > 0.0
-                else None
-            )
-            return total_duration, aggregate_throughput
-
-    backend_path = run_directory / "manifests" / "backend_result.json"
-    if not backend_path.is_file():
-        return None, None
-    backend = _mapping(_read_json(backend_path), "backend result")
-    metrics_value = backend.get("metrics")
-    if not isinstance(metrics_value, Mapping):
-        return None, None
-    return (
-        _optional_float(metrics_value.get("train_runtime")),
-        _optional_float(metrics_value.get("train_samples_per_second")),
-    )
-
-
 def _checkpoint_step(name: str) -> int:
     match = re.fullmatch(r"checkpoint-(\d+)", name)
     if match is None:
@@ -341,11 +264,3 @@ def _json_value(value: object, context: str) -> JsonValue:
     if isinstance(value, Mapping):
         return _json_object(value, context)
     raise ValueError(f"{context} contains {type(value).__name__}")
-
-
-def _optional_float(value: object) -> float | None:
-    if value is None:
-        return None
-    if isinstance(value, bool) or not isinstance(value, int | float):
-        return None
-    return float(value)

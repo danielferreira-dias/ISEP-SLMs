@@ -1,0 +1,31 @@
+{
+  "checks": {
+    "accepted_caption_rows": 3250,
+    "base_v0_3_shards_reused_without_rewrite": true,
+    "caption_image_sha256_recorded": true,
+    "caption_images_decoded": true,
+    "caption_internal_overlap_rows": 0,
+    "caption_train_dev_group_overlap": 0,
+    "raw_caption_exposed_to_trainer": false
+  },
+  "counts": {
+    "caption": {
+      "rows": 3250,
+      "sft_dev": 480,
+      "sft_train": 2770
+    },
+    "diagnosis": {
+      "rows": 7541,
+      "sft_dev": 1229,
+      "sft_train": 6312
+    },
+    "morphology": {
+      "rows": 3595,
+      "sft_dev": 527,
+      "sft_train": 3068
+    }
+  },
+  "release_id": "isep_distill_dataset_v0.4.0",
+  "release_status": "materialized_and_validated",
+  "schema_version": "0.4.0"
+}

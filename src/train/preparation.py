@@ -1,4 +1,4 @@
-"""Dataset, backend-spec, and run-directory preparation for E1."""
+"""Dataset, backend-spec, and run-directory preparation for training phases."""
 
 from __future__ import annotations
 
@@ -12,7 +12,8 @@ from src.train.artifacts import ArtifactStore
 from src.train.backends import LoraSpec, TrainerSpec
 from src.train.config import TrainingConfig
 from src.train.data import build_lazy_phase_dataset
-from src.train.domain import PreparedRelease, ReleaseSubset
+from src.train.domain import PreparedRelease, ReleaseSubset, TrainingPhaseName
+from src.train.e2 import E2ReleaseAudit, build_e2_training_dataset
 from src.train.run_io import load_execution_profile, load_run_config
 from src.train.scientific import config_hash
 
@@ -55,22 +56,41 @@ def training_datasets(
     run_directory: Path,
     *,
     smoke: bool,
+    e2_release: E2ReleaseAudit | None = None,
 ) -> tuple[Sequence[dict[str, object]], Sequence[dict[str, object]]]:
     """Build memory-mapped train/dev datasets and optional smoke prefixes."""
 
     cache = run_directory / "logs" / "hf_cache"
-    train = build_lazy_phase_dataset(
-        config,
-        release,
-        ReleaseSubset.SFT_TRAIN,
-        cache_directory=cache,
-    )
-    dev = build_lazy_phase_dataset(
-        config,
-        release,
-        ReleaseSubset.SFT_DEV,
-        cache_directory=cache,
-    )
+    train: Sequence[dict[str, object]]
+    dev: Sequence[dict[str, object]]
+    if config.experiment.phase is TrainingPhaseName.E2_SKINCON:
+        if e2_release is None:
+            raise ValueError("E2 training requires an audited E2 release")
+        train = build_e2_training_dataset(
+            config,
+            e2_release,
+            ReleaseSubset.SFT_TRAIN,
+            cache_directory=cache,
+        )
+        dev = build_e2_training_dataset(
+            config,
+            e2_release,
+            ReleaseSubset.SFT_DEV,
+            cache_directory=cache,
+        )
+    else:
+        train = build_lazy_phase_dataset(
+            config,
+            release,
+            ReleaseSubset.SFT_TRAIN,
+            cache_directory=cache,
+        )
+        dev = build_lazy_phase_dataset(
+            config,
+            release,
+            ReleaseSubset.SFT_DEV,
+            cache_directory=cache,
+        )
     if smoke:
         return PrefixDataset(train, 64), PrefixDataset(dev, 32)
     return train, dev

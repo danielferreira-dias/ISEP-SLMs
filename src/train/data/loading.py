@@ -9,7 +9,7 @@ import pandas as pd  # type: ignore[import-untyped]
 import pyarrow.parquet as pq
 
 from src.train.config import TrainingConfig
-from src.train.data.images import preprocess_image
+from src.train.data.images import preprocess_image_with_metadata
 from src.train.data.integrity import validate_assignment_columns
 from src.train.data.source import (
     SOURCE_METADATA_COLUMNS,
@@ -122,16 +122,23 @@ def iter_release_samples(
                 if sample_id not in selected_ids:
                     continue
                 yielded += 1
+                image, geometry = preprocess_image_with_metadata(
+                    _image_input(raw_row.get("image"), source_root),
+                    max_edge_pixels=config.dataset.image.max_edge_pixels,
+                )
                 yield LabeledImageSample(
                     sample_id=sample_id,
                     leakage_group_id=_required_string(raw_row, "leakage_group_id"),
                     disease_id=_required_string(raw_row, "disease_id"),
                     label=_required_string(raw_row, "label"),
                     source=_required_string(raw_row, "source"),
-                    image=preprocess_image(
-                        _image_input(raw_row.get("image"), source_root),
-                        max_edge_pixels=config.dataset.image.max_edge_pixels,
-                    ),
+                    image=image,
+                    subset=subset.value,
+                    image_width=geometry.image_width,
+                    image_height=geometry.image_height,
+                    pixel_count=geometry.pixel_count,
+                    resized_width=geometry.resized_width,
+                    resized_height=geometry.resized_height,
                 )
     if yielded != len(selected_ids):
         raise ValueError(

@@ -57,9 +57,10 @@ class ExperimentConfig(StrictConfigModel):
     def _parse_phase(cls, value: object) -> TrainingPhaseName:
         if isinstance(value, TrainingPhaseName):
             return value
-        if value == TrainingPhaseName.E1_LABEL.value:
-            return TrainingPhaseName.E1_LABEL
-        raise ValueError("Only the e1_label phase is implemented")
+        try:
+            return TrainingPhaseName(str(value))
+        except ValueError as exc:
+            raise ValueError("Unknown training phase") from exc
 
     @field_validator("vision_profile", mode="before")
     @classmethod
@@ -161,6 +162,95 @@ class DatasetConfig(StrictConfigModel):
                 raise ValueError(
                     "Production E1 split, panel, and cardinalities are frozen"
                 )
+        return self
+
+
+class E2ExpectedConfig(StrictConfigModel):
+    """Frozen row counts for the human-only E2 release."""
+
+    diagnosis_train: Literal[6312] = 6312
+    diagnosis_dev: Literal[1229] = 1229
+    morphology_train: Literal[3068] = 3068
+    morphology_dev: Literal[527] = 527
+    caption_train: Literal[0, 2767] = 0
+    caption_dev: Literal[0, 483] = 0
+    morphology_concepts: Literal[48] = 48
+
+    @model_validator(mode="after")
+    def _validate_caption_pair(self) -> E2ExpectedConfig:
+        if (self.caption_train, self.caption_dev) not in {(0, 0), (2767, 483)}:
+            raise ValueError("E2 caption train/dev counts must be admitted together")
+        return self
+
+
+class E2DatasetConfig(StrictConfigModel):
+    """Pinned ISEPDistillDataset release consumed by E2."""
+
+    source_directory: StrictPath = Path("data/training/ISEPDistillDataset")
+    hub_repo_id: Literal["danielfdias98/ISEPDistillDataset"] = (
+        "danielfdias98/ISEPDistillDataset"
+    )
+    hub_revision: str = "085ff4b0c5c304b4c390be2073c164350f1250f0"
+    release_id: str = "isep_distill_dataset_v0.3.0"
+    schema_version: str = "0.3.0"
+    release_manifest_file: StrictPath = Path("metadata/release.json")
+    release_manifest_sha256: str = (
+        "6d7b4b5ea8b0041e443aab5aff9491d660dddc9d60f33345fa9a186c94b79b3b"
+    )
+    ontology_file: StrictPath = Path("metadata/skincon_ontology.json")
+    ontology_sha256: Literal[
+        "b5ac80ff7ba2d53855a5e759930181b9cef1358747d385d0de5fcaa2eaf86847"
+    ] = "b5ac80ff7ba2d53855a5e759930181b9cef1358747d385d0de5fcaa2eaf86847"
+    mixing_strategy: Literal[
+        "all_rows_deterministic_interleave_v1",
+        "all_rows_deterministic_interleave_v2",
+    ] = "all_rows_deterministic_interleave_v1"
+    verify_all_shards: Literal[True] = True
+    expected: E2ExpectedConfig = E2ExpectedConfig()
+
+    @model_validator(mode="after")
+    def _validate_frozen_release(self) -> E2DatasetConfig:
+        releases: dict[str, dict[str, object]] = {
+            "isep_distill_dataset_v0.3.0": {
+                "hub_revision": "085ff4b0c5c304b4c390be2073c164350f1250f0",
+                "schema_version": "0.3.0",
+                "release_manifest_file": Path("metadata/release.json"),
+                "release_manifest_sha256": (
+                    "6d7b4b5ea8b0041e443aab5aff9491d660dddc9d60f33345fa9a186c94b79b3b"
+                ),
+                "mixing_strategy": "all_rows_deterministic_interleave_v1",
+                "caption_counts": (0, 0),
+            },
+            "isep_distill_dataset_v0.4.1": {
+                "hub_revision": "b215f0474e4931b5951da768e79a0d579d26919d",
+                "schema_version": "0.4.1",
+                "release_manifest_file": Path(
+                    "releases/isep_distill_dataset_v0.4.1/release.json"
+                ),
+                "release_manifest_sha256": (
+                    "8638a3fea6ed49875359a9e8e1781f104e8350bae4edafb250ff58a4ef35ce13"
+                ),
+                "mixing_strategy": "all_rows_deterministic_interleave_v2",
+                "caption_counts": (2767, 483),
+            },
+        }
+        expected = releases.get(self.release_id)
+        if expected is None:
+            raise ValueError("Unknown ISEPDistillDataset E2 release")
+        observed: dict[str, object] = {
+            "hub_revision": self.hub_revision,
+            "schema_version": self.schema_version,
+            "release_manifest_file": self.release_manifest_file,
+            "release_manifest_sha256": self.release_manifest_sha256,
+            "mixing_strategy": self.mixing_strategy,
+            "caption_counts": (
+                self.expected.caption_train,
+                self.expected.caption_dev,
+            ),
+        }
+        drift = [key for key, value in expected.items() if observed[key] != value]
+        if drift:
+            raise ValueError("Frozen E2 release identity changed: " + ", ".join(drift))
         return self
 
 
@@ -326,6 +416,7 @@ class TrainingConfig(StrictConfigModel):
     schema_version: Literal[1] = 1
     experiment: ExperimentConfig
     dataset: DatasetConfig
+    e2: E2DatasetConfig | None = None
     model: ModelConfig
     lora: LoraConfig
     trainer: TrainerConfig
@@ -345,6 +436,15 @@ class TrainingConfig(StrictConfigModel):
                 "vision_profile and finetune_vision_layers describe different "
                 "experimental conditions"
             )
+        if self.experiment.phase is TrainingPhaseName.E1_LABEL and self.e2 is not None:
+            raise ValueError("E1 must not declare an E2 dataset")
+        if self.experiment.phase is TrainingPhaseName.E2_SKINCON and self.e2 is None:
+            raise ValueError("E2 requires the pinned ISEPDistillDataset contract")
+        if self.experiment.phase is TrainingPhaseName.E2_SKINCON:
+            if self.continuation is not None:
+                raise ValueError("Primary E2 starts from the pinned base, not E1")
+            if self.trainer.epochs != 3:
+                raise ValueError("Primary E2 uses the fixed three-epoch budget")
         if self.continuation is None and self.trainer.epochs != 3:
             raise ValueError("A five-epoch target requires a continuation checkpoint")
         if self.continuation is not None and self.trainer.epochs != (

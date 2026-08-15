@@ -43,10 +43,17 @@ Each annotation should identify:
 9. [Expanded visual hallucination audits](benchmarks/09_expanded_visual_hallucination_audits.md)
 10. [Internal Benchmark: complete pre-training model comparison](benchmarks/10_internal_benchmark_qwen_3_5_vs_qwen_3_6.md)
 11. [Internal Benchmark temperature sensitivity](benchmarks/11_internal_benchmark_temperature_sensitivity.md)
+12. [DermoBench and Clinical Context comparison](benchmarks/12_dermobench_and_clinical_context_qwen_comparison.md)
+13. [Same-hardware E1 quality-efficiency Pareto comparison](benchmarks/13_same_hardware_efficiency_pareto_e1.md)
 
 ## Training steps
 
 1. [E1 label-only: frozen vision versus Vision LoRA](training_steps/01_e1_label_only_vision_lora_ablation.md)
+
+## Final dataset
+
+1. [ISEPDistillDataset construction plan](final_dataset/01_isep_distill_dataset_construction_plan.md)
+2. [Adaptive clinical-context acquisition strategy](final_dataset/02_adaptive_context_acquisition_strategy.md)
 
 ## Notes
 

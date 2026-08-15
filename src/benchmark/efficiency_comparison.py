@@ -54,6 +54,11 @@ class EfficiencyComparisonRow:
     gpu_seconds_per_request: float | None
     peak_vram_gib: float | None
     peak_server_ram_gib: float | None
+    peak_system_memory_used_gib: float | None
+    mean_gpu_utilization_percent: float | None
+    mean_gpu_power_watts: float | None
+    peak_gpu_power_watts: float | None
+    peak_gpu_temperature_celsius: float | None
     gpu_energy_wh: float | None
     idle_adjusted_gpu_energy_wh: float | None
     energy_wh_per_request: float | None
@@ -229,7 +234,10 @@ def _parse_row(model_id: str, record: dict[str, str]) -> EfficiencyComparisonRow
     return EfficiencyComparisonRow(**values)  # type: ignore[arg-type]
 
 
-def _write_dataclass_csv(path: Path, rows: tuple[object, ...]) -> None:
+def _write_dataclass_csv(
+    path: Path,
+    rows: tuple[EfficiencyComparisonRow, ...] | tuple[ParetoPoint, ...],
+) -> None:
     if not rows:
         raise ValueError("cannot write an empty comparison")
     records = [asdict(row) for row in rows]

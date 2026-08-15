@@ -139,6 +139,7 @@ measurement systems rather than converted into a single scale.
 | `skindisnet/` | SkinDisNet | Complete official version 2 archive with 1,710 preprocessed smartphone images and patient metadata |
 | `skincon/` | SKINCON | Complete concept annotations; images remain subject to Fitzpatrick17k/DDI access |
 | `skincare/` | SkinCaRe | Complete gated Hugging Face snapshot, including its SkinCAP and SkinCoT components |
+| `skincap/` | SkinCAP | Complete pinned standalone snapshot; 3,250 authorized filtered captions materialized in corrected private ISEPDistillDataset v0.4.1 |
 | `dermobench/` | DermoBench | Complete gated Hub release: official task annotations and bundled image archive |
 | `hiba/` | HIBA Skin Lesions | Complete official archive; only 355 clinical overview/close-up images are training-only |
 

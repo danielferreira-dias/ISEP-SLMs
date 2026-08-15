@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import gc
-from collections.abc import Sequence
+from collections.abc import Sequence, Sized
 from pathlib import Path
 
 from src.train.backends.contracts import (
@@ -25,6 +25,10 @@ from src.train.backends.parameters import (
     validate_trainable_parameter_manifest,
 )
 from src.train.backends.runtime import validate_nvidia_bf16_runtime
+from src.train.backends.sample_costs import (
+    SampleCostAuditingCollator,
+    materialize_sample_costs,
+)
 from src.train.backends.unsloth_build import (
     CollectingCheckpointObserver,
     apply_lora,
@@ -79,9 +83,22 @@ class UnslothBackend:
             metric_sink=metric_sink,
             checkpoint_observer=collector,
             output_dir=request.trainer.output_dir,
+            examples_per_step=(
+                request.trainer.per_device_train_batch_size
+                * request.trainer.gradient_accumulation_steps
+            ),
         )
         callback = framework_callback(api.trainer_callback, bridge)
-        collator = build_vision_collator(api, model, processor)
+        raw_collator = build_vision_collator(api, model, processor)
+        sample_cost_path = (
+            request.trainer.output_dir.parent / "logs" / "sample_costs.jsonl"
+        )
+        collator = SampleCostAuditingCollator(
+            collator=raw_collator,
+            processor=processor,
+            model=model,
+            jsonl_path=sample_cost_path,
+        )
         mask_audit = audit_response_only_mask(
             collator=collator,
             processor=processor,
@@ -122,16 +139,30 @@ class UnslothBackend:
         resume_value = (
             str(resume_from_checkpoint) if resume_from_checkpoint is not None else None
         )
-        train_output = invoke_method(
-            trainer,
-            "train",
-            required_keywords=(
-                frozenset({"resume_from_checkpoint"})
-                if resume_from_checkpoint is not None
-                else frozenset()
-            ),
-            resume_from_checkpoint=resume_value,
-        )
+        training_completed = False
+        try:
+            train_output = invoke_method(
+                trainer,
+                "train",
+                required_keywords=(
+                    frozenset({"resume_from_checkpoint"})
+                    if resume_from_checkpoint is not None
+                    else frozenset()
+                ),
+                resume_from_checkpoint=resume_value,
+            )
+            training_completed = True
+        finally:
+            materialize_sample_costs(
+                sample_cost_path,
+                request.trainer.output_dir.parent / "metrics",
+                expected_record_count=(
+                    _dataset_length(request.train_dataset, "train_dataset")
+                    + _dataset_length(request.eval_dataset, "eval_dataset")
+                    if training_completed
+                    else None
+                ),
+            )
         invoke_method(trainer, "save_state")
         final_adapter = request.trainer.output_dir / "final_adapter"
         invoke_method(trainer, "save_model", str(final_adapter))
@@ -213,3 +244,11 @@ class UnslothBackend:
         gc.collect()
         cuda = required_attribute(api.torch, "cuda")
         invoke_method(cuda, "empty_cache")
+
+
+def _dataset_length(value: object, context: str) -> int:
+    """Return a declared dataset cardinality or fail before accepting coverage."""
+
+    if not isinstance(value, Sized):
+        raise TypeError(f"{context} must expose a stable length")
+    return len(value)

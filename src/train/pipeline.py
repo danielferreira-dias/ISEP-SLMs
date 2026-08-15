@@ -1,4 +1,4 @@
-"""End-to-end E1 orchestration over typed, independently tested modules."""
+"""End-to-end orchestration over typed, independently tested phases."""
 
 from __future__ import annotations
 
@@ -13,7 +13,8 @@ from src.train.checkpoint_hub import create_checkpoint_mirror
 from src.train.config import TrainingConfig
 from src.train.continuation import stage_continuation_checkpoint
 from src.train.data import load_taxonomy
-from src.train.domain import PreparedRelease
+from src.train.domain import PreparedRelease, TrainingPhaseName
+from src.train.e2 import E2HumanPhase, E2ReleaseAudit, inspect_e2_release
 from src.train.environment import collect_environment
 from src.train.evaluate import model_spec
 from src.train.execution import RunIdentity, TrainingExecutor
@@ -48,14 +49,23 @@ def run_training(
 
     selected_backend = backend or _unsloth_backend()
     release = open_frozen_release(config)
-    phase = LabelOnlyPhase(load_taxonomy(config))
+    e2_release = (
+        inspect_e2_release(config)
+        if config.experiment.phase is TrainingPhaseName.E2_SKINCON
+        else None
+    )
+    prompt = _phase_prompt(config, e2_release)
     store = open_run_store(config, resume_from, smoke, run_id)
     run_directory = store.layout.run_directory
     identity = RunIdentity(
         experiment_id=config.experiment.id,
         run_id=store.layout.run_id,
         config_hash=config_hash(config),
-        dataset_hash=release.audit.assignment_sha256,
+        dataset_hash=(
+            e2_release.training_contract_sha256
+            if e2_release is not None
+            else release.audit.assignment_sha256
+        ),
         model_id=config.model.repo_id,
         model_revision=config.model.revision,
         execution_profile="smoke" if smoke else "full",
@@ -66,9 +76,10 @@ def run_training(
             store,
             config,
             release,
-            phase.prompt,
+            prompt,
             resume_from,
             smoke=smoke,
+            e2_release=e2_release,
         )
         if config.continuation is not None and smoke:
             raise ValueError(
@@ -105,7 +116,11 @@ def run_training(
             ),
         )
         train_dataset, eval_dataset = training_datasets(
-            config, release, run_directory, smoke=smoke
+            config,
+            release,
+            run_directory,
+            smoke=smoke,
+            e2_release=e2_release,
         )
         request = FineTuneRequest(
             model=model_spec(config),
@@ -152,6 +167,7 @@ def run_training(
             config=config,
             release=release,
             smoke=smoke,
+            e2_release=e2_release,
         )
         store.write_status("completed")
         return result
@@ -171,6 +187,7 @@ def _ensure_run_manifests(
     resume_from: Path | None,
     *,
     smoke: bool,
+    e2_release: E2ReleaseAudit | None,
 ) -> None:
     if resume_from is not None:
         run_status = store.layout.manifests / "run_status.json"
@@ -187,7 +204,29 @@ def _ensure_run_manifests(
         release=release,
         prompt=prompt,
         execution_profile="smoke" if smoke else "full",
+        e2_release=e2_release,
     )
+
+
+def _phase_prompt(
+    config: TrainingConfig,
+    e2_release: E2ReleaseAudit | None,
+) -> str:
+    taxonomy = load_taxonomy(config)
+    if config.experiment.phase is TrainingPhaseName.E1_LABEL:
+        return LabelOnlyPhase(taxonomy).prompt
+    if e2_release is None:
+        raise ValueError("E2 phase requires its audited release")
+    phase = E2HumanPhase(taxonomy=taxonomy, ontology=e2_release.ontology)
+    prompt = (
+        "[diagnosis]\n"
+        f"{phase.diagnosis_prompt}\n\n"
+        "[morphology]\n"
+        f"{phase.morphology_prompt}"
+    )
+    if e2_release.caption_train > 0:
+        prompt += f"\n\n[caption]\n{phase.caption_prompt}"
+    return prompt
 
 
 def _unsloth_backend() -> FineTuningBackend:

@@ -19,9 +19,10 @@ type JsonValue = JsonScalar | list[JsonValue] | dict[str, JsonValue]
 
 
 class TrainingPhaseName(StrEnum):
-    """Training phases implemented by the first pipeline release."""
+    """Runnable supervised phases in the training pipeline."""
 
     E1_LABEL = "e1_label"
+    E2_SKINCON = "e2_skincon"
 
 
 class VisionTuningProfile(StrEnum):
@@ -77,6 +78,12 @@ class LabeledImageSample:
     label: str
     source: str
     image: Image.Image
+    subset: str = ""
+    image_width: int = 0
+    image_height: int = 0
+    pixel_count: int = 0
+    resized_width: int = 0
+    resized_height: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -133,17 +140,40 @@ class FormattedExample:
     disease_id: str
     label: str
     messages: tuple[ChatMessage, ...]
+    subset: str = ""
+    source: str = ""
+    image_width: int = 0
+    image_height: int = 0
+    pixel_count: int = 0
+    resized_width: int = 0
+    resized_height: int = 0
 
     def as_record(self) -> dict[str, object]:
         """Convert the example to a Hugging Face Dataset-compatible record."""
 
-        return {
+        record: dict[str, object] = {
             "sample_id": self.sample_id,
             "leakage_group_id": self.leakage_group_id,
             "disease_id": self.disease_id,
             "label": self.label,
             "messages": [message.as_record() for message in self.messages],
         }
+        if self.image_width > 0:
+            record.update(
+                {
+                    "phase": TrainingPhaseName.E1_LABEL.value,
+                    "task": "diagnosis",
+                    "split": self.subset,
+                    "source": self.source,
+                    "image_width": self.image_width,
+                    "image_height": self.image_height,
+                    "pixel_count": self.pixel_count,
+                    "resized_width": self.resized_width,
+                    "resized_height": self.resized_height,
+                    "annotation_availability": ["diagnosis"],
+                }
+            )
+        return record
 
 
 @dataclass(frozen=True, slots=True)

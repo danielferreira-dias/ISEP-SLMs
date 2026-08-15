@@ -1,4 +1,4 @@
-"""Thin command-line interface for the reproducible E1 training pipeline."""
+"""Thin command-line interface for reproducible ISEP training phases."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ from src.train.scientific import (
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="isep-train",
-        description="Reproducible Unsloth LoRA training for ISEP E1_label.",
+        description="Reproducible Unsloth LoRA training for ISEP E1 and E2.",
     )
     commands = parser.add_subparsers(dest="command", required=True)
 

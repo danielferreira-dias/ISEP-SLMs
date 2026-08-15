@@ -7,8 +7,10 @@ official student, Qwen 3.5 4B, and the larger local comparison model, Qwen 3.6
 27B. It now also records the first post-training E1 comparison between the
 three-epoch label-only checkpoints with frozen vision and Vision LoRA. The two
 pre-training models completed the same 2,262 benchmark cases with thinking
-disabled; the E1 checkpoints completed the three deterministic clinical tasks,
-1,962 cases each, but were not evaluated on the open-ended task.
+disabled. The E1 checkpoints first completed the three deterministic clinical
+tasks (1,962 cases each) and subsequently completed a paired 300-case
+open-ended run. The E1 open-ended responses are preserved, but their blinded
+judge scores are now complete with 99% coverage for each checkpoint.
 
 It was subsequently extended with the same 2,262 cases for Qwen 3.8 Max
 through the official Alibaba OpenRouter provider. Qwen 3.8 uses mandatory
@@ -33,11 +35,10 @@ through Google AI Studio with provider-default decoding and its mandatory
 `minimal` thinking level. Gemini 3.7 Flash subsequently completed the same
 2,262 cases through Google AI Studio with `reasoning_effort=medium`. Eight
 generalist/local/API model runs are compared below using the frozen prompts,
-parsers, and metrics. Seven have completed the blinded-judge protocol; the
-local Qwen 3.8 27B judge is pending. The two selected E1 epoch-3 checkpoints
-are included in the same consolidated table for direct context, but are
-explicitly marked as dermatology-specialized and have dashes for the
-open-ended task, which was not executed.
+parsers, and metrics. Seven generalist models and both E1 checkpoints have
+completed the blinded-judge protocol; the local Qwen 3.8 27B judge is pending.
+The two selected E1 epoch-3 checkpoints are included in the same consolidated
+table for direct context and are explicitly marked as dermatology-specialized.
 
 The purpose of this run was to measure the student's starting point and to
 determine how much performance is gained by scaling the same model family
@@ -85,9 +86,10 @@ metrics.
 | Open-Ended Diagnosis | 300 | Free-text top-three differential and rationale |
 | **Total** | **2,262** | **Same inference cases for all eight generalist/local/API runs** |
 
-The two E1 checkpoints ran the first three rows only: 1,962 deterministic cases
-per condition. A dash in the post-training tables means that the task was not
-executed; it never represents a zero score.
+The two E1 checkpoints now have all four rows: 1,962 deterministic cases plus
+300 open-ended cases per condition. Their open-ended metrics use GPT-5.6 Luna
+as a single blinded judge, without fallback, and retain three invalid judge
+outputs per condition in the disclosed coverage.
 
 ## Pre-training headline results
 
@@ -143,40 +145,41 @@ that task, not a score of zero.
 | Evidence — MRR | 52.24% | 59.29% | 59.48% | 68.48% | 50.83% | 54.47% | 64.22% | **77.82%** | 67.70% | 69.91% |
 | Evidence — semantic compliance | 38.81% | 49.25% | 54.48% | 59.70% | 64.18% | 52.99% | 82.84% | **84.33%** | 32.09% | 35.82% |
 | Evidence — grounded Top-1 success | **15.67%** | 7.46% | 5.97% | 5.22% | 5.97% | 5.97% | 11.19% | 5.97% | 14.93% | 12.69% |
-| Open-ended — judge coverage | **95.33%** | 95.00% | — | 87.00% | 84.67% | 94.00% | 90.00% | 92.00% | — | — |
-| Open-ended — Top-1 | 16.78% | 24.21% | — | **42.15%** | 23.62% | 24.11% | 41.48% | 32.97% | — | — |
-| Open-ended — Top-3 | 38.11% | 51.23% | — | **65.52%** | 43.70% | 47.16% | 61.48% | 56.52% | — | — |
-| Open-ended — MRR | 26.34% | 35.85% | — | **52.49%** | 32.22% | 33.69% | 50.12% | 43.24% | — | — |
-| Clinical rationale, 0–4 | 1.49 | 1.95 | — | **2.55** | 1.87 | 2.00 | 2.41 | 2.19 | — | — |
-| Evidence grounding, 0–4 | 1.74 | 2.17 | — | **2.62** | 1.98 | 2.29 | 2.58 | 2.25 | — | — |
-| Unsupported-claim rate | 94.76% | 88.77% | — | **70.50%** | 95.67% | 81.56% | 77.04% | 72.83% | — | — |
+| Open-ended — judge coverage | 95.33% | 95.00% | — | 87.00% | 84.67% | 94.00% | 90.00% | 92.00% | **99.00%** | **99.00%** |
+| Open-ended — Top-1 | 16.78% | 24.21% | — | **42.15%** | 23.62% | 24.11% | 41.48% | 32.97% | 41.08% | 41.75% |
+| Open-ended — Top-3 | 38.11% | 51.23% | — | 65.52% | 43.70% | 47.16% | 61.48% | 56.52% | **68.35%** | 67.34% |
+| Open-ended — MRR | 26.34% | 35.85% | — | 52.49% | 32.22% | 33.69% | 50.12% | 43.24% | **53.25%** | 52.97% |
+| Clinical rationale, 0–4 | 1.49 | 1.95 | — | **2.55** | 1.87 | 2.00 | 2.41 | 2.19 | 1.87 | 1.94 |
+| Evidence grounding, 0–4 | 1.74 | 2.17 | — | **2.62** | 1.98 | 2.29 | 2.58 | 2.25 | 2.56 | 2.38 |
+| Unsupported-claim rate | 94.76% | 88.77% | — | **70.50%** | 95.67% | 81.56% | 77.04% | 72.83% | 72.39% | 81.82% |
 
 `Raw` Confusion metrics preserve strict format failures in the denominator.
 `Canonical` metrics apply only the frozen deterministic parser and therefore
 show the clinical ranking recoverable from the response; they do not erase the
 strict-format failure disclosed below. Gemini 3.7 Medium leads every structured
-disease-ranking measure in this eight-model table. Qwen 3.8 Max remains
-strongest on the primary judged open-ended metrics, with Gemini 3.5 close
-behind. The local Qwen 3.8 27B open-ended cells are pending rather than zero.
-MiniMax no longer has the highest semantic-compliance score once the Gemini
-models are included.
+disease-ranking measure in this eight-model table. Qwen 3.8 Max retains the
+highest open-ended Top-1, while E1 Frozen has the highest Top-3 and MRR. The
+local Qwen 3.8 27B open-ended cells are pending rather than zero. MiniMax no
+longer has the highest semantic-compliance score once the Gemini models are
+included.
 
-The E1 open-ended cells are deliberately blank because the earlier E1
-campaign was scoped to deterministic tasks without LLM-as-a-judge. No
-`open_ended_diagnosis` inference was generated for either fine-tuned
-checkpoint, so there are no 300-case responses to judge and no legitimate
-Top-1, Top-3, MRR, rationale, grounding, or unsupported-claim scores to report.
-Completing these cells requires a new, paired inference run with the selected
-epoch-3 checkpoints, followed by the frozen blinded-judge protocol. The dash
-must not be replaced by zero or inferred from the structured-task results.
+The preserved E1 runs are `20260815T033723Z_50881d2f` for Frozen and
+`20260815T024948Z_8fe10b05` for Vision LoRA. They were judged with the frozen
+prompt and schema using GPT-5.6 Luna only. Each retained 297 valid judgments
+and three persistent judge-invalid outputs. The reported percentages use the
+297 valid judgments; the corresponding conservative all-300 Top-1 rates are
+40.67% for Frozen and 41.33% for Vision.
 
-Judge recovery was not perfectly symmetric: the two local pre-training Qwen runs had three
-historical `--retry-invalid` passes after an initial concurrent run encountered
-Azure rate limits, whereas Qwen 3.8 Max, MiniMax, and MiMo each received one
-controlled retry after their initial sequential pass. Gemini 3.5 used one judge
-pass without an invalid-judgment retry; Gemini 3.7 used the separately frozen
-GPT-5.6 Luna judge protocol described below. No evaluated-model
-answer was regenerated, but open-ended coverage differs across models.
+Judge recovery was not perfectly symmetric: the two local pre-training Qwen
+runs had three historical `--retry-invalid` passes after an initial concurrent
+run encountered Azure rate limits, whereas Qwen 3.8 Max, MiniMax, and MiMo each
+received one controlled retry after their initial sequential pass. E1 Frozen
+received one invalid-only retry and E1 Vision received two; an earlier Vision
+attempt that produced only connection errors contributed no scores. Gemini 3.5
+used one judge pass without an invalid-judgment retry; Gemini 3.7 used the
+separately frozen GPT-5.6 Luna judge protocol described below. No
+evaluated-model answer was regenerated, but open-ended coverage differs across
+models.
 Judge-dependent scores must therefore always be read with the coverage and
 conservative all-300-case rates, rather than compared as if every response had
 an independent human rating.
@@ -201,7 +204,9 @@ conditions were evaluated:
 Both checkpoints used the historical Qwen 4B inference profile:
 `temperature=0.6`, `top_p=0.95`, `top_k=20`, `presence_penalty=1.5`, seed 42,
 and thinking disabled. The 1,962 structured task IDs were exactly paired with
-the E0 runs. The E1 checkpoints were not evaluated on the 300 open-ended cases.
+the E0 runs. A subsequent paired run added the same 300 open-ended cases to
+both E1 conditions; their GPT-5.6 Luna judge results are complete at 99%
+coverage.
 Epoch 3 is reported because the subsequent continued-training checkpoints at
 epochs 4 and 5 were rejected by the frozen `sft_dev` selection rule; they do
 not replace the selected E1 checkpoints in benchmark comparisons.
@@ -223,14 +228,20 @@ not replace the selected E1 checkpoints in benchmark comparisons.
 | Evidence — Top-3 | 61.19% | 69.40% | 79.10% | **81.34%** | 86.57% |
 | Evidence — Top-6 | 71.64% | 81.34% | 87.31% | **88.81%** | 91.79% |
 | Evidence — MRR | 52.24% | 59.29% | 67.70% | **69.91%** | 77.82% |
-| Open-ended — judged metrics | available | available | — | — | available |
+| Open-ended — judge coverage | 95.33% | 95.00% | 99.00% | 99.00% | 92.00% |
+| Open-ended — Top-1 | 16.78% | 24.21% | 41.08% | **41.75%** | 32.97% |
+| Open-ended — Top-3 | 38.11% | 51.23% | **68.35%** | 67.34% | 56.52% |
+| Open-ended — MRR | 26.34% | 35.85% | **53.25%** | 52.97% | 43.24% |
 
 Bold in the two E1 columns identifies the better E1 condition; it is not a
 claim that E1 exceeds Gemini 3.7. Vision LoRA improved E1 Top-1 over Frozen by
 6.00 pp in Top-K, 4.83 pp in Confusion Sets, and 2.24 pp in Evidence. Relative
 to E0 Qwen 4B, the corresponding Vision gains were 23.20, 12.56, and 16.42 pp.
 It also exceeded Qwen 3.6 27B Top-1 by 13.30, 5.19, and 11.94 pp on these three
-tasks.
+tasks. Open-ended results are more nuanced: Vision has the better Top-1, but
+Frozen has the better Top-3, MRR, evidence grounding, and unsupported-claim
+rate. This supports E2 structured/E3 hard-KD rather than selecting Vision from
+diagnostic accuracy alone.
 
 Exact paired McNemar tests for E1 Vision against Qwen 27B gave
 `p=1.97e-15`, `p=1.69e-4`, and `p=0.0226`, respectively. Against E1 Frozen,
@@ -945,9 +956,12 @@ but it is not the strongest or most reliable open-ended comparator.
 5. Evidence grounding remains a principal weakness across all eight
    generalist/API models and both E1 conditions. Better Top-K diagnosis alone
    does not solve unsupported visual claims or semantic noncompliance.
-6. Gemini 3.7 Medium is strongest on structured diagnosis, whereas Qwen 3.8 Max
-   remains strongest on the principal judged open-ended metrics. Gemini 3.7's
-   29 open-ended backend failures prevent treating it as uniformly dominant.
+6. Gemini 3.7 Medium is strongest on structured diagnosis. In open-ended
+   diagnosis, Qwen 3.8 Max has the highest Top-1, while E1 Frozen has the
+   highest Top-3 and MRR. Qwen 3.8 Max still has stronger rationale quality and
+   slightly stronger grounding than either label-only E1 condition, showing
+   why diagnosis ranking alone is insufficient. Gemini 3.7's 29 open-ended
+   backend failures prevent treating it as uniformly dominant.
 7. MiMo is a more credible teacher candidate than MiniMax in this comparison:
    it has better Evidence morphology, open-ended grounding, output format, and
    fewer unsupported claims. MiniMax's strengths are semantic compliance and
@@ -969,7 +983,8 @@ and HTML reports are stored under:
 `outputs/internal_benchmark_full_v1/qwen_3_8_max_low/`,
 `outputs/internal_benchmark_full_v1/gemini_3_5_flash_lite_minimal/final/`,
 `outputs/internal_benchmark_full_v1/gemini_3_7_flash_medium/final/`,
-`outputs/qwen_3_8_27b_full_benchmarks/`, and
+`outputs/qwen_3_8_27b_full_benchmarks/`,
+`outputs/efficiency_cohort_v1/qwen_3_8_27b/`, and
 `outputs/e1_epoch3_historical_t06_benchmarks/`.
 
 The 50 files in the remote Qwen 3.8 27B benchmark tree were compared with the
@@ -977,9 +992,19 @@ Mac copy using an rsync checksum dry-run on 2026-08-15; no remote file was
 missing or different. The two additional local files are preserved vLLM
 server logs and are not part of the remote benchmark tree.
 
-The copied E1 campaign contains 227 files and 499,275,681 bytes. Remote and
-local aggregate SHA-256 are identical:
+The separate Qwen 3.8 27B efficiency cohort contains 400 matched requests
+(100 per task) with complete client-observed TTFT, latency, token throughput,
+VRAM, server RAM, power, and integrated GPU-energy records. The raw remote
+files were verified against the Mac copy by checksum before the recoverable
+55.6 GB model cache was removed from the RunPod. The completed four-model
+Pareto comparison and its figures are documented in
+`annotations/benchmarks/13_same_hardware_efficiency_pareto_e1.md`.
+
+Before judging, the copied E1 campaign contained 227 files and 499,275,681
+bytes. Remote and local aggregate SHA-256 were identical:
 `244eaaaf27c55fa1ed6d51d8dd49a1b68de0a1eb9016ebfd1bb6c9734af574fa`.
+The GPT-5.6 Luna judgments, metrics, manifests, and HTML reports were then
+generated locally and are intentionally outside that pre-judge remote hash.
 
 The output directory is intentionally excluded from Git because it contains
 large, reproducible run artifacts. This annotation preserves the protocol and

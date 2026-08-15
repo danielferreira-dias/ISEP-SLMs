@@ -10,7 +10,7 @@ from typing import Protocol, cast, overload
 from PIL import Image
 
 from src.train.config import TrainingConfig
-from src.train.data.images import preprocess_image
+from src.train.data.images import preprocess_image_with_metadata
 from src.train.data.loading import load_assignments
 from src.train.data.source import load_source_frame, source_shards
 from src.train.data.taxonomy import load_taxonomy
@@ -49,6 +49,7 @@ class LazyReleaseDataset(Sequence[dict[str, object]]):
         phase: TrainingPhase,
         max_edge_pixels: int,
         source_root: Path,
+        subset: ReleaseSubset = ReleaseSubset.SFT_TRAIN,
     ) -> None:
         """Initialize a view whose metadata order matches its Arrow indices."""
 
@@ -59,6 +60,7 @@ class LazyReleaseDataset(Sequence[dict[str, object]]):
         self._phase = phase
         self._max_edge_pixels = max_edge_pixels
         self._source_root = source_root
+        self._subset = subset
 
     def __len__(self) -> int:
         """Return the number of assigned samples in this release view."""
@@ -86,16 +88,23 @@ class LazyReleaseDataset(Sequence[dict[str, object]]):
             raise ValueError("Hugging Face Dataset returned a non-mapping row")
         assigned = self._samples[normalized_index]
         _verify_backing_identity(row, assigned)
+        image, geometry = preprocess_image_with_metadata(
+            _image_input(row.get("image"), self._source_root),
+            max_edge_pixels=self._max_edge_pixels,
+        )
         sample = LabeledImageSample(
             sample_id=assigned.sample_id,
             leakage_group_id=assigned.leakage_group_id,
             disease_id=assigned.disease_id,
             label=assigned.label,
             source=assigned.source,
-            image=preprocess_image(
-                _image_input(row.get("image"), self._source_root),
-                max_edge_pixels=self._max_edge_pixels,
-            ),
+            image=image,
+            subset=self._subset.value,
+            image_width=geometry.image_width,
+            image_height=geometry.image_height,
+            pixel_count=geometry.pixel_count,
+            resized_width=geometry.resized_width,
+            resized_height=geometry.resized_height,
         )
         return self._phase.format_example(sample).as_record()
 
@@ -167,6 +176,7 @@ def build_lazy_phase_dataset(
         phase=selected_phase,
         max_edge_pixels=config.dataset.image.max_edge_pixels,
         source_root=config.resolve_path(config.dataset.source_directory),
+        subset=subset,
     )
 
 

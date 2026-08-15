@@ -207,6 +207,19 @@ class BenchmarkEfficiencyTest(unittest.TestCase):
             self.assertTrue((comparison / "tables/pareto_frontiers.csv").is_file())
             self.assertTrue((comparison / "figures/quality_vs_latency.png").is_file())
             self.assertTrue((comparison / "figures/quality_vs_latency.svg").is_file())
+            for stem in (
+                "latency_percentiles",
+                "ttft_percentiles",
+                "tpot_percentiles",
+                "throughput",
+                "memory",
+                "resource_per_request",
+                "gpu_utilization_power",
+                "gpu_peak_telemetry",
+            ):
+                self.assertTrue((comparison / f"figures/{stem}.png").is_file())
+                self.assertTrue((comparison / f"figures/{stem}.svg").is_file())
+                self.assertTrue((comparison / f"figures/{stem}_source.csv").is_file())
             self.assertTrue((comparison / "report/thesis_summary.md").is_file())
 
     def test_pareto_marks_tradeoffs_and_dominated_points(self) -> None:
@@ -286,6 +299,11 @@ def _comparison_row(
         gpu_seconds_per_request=latency,
         peak_vram_gib=vram,
         peak_server_ram_gib=10.0,
+        peak_system_memory_used_gib=20.0,
+        mean_gpu_utilization_percent=90.0,
+        mean_gpu_power_watts=250.0,
+        peak_gpu_power_watts=300.0,
+        peak_gpu_temperature_celsius=60.0,
         gpu_energy_wh=energy * 100,
         idle_adjusted_gpu_energy_wh=energy * 90,
         energy_wh_per_request=energy,

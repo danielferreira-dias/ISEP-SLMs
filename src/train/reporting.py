@@ -27,7 +27,9 @@ from src.train.artifacts.training_history import (
 )
 from src.train.artifacts.types import TableCell
 from src.train.data import load_assignments
-from src.train.run_io import resource_summary
+from src.train.e2.caption_plots import render_caption_and_multitask_plots
+from src.train.e2.plots import render_morphology_plots
+from src.train.resource_metrics import resource_summary
 
 
 def build_run_report(run_directory: Path) -> None:
@@ -53,6 +55,8 @@ def build_run_report(run_directory: Path) -> None:
     plotter.training_history(history)
     checkpoints = _checkpoint_points(run_directory)
     plotter.checkpoint_metrics(checkpoints)
+    render_morphology_plots(store)
+    render_caption_and_multitask_plots(store)
 
     final_path = store.path("metrics", "classification.json")
     if final_path.is_file():
@@ -76,7 +80,7 @@ def build_run_report(run_directory: Path) -> None:
     if final_path.is_file():
         generate_report(
             run_directory,
-            title=f"ISEP E1 training run {run_directory.name}",
+            title=f"ISEP training run {run_directory.name}",
             limitations=(
                 "Checkpoint selection uses only frozen sft_dev data.",
                 "ISEPDermaBench, DermoBench, DDI, and SkinDisNet are excluded "

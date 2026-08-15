@@ -21,6 +21,15 @@
       "allowed_role": "private_research_training_user_authorized_2026_08_14",
       "redistribution_status": "private_repository_only_do_not_publish",
       "benchmark_consequence": "no_longer_independent_external_evaluation_after_training"
+    },
+    {
+      "source_id": "skincap",
+      "license_id": "SKINCAP_GATED_RESEARCH_USE_WITH_WRITTEN_PERMISSION",
+      "allowed_role": "private_thesis_caption_derivatives_and_model_training",
+      "authorization_status": "written_permission_attested_by_dataset_owner_2026_08_15",
+      "authorization_document_stored": false,
+      "image_terms": "fitzpatrick17k_or_ddi_source_terms_also_apply",
+      "redistribution_status": "private_repository_only"
     }
   ]
 }

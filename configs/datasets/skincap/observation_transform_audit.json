@@ -1,0 +1,38 @@
+{
+  "accepted_by_source": {
+    "ddi": 601,
+    "fitzpatrick17k": 2649
+  },
+  "accepted_observation_rows": 3250,
+  "author_excluded_rows": 439,
+  "boundary_counts": {
+    "diagnostic": 2977,
+    "gold_diagnosis": 263,
+    "management": 10,
+    "none": 28,
+    "testing": 40
+  },
+  "caption_variant": "v240715_google_translate_en",
+  "derivatives_materialized": true,
+  "downloaded_rows": 4000,
+  "frozen_internal_overlap_rows": 119,
+  "frozen_validation_overlap_rows": 124,
+  "metadata_sha256": "0286ec8ba295eda97b89db04969e5436862b8c8f68aa03b3104705e2a9b39df3",
+  "observation_word_statistics": {
+    "max": 65,
+    "median": 19.0,
+    "min": 5,
+    "p95": 34.0
+  },
+  "rejected_observation_rows": 68,
+  "rejection_counts": {
+    "empty_observation": 4,
+    "residual_gold_diagnosis": 1,
+    "too_few_characters": 19,
+    "too_few_words": 67
+  },
+  "technical_candidate_groups": 3317,
+  "technical_candidate_rows": 3318,
+  "transform_version": "skincap_observation_prefix_v1",
+  "usable_before_leakage_rows": 3561
+}
