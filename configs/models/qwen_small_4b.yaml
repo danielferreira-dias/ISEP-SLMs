@@ -25,13 +25,13 @@ capabilities:
 source:
   type: huggingface
   repo_id: Qwen/Qwen3.5-4B
-  revision: main
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
   access: public
   license: apache-2.0
 
 processor:
   repo_id: Qwen/Qwen3.5-4B
-  revision: main
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
 
 backend:
   default_profile: vllm

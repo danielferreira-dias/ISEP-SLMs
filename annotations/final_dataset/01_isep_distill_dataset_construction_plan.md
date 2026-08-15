@@ -3,7 +3,7 @@
 | Campo | Valor |
 | --- | --- |
 | Data da decisão | 2026-08-08 |
-| Estado | especificação metodológica anterior à implementação |
+| Estado | especificação metodológica; `diagnosis` e `morphology` v0.3.0 materializados |
 | Student de referência | Qwen 3.5 4B multimodal |
 | Objetivo | construir supervisão multimodal leakage-safe para especializar um modelo pequeno em perceção, descrição e diagnóstico dermatológico, mantendo cada afirmação clínica auditável |
 
@@ -117,9 +117,11 @@ O estudo SKINCON foi concebido precisamente para fornecer conceitos clínicos fi
 
 Há também precedente arquitetural para esta separação: o SkinGPT-4 utilizou primeiro alinhamento imagem-conceito com SKINCON e só depois treino de interação imagem-texto ([Zhou et al., 2024](https://doi.org/10.1038/s41467-024-50043-3)). No ISEP, isto motiva uma fase visual-conceptual anterior ou uma tarefa de morfologia separada; não demonstra, por si só, que a mesma sequência será ótima no Qwen 3.5 4B.
 
-O join local preliminar encontrou 606 imagens Fitzpatrick17k do pool de treino atual com conceitos SKINCON utilizáveis. Encontrou ainda 2.353 imagens SKINCON utilizáveis que não pertencem ao treino atual nem aos grupos reservados conhecidos. Estas 2.353 podem ser consideradas para uma configuração `morphology` sem target diagnóstico, desde que a licença da imagem de origem permita o uso e a análise de leakage seja novamente executada sobre o release final. O máximo teórico preliminar é, portanto, 2.959 imagens com supervisão de conceitos fora dos grupos reservados, mas este valor ainda deve ser reproduzido pelo builder e congelado num relatório.
+O audit reproduzido em 14 de agosto de 2026 encontrou 606 imagens Fitzpatrick17k do pool de treino atual com conceitos SKINCON utilizáveis, 2.353 imagens Fitzpatrick17k adicionais elegíveis para uma configuração `morphology` sem target diagnóstico da taxonomia de 21 classes e 271 overlaps com o Internal Benchmark congelado. Estes 271 continuam excluídos para preservar a validade interna. O pool Fitzpatrick17k elegível fica, portanto, em 2.959 imagens.
 
-As 636 anotações SKINCON ligadas a DDI devem permanecer no lado da avaliação, porque DDI é um benchmark externo sob Research Use Agreement. Esta reserva tem valor científico: o estudo DDI construiu uma coleção curada, diversa e confirmada por patologia e observou quedas de 27% a 36% na ROC-AUC relativamente aos resultados originais dos modelos avaliados, com pior desempenho em pele escura e doenças pouco comuns ([Daneshjou et al., 2022](https://doi.org/10.1126/sciadv.abq6147)). Treinar nas anotações DDI eliminaria parte dessa função de avaliação externa; elas não devem migrar para o treino apenas por estarem disponíveis numa tabela de conceitos.
+Por decisão experimental registada em 14 de agosto de 2026, as 636 anotações SKINCON DDI utilizáveis passam a `sft_train`/`sft_dev`, sob o Research Use Agreement e apenas no repositório privado. Esta decisão eleva o pool de morfologia para 3.595 imagens e deixa de reservar linhas DDI para avaliação externa. A consequência deve ser explícita: depois de treinar com estas imagens ou anotações, DDI deixa de ser evidência independente de generalização e os seus resultados só podem ser descritos como in-domain ou contaminados. SkinDisNet e os restantes conjuntos não usados no treino mantêm o papel externo.
+
+O builder materializado confirmou que todas as 3.866 anotações SKINCON utilizáveis têm uma label diagnóstica upstream. Depois de excluir os 271 overlaps reservados e aplicar os aliases e mappings source-specific versionados, 1.198 das 3.595 linhas publicadas mapeiam para as 21 classes atuais; as restantes 2.397 mantêm a label original, mas entram apenas como supervisão de morfologia para não expandir silenciosamente a taxonomia diagnóstica. O número preliminar de 1.171 foi corrigido porque não aplicava integralmente esses mappings revistos.
 
 ### 4.3 SkinCAP e SkinCoT como fontes condicionais
 
@@ -132,7 +134,7 @@ O [dataset card de SkinCaRe](https://huggingface.co/datasets/yuhos16/SkinCaRe/bl
 Estas fontes só devem entrar na construção após três verificações:
 
 1. permissão escrita ou licença inequívoca para o uso pretendido e para a eventual distribuição de derivados.
-2. remoção de todo o overlap com Validation, Internal Benchmark, DDI externo e restantes grupos selados.
+2. remoção de todo o overlap com Validation, Internal Benchmark e restantes grupos selados. DDI deixa de ser um conjunto selado nesta experiência.
 3. auditoria do processo de criação do target, porque uma explicação escrita depois de mostrar o gold é uma rationale condicionada pela resposta.
 
 SkinCAP pode alimentar a tarefa `caption` quando o texto for compatível com a imagem e com a taxonomy. SkinCoT não deve ser importado como raw chain-of-thought principal: pode fornecer exemplos de estrutura clínica ou de descrição depois de revisão, normalização e rotulagem explícita de `target_source=human_reviewed_external`. O release local não expõe, por caso, todos os scores numéricos de revisão descritos no artigo. A ausência desses campos impede tratá-los como labels de qualidade individuais. Esta escolha preserva o benefício documentado — linguagem dermatológica mais rica — sem confundir uma rationale revista depois de conhecida a resposta com evidência answer-blind.
@@ -147,7 +149,7 @@ Um segundo teacher visual, como PanDerm, pode ser usado numa experiência de fea
 
 ## 5. Regra de leakage e elegibilidade
 
-O treino só pode usar amostras cujo `leakage_group_id` não ocorra em nenhum conjunto reservado. O registo de exclusão deve incluir Validation, Internal Benchmark selado, DDI externo, SkinDisNet e qualquer benchmark futuro.
+O treino só pode usar amostras cujo `leakage_group_id` não ocorra em nenhum conjunto reservado. O registo de exclusão deve incluir Validation, Internal Benchmark selado, SkinDisNet e qualquer benchmark futuro. DDI fica fora desta lista a partir da decisão experimental de 14 de agosto de 2026.
 
 O audit local identificou 931 imagens Fitzpatrick17k únicas em grupos reservados e 271 overlaps utilizáveis com SKINCON. Estes 271 casos podem servir para avaliar morfologia, mas não podem produzir targets de treino. A regra aplica-se à imagem exata, a cópias redimensionadas, crops, versões recomprimidas e imagens com o mesmo patient/lesion/source lineage.
 
@@ -949,7 +951,7 @@ Attention maps podem ser exploradas, mas não provam causalmente que o modelo us
 - resultados por skin tone quando disponível.
 - resultados por source e tipo/modalidade de imagem.
 - classes inflamatórias, infeciosas e neoplásicas.
-- DDI e SkinDisNet apenas como avaliação externa.
+- SkinDisNet e outros conjuntos não usados no treino como avaliação externa. DDI é apenas uma análise in-domain/contaminada depois da integração SKINCON.
 - diferença entre Validation de desenvolvimento e Internal Benchmark selado.
 
 ### 16.5 Eficiência
@@ -962,7 +964,7 @@ Attention maps podem ser exploradas, mas não provam causalmente que o modelo us
 
 ### 16.6 Retenção de conhecimento médico e geral
 
-Além do ISEPDermaBench, DermoBench, DDI e SkinDisNet, a avaliação final pode
+Além do ISEPDermaBench, DermoBench e SkinDisNet, a avaliação final pode
 incluir **MedQA**, **PubMedQA** e os domínios médicos de **MMLU**. Estes
 benchmarks têm uma função diferente: não medem perceção dermatológica nem
 grounding visual; medem conhecimento médico textual, resolução de perguntas
@@ -1217,6 +1219,6 @@ Esta arquitetura de dados permite que a tese responda a perguntas causais mais l
 
 ## 24. Provenance desta nota
 
-Esta especificação sintetiza a investigação académica e os audits locais registados nas referências internas. Os valores de joins ainda não materializados num builder versionado, nomeadamente os 2.959 candidatos SKINCON e os 931 casos Fitzpatrick17k reservados, devem ser tratados como resultados preliminares até serem reproduzidos automaticamente e incluídos no manifest da primeira release.
+Esta especificação sintetiza a investigação académica e os audits locais registados nas referências internas. A cobertura SKINCON foi reproduzida em 14 de agosto de 2026 e registada em `data/training/ISEPDistillDataset/metadata/skincon_coverage.json`: 3.866 anotações utilizáveis, zero labels upstream em falta, 271 overlaps internos excluídos e 3.595 linhas de morfologia publicadas. O builder versionado materializou ainda as 7.541 linhas de `diagnosis`; os counts, splits, revisões e SHA-256 dos shards ficaram congelados em `metadata/release.json`. `caption`, `structured` e `open_response` continuam por gerar e só podem ser materializados após existirem targets reais aceites.
 
 O texto foi preparado com assistência de IA e deve ser revisto pelo autor da dissertação. Decisões clínicas, licenças e critérios de revisão especializada exigem validação humana antes da geração ou publicação do dataset.

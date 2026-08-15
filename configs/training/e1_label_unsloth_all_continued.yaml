@@ -1,0 +1,113 @@
+# Two additional epochs from the selected E1 Vision LoRA epoch-three checkpoint.
+schema_version: 1
+
+experiment:
+  id: e1_label_unsloth_all_continued
+  phase: e1_label
+  vision_profile: unsloth_all
+
+dataset:
+  source_directory: data/training/ISEPDermData
+  source_version: 1.3.0
+  hub_repo_id: danielfdias98/ISEPDermData
+  hub_revision: f7403f817376de0dea0048bd3c490e294a0ccaca
+  release_id: e1_label_v1
+  release_directory: data/training/ISEPDermData/releases/e1_label_v1
+  source_release_file: release.json
+  taxonomy_file: metadata/taxonomy.json
+  split:
+    train_ratio: 0.85
+    dev_ratio: 0.15
+    seed: 42
+    secondary_feature_weight: 0.25
+    panel_groups_per_class: 10
+    panel_seed: 1042
+  expected:
+    image_count: 7541
+    group_count: 5671
+    class_count: 21
+    source_count: 4
+    train_image_count: 6312
+    train_group_count: 4820
+    dev_image_count: 1229
+    dev_group_count: 851
+  image:
+    max_edge_pixels: 512
+    mode: RGB
+    correct_exif_orientation: true
+    preserve_aspect_ratio: true
+    allow_upscale: false
+
+model:
+  repo_id: Qwen/Qwen3.5-4B
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  processor_repo_id: Qwen/Qwen3.5-4B
+  processor_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  dtype: bfloat16
+  load_in_4bit: false
+  trust_remote_code: false
+  enable_thinking: false
+
+lora:
+  rank: 16
+  alpha: 16
+  dropout: 0.0
+  bias: none
+  target_modules: all-linear
+  use_rslora: false
+  use_loftq: false
+  finetune_vision_layers: true
+  finetune_language_layers: true
+  finetune_attention_modules: true
+  finetune_mlp_modules: true
+
+trainer:
+  epochs: 5
+  micro_batch_size: 2
+  gradient_accumulation_steps: 4
+  learning_rate: 0.0002
+  optimizer: adamw_8bit
+  weight_decay: 0.001
+  warmup_ratio: 0.05
+  scheduler: linear
+  max_grad_norm: 1.0
+  gradient_checkpointing: unsloth
+  bf16: true
+  packing: false
+  max_length: null
+  early_stopping: false
+  seed: 3407
+  logging_steps: 10
+  save_strategy: epoch
+
+continuation:
+  parent_run_directory: outputs/training/e1_label_unsloth_all/full-l40s-vision-seed3407-20260813
+  parent_checkpoint_id: checkpoint-2367
+  parent_epoch: 3
+  additional_epochs: 2
+  parent_adapter_sha256: 7ac30915073075aa0706724c31305c3eb45264f0bbb315ec0befe0e333947e3c
+
+evaluation:
+  evals_per_epoch: 4
+  generation_do_sample: false
+  generation_temperature: 0.0
+  selection_metric: macro_f1
+  tie_break_metrics: [balanced_accuracy, eval_loss, earlier_epoch]
+  confirmation_seeds: [42, 3407, 2026]
+
+artifacts:
+  output_directory: outputs/training
+  tensorboard: true
+  save_png: true
+  save_svg: true
+  save_predictions_parquet: true
+  include_clinical_images: false
+  resource_sample_interval_seconds: 5.0
+  thesis_export_directory: null
+  checkpoint_hub:
+    enabled: false
+    repo_id: danielfdias98/ISEP-training-checkpoints
+    revision: main
+    repo_type: model
+    private: true
+    upload_smoke: false

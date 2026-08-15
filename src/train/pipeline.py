@@ -11,8 +11,10 @@ from src.train.backends import (
 )
 from src.train.checkpoint_hub import create_checkpoint_mirror
 from src.train.config import TrainingConfig
+from src.train.continuation import stage_continuation_checkpoint
 from src.train.data import load_taxonomy
 from src.train.domain import PreparedRelease
+from src.train.environment import collect_environment
 from src.train.evaluate import model_spec
 from src.train.execution import RunIdentity, TrainingExecutor
 from src.train.execution.resources import LocalResourceMonitor
@@ -68,6 +70,18 @@ def run_training(
             resume_from,
             smoke=smoke,
         )
+        if config.continuation is not None and smoke:
+            raise ValueError(
+                "Continuation runs do not use the fresh-training smoke profile"
+            )
+        if config.continuation is not None and resume_from is None:
+            training_checkpoint = stage_continuation_checkpoint(
+                config,
+                run_directory=run_directory,
+                identity=identity,
+            )
+        else:
+            training_checkpoint = resume_from
         checkpoint_mirror = create_checkpoint_mirror(
             config=config.artifacts.checkpoint_hub,
             identity=identity,
@@ -84,6 +98,11 @@ def run_training(
             release=release,
             store=store,
             smoke=smoke,
+            checkpoint_path=(
+                run_directory / "checkpoints" / config.continuation.parent_checkpoint_id
+                if config.continuation is not None
+                else None
+            ),
         )
         train_dataset, eval_dataset = training_datasets(
             config, release, run_directory, smoke=smoke
@@ -109,6 +128,12 @@ def run_training(
             metric_sink=sink,
             interval_seconds=(config.artifacts.resource_sample_interval_seconds),
         )
+        initializing_from_parent = (
+            config.continuation is not None
+            and training_checkpoint is not None
+            and training_checkpoint.name == config.continuation.parent_checkpoint_id
+            and not (run_directory / "manifests" / "run_status.json").exists()
+        )
         TrainingExecutor(
             backend=selected_backend,
             run_dir=run_directory,
@@ -116,7 +141,11 @@ def run_training(
             metric_sink=sink,
             resource_monitor=monitor,
             checkpoint_observer=checkpoint_mirror,
-        ).execute(request, resume_from_checkpoint=resume_from)
+        ).execute(
+            request,
+            resume_from_checkpoint=training_checkpoint,
+            initialize_from_checkpoint=initializing_from_parent,
+        )
         result = evaluate_run(
             run_directory,
             backend=selected_backend,
@@ -144,6 +173,13 @@ def _ensure_run_manifests(
     smoke: bool,
 ) -> None:
     if resume_from is not None:
+        run_status = store.layout.manifests / "run_status.json"
+        if config.continuation is not None and not run_status.exists():
+            store.write_json(
+                "manifests",
+                "environment.json",
+                collect_environment(config.project_root),
+            )
         return
     write_run_manifests(
         store=store,

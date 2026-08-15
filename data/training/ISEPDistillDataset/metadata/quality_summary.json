@@ -1,0 +1,46 @@
+{
+  "checks": {
+    "all_image_sha256_verified_when_available": true,
+    "all_images_decoded": true,
+    "diagnosis_matches_frozen_e1": true,
+    "explicit_huggingface_configs_required": true,
+    "morphology_internal_overlap_rows": 0,
+    "train_dev_group_overlap": 0
+  },
+  "counts": {
+    "diagnosis": {
+      "rows": 7541,
+      "sft_dev": 1229,
+      "sft_train": 6312
+    },
+    "morphology": {
+      "rows": 3595,
+      "sft_dev": 527,
+      "sft_train": 3068
+    }
+  },
+  "morphology": {
+    "inherited_e1_rows": 606,
+    "mapped_21_class_rows": 1198,
+    "outside_21_class_rows": 2397,
+    "raw_usable_rows": 3866,
+    "released_groups": 3594,
+    "released_rows": 3595,
+    "reserved_rows_excluded": 271,
+    "source_rows": {
+      "ddi": 636,
+      "fitzpatrick17k": 2959
+    },
+    "split_groups": {
+      "sft_dev": 527,
+      "sft_train": 3067
+    },
+    "split_rows": {
+      "sft_dev": 527,
+      "sft_train": 3068
+    }
+  },
+  "release_id": "isep_distill_dataset_v0.3.0",
+  "release_status": "materialized_and_validated",
+  "schema_version": "0.3.0"
+}

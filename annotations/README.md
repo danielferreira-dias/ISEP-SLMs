@@ -67,3 +67,4 @@ Each annotation should identify:
 15. [Reasoning, vision, and the no-image grounding ablation](notes/15_reasoning_vision_and_no_image_grounding_ablation.md)
 16. [SkinFlow and the visual-encoder strategy](notes/16_skinflow_architecture_and_visual_encoder_strategy.md)
 17. [Visual attribution, lesion localization, and diagnostic accuracy](notes/17_visual_attribution_localization_vs_diagnostic_accuracy.md)
+18. [Efficiency and agentic benchmark strategy](notes/18_efficiency_and_agentic_benchmark_strategy.md)

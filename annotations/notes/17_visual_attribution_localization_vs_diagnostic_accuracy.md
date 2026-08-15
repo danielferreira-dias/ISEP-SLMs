@@ -1,8 +1,8 @@
 # Atribuição visual, localização e accuracy diagnóstica
 
-**Data:** 2026-08-11  
-**Estado:** piloto qualitativo frozen de três casos concluído; comparação pré/pós fine-tuning ainda pendente  
-**Âmbito:** Qwen/Qwen3.5-4B, checkpoint base `E0_base`, atribuição por oclusão de patches
+**Data:** 2026-08-14
+**Estado:** piloto E0 e comparação emparelhada E0 versus E1 Vision LoRA concluídos em três casos congelados
+**Âmbito:** Qwen/Qwen3.5-4B, `E0_base` versus `E1_label` Vision LoRA epoch 3, atribuição por oclusão de patches
 
 ## Pergunta
 
@@ -27,13 +27,13 @@ pré-declarados: um em que o gold label permaneceu no Top-6 e outro em que ficou
 fora do Top-6. Esta seleção evita escolher exemplos apenas porque os mapas
 parecem convincentes.
 
-Há ainda uma distinção factual importante. O relatório analisado contém apenas
-o checkpoint base `E0_base`. O capítulo experimental indica que as avaliações
-completas dos checkpoints label-only e posteriores continuam pendentes. Logo,
-este artefacto **não mede uma diminuição pré/pós fine-tuning**. Se “diminuição da
-accuracy” se referir a valores observados entre benchmarks, modelos, prompts ou
-backends diferentes, essas diferenças também não podem ser atribuídas a esta
-imagem sem uma comparação emparelhada e controlada.
+O piloto inicial continha apenas o checkpoint base `E0_base`, executado em
+MPS/FP16. Em 2026-08-14, os mesmos três casos, targets, imagens, prompts e
+perturbações foram repetidos em CUDA/BF16 para `E0_base` e para o checkpoint
+`E1_label` Vision LoRA epoch 3. Esta comparação reduz o confound de dispositivo
+e precisão, mas continua exploratória: contém três imagens, cinco mapas de
+target e nove tiles por mapa. Não mede por si só uma alteração da accuracy
+global nem demonstra que a Vision LoRA causou melhor localização clínica.
 
 ## Evidência local do caso de controlo
 
@@ -117,6 +117,95 @@ pré-declarados.
 
 As correlações de Spearman são descrições de apenas nove tiles. Não são testes
 de significância nem estimativas da população.
+
+## Comparação controlada E0 versus E1 Vision LoRA
+
+Para isolar melhor o efeito do checkpoint, o E0 foi repetido no mesmo RunPod,
+em CUDA/BF16, antes da comparação com o E1 Vision LoRA. O prompt, processador,
+imagens, hashes, targets, grelha 3 × 3 e raio de blur permaneceram congelados.
+Como controlo de implementação, E0 MPS/FP16 e E0 CUDA/BF16 conservaram o tile
+máximo nos cinco mapas. A correlação de Pearson entre os mapas brutos variou de
+`0.905` a `0.998` e a correlação de Spearman de `0.600` a `0.983`. Por isso, os
+resultados principais abaixo usam apenas a comparação CUDA/BF16 emparelhada.
+
+| Caso e target fixo | Score E0 → E1 | Maior queda E0 → E1 | Tile máximo E0 → E1 | Spearman dos mapas |
+|---|---:|---:|---|---:|
+| Acne vulgaris, gold | `-0.325 → -0.723` | `0.720 → 1.006` | centro → centro | `0.350` |
+| Urticaria, gold | `-0.727 → -0.095` | `0.604 → 0.328` | centro → inferior-esquerda | `0.750` |
+| Psoriasis, target previsto no E0 | `-0.948 → -1.486` | `0.159 → 0.013` | centro → superior-direita | `-0.067` |
+| Drug eruption, gold | `-0.998 → -1.513` | `0.027 → 0.005` | superior-centro → centro-direita | `0.550` |
+| SCC, target previsto no E0 | `-0.559 → -1.542` | `0.151 → 0.156` | superior-direita → centro-direita | `-0.167` |
+
+![Scores emparelhados E0 versus E1 Vision LoRA](../training_steps/figures/02_visual_attribution_e0_vs_e1/paired_target_scores.png)
+
+**Legenda proposta.** Comparação exploratória, emparelhada e descritiva de
+cinco targets em três imagens. O painel esquerdo apresenta a log-probabilidade
+média teacher-forced do target na imagem original; o painel direito mostra a
+maior queda bruta após ocultar um dos nove tiles. Valores mais altos no painel
+esquerdo indicam maior score do target; valores mais altos no painel direito
+indicam maior dependência positiva de pelo menos uma região. Estas duas medidas
+não são equivalentes a confidence calibrada, accuracy ou segmentação.
+
+### Leitura dos casos
+
+- **Acne vulgaris:** o tile central permaneceu dominante e a queda máxima
+  aumentou de `0.720` para `1.006`, apesar de o score original do target ter
+  diminuído. O E1 ficou mais sensível à região central para este target, mas não
+  ficou necessariamente mais confiante na classe.
+- **Urticaria:** o score gold aumentou substancialmente (`+0.632`), mas a queda
+  máxima diminuiu e migrou do centro para o tile inferior-esquerdo. O suporte
+  positivo tornou-se mais distribuído, não simplesmente mais centrado.
+- **Psoriasis:** este era o target previsto no benchmark E0, não uma nova
+  previsão do E1. No E1, o suporte positivo máximo quase desapareceu
+  (`0.159 → 0.013`) e o mapa bruto deixou de estar correlacionado com o E0.
+- **Drug eruption:** o target gold perdeu score e apresentou praticamente zero
+  suporte positivo em ambos os checkpoints. Este caso não mostra recuperação
+  do alinhamento visual para o gold.
+- **SCC:** o máximo positivo permaneceu semelhante, mas o mapa mudou de forma
+  acentuada; a soma das mudanças absolutas aumentou sobretudo por quedas
+  negativas. A intensidade visual do overlay normalizado esconderia esta
+  diferença sem consultar os valores brutos.
+
+| Target | E0 CUDA/BF16 | E1 Vision LoRA CUDA/BF16 |
+|---|---|---|
+| Acne vulgaris, gold | ![E0 Acne](../assets/visual_attribution/qwen_3_5_4b_e0_cuda_scin_acne_gold_overlay.png) | ![E1 Acne](../assets/visual_attribution/qwen_3_5_4b_e1_vision_scin_acne_gold_overlay.png) |
+| Urticaria, gold | ![E0 Urticaria](../assets/visual_attribution/qwen_3_5_4b_e0_cuda_scin_urticaria_gold_overlay.png) | ![E1 Urticaria](../assets/visual_attribution/qwen_3_5_4b_e1_vision_scin_urticaria_gold_overlay.png) |
+| Psoriasis, target E0 | ![E0 Psoriasis](../assets/visual_attribution/qwen_3_5_4b_e0_cuda_scin_psoriasis_frozen_target_overlay.png) | ![E1 Psoriasis](../assets/visual_attribution/qwen_3_5_4b_e1_vision_scin_psoriasis_frozen_target_overlay.png) |
+| Drug eruption, gold | ![E0 Drug eruption](../assets/visual_attribution/qwen_3_5_4b_e0_cuda_fitz_drug_eruption_gold_overlay.png) | ![E1 Drug eruption](../assets/visual_attribution/qwen_3_5_4b_e1_vision_fitz_drug_eruption_gold_overlay.png) |
+| SCC, target E0 | ![E0 SCC](../assets/visual_attribution/qwen_3_5_4b_e0_cuda_fitz_scc_frozen_target_overlay.png) | ![E1 SCC](../assets/visual_attribution/qwen_3_5_4b_e1_vision_fitz_scc_frozen_target_overlay.png) |
+
+### Conclusão da comparação pré/pós
+
+O E1 Vision LoRA **alterou materialmente a sensibilidade espacial**, mas os três
+casos não sustentam a afirmação geral de que a visão ficou melhor. Apenas o
+caso de acne preservou o tile máximo e aumentou claramente a dependência da
+região central. Urticaria melhorou no score do gold, enquanto Psoriasis e Drug
+eruption perderam suporte positivo e SCC mudou de topologia sem melhoria clara.
+A formulação suportada é:
+
+> Nos três casos congelados, a adaptação Vision LoRA modificou os scores e os
+> mapas de oclusão de forma dependente do target. Observou-se maior
+> sensibilidade à lesão central num caso correto, mas não uma melhoria uniforme
+> do grounding visual nos casos errados.
+
+Esta conclusão é descritiva. Os targets `Psoriasis` e `SCC` foram congelados a
+partir das previsões E0 para permitir comparação emparelhada; não devem ser
+apresentados como previsões efetivas do E1. Além disso, os três IDs do piloto
+antigo não pertencem à atual coorte `visual_top_k_closed_set` v3.6.0, pelo que a
+transição de diagnóstico E0→E1 não foi medida nesta análise.
+
+### Validação estatística e fallacy scan
+
+Não foram executados testes de hipótese: `n=3` imagens e cinco targets permitem
+apenas descrição exploratória. A verificação metodológica cobriu os 11 padrões
+do protocolo ARS (`11/11`): Simpson, ecological fallacy, collider bias e reverse
+causality não são aplicáveis ao desenho atual; não há attrition nem inferência
+de prevalência. Permanecem cautelas de seleção/Berkson, porque os casos foram
+escolhidos por estratos de desempenho E0, de look-elsewhere por existirem várias
+métricas por mapa e de garden of forking paths por a interpretação ocorrer após
+observar os resultados. O congelamento prévio dos IDs, targets e método reduz,
+mas não elimina, estes riscos. Qualquer linguagem causal ou generalização para
+a população seria inadequada.
 
 ### Caso errado com gold no Top-6: Urticaria versus Psoriasis
 
@@ -233,8 +322,11 @@ decomposição deve separar `semantic_error`, `format_error`, `abstention` e
 Fine-tuning pode preservar características visuais e alterar o mapeamento entre
 essas características, os tokens e os rótulos. Interferência entre classes,
 desbalanceamento, ruído de labels, overfitting e esquecimento são mecanismos
-possíveis, mas **ainda não demonstrados neste run**. Só uma comparação
-emparelhada entre checkpoints pode testá-los.
+possíveis. A comparação emparelhada E0 versus E1 confirmou que os mapas e os
+scores mudaram após o treino, mas não identifica qual destes mecanismos causou
+as alterações nem demonstra melhoria global. Esse diagnóstico exigiria mais
+casos, seeds, classes concorrentes e uma ligação direta às transições de
+predição do benchmark.
 
 ## Limitações específicas desta visualização
 
@@ -377,6 +469,8 @@ na decisão humana.
 
 ## Artefactos e reprodutibilidade
 
+### Piloto original E0 MPS/FP16
+
 - Configuração: `configs/vision_analysis/student_visual_attribution_pilot_v1.yaml`
 - Comando executado: `uv run python -m src.vision_analysis.cli --device mps --dtype float16 --output outputs/vision_analysis/qwen_3_5_4b_e0_visual_attribution_pilot_v1/all_frozen_cases`
 - Manifesto completo: `outputs/vision_analysis/qwen_3_5_4b_e0_visual_attribution_pilot_v1/all_frozen_cases/manifest.json`
@@ -385,6 +479,20 @@ na decisão humana.
 - Relatório completo: `outputs/vision_analysis/qwen_3_5_4b_e0_visual_attribution_pilot_v1/all_frozen_cases/report.html`
 - Dimensão: 23 ficheiros, 2.6 MB.
 - Estado: `complete`, `exit code 0`, sem retry.
+
+### Comparação controlada CUDA/BF16
+
+- Configuração E0: `configs/vision_analysis/student_visual_attribution_e0_cuda_bf16_v1.yaml`
+- Configuração E1: `configs/vision_analysis/student_visual_attribution_e1_vision_lora_v1.yaml`
+- Manifesto E0: `outputs/vision_analysis/qwen_3_5_4b_e0_cuda_bf16_visual_attribution_v1/all_frozen_cases/manifest.json`
+- Manifesto E1: `outputs/vision_analysis/qwen_3_5_4b_e1_vision_lora_visual_attribution_v1/all_frozen_cases/manifest.json`
+- Relatório E0: `outputs/vision_analysis/qwen_3_5_4b_e0_cuda_bf16_visual_attribution_v1/all_frozen_cases/report.html`
+- Relatório E1: `outputs/vision_analysis/qwen_3_5_4b_e1_vision_lora_visual_attribution_v1/all_frozen_cases/report.html`
+- Dados da figura: `annotations/training_steps/figures/02_visual_attribution_e0_vs_e1/paired_target_scores_source.csv`
+- Figura PNG/SVG: `annotations/training_steps/figures/02_visual_attribution_e0_vs_e1/paired_target_scores.{png,svg}`
+- E0: 23 ficheiros, 2,708,861 bytes, digest agregado SHA-256 `1dcdee7de0d6735b1fb6e62767c91741e4e9104f9971fa891d2d55de8324ce9b`.
+- E1: 23 ficheiros, 2,727,354 bytes, digest agregado SHA-256 `d24ea476ca6716d20a30c711e9b235afe9532e494dd6cd82df712f3d8e3bd759`.
+- Estado dos dois manifests: `complete`; três casos e cinco mapas de target em cada checkpoint.
 
 | Asset preservado na annotation | SHA-256 |
 |---|---|

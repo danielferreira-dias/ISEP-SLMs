@@ -1,11 +1,14 @@
-# Internal Benchmark: complete pre-training model comparison
+# Internal Benchmark: pre-training and E1 post-training comparison
 
 ## Status and objective
 
 This note records the complete pre-training Internal Benchmark baseline for the
 official student, Qwen 3.5 4B, and the larger local comparison model, Qwen 3.6
-27B. Both models completed the same 2,262 benchmark cases with thinking
-disabled.
+27B. It now also records the first post-training E1 comparison between the
+three-epoch label-only checkpoints with frozen vision and Vision LoRA. The two
+pre-training models completed the same 2,262 benchmark cases with thinking
+disabled; the E1 checkpoints completed the three deterministic clinical tasks,
+1,962 cases each, but were not evaluated on the open-ended task.
 
 It was subsequently extended with the same 2,262 cases for Qwen 3.8 Max
 through the official Alibaba OpenRouter provider. Qwen 3.8 uses mandatory
@@ -13,21 +16,36 @@ reasoning, so it was evaluated with the frozen `reasoning_effort=low` setting
 selected by the preceding hallucination audit. Its results are reported in a
 separate section because this is not a controlled thinking-off comparison.
 
+The local **Qwen 3.8 27B** checkpoint was subsequently evaluated on the same
+2,262 Internal Benchmark inference cases, plus the 522-case Clinical Context
+Ablation. It ran with temperature zero and thinking disabled on an RTX PRO
+6000 Blackwell. All 2,784 model responses are preserved locally. Its 300
+open-ended responses have not yet been judged, so only deterministic scores
+are used in comparisons and all judge-dependent cells remain blank. This
+model is distinct from the much larger **Qwen 3.8 Max** API model.
+
 MiniMax M3 and MiMo V2.5 subsequently completed the same benchmark through
 their official OpenRouter providers with thinking requested as disabled. The
 provider still returned residual reasoning for some responses, so this label
 describes the request configuration rather than a guarantee of zero internal
 reasoning. Gemini 3.5 Flash-Lite subsequently completed the same benchmark
 through Google AI Studio with provider-default decoding and its mandatory
-`minimal` thinking level. The six completed models are compared below using the frozen
-prompts, parsers, metrics, and blinded-judge protocol.
+`minimal` thinking level. Gemini 3.7 Flash subsequently completed the same
+2,262 cases through Google AI Studio with `reasoning_effort=medium`. Eight
+generalist/local/API model runs are compared below using the frozen prompts,
+parsers, and metrics. Seven have completed the blinded-judge protocol; the
+local Qwen 3.8 27B judge is pending. The two selected E1 epoch-3 checkpoints
+are included in the same consolidated table for direct context, but are
+explicitly marked as dermatology-specialized and have dashes for the
+open-ended task, which was not executed.
 
 The purpose of this run was to measure the student's starting point and to
 determine how much performance is gained by scaling the same model family
-before any dermatology-specific fine-tuning. These results do not yet complete
-teacher selection: Qwen 3.7 Flash has not run the full Internal Benchmark. All
-open-ended responses documented here have been scored with the frozen
-blinded-judge protocol.
+before any dermatology-specific fine-tuning. These results do not themselves
+select the teacher: teacher and prompt selection must use Validation rather
+than further optimization on this inspected Internal Benchmark. All
+open-ended scores documented here use the frozen blinded-judge protocol. The
+local Qwen 3.8 27B responses are preserved but remain explicitly pending.
 
 Because the Internal Benchmark has now been inspected, these results must be
 treated as a frozen pre-training baseline. Future prompt, parser, and inference
@@ -65,9 +83,13 @@ metrics.
 | Visual Confusion Sets | 828 | 414 paired low/high-confusability cases |
 | Evidence-Grounded Diagnosis | 134 | Diagnosis, visible findings, and evidence links |
 | Open-Ended Diagnosis | 300 | Free-text top-three differential and rationale |
-| **Total** | **2,262** | **Same cases for all six completed models** |
+| **Total** | **2,262** | **Same inference cases for all eight generalist/local/API runs** |
 
-## Headline results
+The two E1 checkpoints ran the first three rows only: 1,962 deterministic cases
+per condition. A dash in the post-training tables means that the task was not
+executed; it never represents a zero score.
+
+## Pre-training headline results
 
 Structured-task percentages below use all assigned cases as the denominator,
 including invalid outputs where applicable. Open-ended judge percentages use
@@ -95,60 +117,162 @@ coverage are disclosed separately.
 | Open-ended — judge Top-3 | 38.11% | **51.23%** | +13.12 pp |
 | Open-ended — judge MRR | 26.34% | **35.85%** | +9.51 pp |
 
-### Consolidated six-model results
+### Consolidated comparison: eight generalist/local/API models and two E1 checkpoints
 
 The following table combines the completed local and API runs. Structured
 metrics use every assigned case as the denominator. Open-ended metrics use the
 scored outcomes reported by the judge pipeline, including explicit model
-failures where present; judge coverage is therefore shown alongside them.
+failures where present; judge coverage is therefore shown alongside them. The
+last two columns are not generalist baselines: they received the same supervised
+21-class dermatology training. A dash means that no prediction run exists for
+that task, not a score of zero.
 
-| Task and metric | Qwen 3.5 4B | Qwen 3.6 27B | Qwen 3.8 Max | MiniMax M3 | MiMo V2.5 | Gemini 3.5 Flash-Lite |
-|---|---:|---:|---:|---:|---:|---:|
-| Top-K — Top-1 | 33.00% | 42.90% | **52.50%** | 29.70% | 32.20% | 50.70% |
-| Top-K — Top-3 | 62.50% | 74.30% | 79.70% | 60.70% | 59.50% | **80.00%** |
-| Top-K — Top-6 | 76.60% | 88.60% | 87.70% | 78.20% | 77.20% | **90.90%** |
-| Top-K — MRR | 49.03% | 60.08% | **66.31%** | 46.77% | 47.94% | 65.79% |
-| Confusion — raw Top-1 | 68.84% | 76.21% | 80.43% | 56.04% | 49.40% | **81.04%** |
-| Confusion — canonical Top-1 | 69.32% | 77.29% | 80.43% | 69.93% | 68.36% | **82.25%** |
-| Confusion — canonical Top-2 | 87.80% | 93.72% | 91.43% | 89.01% | 88.65% | **95.05%** |
-| Confusion — raw MRR | 81.80% | 86.33% | 87.50% | 66.38% | 60.29% | **88.97%** |
-| Evidence — Top-1 | 41.79% | 46.27% | **58.96%** | 38.81% | 41.79% | 52.99% |
-| Evidence — Top-3 | 61.19% | 69.40% | **76.12%** | 61.19% | 62.69% | 72.39% |
-| Evidence — Top-6 | 71.64% | 81.34% | 83.58% | 73.13% | 76.87% | **87.31%** |
-| Evidence — MRR | 52.24% | 59.29% | **68.48%** | 50.83% | 54.47% | 64.22% |
-| Evidence — semantic compliance | 38.81% | 49.25% | 59.70% | 64.18% | 52.99% | **82.84%** |
-| Evidence — grounded Top-1 success | **15.67%** | 7.46% | 5.22% | 5.97% | 5.97% | 11.19% |
-| Open-ended — judge coverage | **95.33%** | 95.00% | 87.00% | 84.67% | 94.00% | 90.00% |
-| Open-ended — Top-1 | 16.78% | 24.21% | **42.15%** | 23.62% | 24.11% | 41.48% |
-| Open-ended — Top-3 | 38.11% | 51.23% | **65.52%** | 43.70% | 47.16% | 61.48% |
-| Open-ended — MRR | 26.34% | 35.85% | **52.49%** | 32.22% | 33.69% | 50.12% |
-| Clinical rationale, 0–4 | 1.49 | 1.95 | **2.55** | 1.87 | 2.00 | 2.41 |
-| Evidence grounding, 0–4 | 1.74 | 2.17 | **2.62** | 1.98 | 2.29 | 2.58 |
-| Unsupported-claim rate | 94.76% | 88.77% | **70.50%** | 95.67% | 81.56% | 77.04% |
+| Task and metric | Qwen 3.5 4B | Qwen 3.6 27B | Qwen 3.8 27B | Qwen 3.8 Max | MiniMax M3 | MiMo V2.5 | Gemini 3.5 Flash-Lite | Gemini 3.7 Flash Medium | E1 Frozen (4B) | E1 Vision LoRA (4B) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Top-K — Top-1 | 33.00% | 42.90% | 41.00% | 52.50% | 29.70% | 32.20% | 50.70% | **58.00%** | 50.20% | 56.20% |
+| Top-K — Top-3 | 62.50% | 74.30% | 73.50% | 79.70% | 60.70% | 59.50% | 80.00% | **87.30%** | 80.00% | 84.10% |
+| Top-K — Top-6 | 76.60% | 88.60% | 85.70% | 87.70% | 78.20% | 77.20% | 90.90% | **93.60%** | 89.50% | 92.60% |
+| Top-K — MRR | 49.03% | 60.08% | 57.53% | 66.31% | 46.77% | 47.94% | 65.79% | **72.70%** | 65.46% | 70.55% |
+| Confusion — raw Top-1 | 68.84% | 76.21% | 76.57% | 80.43% | 56.04% | 49.40% | 81.04% | **83.57%** | 76.57% | 81.40% |
+| Confusion — canonical Top-1 | 69.32% | 77.29% | 76.81% | 80.43% | 69.93% | 68.36% | 82.25% | **83.57%** | 76.57% | 81.40% |
+| Confusion — canonical Top-2 | 87.80% | 93.72% | 93.00% | 91.43% | 89.01% | 88.65% | 95.05% | **96.74%** | 89.86% | 91.67% |
+| Confusion — raw MRR | 81.80% | 86.33% | 87.00% | 87.50% | 66.38% | 60.29% | 88.97% | **91.24%** | 85.47% | 88.71% |
+| Evidence — Top-1 | 41.79% | 46.27% | 45.52% | 58.96% | 38.81% | 41.79% | 52.99% | **67.91%** | 55.97% | 58.21% |
+| Evidence — Top-3 | 61.19% | 69.40% | 73.13% | 76.12% | 61.19% | 62.69% | 72.39% | **86.57%** | 79.10% | 81.34% |
+| Evidence — Top-6 | 71.64% | 81.34% | 82.09% | 83.58% | 73.13% | 76.87% | 87.31% | **91.79%** | 87.31% | 88.81% |
+| Evidence — MRR | 52.24% | 59.29% | 59.48% | 68.48% | 50.83% | 54.47% | 64.22% | **77.82%** | 67.70% | 69.91% |
+| Evidence — semantic compliance | 38.81% | 49.25% | 54.48% | 59.70% | 64.18% | 52.99% | 82.84% | **84.33%** | 32.09% | 35.82% |
+| Evidence — grounded Top-1 success | **15.67%** | 7.46% | 5.97% | 5.22% | 5.97% | 5.97% | 11.19% | 5.97% | 14.93% | 12.69% |
+| Open-ended — judge coverage | **95.33%** | 95.00% | — | 87.00% | 84.67% | 94.00% | 90.00% | 92.00% | — | — |
+| Open-ended — Top-1 | 16.78% | 24.21% | — | **42.15%** | 23.62% | 24.11% | 41.48% | 32.97% | — | — |
+| Open-ended — Top-3 | 38.11% | 51.23% | — | **65.52%** | 43.70% | 47.16% | 61.48% | 56.52% | — | — |
+| Open-ended — MRR | 26.34% | 35.85% | — | **52.49%** | 32.22% | 33.69% | 50.12% | 43.24% | — | — |
+| Clinical rationale, 0–4 | 1.49 | 1.95 | — | **2.55** | 1.87 | 2.00 | 2.41 | 2.19 | — | — |
+| Evidence grounding, 0–4 | 1.74 | 2.17 | — | **2.62** | 1.98 | 2.29 | 2.58 | 2.25 | — | — |
+| Unsupported-claim rate | 94.76% | 88.77% | — | **70.50%** | 95.67% | 81.56% | 77.04% | 72.83% | — | — |
 
 `Raw` Confusion metrics preserve strict format failures in the denominator.
 `Canonical` metrics apply only the frozen deterministic parser and therefore
 show the clinical ranking recoverable from the response; they do not erase the
-strict-format failure disclosed below. Qwen 3.8 leads most diagnostic and
-open-ended measures, while Gemini leads Top-K Top-3/Top-6, the paired
-Confusion metrics, Evidence Top-6, and Evidence semantic compliance. MiniMax
-no longer has the highest semantic-compliance score once Gemini is included.
+strict-format failure disclosed below. Gemini 3.7 Medium leads every structured
+disease-ranking measure in this eight-model table. Qwen 3.8 Max remains
+strongest on the primary judged open-ended metrics, with Gemini 3.5 close
+behind. The local Qwen 3.8 27B open-ended cells are pending rather than zero.
+MiniMax no longer has the highest semantic-compliance score once the Gemini
+models are included.
 
-Judge recovery was not perfectly symmetric: the two local Qwen runs had three
+The E1 open-ended cells are deliberately blank because the earlier E1
+campaign was scoped to deterministic tasks without LLM-as-a-judge. No
+`open_ended_diagnosis` inference was generated for either fine-tuned
+checkpoint, so there are no 300-case responses to judge and no legitimate
+Top-1, Top-3, MRR, rationale, grounding, or unsupported-claim scores to report.
+Completing these cells requires a new, paired inference run with the selected
+epoch-3 checkpoints, followed by the frozen blinded-judge protocol. The dash
+must not be replaced by zero or inferred from the structured-task results.
+
+Judge recovery was not perfectly symmetric: the two local pre-training Qwen runs had three
 historical `--retry-invalid` passes after an initial concurrent run encountered
-Azure rate limits, whereas Qwen 3.8, MiniMax, and MiMo each received one
-controlled retry after their initial sequential pass. Gemini used one judge
-pass without an invalid-judgment retry. No evaluated-model
+Azure rate limits, whereas Qwen 3.8 Max, MiniMax, and MiMo each received one
+controlled retry after their initial sequential pass. Gemini 3.5 used one judge
+pass without an invalid-judgment retry; Gemini 3.7 used the separately frozen
+GPT-5.6 Luna judge protocol described below. No evaluated-model
 answer was regenerated, but open-ended coverage differs across models.
 Judge-dependent scores must therefore always be read with the coverage and
 conservative all-300-case rates, rather than compared as if every response had
 an independent human rating.
 
-Qwen 3.6 27B is consistently stronger on disease ranking. The most important
+In the pre-training local comparison, Qwen 3.6 27B is consistently stronger
+than Qwen 3.5 4B on disease ranking. The most important
 exception is `grounded_top_1_success`, a strict conjunction requiring a correct
 Top-1 diagnosis and compliant evidence grounding. Its reduction must be
 investigated at case level; it does not, by itself, demonstrate that Qwen 3.5
 has better clinical reasoning.
+
+## E1 label-only post-training comparison
+
+The official E1 experiment fine-tuned the same Qwen 3.5 4B checkpoint for
+three epochs on 6,312 `sft_train` images and 21 canonical labels. Two controlled
+conditions were evaluated:
+
+- **E1 Frozen:** language-side LoRA with the vision component frozen;
+- **E1 Vision:** the same recipe, seed, data, updates, resolution, and LoRA
+  hyperparameters, additionally enabling Vision LoRA.
+
+Both checkpoints used the historical Qwen 4B inference profile:
+`temperature=0.6`, `top_p=0.95`, `top_k=20`, `presence_penalty=1.5`, seed 42,
+and thinking disabled. The 1,962 structured task IDs were exactly paired with
+the E0 runs. The E1 checkpoints were not evaluated on the 300 open-ended cases.
+Epoch 3 is reported because the subsequent continued-training checkpoints at
+epochs 4 and 5 were rejected by the frozen `sft_dev` selection rule; they do
+not replace the selected E1 checkpoints in benchmark comparisons.
+
+### Diagnostic ranking
+
+| Task and metric | E0 Qwen 4B | Qwen 27B | E1 Frozen | E1 Vision | Gemini 3.7 Medium |
+|---|---:|---:|---:|---:|---:|
+| Top-K — Top-1 | 33.00% | 42.90% | 50.20% | **56.20%** | 58.00% |
+| Top-K — Top-3 | 62.50% | 74.30% | 80.00% | **84.10%** | 87.30% |
+| Top-K — Top-6 | 76.60% | 88.60% | 89.50% | **92.60%** | 93.60% |
+| Top-K — MRR | 49.03% | 60.08% | 65.46% | **70.55%** | 72.70% |
+| Top-K — macro F1 | 28.52% | 38.73% | 48.73% | **53.50%** | 57.36% |
+| Confusion — Top-1 | 68.84% | 76.21% | 76.57% | **81.40%** | 83.57% |
+| Confusion — Top-2 | 86.96% | **92.27%** | 89.86% | 91.67% | 96.74% |
+| Confusion — MRR | 81.80% | 86.33% | 85.47% | **88.71%** | 91.24% |
+| Confusion — macro F1 | 68.21% | 75.67% | 76.27% | **80.31%** | 84.16% |
+| Evidence — Top-1 | 41.79% | 46.27% | 55.97% | **58.21%** | 67.91% |
+| Evidence — Top-3 | 61.19% | 69.40% | 79.10% | **81.34%** | 86.57% |
+| Evidence — Top-6 | 71.64% | 81.34% | 87.31% | **88.81%** | 91.79% |
+| Evidence — MRR | 52.24% | 59.29% | 67.70% | **69.91%** | 77.82% |
+| Open-ended — judged metrics | available | available | — | — | available |
+
+Bold in the two E1 columns identifies the better E1 condition; it is not a
+claim that E1 exceeds Gemini 3.7. Vision LoRA improved E1 Top-1 over Frozen by
+6.00 pp in Top-K, 4.83 pp in Confusion Sets, and 2.24 pp in Evidence. Relative
+to E0 Qwen 4B, the corresponding Vision gains were 23.20, 12.56, and 16.42 pp.
+It also exceeded Qwen 3.6 27B Top-1 by 13.30, 5.19, and 11.94 pp on these three
+tasks.
+
+Exact paired McNemar tests for E1 Vision against Qwen 27B gave
+`p=1.97e-15`, `p=1.69e-4`, and `p=0.0226`, respectively. Against E1 Frozen,
+the first two gains remained supported after Holm correction across the three
+tasks (`p_Holm=0.00624` and `0.00135`); the Evidence Top-1 difference did not
+(`p_Holm=0.690`). These tests describe this fixed benchmark and single training
+seed; they are not a substitute for the planned three-seed confirmation.
+
+### Evidence-quality trade-off
+
+The label-only objective improved diagnosis ranking but did not teach the
+structured evidence schema. This produced an important trade-off:
+
+| Evidence metric | E0 Qwen 4B | Qwen 27B | E1 Frozen | E1 Vision |
+|---|---:|---:|---:|---:|
+| Top-1 macro F1 | 33.29% | 39.88% | 51.35% | **51.65%** |
+| Finding F1 | **52.97%** | 58.53% | 44.21% | 47.78% |
+| Semantic compliance | **38.81%** | 49.25% | 32.09% | 35.82% |
+| Schema compliance | **92.54%** | 97.01% | 70.90% | 59.70% |
+| Invalid concept-ID rate | **5.97%** | 2.99% | 26.12% | 40.30% |
+| Unsupported finding rate, lower is better | 49.45% | 47.79% | 42.47% | **41.80%** |
+| Grounded Top-1 success | **15.67%** | 7.46% | 14.93% | 12.69% |
+
+The E1 models therefore learned the 21-label diagnosis task, but their improved
+Top-1 accuracy must not be described as improved evidence-grounded reasoning.
+The drop in schema and concept validity is a direct motivation for the later
+structured-evidence training phase.
+
+### Grounding and hallucination controls
+
+| Deterministic control | E1 Frozen | E1 Vision |
+|---|---:|---:|
+| No-image correct abstention, 50 cases | 100.00% | 100.00% |
+| General audit question-status accuracy, 300 cases | **74.67%** | 70.33% |
+| General audit unanswerable detection | **72.50%** | 67.50% |
+| Counterfactual full success, 200 cases | **65.00%** | 61.00% |
+| Hard-negative Top-1, 150 cases | **54.00%** | 48.00% |
+| Pixel-shuffle correct abstention, 50 cases | 100.00% | 100.00% |
+
+Vision LoRA was stronger on the diagnostic tasks but weaker on several
+hallucination and counterfactual controls. This prevents the thesis from
+equating higher diagnostic accuracy with uniformly better visual grounding.
 
 ## Visual Top-K
 
@@ -355,6 +479,66 @@ while remaining disclosed as a raw-output failure.
 These are operational measurements, not a controlled throughput benchmark.
 The two servers shared one GPU and overlapped during part of the execution, so
 the timings should not be used as isolated model-speed estimates.
+
+## Qwen 3.8 27B local comparator
+
+Qwen 3.8 27B was run locally from `Qwen/Qwen3.8-27B` pinned to commit
+`1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0`. The execution used BF16 vLLM on
+one RTX PRO 6000 Blackwell, temperature zero, seed 42, thinking disabled,
+prompt-only structured generation, a maximum output of 8,192 tokens, and a
+batch size of eight. This is a new local 27B checkpoint and must not be
+conflated with the Qwen 3.8 Max API comparator below.
+
+### Diagnostic and grounding results
+
+| Task and metric | Qwen 3.8 27B |
+|---|---:|
+| Visual Top-K — Top-1 / Top-3 / Top-6 | 41.00% / 73.50% / 85.70% |
+| Visual Top-K — MRR / macro F1 | 57.53% / 37.42% |
+| Confusion Sets — raw Top-1 / Top-2 | 76.57% / 92.75% |
+| Confusion Sets — canonical Top-1 / Top-2 | 76.81% / 93.00% |
+| Confusion Sets — raw MRR / macro F1 | 87.00% / 77.03% |
+| Evidence — Top-1 / Top-3 / Top-6 | 45.52% / 73.13% / 82.09% |
+| Evidence — MRR / macro F1 | 59.48% / 41.77% |
+| Evidence — finding F1 | 54.95% |
+| Evidence — semantic compliance | 54.48% |
+| Evidence — grounded Top-1 success | 5.97% |
+| Evidence — recoverable JSON / strict schema | 100.00% / 94.78% |
+| Open-ended — response generation | 300 / 300 |
+| Open-ended — judge-dependent metrics | **Pending** |
+
+The local 27B does not improve uniformly over the historical Qwen 3.6 27B
+run. It is 1.90 pp lower on Top-K Top-1 and 0.48 pp lower on canonical
+Confusion Top-1, but 0.21 pp higher on Evidence MRR and 5.22 pp higher on
+Evidence semantic compliance. This is descriptive only: the older Qwen 3.6
+run used its historical sampled profile on different hardware, whereas Qwen
+3.8 used deterministic generation. The same-hardware efficiency cohort is the
+controlled source for subsequent latency, energy, memory, and matched-quality
+comparisons.
+
+### Clinical Context Ablation
+
+The additional context evaluation contains 261 matched image-only versus
+image-plus-context pairs, or 522 inference requests.
+
+| Condition | Top-1 | Top-3 | Top-6 | MRR | Macro F1 |
+|---|---:|---:|---:|---:|---:|
+| Image only | 39.85% | 78.54% | 90.04% | 58.88% | 20.90% |
+| Image plus context | **44.44%** | **81.61%** | **91.57%** | **62.78%** | 20.13% |
+| Context minus image only | +4.60 pp | +3.07 pp | +1.53 pp | +3.90 pp | -0.77 pp |
+
+The paired Top-1 change was 52 improved pairs versus 40 worsened pairs, with
+McNemar exact `p=0.251` and a paired 95% confidence interval of -2.30 to
++11.88 pp. Context therefore produced a positive point estimate but not a
+statistically supported Top-1 gain in this cohort.
+
+### Output integrity
+
+Across the 2,784 preserved requests, the final statuses were 2,676 `ok`, 86
+`format_invalid`, 17 `semantic_noncompliant`, and five `schema_invalid`. There
+were no backend, image, safety, or truncation failures. The 86 raw-format
+failures are concentrated in Evidence (84) and Confusion (two); all structured
+responses remained recoverable by the frozen deterministic parser.
 
 ## Qwen 3.8 Max API comparator
 
@@ -633,11 +817,13 @@ operational no-thinking condition.
 | Evidence schema compliance | 98.51% |
 | Top-1 Brier score / expected calibration error | 25.97 / 24.09% |
 
-The model is close to Qwen 3.8 Max on diagnostic ranking, leads all six models
+The model is close to Qwen 3.8 Max on diagnostic ranking and, among the six
+models available when this run was originally analysed, led
 on Top-K Top-3/Top-6, canonical Confusion Top-1/Top-2, Evidence Top-6, and
 Evidence semantic compliance, and has materially better output reliability.
-Qwen 3.8 remains stronger on Top-K Top-1/MRR, Evidence Top-1/Top-3/MRR, and
-most blinded open-ended measures.
+After adding Gemini 3.7, that historical six-model claim no longer holds:
+Gemini 3.7 leads the structured generalist/API comparison. Qwen 3.8 remains
+stronger on most blinded open-ended measures.
 
 ### Skin-tone slices
 
@@ -710,38 +896,90 @@ per million input tokens and $2.50 per million output tokens, this is an
 estimated $1.68 for Gemini inference before caching and excluding the separate
 Luna/Qwen judge calls.
 
+## Gemini 3.7 Flash Medium API comparator
+
+Gemini 3.7 Flash received the same 2,262 cases through OpenRouter's Google AI
+Studio route, with provider fallback disabled and `reasoning_effort=medium`.
+It obtained the strongest structured disease-ranking results in the completed
+generalist/API comparison: 58.00% Top-K Top-1, 83.57% Confusion Top-1, and
+67.91% Evidence Top-1.
+
+The open-ended run was less reliable. It contained 29 evaluated-model backend
+errors; these were retained as failures rather than regenerated. GPT-5.6 Luna
+produced 247 valid judgments, 24 judge outputs remained invalid, and the 29
+model failures were included in the judge pipeline's conservative outcomes.
+
+| Open-ended outcome | Gemini 3.7 Flash Medium |
+|---|---:|
+| Scored outcomes, including model failures | 276 / 300 |
+| Valid judge objects | 247 / 300 |
+| Model-response failures retained as failures | 29 / 300 |
+| Persistent judge-invalid | 24 / 300 |
+| Top-1 / Top-3 over scored outcomes | 32.97 / 56.52% |
+| MRR | 43.24% |
+| Clinical-rationale quality, 0–4 | 2.19 |
+| Evidence grounding, 0–4 | 2.25 |
+| Unsupported-claim rate | 72.83% |
+
+Across all 2,262 evaluated-model requests, the final statuses were 2,204 `ok`,
+10 `format_invalid`, 18 `semantic_noncompliant`, and 30 `backend_error`.
+Consequently, Gemini 3.7 is the strongest structured comparator observed here,
+but it is not the strongest or most reliable open-ended comparator.
+
 ## Interpretation and decision gate
 
 1. Qwen 3.6 27B is the stronger zero-shot local model for disease ranking on
    all three scored structured tasks.
-2. Qwen 3.5 4B remains the official student. Its lower baseline establishes the
-   improvement target for dermatology-specific fine-tuning and distillation.
-3. Evidence grounding remains a principal weakness across all six models.
-   Better Top-K diagnosis alone does not solve unsupported visual claims or
-   semantic noncompliance.
-4. Qwen 3.8 Max remains narrowly strongest in primary diagnostic and judged
-   open-ended quality, while Gemini 3.5 Flash-Lite is the strongest operational
-   challenger: it is much cheaper, has fewer provider failures, and leads
-   several coverage, confusion, semantic-compliance, and Top-6 measures.
-5. MiMo is a more credible teacher candidate than MiniMax in this comparison:
+2. The new local Qwen 3.8 27B is not uniformly stronger than the historical
+   Qwen 3.6 27B: the direction changes by task and metric. Since the runs used
+   different decoding profiles and hardware, this is not evidence that the
+   newer model regressed; a matched cohort is required.
+3. E1 Vision is the strongest local 4B checkpoint. It surpasses both local 27B
+   models in Top-1 on all three deterministic Internal Benchmark tasks,
+   providing direct support for the thesis hypothesis under this fixed domain
+   benchmark. The comparison against Qwen 3.8 27B still has a decoding-profile
+   caveat until the matched efficiency cohort is complete.
+4. This advantage is task-specific, not universal. Label-only E1 improves
+   diagnosis while degrading structured evidence validity, and Vision LoRA is
+   weaker than Frozen on several hallucination and counterfactual controls.
+5. Evidence grounding remains a principal weakness across all eight
+   generalist/API models and both E1 conditions. Better Top-K diagnosis alone
+   does not solve unsupported visual claims or semantic noncompliance.
+6. Gemini 3.7 Medium is strongest on structured diagnosis, whereas Qwen 3.8 Max
+   remains strongest on the principal judged open-ended metrics. Gemini 3.7's
+   29 open-ended backend failures prevent treating it as uniformly dominant.
+7. MiMo is a more credible teacher candidate than MiniMax in this comparison:
    it has better Evidence morphology, open-ended grounding, output format, and
    fewer unsupported claims. MiniMax's strengths are semantic compliance and
    paired confusion cases.
-6. The final teacher decision should compare Qwen 3.8's small quality lead
-   against Gemini's much stronger reliability/cost profile, and should still
-   disclose that the Qwen 3.7 full-benchmark comparison is incomplete.
-7. Any further prompt or parser development should use the unused Validation
-   cases. The Internal Benchmark should now remain fixed for the post-training
-   comparison.
+8. The final teacher decision should compare open-ended quality, structured
+   accuracy, reliability, cost, and teachability rather than selecting the
+   highest single score. The local Qwen 3.8 27B open-ended judge remains
+   incomplete.
+9. Any further prompt, parser, checkpoint, or training selection must use
+   Validation/SFT Dev. These Internal Benchmark results are confirmatory and
+   must remain fixed.
 
 ## Reproducibility artifacts
 
 The complete predictions, manifests, deterministic metrics, judge metrics,
 and HTML reports are stored under:
 
-`outputs/internal_benchmark_full_v1/thinking_off/` and
-`outputs/internal_benchmark_full_v1/qwen_3_8_max_low/`, with Gemini under
-`outputs/internal_benchmark_full_v1/gemini_3_5_flash_lite_minimal/final/`.
+`outputs/internal_benchmark_full_v1/thinking_off/`,
+`outputs/internal_benchmark_full_v1/qwen_3_8_max_low/`,
+`outputs/internal_benchmark_full_v1/gemini_3_5_flash_lite_minimal/final/`,
+`outputs/internal_benchmark_full_v1/gemini_3_7_flash_medium/final/`,
+`outputs/qwen_3_8_27b_full_benchmarks/`, and
+`outputs/e1_epoch3_historical_t06_benchmarks/`.
+
+The 50 files in the remote Qwen 3.8 27B benchmark tree were compared with the
+Mac copy using an rsync checksum dry-run on 2026-08-15; no remote file was
+missing or different. The two additional local files are preserved vLLM
+server logs and are not part of the remote benchmark tree.
+
+The copied E1 campaign contains 227 files and 499,275,681 bytes. Remote and
+local aggregate SHA-256 are identical:
+`244eaaaf27c55fa1ed6d51d8dd49a1b68de0a1eb9016ebfd1bb6c9734af574fa`.
 
 The output directory is intentionally excluded from Git because it contains
 large, reproducible run artifacts. This annotation preserves the protocol and

@@ -78,16 +78,25 @@ def evaluate_run(
     )
     for checkpoint in checkpoints:
         validate_resume_checkpoint(checkpoint, identity)
-    if not selected_smoke and len(checkpoints) != selected_config.trainer.epochs:
+    if selected_config.continuation is None:
+        expected_epochs = tuple(
+            float(epoch) for epoch in range(1, selected_config.trainer.epochs + 1)
+        )
+    else:
+        expected_epochs = tuple(
+            float(epoch)
+            for epoch in range(
+                selected_config.continuation.parent_epoch,
+                selected_config.trainer.epochs + 1,
+            )
+        )
+    if not selected_smoke and len(checkpoints) != len(expected_epochs):
         raise RuntimeError(
-            f"Expected {selected_config.trainer.epochs} epoch checkpoints, "
+            f"Expected {len(expected_epochs)} epoch checkpoints, "
             f"found {len(checkpoints)}"
         )
     if not selected_smoke:
         epochs = tuple(checkpoint_training_state(path)[0] for path in checkpoints)
-        expected_epochs = tuple(
-            float(epoch) for epoch in range(1, selected_config.trainer.epochs + 1)
-        )
         if epochs != expected_epochs:
             raise RuntimeError(
                 f"Expected epoch checkpoints {expected_epochs}, found {epochs}"
@@ -159,8 +168,9 @@ def ensure_preupdate_panel(
     release: PreparedRelease,
     store: ArtifactStore,
     smoke: bool,
+    checkpoint_path: Path | None = None,
 ) -> None:
-    """Evaluate the base on the 210-case panel before the first update."""
+    """Evaluate the initial model state before the first optimizer update."""
 
     path = store.path("metrics", "dev_panel__base.json")
     if path.is_file():
@@ -170,8 +180,10 @@ def ensure_preupdate_panel(
         config=config,
         release=release,
         subset=ReleaseSubset.DEV_PANEL,
-        checkpoint_id="base",
-        checkpoint_path=None,
+        checkpoint_id=(
+            "base" if checkpoint_path is None else "continuation_parent_epoch_3"
+        ),
+        checkpoint_path=checkpoint_path,
         max_samples=32 if smoke else None,
     )
     persist_evaluation(store, baseline)

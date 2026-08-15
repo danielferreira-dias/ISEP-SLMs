@@ -1,0 +1,57 @@
+{
+  "benchmark_release": "ISEPDermaBench/1.9.0",
+  "benchmark_release_sha256": "45c857ee52421d30e9da091954dbe9856a598b34b65436d305c587f60b810765",
+  "evaluation_set": "internal_benchmark",
+  "id": "isep_efficiency_cohort_v1",
+  "measured_request_count": 400,
+  "purpose": "Same-hardware quality, latency, throughput, memory, energy, and cost comparison",
+  "schema_version": 1,
+  "seed": 42,
+  "selection_algorithm": "class_balanced_nested_round_robin_v1",
+  "smoke_gate": {
+    "measured": false,
+    "request_count": 10,
+    "sha256": "1a265da417ad2dbeea68ec077659df4fceb12befaf2bc82c9c81206a0051823a",
+    "task_ids_file": "smoke_visual_top_k_10_cases.task_ids.txt"
+  },
+  "tasks": {
+    "evidence_grounded_diagnosis": {
+      "request_count": 100,
+      "selection_unit": "case",
+      "sha256": "c484ed41fb61f0a28f2d4ad0404e95894137d4225701b7c6b0e3634184f822e1",
+      "source_task": "evidence_grounded_diagnosis",
+      "task_ids_file": "evidence_grounded_diagnosis_100_cases.task_ids.txt",
+      "unit_count": 100
+    },
+    "open_ended_diagnosis": {
+      "request_count": 100,
+      "selection_unit": "case",
+      "sha256": "d50e243485a16461280603c6366539c4fe24cf5f9c0bdcb022439327ec1ab3fa",
+      "source_task": "open_ended_diagnosis",
+      "task_ids_file": "open_ended_diagnosis_100_cases.task_ids.txt",
+      "unit_count": 100
+    },
+    "visual_disease_confusion_sets": {
+      "request_count": 100,
+      "selection_unit": "image_pair",
+      "sha256": "272ffd9cfb4a61b5f89ea514612bd20336bcd9cac72ce5f54213c573ecc00a4f",
+      "source_task": "visual_confusion_sets",
+      "task_ids_file": "visual_confusion_sets_50_pairs.task_ids.txt",
+      "unit_count": 50
+    },
+    "visual_top_k_closed_set": {
+      "request_count": 100,
+      "selection_unit": "case",
+      "sha256": "8fadf72a461a3df54725136a64584efb94189ba155b6bfb74b0bc423b71acf4d",
+      "source_task": "visual_top_k",
+      "task_ids_file": "visual_top_k_100_cases.task_ids.txt",
+      "unit_count": 100
+    }
+  },
+  "warmup": {
+    "measured": false,
+    "request_count": 1,
+    "sha256": "db6e999fe997606066bffa23a5a1fa5198a778d2e90d0f75e902cf1a5ccce34b",
+    "task_ids_file": "warmup_visual_top_k_1_case.task_ids.txt"
+  }
+}

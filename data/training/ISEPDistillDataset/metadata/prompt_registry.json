@@ -1,0 +1,18 @@
+{
+  "registry_version": "0.2.0",
+  "status": "frozen_release_prompts",
+  "prompts": [
+    {
+      "prompt_id": "diagnosis_label_only_v1",
+      "config": "diagnosis",
+      "sha256": "42283147906a72810260303944f153f2f151d9577615d839f6f15e1693d52051",
+      "purpose": "Exact E1 closed-taxonomy label-only supervision"
+    },
+    {
+      "prompt_id": "skincon_morphology_v1",
+      "config": "morphology",
+      "sha256": "3f4d4b877d982578a452e9312fa042a174226b8b7d49f1f029fc21129b789959",
+      "purpose": "Answer-blind 48-concept SKINCON morphology supervision"
+    }
+  ]
+}

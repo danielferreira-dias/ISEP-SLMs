@@ -1,0 +1,69 @@
+{
+  "documentation_only": true,
+  "sample_id": "SYNTHETIC_SCHEMA_EXAMPLE_001",
+  "case_id": "SYNTHETIC_CASE_001",
+  "task_id": "open_diagnosis_v1",
+  "image_asset_id": "synthetic-placeholder-not-distributed",
+  "image_sha256": null,
+  "view_type": "close_up",
+  "perceptual_group_id": null,
+  "leakage_group_id": "SYNTHETIC_CASE_001",
+  "source_dataset": "documentation_example",
+  "source_sample_id": "SYNTHETIC_SCHEMA_EXAMPLE_001",
+  "license_id": "NOT_APPLICABLE_SYNTHETIC_DOCUMENTATION",
+  "split": "excluded",
+  "exclusion_reasons": ["documentation_only"],
+  "disease_id": "D001",
+  "gold_diagnosis": "melanoma",
+  "gold_provenance": "unknown_provenance",
+  "taxonomy_version": "preview",
+  "label_conflict_status": null,
+  "target_variant": "open_response",
+  "target_source": "deterministic_rendering",
+  "skincon": {
+    "ontology_version": "skincon_48_v1",
+    "annotation_source": "SKINCON",
+    "source_subset": "documentation_example",
+    "source_image_id": "SYNTHETIC_SCHEMA_EXAMPLE_001",
+    "positive_concepts": ["Macule", "Pigmented"],
+    "all_concepts_annotated": true
+  },
+  "image_assessment": null,
+  "dominant_visual_pattern": null,
+  "observations": [],
+  "not_assessable_features": [],
+  "differential": [],
+  "action": null,
+  "action_urgency": null,
+  "requested_information": null,
+  "concise_clinical_rationale": null,
+  "structured_response": null,
+  "open_response": "The image shows an asymmetric pigmented lesion with an irregular border and color variation. Melanoma should be considered first, followed by a melanocytic nevus and seborrheic keratosis. Recent evolution cannot be assessed from the photograph, so clinical history and in-person assessment are appropriate.",
+  "teacher_model": "Qwen/Qwen3.6-27B",
+  "teacher_revision": null,
+  "prompt_id": "open_response_rendering_v1_preview",
+  "prompt_sha256": null,
+  "generation_id": "SYNTHETIC_GENERATION_001",
+  "schema_version": "0.2.0",
+  "quality_status": "example_only",
+  "rejection_reasons": ["documentation_only"],
+  "schema_valid": true,
+  "vocabulary_valid": true,
+  "evidence_links_valid": true,
+  "unsupported_claim_flags": [],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {"type": "image"},
+        {"type": "text", "text": "Provide a concise clinical response based only on visible findings. State uncertainty and the appropriate next action."}
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {"type": "text", "text": "The image shows an asymmetric pigmented lesion with an irregular border and color variation. Melanoma should be considered first, followed by a melanocytic nevus and seborrheic keratosis. Recent evolution cannot be assessed from the photograph, so clinical history and in-person assessment are appropriate."}
+      ]
+    }
+  ]
+}

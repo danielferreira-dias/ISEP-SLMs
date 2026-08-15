@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
 import json
 import os
-from pathlib import Path
 import subprocess
 import time
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit, urlunsplit
@@ -48,15 +48,9 @@ class VllmServerConfig:
                 "A Hugging Face model repository is required for vLLM"
             )
         if not 1 <= self.port <= 65535:
-            raise InferenceConfigurationError(
-                "vLLM port must be between 1 and 65535"
-            )
-        if self.tensor_parallel_size is not None and (
-            self.tensor_parallel_size < 1
-        ):
-            raise InferenceConfigurationError(
-                "tensor_parallel_size must be positive"
-            )
+            raise InferenceConfigurationError("vLLM port must be between 1 and 65535")
+        if self.tensor_parallel_size is not None and (self.tensor_parallel_size < 1):
+            raise InferenceConfigurationError("tensor_parallel_size must be positive")
         _reject_secret_cli_args(self.additional_args)
 
     @property
@@ -83,9 +77,7 @@ class VllmServerConfig:
         if self.dtype:
             command.extend(["--dtype", self.dtype])
         if self.max_model_len is not None:
-            command.extend(
-                ["--max-model-len", str(self.max_model_len)]
-            )
+            command.extend(["--max-model-len", str(self.max_model_len)])
         if self.gpu_memory_utilization is not None:
             command.extend(
                 [
@@ -94,13 +86,9 @@ class VllmServerConfig:
                 ]
             )
         if self.reasoning_parser:
-            command.extend(
-                ["--reasoning-parser", self.reasoning_parser]
-            )
+            command.extend(["--reasoning-parser", self.reasoning_parser])
         if self.served_model_name:
-            command.extend(
-                ["--served-model-name", self.served_model_name]
-            )
+            command.extend(["--served-model-name", self.served_model_name])
         command.extend(self.additional_args)
         return tuple(command)
 
@@ -129,12 +117,8 @@ class VllmBackend(OpenAICompatibleChatBackend):
         kwargs.setdefault("stream_responses", True)
         resolved_api_key = api_key
         resolved_api_key_env = api_key_env
-        if (
-            resolved_api_key is None
-            and (
-                resolved_api_key_env is None
-                or not os.environ.get(resolved_api_key_env)
-            )
+        if resolved_api_key is None and (
+            resolved_api_key_env is None or not os.environ.get(resolved_api_key_env)
         ):
             # vLLM does not require authentication unless launched with an
             # API key. The OpenAI SDK still requires a non-empty placeholder.
@@ -199,8 +183,7 @@ class VllmBackend(OpenAICompatibleChatBackend):
         if not result.ok:
             detail = ", ".join(result.errors) or "unknown_preflight_error"
             raise InferencePreflightError(
-                f"vLLM preflight failed for model {self.model_id!r}: "
-                f"{detail}"
+                f"vLLM preflight failed for model {self.model_id!r}: {detail}"
             )
 
 
@@ -265,8 +248,7 @@ class ManagedVllmServer:
             self._process = None
             self._close_log()
             raise InferenceTransportError(
-                f"Failed to start the vLLM server for "
-                f"{self.config.model!r}"
+                f"Failed to start the vLLM server for {self.config.model!r}"
             ) from None
         if wait_until_ready:
             try:
@@ -315,14 +297,10 @@ class ManagedVllmServer:
                 return
             process.terminate()
             try:
-                process.wait(
-                    timeout=self.config.shutdown_timeout_seconds
-                )
+                process.wait(timeout=self.config.shutdown_timeout_seconds)
             except subprocess.TimeoutExpired:
                 process.kill()
-                process.wait(
-                    timeout=self.config.shutdown_timeout_seconds
-                )
+                process.wait(timeout=self.config.shutdown_timeout_seconds)
         finally:
             self._close_log()
 
@@ -358,6 +336,7 @@ def server_config_from_model(
     executable: str = "vllm",
     max_model_len: int | None = None,
     additional_args: Sequence[str] = (),
+    allow_unmanaged: bool = False,
 ) -> VllmServerConfig:
     """Build a managed-server command from normalized model configuration."""
 
@@ -367,11 +346,11 @@ def server_config_from_model(
         raise InferenceConfigurationError(
             "Managed vLLM requires a local profile with engine='vllm'"
         )
-    if _field(profile, "managed", True) is False:
+    if not allow_unmanaged and _field(profile, "managed", True) is False:
         raise InferenceConfigurationError(
             "The selected vLLM profile does not allow managed startup"
         )
-    if _field(profile, "managed_allowed", True) is False:
+    if not allow_unmanaged and _field(profile, "managed_allowed", True) is False:
         raise InferenceConfigurationError(
             "The selected vLLM profile forbids managed startup"
         )
@@ -383,9 +362,7 @@ def server_config_from_model(
         )
     reasoning = _field(config, "reasoning")
     resolved_max_model_len = (
-        max_model_len
-        if max_model_len is not None
-        else _field(profile, "max_model_len")
+        max_model_len if max_model_len is not None else _field(profile, "max_model_len")
     )
     image_limit = _field(profile, "limit_images_per_prompt")
     if image_limit is None:
@@ -412,9 +389,7 @@ def server_config_from_model(
             ),
         }
         processor_kwargs = {
-            key: value
-            for key, value in processor_kwargs.items()
-            if value is not None
+            key: value for key, value in processor_kwargs.items() if value is not None
         }
         if processor_kwargs:
             resolved_additional_args.extend(

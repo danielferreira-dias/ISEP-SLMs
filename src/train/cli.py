@@ -170,15 +170,24 @@ def _dispatch(arguments: argparse.Namespace) -> dict[str, object]:
 
 def _validate_known_pair(config_path: Path) -> bool:
     root = config_path.resolve().parent
-    frozen = root / "e1_label_frozen_vision.yaml"
-    visual = root / "e1_label_unsloth_all.yaml"
-    if config_path.resolve() not in {frozen, visual}:
-        return False
-    validate_controlled_pair(
-        load_training_config(frozen),
-        load_training_config(visual),
+    pairs = (
+        (
+            root / "e1_label_frozen_vision.yaml",
+            root / "e1_label_unsloth_all.yaml",
+        ),
+        (
+            root / "e1_label_frozen_vision_continued.yaml",
+            root / "e1_label_unsloth_all_continued.yaml",
+        ),
     )
-    return True
+    for frozen, visual in pairs:
+        if config_path.resolve() in {frozen, visual}:
+            validate_controlled_pair(
+                load_training_config(frozen),
+                load_training_config(visual),
+            )
+            return True
+    return False
 
 
 def _comparison_output() -> Path:

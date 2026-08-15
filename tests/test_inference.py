@@ -4,25 +4,25 @@ from __future__ import annotations
 
 import asyncio
 import json
+import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
-import unittest
 
+from src.inference.azure import AzureBackend
 from src.inference.base import (
     InferenceConfigurationError,
     InferenceRequest,
     InferenceSafetyRefusal,
     InferenceTransportError,
 )
-from src.inference.azure import AzureBackend
 from src.inference.factory import create_backend
 from src.inference.local import LocalBackend
 from src.inference.openai_compatible import (
     OpenAICompatibleChatBackend,
 )
-from src.inference.responses import AzureResponsesBackend
 from src.inference.reasoning_parsing import separate_embedded_reasoning
+from src.inference.responses import AzureResponsesBackend
 from src.inference.vllm import (
     ManagedVllmServer,
     VllmBackend,
@@ -68,10 +68,7 @@ class _FakeClient:
         self.responses = self.responses_create
         self.models = SimpleNamespace(
             list=lambda: SimpleNamespace(
-                data=[
-                    SimpleNamespace(id=model_id)
-                    for model_id in model_ids
-                ]
+                data=[SimpleNamespace(id=model_id) for model_id in model_ids]
             )
         )
 
@@ -185,9 +182,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
                         prompt_tokens=10,
                         completion_tokens=7,
                         total_tokens=17,
-                        completion_tokens_details=SimpleNamespace(
-                            reasoning_tokens=2
-                        ),
+                        completion_tokens_details=SimpleNamespace(reasoning_tokens=2),
                     ),
                 ),
             ]
@@ -295,8 +290,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         )
 
         self.assertFalse(
-            client.chat_create.payload["extra_body"]
-            ["chat_template_kwargs"]["thinking"]
+            client.chat_create.payload["extra_body"]["chat_template_kwargs"]["thinking"]
         )
 
     def test_vllm_sends_numeric_thinking_budget_when_enabled(self) -> None:
@@ -328,8 +322,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            client.chat_create.payload["extra_body"]
-            ["thinking_token_budget"],
+            client.chat_create.payload["extra_body"]["thinking_token_budget"],
             8192,
         )
 
@@ -438,7 +431,6 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         self.assertNotIn("seed", payload)
         self.assertEqual(payload["temperature"], 1.0)
 
-
     def test_azure_fallback_maps_disabled_thinking_to_no_effort(self) -> None:
         response = SimpleNamespace(
             choices=[
@@ -486,9 +478,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
                 prompt_tokens=20,
                 completion_tokens=12,
                 total_tokens=32,
-                completion_tokens_details=SimpleNamespace(
-                    reasoning_tokens=7
-                ),
+                completion_tokens_details=SimpleNamespace(reasoning_tokens=7),
             ),
         )
         client = _FakeClient(chat_response=response)
@@ -527,9 +517,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
         user_content = payload["messages"][1]["content"]
         self.assertEqual(user_content[0]["type"], "image_url")
         self.assertTrue(
-            user_content[0]["image_url"]["url"].startswith(
-                "data:image/jpeg;base64,"
-            )
+            user_content[0]["image_url"]["url"].startswith("data:image/jpeg;base64,")
         )
         self.assertEqual(user_content[1]["type"], "text")
 
@@ -615,9 +603,7 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
                 )
             ],
             usage=SimpleNamespace(
-                completion_tokens_details=SimpleNamespace(
-                    reasoning_tokens=4
-                )
+                completion_tokens_details=SimpleNamespace(reasoning_tokens=4)
             ),
         )
         backend = OpenAICompatibleChatBackend(
@@ -734,9 +720,11 @@ class ResponsesBackendTests(unittest.TestCase):
             "content_policy_violation",
         )
         self.assertTrue(
-            context.exception.details["content_filter"]["innererror"]
-            ["content_filter_result"]["violence"]["filtered"]
+            context.exception.details["content_filter"]["innererror"][
+                "content_filter_result"
+            ]["violence"]["filtered"]
         )
+
     def test_responses_requests_official_summary_and_marks_truncation(
         self,
     ) -> None:
@@ -748,9 +736,7 @@ class ResponsesBackendTests(unittest.TestCase):
                 summary="detailed",
             ),
             status="incomplete",
-            incomplete_details=SimpleNamespace(
-                reason="max_output_tokens"
-            ),
+            incomplete_details=SimpleNamespace(reason="max_output_tokens"),
             output_text=None,
             output=[
                 SimpleNamespace(
@@ -783,9 +769,7 @@ class ResponsesBackendTests(unittest.TestCase):
                 input_tokens=18,
                 output_tokens=30,
                 total_tokens=48,
-                output_tokens_details=SimpleNamespace(
-                    reasoning_tokens=21
-                ),
+                output_tokens_details=SimpleNamespace(reasoning_tokens=21),
             ),
         )
         client = _FakeClient(responses_response=response)
@@ -933,10 +917,7 @@ class VllmBackendTests(unittest.TestCase):
                     SimpleNamespace(
                         finish_reason="stop",
                         delta=SimpleNamespace(
-                            content=(
-                                "<unused95>"
-                                '{"predictions":["D003"]}'
-                            ),
+                            content=('<unused95>{"predictions":["D003"]}'),
                         ),
                     )
                 ],
@@ -973,9 +954,7 @@ class VllmBackendTests(unittest.TestCase):
             result.reasoning.source_field,
             "content.medgemma_special_tokens",
         )
-        self.assertTrue(
-            result.metadata["embedded_reasoning_block_complete"]
-        )
+        self.assertTrue(result.metadata["embedded_reasoning_block_complete"])
 
     def test_completion_streams_content_reasoning_and_usage(self) -> None:
         chunks = [
@@ -1062,12 +1041,8 @@ class VllmBackendTests(unittest.TestCase):
         backend = VllmBackend(
             model_id="qwen",
             request_model="Qwen/Qwen3.5-4B",
-            client=_FakeClient(
-                model_ids=("Qwen/Qwen3.5-4B",)
-            ),
-            health_probe=lambda url, timeout: (
-                url == "http://localhost:8000/health"
-            ),
+            client=_FakeClient(model_ids=("Qwen/Qwen3.5-4B",)),
+            health_probe=lambda url, timeout: url == "http://localhost:8000/health",
             base_url="http://localhost:8000/v1",
         )
 
@@ -1244,9 +1219,7 @@ class VllmBackendTests(unittest.TestCase):
 
         command = server_config_from_model(model_config).command()
 
-        processor_flag_index = command.index(
-            "--mm-processor-kwargs"
-        )
+        processor_flag_index = command.index("--mm-processor-kwargs")
         self.assertEqual(
             json.loads(command[processor_flag_index + 1]),
             {
@@ -1254,6 +1227,30 @@ class VllmBackendTests(unittest.TestCase):
                 "max_slice_nums": 36,
             },
         )
+
+    def test_server_config_allows_explicit_controlled_unmanaged_override(self) -> None:
+        """The cohort starter may opt into an endpoint-only model profile."""
+
+        model_config = SimpleNamespace(
+            source=SimpleNamespace(repo_id="example/private-merged-model"),
+            processor=None,
+            backend=SimpleNamespace(
+                active_profile=SimpleNamespace(
+                    engine="vllm",
+                    managed=False,
+                    managed_allowed=False,
+                )
+            ),
+            reasoning=SimpleNamespace(parser=None),
+        )
+
+        with self.assertRaises(InferenceConfigurationError):
+            server_config_from_model(model_config)
+        server_config = server_config_from_model(
+            model_config,
+            allow_unmanaged=True,
+        )
+        self.assertEqual(server_config.model, "example/private-merged-model")
 
 
 class BackendFactoryTests(unittest.TestCase):

@@ -80,6 +80,7 @@ class TrainingExecutor:
         request: FineTuneRequest,
         *,
         resume_from_checkpoint: Path | None = None,
+        initialize_from_checkpoint: bool = False,
     ) -> BackendFitResult:
         """Run a fit and atomically record completion, failure, or interruption.
 
@@ -87,6 +88,8 @@ class TrainingExecutor:
             request: Immutable backend request with already prepared datasets.
             resume_from_checkpoint: Explicit checkpoint validated against the
                 run's config, dataset, and model identity.
+            initialize_from_checkpoint: Allow a newly created continuation run
+                to start from its separately staged parent checkpoint.
 
         Returns:
             Backend result after durable local manifests are written.
@@ -103,6 +106,10 @@ class TrainingExecutor:
                 "Trainer output_dir must equal the run checkpoint directory: "
                 f"{expected_output}"
             )
+        if initialize_from_checkpoint and resume_from_checkpoint is None:
+            raise ValueError(
+                "initialize_from_checkpoint requires an explicit staged checkpoint"
+            )
 
         identity_store = RunIdentityStore(self._layout.manifests / "run_identity.json")
         status_store = RunStatusStore(self._layout.manifests / "run_status.json")
@@ -111,6 +118,7 @@ class TrainingExecutor:
         self._prepare_status(
             status_store,
             resume_from_checkpoint=resume_from_checkpoint,
+            initialize_from_checkpoint=initialize_from_checkpoint,
         )
         if resume_from_checkpoint is not None:
             validate_resume_checkpoint(
@@ -168,6 +176,7 @@ class TrainingExecutor:
         status_store: RunStatusStore,
         *,
         resume_from_checkpoint: Path | None,
+        initialize_from_checkpoint: bool,
     ) -> None:
         current = status_store.current()
         if resume_from_checkpoint is None:
@@ -175,6 +184,8 @@ class TrainingExecutor:
                 raise RuntimeError(
                     f"Run is already {current.value}; explicit resume is required"
                 )
+            return
+        if initialize_from_checkpoint and current == RunStatus.CREATED:
             return
         if current == RunStatus.RUNNING:
             status_store.transition(

@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://huggingface.co/datasets/danielfdias98/ISEPDistillDataset/blob/main/schemas/canonical_record.schema.json",
+  "title": "ISEPDistillDataset canonical record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sample_id",
+    "case_id",
+    "task_id",
+    "image_asset_id",
+    "view_type",
+    "leakage_group_id",
+    "source_dataset",
+    "source_sample_id",
+    "license_id",
+    "split",
+    "disease_id",
+    "gold_diagnosis",
+    "gold_provenance",
+    "taxonomy_version",
+    "target_variant",
+    "target_source",
+    "schema_version",
+    "quality_status",
+    "messages"
+  ],
+  "properties": {
+    "documentation_only": {
+      "type": "boolean",
+      "description": "True only for synthetic examples stored outside release data shards."
+    },
+    "sample_id": {"type": "string", "minLength": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "image_asset_id": {"type": "string", "minLength": 1},
+    "image_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "view_type": {
+      "enum": ["overview", "close_up", "oblique", "dermoscopic", "unknown"]
+    },
+    "perceptual_group_id": {"type": ["string", "null"]},
+    "leakage_group_id": {"type": "string", "minLength": 1},
+    "source_dataset": {"type": "string", "minLength": 1},
+    "source_sample_id": {"type": "string", "minLength": 1},
+    "license_id": {"type": "string", "minLength": 1},
+    "split": {"enum": ["sft_train", "sft_dev", "excluded"]},
+    "exclusion_reasons": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "disease_id": {"type": ["string", "null"], "pattern": "^D[0-9]{3}$"},
+    "gold_diagnosis": {"type": "string", "minLength": 1},
+    "gold_provenance": {
+      "enum": [
+        "clinical_diagnosis",
+        "dermoscopy_supported",
+        "histopathology_confirmed",
+        "microbiology_confirmed",
+        "expert_consensus",
+        "atlas_label",
+        "dermatologist_differential",
+        "unknown_provenance"
+      ]
+    },
+    "taxonomy_version": {"type": "string", "minLength": 1},
+    "label_conflict_status": {"type": ["string", "null"]},
+    "target_variant": {"type": "string", "minLength": 1},
+    "target_source": {
+      "enum": [
+        "human_annotated",
+        "human_source_join",
+        "teacher_generated",
+        "teacher_generated_human_reviewed",
+        "deterministic_rendering"
+      ]
+    },
+    "skincon": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "ontology_version",
+        "annotation_source",
+        "source_subset",
+        "source_image_id",
+        "positive_concepts",
+        "all_concepts_annotated"
+      ],
+      "properties": {
+        "ontology_version": {"const": "skincon_48_v1"},
+        "annotation_source": {"const": "SKINCON"},
+        "source_subset": {
+          "enum": ["fitzpatrick17k", "ddi", "documentation_example"]
+        },
+        "source_image_id": {"type": "string", "minLength": 1},
+        "positive_concepts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "Vesicle",
+              "Papule",
+              "Macule",
+              "Plaque",
+              "Abscess",
+              "Pustule",
+              "Bulla",
+              "Patch",
+              "Nodule",
+              "Ulcer",
+              "Crust",
+              "Erosion",
+              "Excoriation",
+              "Atrophy",
+              "Exudate",
+              "Purpura/Petechiae",
+              "Fissure",
+              "Induration",
+              "Xerosis",
+              "Telangiectasia",
+              "Scale",
+              "Scar",
+              "Friable",
+              "Sclerosis",
+              "Pedunculated",
+              "Exophytic/Fungating",
+              "Warty/Papillomatous",
+              "Dome-shaped",
+              "Flat topped",
+              "Brown(Hyperpigmentation)",
+              "Translucent",
+              "White(Hypopigmentation)",
+              "Purple",
+              "Yellow",
+              "Black",
+              "Erythema",
+              "Comedo",
+              "Lichenification",
+              "Blue",
+              "Umbilicated",
+              "Poikiloderma",
+              "Salmon",
+              "Wheal",
+              "Acuminate",
+              "Burrow",
+              "Gray",
+              "Pigmented",
+              "Cyst"
+            ]
+          }
+        },
+        "all_concepts_annotated": {"const": true}
+      }
+    },
+    "image_assessment": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "is_evaluable": {"type": "boolean"},
+        "views_available": {"type": "array", "items": {"type": "string"}},
+        "quality_defects": {"type": "array", "items": {"type": "string"}},
+        "has_anatomic_overview": {"type": "boolean"},
+        "has_scale": {"type": "boolean"},
+        "has_lateral_profile": {"type": "boolean"},
+        "distribution_assessability": {"type": "string"},
+        "color_reliability": {"type": "string"}
+      }
+    },
+    "dominant_visual_pattern": {"type": ["string", "null"]},
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "concept", "status", "provenance", "scope", "confidence"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "concept": {"type": "string", "minLength": 1},
+          "status": {
+            "enum": ["present", "absent_in_observed_scope", "uncertain", "not_assessable", "not_shown"]
+          },
+          "provenance": {"type": "string", "minLength": 1},
+          "scope": {"type": "string", "minLength": 1},
+          "confidence": {"enum": ["low", "moderate", "high"]},
+          "evidence_region": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "not_assessable_features": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "differential": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rank",
+          "disease_id",
+          "supporting_observation_ids",
+          "contradicting_observation_ids",
+          "diagnostic_confidence",
+          "clinical_risk_if_missed"
+        ],
+        "properties": {
+          "rank": {"type": "integer", "minimum": 1},
+          "disease_id": {"type": "string", "pattern": "^D[0-9]{3}$"},
+          "supporting_observation_ids": {"type": "array", "items": {"type": "string"}},
+          "contradicting_observation_ids": {"type": "array", "items": {"type": "string"}},
+          "missing_discriminators": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["feature", "required_source"],
+              "properties": {
+                "feature": {"type": "string"},
+                "required_source": {"type": "string"}
+              }
+            }
+          },
+          "diagnostic_confidence": {"enum": ["low", "moderate", "high"]},
+          "clinical_risk_if_missed": {"enum": ["low", "moderate", "high"]}
+        }
+      }
+    },
+    "action": {
+      "type": ["string", "null"],
+      "enum": [
+        "DIAGNOSE_PROVISIONALLY",
+        "REQUEST_OVERVIEW_IMAGE",
+        "REQUEST_CLOSEUP_IMAGE",
+        "REQUEST_SCALE_OR_PROFILE",
+        "REQUEST_CLINICAL_CONTEXT",
+        "REQUEST_DERMOSCOPY",
+        "REQUEST_IN_PERSON_EXAM",
+        "RECOMMEND_CONFIRMATORY_TEST",
+        "ABSTAIN_POOR_QUALITY",
+        "ABSTAIN_OUT_OF_DOMAIN",
+        null
+      ]
+    },
+    "action_urgency": {"type": ["string", "null"]},
+    "requested_information": {"type": ["string", "null"]},
+    "concise_clinical_rationale": {"type": ["string", "null"]},
+    "structured_response": {"type": ["string", "null"]},
+    "open_response": {"type": ["string", "null"]},
+    "teacher_model": {"type": ["string", "null"]},
+    "teacher_revision": {"type": ["string", "null"]},
+    "prompt_id": {"type": ["string", "null"]},
+    "prompt_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "generation_id": {"type": ["string", "null"]},
+    "schema_version": {"type": "string", "minLength": 1},
+    "quality_status": {
+      "enum": ["pending", "accepted", "partially_accepted", "rejected", "example_only"]
+    },
+    "rejection_reasons": {"type": "array", "items": {"type": "string"}},
+    "schema_valid": {"type": ["boolean", "null"]},
+    "vocabulary_valid": {"type": ["boolean", "null"]},
+    "evidence_links_valid": {"type": ["boolean", "null"]},
+    "unsupported_claim_flags": {"type": "array", "items": {"type": "string"}},
+    "messages": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "content"],
+        "properties": {
+          "role": {"enum": ["system", "user", "assistant"]},
+          "content": {"type": "array", "items": {"type": "object"}}
+        }
+      }
+    }
+  }
+}

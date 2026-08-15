@@ -69,6 +69,11 @@ def controlled_training_document(
     experiment.pop("vision_profile", None)
     lora = _child_object(document, "lora")
     lora.pop("finetune_vision_layers", None)
+    continuation = document.get("continuation")
+    if isinstance(continuation, dict):
+        continuation.pop("parent_run_directory", None)
+        continuation.pop("parent_checkpoint_id", None)
+        continuation.pop("parent_adapter_sha256", None)
     document.pop("artifacts", None)
     return document
 

@@ -1,0 +1,59 @@
+{
+  "audit_version": "1.0.0",
+  "audit_date": "2026-08-14",
+  "status": "reproduced_from_local_source_snapshots",
+  "sources": {
+    "fitzpatrick17k": {
+      "raw_annotations": 3690,
+      "usable_annotations": 3230,
+      "annotator_excluded": 460,
+      "upstream_diagnosis_present": 3230,
+      "upstream_diagnosis_missing": 0,
+      "mapped_to_21_class_taxonomy_before_reserved_exclusion": 1175,
+      "mapped_to_21_class_taxonomy_released": 904,
+      "outside_21_class_taxonomy_released": 2055,
+      "current_isepdermdata_overlap": 606,
+      "internal_reserved_overlap": 271,
+      "morphology_train_dev_candidates": 2959
+    },
+    "ddi": {
+      "raw_annotations": 656,
+      "usable_annotations": 636,
+      "annotator_excluded": 20,
+      "upstream_diagnosis_present": 636,
+      "upstream_diagnosis_missing": 0,
+      "mapped_to_21_class_taxonomy_released": 294,
+      "outside_21_class_taxonomy_released": 342,
+      "current_isepdermdata_overlap": 0,
+      "internal_reserved_overlap": 0,
+      "morphology_train_dev_candidates": 636
+    }
+  },
+  "totals": {
+    "raw_annotations": 4346,
+    "usable_annotations": 3866,
+    "annotator_excluded": 480,
+    "upstream_diagnosis_present": 3866,
+    "upstream_diagnosis_missing": 0,
+    "mapped_to_21_class_taxonomy_before_reserved_exclusion": 1469,
+    "mapped_to_21_class_taxonomy_released": 1198,
+    "outside_21_class_taxonomy_released": 2397,
+    "internal_reserved_overlap": 271,
+    "morphology_train_dev_candidates": 3595
+  },
+  "policy": {
+    "use_ddi_for_training": true,
+    "ddi_external_benchmark_status_after_training": "contaminated_not_independent",
+    "exclude_annotator_rejected_rows": true,
+    "exclude_internal_benchmark_overlap": true,
+    "outside_taxonomy_rows": "morphology_only",
+    "missing_task_semantics": "absence_of_task_row_never_null_or_invented_target"
+  },
+  "notes": [
+    "SKINCON itself contains image IDs and 48 morphology labels, not diagnostic labels.",
+    "Diagnostic labels were verified through the Fitzpatrick17k and DDI source metadata.",
+    "All 3866 usable SKINCON annotations have an upstream diagnostic label.",
+    "The previous scaffold count of 1171 mapped rows omitted reviewed aliases and source-specific mappings; the materialized builder reproduces 1198 mapped released rows.",
+    "Rows outside the 21-class thesis taxonomy remain useful for morphology supervision without a diagnosis target."
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "documentation_only": true,
+  "sample_id": "SYNTHETIC_SCHEMA_EXAMPLE_001",
+  "case_id": "SYNTHETIC_CASE_001",
+  "task_id": "structured_diagnosis_v1",
+  "image_asset_id": "synthetic-placeholder-not-distributed",
+  "image_sha256": null,
+  "view_type": "close_up",
+  "perceptual_group_id": null,
+  "leakage_group_id": "SYNTHETIC_CASE_001",
+  "source_dataset": "documentation_example",
+  "source_sample_id": "SYNTHETIC_SCHEMA_EXAMPLE_001",
+  "license_id": "NOT_APPLICABLE_SYNTHETIC_DOCUMENTATION",
+  "split": "excluded",
+  "exclusion_reasons": ["documentation_only"],
+  "disease_id": "D001",
+  "gold_diagnosis": "melanoma",
+  "gold_provenance": "unknown_provenance",
+  "taxonomy_version": "preview",
+  "label_conflict_status": null,
+  "target_variant": "structured_json",
+  "target_source": "deterministic_rendering",
+  "skincon": {
+    "ontology_version": "skincon_48_v1",
+    "annotation_source": "SKINCON",
+    "source_subset": "documentation_example",
+    "source_image_id": "SYNTHETIC_SCHEMA_EXAMPLE_001",
+    "positive_concepts": ["Macule", "Pigmented"],
+    "all_concepts_annotated": true
+  },
+  "image_assessment": {
+    "is_evaluable": true,
+    "views_available": ["close_up"],
+    "quality_defects": [],
+    "has_anatomic_overview": false,
+    "has_scale": false,
+    "has_lateral_profile": false,
+    "distribution_assessability": "within_frame_only",
+    "color_reliability": "uncertain"
+  },
+  "dominant_visual_pattern": "pigmented asymmetric lesion",
+  "observations": [
+    {
+      "id": "obs_1",
+      "concept": "asymmetry",
+      "status": "present",
+      "provenance": "synthetic_documentation",
+      "scope": "index_lesion",
+      "confidence": "moderate",
+      "evidence_region": "whole_lesion"
+    },
+    {
+      "id": "obs_2",
+      "concept": "irregular_border",
+      "status": "present",
+      "provenance": "synthetic_documentation",
+      "scope": "index_lesion",
+      "confidence": "moderate",
+      "evidence_region": "lesion_periphery"
+    },
+    {
+      "id": "obs_3",
+      "concept": "color_variation",
+      "status": "present",
+      "provenance": "synthetic_documentation",
+      "scope": "index_lesion",
+      "confidence": "moderate",
+      "evidence_region": "whole_lesion"
+    }
+  ],
+  "not_assessable_features": ["palpable_consistency", "recent_evolution"],
+  "differential": [
+    {
+      "rank": 1,
+      "disease_id": "D001",
+      "supporting_observation_ids": ["obs_1", "obs_2", "obs_3"],
+      "contradicting_observation_ids": [],
+      "missing_discriminators": [
+        {"feature": "recent_evolution", "required_source": "history"}
+      ],
+      "diagnostic_confidence": "moderate",
+      "clinical_risk_if_missed": "high"
+    },
+    {
+      "rank": 2,
+      "disease_id": "D002",
+      "supporting_observation_ids": ["obs_3"],
+      "contradicting_observation_ids": ["obs_1", "obs_2"],
+      "missing_discriminators": [],
+      "diagnostic_confidence": "low",
+      "clinical_risk_if_missed": "low"
+    },
+    {
+      "rank": 3,
+      "disease_id": "D003",
+      "supporting_observation_ids": ["obs_3"],
+      "contradicting_observation_ids": ["obs_1"],
+      "missing_discriminators": [],
+      "diagnostic_confidence": "low",
+      "clinical_risk_if_missed": "low"
+    }
+  ],
+  "action": "REQUEST_CLINICAL_CONTEXT",
+  "action_urgency": "prompt",
+  "requested_information": "duration_and_recent_change",
+  "concise_clinical_rationale": "The visible asymmetry, irregular border, and color variation support an atypical pigmented lesion, but recent evolution is not assessable from the image.",
+  "structured_response": "{\"image_assessment\":{\"is_evaluable\":true},\"observations\":[{\"id\":\"obs_1\",\"concept\":\"asymmetry\"}],\"differential\":[{\"rank\":1,\"disease_id\":\"D001\"}],\"action\":\"REQUEST_CLINICAL_CONTEXT\"}",
+  "open_response": null,
+  "teacher_model": "Qwen/Qwen3.6-27B",
+  "teacher_revision": null,
+  "prompt_id": "structured_two_stage_v1_preview",
+  "prompt_sha256": null,
+  "generation_id": "SYNTHETIC_GENERATION_001",
+  "schema_version": "0.2.0",
+  "quality_status": "example_only",
+  "rejection_reasons": ["documentation_only"],
+  "schema_valid": true,
+  "vocabulary_valid": true,
+  "evidence_links_valid": true,
+  "unsupported_claim_flags": [],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {"type": "image"},
+        {"type": "text", "text": "Assess the image, describe only visible findings, and return the differential in the requested schema."}
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {"type": "text", "text": "{\"image_assessment\":{\"is_evaluable\":true},\"observations\":[{\"id\":\"obs_1\",\"concept\":\"asymmetry\"}],\"differential\":[{\"rank\":1,\"disease_id\":\"D001\"}],\"action\":\"REQUEST_CLINICAL_CONTEXT\"}"}
+      ]
+    }
+  ]
+}

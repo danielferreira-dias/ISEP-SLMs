@@ -4,34 +4,61 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import replace
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
 import time
+from dataclasses import replace
+from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
+
+if TYPE_CHECKING:
+    from src.config import ModelConfig
+    from src.inference.vllm import VllmServerConfig
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("model_config", type=Path)
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    parser.add_argument(
+        "--model-path",
+        type=Path,
+        help=(
+            "Load weights from this local directory while retaining the canonical "
+            "repo ID from the model YAML as the served model name."
+        ),
+    )
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, required=True)
     parser.add_argument("--gpu-memory-utilization", type=float)
     parser.add_argument("--max-num-seqs", type=int, default=8)
     parser.add_argument("--thinking", choices=("config", "on", "off"), default="config")
-    parser.add_argument("--gdn-prefill-backend", choices=("auto", "triton", "flashinfer", "cutedsl"), default="auto")
+    parser.add_argument(
+        "--gdn-prefill-backend",
+        choices=("auto", "triton", "flashinfer", "cutedsl"),
+        default="auto",
+    )
     parser.add_argument("--startup-timeout", type=int, default=1800)
     parser.add_argument("--log-dir", type=Path, default=Path("runs/vllm"))
+    parser.add_argument(
+        "--allow-unmanaged-config",
+        action="store_true",
+        help=(
+            "Explicitly allow starting a profile normally marked endpoint-only. "
+            "Used for controlled same-hardware experiments with portable Hub models."
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
 
-def load_server_config(args: argparse.Namespace):
+def load_server_config(
+    args: argparse.Namespace,
+) -> tuple[ModelConfig, VllmServerConfig]:
     root = args.project_root.resolve()
     sys.path.insert(0, str(root))
     from src.config import load_model_config
@@ -41,26 +68,62 @@ def load_server_config(args: argparse.Namespace):
     if not model_path.is_absolute():
         model_path = root / model_path
     model = load_model_config(model_path, root=root)
-    config = server_config_from_model(model, host=args.host, port=args.port)
+    config = server_config_from_model(
+        model,
+        host=args.host,
+        port=args.port,
+        allow_unmanaged=args.allow_unmanaged_config,
+    )
+    local_model_path: Path | None = None
+    if args.model_path is not None:
+        local_model_path = args.model_path
+        if not local_model_path.is_absolute():
+            local_model_path = root / local_model_path
+        local_model_path = local_model_path.resolve()
+        if not (local_model_path / "config.json").is_file():
+            raise ValueError(
+                "--model-path must be a local model directory containing config.json"
+            )
+        config = replace(config, model=str(local_model_path))
     if args.gpu_memory_utilization is not None:
         if not 0 < args.gpu_memory_utilization < 1:
             raise ValueError("--gpu-memory-utilization must be between 0 and 1")
         config = replace(config, gpu_memory_utilization=args.gpu_memory_utilization)
 
     extra = list(config.additional_args)
+    if (
+        local_model_path is None
+        and model.source.revision
+        and model.source.revision != "main"
+    ):
+        extra.extend(["--revision", model.source.revision])
+    if (
+        local_model_path is None
+        and model.processor is not None
+        and model.processor.revision
+        and model.processor.revision != "main"
+    ):
+        extra.extend(["--tokenizer-revision", model.processor.revision])
     extra.extend(["--max-num-seqs", str(args.max_num_seqs)])
 
     enabled = model.reasoning.chat_template_kwargs.enable_thinking
     if args.thinking != "config":
         enabled = args.thinking == "on"
-    extra.extend([
-        "--default-chat-template-kwargs",
-        json.dumps({"enable_thinking": enabled}),
-    ])
+    extra.extend(
+        [
+            "--default-chat-template-kwargs",
+            json.dumps({"enable_thinking": enabled}),
+        ]
+    )
 
-    repo_id = model.source.repo_id.lower()
+    source_repo_id = model.source.repo_id
+    if source_repo_id is None:
+        raise ValueError("model source must define repo_id")
+    repo_id = source_repo_id.lower()
     backend = args.gdn_prefill_backend
-    if backend == "auto" and ("qwen3.5" in repo_id or "qwen3.6" in repo_id):
+    if backend == "auto" and any(
+        version in repo_id for version in ("qwen3.5", "qwen3.6", "qwen3.8")
+    ):
         backend = "triton"
     if backend != "auto":
         extra.extend(["--gdn-prefill-backend", backend])
@@ -145,7 +208,9 @@ def main() -> int:
         process.wait(timeout=15)
     except subprocess.TimeoutExpired:
         process.kill()
-    raise TimeoutError(f"vLLM was not ready within {args.startup_timeout}s; inspect {log_path}")
+    raise TimeoutError(
+        f"vLLM was not ready within {args.startup_timeout}s; inspect {log_path}"
+    )
 
 
 if __name__ == "__main__":

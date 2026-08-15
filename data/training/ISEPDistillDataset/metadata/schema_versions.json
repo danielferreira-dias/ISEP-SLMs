@@ -1,0 +1,12 @@
+{
+  "dataset_schema_version": "0.3.0",
+  "status": "diagnosis_and_morphology_materialized",
+  "canonical_record_schema": "schemas/canonical_record.schema.json",
+  "configurations": {
+    "diagnosis": "0.3.0",
+    "morphology": "0.3.0",
+    "caption": "0.2.0",
+    "structured": "0.2.0",
+    "open_response": "0.2.0"
+  }
+}

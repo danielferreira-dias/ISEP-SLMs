@@ -1,18 +1,27 @@
-# DermoBench e Clinical Context Ablation: Qwen 3.5 4B vs Qwen 3.6 27B
+# DermoBench e Clinical Context Ablation: comparação pré-treino e E1
 
 ## Material Passport
 
 - Origin Skill: `experiment-agent`
 - Origin Mode: `validate`
-- Origin Date: 2026-08-09
+- Origin Date: 2026-08-09; atualizações E1 e Qwen 3.8 27B em 2026-08-14/15
 - Verification Status: `ANALYZED`
-- Version Label: `dermobench_qwen_comparison_v2`
+- Version Label: `dermobench_qwen_comparison_v4_e1_consolidated`
 - Overall Confidence: `CAUTION`
 
 ## 1. Objetivo e estado da avaliação
 
-Esta nota compara o student oficial, **Qwen 3.5 4B**, com o candidato local a
-teacher, **Qwen 3.6 27B**, em duas avaliações:
+Esta nota compara os modelos pré-treino **Qwen 3.5 4B** e **Qwen 3.6 27B**
+com dois checkpoints de três épocas da fase label-only E1:
+
+- **E1 Frozen:** LoRA na componente linguística, com a visão congelada;
+- **E1 Vision LoRA:** LoRA na linguagem e nas camadas visuais.
+
+Acrescenta também o novo **Qwen 3.8 27B local** apenas ao Clinical Context
+Ablation. O DermoBench não foi executado para este modelo; as respetivas
+células permanecem assinaladas com “—”.
+
+Foram consideradas duas avaliações:
 
 1. o DermoBench filtrado, com tarefas de descrição, morfologia, diagnóstico,
    reasoning e DDI;
@@ -25,14 +34,18 @@ foram sincronizadas localmente.
 
 O estado final dos dados é:
 
-| Conjunto | Qwen 3.5 4B | Qwen 3.6 27B | Estado comparativo |
+| Condição | DermoBench preservado | Clinical Context | Cobertura interpretável |
 |---|---:|---:|---|
-| DermoBench | 29.099 / 29.099 | 28.173 / 29.099 | 27B incompleto em duas tarefas de reasoning |
-| Clinical Context Ablation | 522 / 522 | 522 / 522 | Completo e emparelhado |
-| **Total preservado** | **29.621** | **28.695** | **58.316 respostas** |
+| Qwen 3.5 4B pré-treino | 29.099 / 29.099 | 522 / 522 | 9 tarefas determinísticas; 4 abertas sem score clínico final |
+| Qwen 3.6 27B pré-treino | 28.173 / 29.099 | 522 / 522 | 9 determinísticas; reasoning incompleto |
+| Qwen 3.8 27B pré-treino | — | 522 / 522 | Clinical Context completo; DermoBench não executado |
+| E1 Frozen, época 3 | 10.701 / 10.701 | 522 / 522 | 7 tarefas de diagnóstico selecionadas |
+| E1 Vision LoRA, época 3 | 10.701 / 10.701 | 522 / 522 | 7 tarefas de diagnóstico selecionadas |
 
-O DermoBench ainda **não tem resultados clínicos finais** para as quatro
-tarefas que requerem LLM-as-a-judge. Por isso, esta nota apresenta:
+O DermoBench pré-treino ainda **não tem resultados clínicos finais** para as
+quatro tarefas que requerem LLM-as-a-judge. Os checkpoints E1 não foram
+executados nessas quatro tarefas nem nas duas tarefas MCQ de morfologia.
+Por isso, esta nota apresenta:
 
 - resultados finais das nove tarefas determinísticas;
 - qualidade e validade dos outputs;
@@ -40,6 +53,9 @@ tarefas que requerem LLM-as-a-judge. Por isso, esta nota apresenta:
 - estado de cobertura das tarefas abertas;
 - limitações que impedem declarar um vencedor global definitivo no
   DermoBench.
+
+Nas tabelas, **“—” significa que a tarefa não foi avaliada ou não dispõe de
+score final**; nunca significa zero.
 
 ## 2. Protocolo executado
 
@@ -64,6 +80,20 @@ não apenas a resposta do modelo quando o formato é válido.
 Esta não é uma experiência pura de scaling. Além do número de parâmetros,
 mudam a geração do modelo, a versão Qwen e o `presence_penalty`. As diferenças
 não devem ser atribuídas exclusivamente a 4B versus 27B parâmetros.
+
+Os dois checkpoints E1 usaram o mesmo perfil histórico do Qwen 3.5 4B
+pré-treino: `temperature=0,6`, `top_p=0,95`, `top_k=20`,
+`presence_penalty=1,5`, seed 42 e thinking desativado. A comparação Frozen
+versus Vision LoRA é, por isso, a ablação E1 mais controlada. Todos os casos
+E1 foram emparelhados pelos mesmos IDs das tarefas. A época 3 permanece nesta
+tabela porque os checkpoints de continued fine-tuning das épocas 4 e 5 foram
+rejeitados pelo critério congelado de seleção em `sft_dev`.
+
+O Qwen 3.8 27B usou BF16 vLLM local, commit
+`1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0`, temperatura zero, seed 42 e
+thinking desativado numa RTX PRO 6000 Blackwell. Por diferir no perfil de
+geração e hardware, a comparação com os runs históricos abaixo é descritiva,
+não uma ablação controlada.
 
 ## 3. Resultados determinísticos do DermoBench
 
@@ -103,8 +133,10 @@ O estudo que introduziu o DermoBench é o preprint de Ru et al. (2026),
 *DermoGPT: Open Weights and Open Data for Morphology-Grounded Dermatological
 Reasoning MLLMs* (arXiv:2601.01868). A Tabela 3 do artigo compara 16 baselines,
 quatro variantes DermoGPT e uma baseline humana. A tabela abaixo reproduz os
-valores publicados, mas conserva apenas as oito colunas de accuracy que foram
-executadas na totalidade pelos dois modelos Qwen deste projeto.
+valores publicados e acrescenta os quatro modelos/checkpoints ISEP. Conserva
+apenas as oito colunas de accuracy que foram executadas na totalidade pelos
+dois modelos Qwen pré-treino; nos checkpoints E1, as duas colunas de morfologia
+ficam marcadas com um traço porque não foram executadas.
 
 #### Legenda das tarefas e colunas
 
@@ -165,6 +197,8 @@ Abreviaturas usadas na tabela:
 | Artigo | Human Performance | — | 83,00% | 92,00% | 85,00% | 77,00% | 94,00% | 86,00% | 89,00% | 93,00% |
 | **ISEP** | **Qwen 3.5 4B** | **4B** | **38,35%** | **62,53%** | **61,47%** | **45,53%** | **40,86%** | **48,02%** | **36,35%** | **56,25%** |
 | **ISEP** | **Qwen 3.6 27B** | **27B** | **52,37%** | **62,21%** | **71,31%** | **21,86%** | **60,33%** | **60,37%** | **45,50%** | **69,17%** |
+| **ISEP E1** | **Qwen 3.5 4B — Frozen (época 3)** | **4B** | **—** | **—** | **72,28%** | **54,47%** | **53,55%** | **54,57%** | **46,79%** | **58,33%** |
+| **ISEP E1** | **Qwen 3.5 4B — Vision LoRA (época 3)** | **4B** | **—** | **—** | **73,82%** | **56,18%** | **54,08%** | **53,96%** | **50,00%** | **63,75%** |
 
 #### Como interpretar esta tabela
 
@@ -183,11 +217,22 @@ leitura, mas **não formam um leaderboard estritamente emparelhado**:
   isto afeta especialmente o Qwen 3.6 27B no MCQ de 25 opções;
 - as linhas `DermoGPT-*` não são modelos base comparáveis em igualdade de
   treino: foram especializadas com DermoInstruct, e algumas usam RL e CCT;
+- as duas linhas `ISEP E1` também são modelos especializados: receberam o
+  mesmo treino supervisionado label-only nas 21 classes do ISEP, ao contrário
+  das linhas generalistas pré-treino;
+- nos checkpoints E1, “—” em T1.3 e T1.4 significa que as tarefas de
+  morfologia não foram executadas. As seis células diagnósticas vêm das seis
+  tarefas visual-diagnosis comparáveis à tabela do artigo; a sétima tarefa E1,
+  DDI Fairness, é apresentada separadamente na Secção 3.4 porque a coluna
+  `Fair.` publicada não é comparável à metadata local;
 - `Human Performance` foi calculado no artigo com uma amostra de 100 casos por
   tarefa, não com todos os casos da coluna.
 
 As colunas T1.1, T1.2, T3.1 e T3.2 foram deliberadamente excluídas porque os
-Qwen deste projeto ainda não têm scores do judge comparáveis. A coluna
+Qwen deste projeto ainda não têm scores do judge comparáveis. Nos checkpoints
+E1, essas tarefas nem sequer foram executadas: a campanha foi deliberadamente
+limitada às tarefas determinísticas de diagnóstico visual, sem
+LLM-as-a-judge. A coluna
 hierárquica também foi excluída porque essa tarefa de 2.000 rows não está na
 release pública usada localmente. Finalmente, a coluna `Fair.` do artigo mede
 `min(group accuracy) / max(group accuracy)`, enquanto a nossa execução só
@@ -222,6 +267,55 @@ escolha recuperável como incorretos. Os nove testes foram corrigidos por Holm.
 - A vantagem observada do 4B no MCQ de 25 opções mantém
   `p_Holm < 0,001`, mas é principalmente uma falha de geração/output do 27B,
   analisada abaixo.
+
+### 3.4 Checkpoints E1 no inventário completo de tarefas
+
+A tabela seguinte torna explícita a cobertura desigual. Os checkpoints E1
+foram avaliados apenas nas sete tarefas que pedem diretamente o diagnóstico da
+doença a partir da imagem. As células com “—” correspondem a tarefas não
+executadas ou sem julgamento clínico final.
+
+| Tarefa DermoBench | Casos | 4B pré-treino | 27B pré-treino | E1 Frozen | E1 Vision LoRA |
+|---|---:|---:|---:|---:|---:|
+| 1.1 Description sem morphology | 783 | — | — | — | — |
+| 1.2 Description com morphology | 783 | — | — | — | — |
+| 1.3 Derm7pt morphology MCQ | 5.530 | 38,35% | **52,37%** | — | — |
+| 1.4 SkinCon morphology MCQ | 9.736 | **62,53%** | 62,21% | — | — |
+| 2.1 Diagnosis MCQ, 25 opções | 1.757 | 45,53% | 21,86% | 54,47% | **56,18%** |
+| 2.1 Diagnosis MCQ, 4 opções | 1.757 | 61,47% | 71,31% | 72,28% | **73,82%** |
+| 2.1 DDI diagnosis MCQ | 656 | 48,02% | **60,37%** | 54,57% | 53,96% |
+| 2.1 Derm1M EDU diagnosis MCQ | 3.615 | 40,86% | **60,33%** | 53,55% | 54,08% |
+| 2.1 Derm7pt diagnosis MCQ | 2.022 | 36,35% | 45,50% | 46,79% | **50,00%** |
+| 2.1 SNU134 diagnosis MCQ | 240 | 56,25% | **69,17%** | 58,33% | 63,75% |
+| 3.1 Diagnostic reasoning sem morphology | 783 | — | — | — | — |
+| 3.2 Diagnostic reasoning com morphology | 783 | — | — | — | — |
+| 4 DDI Fairness MCQ | 654 | 49,24% | **62,54%** | 58,10% | 56,88% |
+
+Para uma comparação estritamente comum, foram agregadas apenas as mesmas sete
+tarefas de diagnóstico (`n=10.701` por modelo):
+
+| Agregação das sete tarefas comuns | 4B pré-treino | 27B pré-treino | E1 Frozen | E1 Vision LoRA |
+|---|---:|---:|---:|---:|
+| Micro-accuracy | 45,45% | 53,35% | 55,95% | **57,28%** |
+| Média não ponderada por tarefa | 48,24% | 55,87% | 56,87% | **58,38%** |
+| Taxa ponderada de escolhas válidas | 99,89% | 87,65% | 95,63% | **97,27%** |
+
+O E1 Vision LoRA superou o 27B no agregado comum, mas este resultado não
+significa que venceu de forma uniforme: foi melhor em três das sete tarefas e
+o 27B em quatro. O ganho agregado é influenciado fortemente pelo MCQ de 25
+opções, onde o 27B sofreu truncamentos e outputs inválidos.
+
+Nos testes emparelhados por tarefa, com correção de Holm:
+
+- E1 Vision LoRA superou significativamente o 27B no MCQ de 25 opções e no
+  Derm7pt diagnosis;
+- o 27B superou significativamente E1 Vision LoRA em DDI, Derm1M EDU e DDI
+  Fairness;
+- as diferenças no MCQ de quatro opções e no SNU134 não permaneceram
+  significativas;
+- no agregado de todos os casos comuns, Vision LoRA superou Frozen por
+  1,33 pp (`p=0,00049`), mas este teste agregado mistura tarefas e deve ser
+  lido juntamente com os resultados por tarefa.
 
 ## 4. Validade e comportamento dos outputs
 
@@ -279,12 +373,12 @@ As tarefas 1.1, 1.2, 3.1 e 3.2 requerem avaliação posterior pelo judge
 da descrição, reasoning, factualidade e concordância clínica permanecem
 ausentes.
 
-| Tarefa aberta | Qwen 3.5 4B | Qwen 3.6 27B | Comparação possível agora |
-|---|---:|---:|---|
-| 1.1 Description sem morphology | 783 / 783 | 783 / 783 | Apenas formato; ambos 100% |
-| 1.2 Description com morphology | 783 / 783 | 783 / 783 | Apenas formato: 98,21% vs 100% |
-| 3.1 Reasoning sem morphology | 783 / 783 | **640 / 783** | Parcial; faltam 143 no 27B |
-| 3.2 Reasoning com morphology | 783 / 783 | **0 / 783** | Impossível comparar |
+| Tarefa aberta | 4B pré-treino | 27B pré-treino | E1 Frozen | E1 Vision | Comparação possível agora |
+|---|---:|---:|---:|---:|---|
+| 1.1 Description sem morphology | 783 / 783 | 783 / 783 | — | — | Apenas formato; ambos os modelos pré-treino 100% |
+| 1.2 Description com morphology | 783 / 783 | 783 / 783 | — | — | Apenas formato: 98,21% vs 100% |
+| 3.1 Reasoning sem morphology | 783 / 783 | **640 / 783** | — | — | Parcial; faltam 143 no 27B |
+| 3.2 Reasoning com morphology | 783 / 783 | **0 / 783** | — | — | Impossível comparar |
 
 Nos 640 IDs comuns da tarefa 3.1, a conformidade estrutural foi 77,03% no 4B e
 99,53% no 27B. Isto mede apenas a presença e ordenação dos blocos exigidos; não
@@ -328,40 +422,56 @@ modelo.
 | 4B — imagem + contexto | **31,03%** | 65,90% | 81,99% | **49,78%** | 100% | 100% |
 | 27B — imagem | 38,31% | **81,99%** | **93,49%** | 60,16% | 100% | 100% |
 | 27B — imagem + contexto | **41,38%** | 78,16% | 92,34% | **61,02%** | 100% | 100% |
+| Qwen 3.8 27B — imagem | 39,85% | 78,54% | 90,04% | 58,88% | 100% | 100% |
+| Qwen 3.8 27B — imagem + contexto | **44,44%** | **81,61%** | **91,57%** | **62,78%** | 100% | 100% |
+| E1 Frozen — imagem | 37,16% | 80,84% | 93,49% | 59,03% | 100% | 100% |
+| E1 Frozen — imagem + contexto | 40,23% | 79,31% | 94,25% | 60,97% | 100% | 100% |
+| E1 Vision — imagem | 46,74% | 81,99% | 94,25% | 65,25% | 100% | 99,62% |
+| E1 Vision — imagem + contexto | **47,13%** | **82,76%** | **95,79%** | **66,72%** | 100% | 100% |
 
 O 27B foi superior ao 4B nas duas condições. A diferença Top-1 foi de 11,11
 pontos com imagem e 10,34 pontos com imagem mais contexto. A comparação
 emparelhada entre modelos permaneceu significativa após correção de Holm nas
 duas condições (`p_Holm = 0,0044` e `0,0045`, respetivamente).
 
+Após E1, Vision LoRA tornou-se a condição local com melhor Top-1 nas duas
+variantes: superou o 27B pré-treino em 8,43 pp com imagem isolada e 5,75 pp com
+imagem mais contexto. Esta melhoria mede especialização no corpus E1, não uma
+vantagem geral de modelos pequenos sobre modelos grandes.
+
+O Qwen 3.8 27B obteve o melhor Top-1 entre os três checkpoints generalistas
+locais nesta ablação (39,85% sem contexto e 44,44% com contexto), mas continua
+abaixo do E1 Vision nas duas condições. Esta observação não é uma comparação
+de eficiência nem uma prova causal de vantagem arquitetural.
+
 ### 6.2 Efeito do contexto dentro de cada modelo
 
-| Métrica: contexto - imagem | Qwen 3.5 4B | Qwen 3.6 27B |
-|---|---:|---:|
-| Top-1 | +3,83 pp | +3,07 pp |
-| Top-3 | -0,38 pp | -3,83 pp |
-| Top-6 | -1,15 pp | -1,15 pp |
-| MRR | +1,71 pp | +0,86 pp |
-| Pares que melhoraram / pioraram em Top-1 | 35 / 25 | 40 / 32 |
-| IC 95% da diferença Top-1 | -1,92 a +9,58 pp | -3,45 a +9,58 pp |
-| McNemar exato | p=0,245 | p=0,410 |
+| Métrica: contexto - imagem | 4B pré-treino | 27B pré-treino | Qwen 3.8 27B | E1 Frozen | E1 Vision |
+|---|---:|---:|---:|---:|---:|
+| Top-1 | +3,83 pp | +3,07 pp | +4,60 pp | +3,07 pp | +0,38 pp |
+| Top-3 | -0,38 pp | -3,83 pp | +3,07 pp | -1,53 pp | +0,77 pp |
+| Top-6 | -1,15 pp | -1,15 pp | +1,53 pp | +0,77 pp | +1,53 pp |
+| MRR | +1,71 pp | +0,86 pp | +3,90 pp | +1,94 pp | +1,47 pp |
+| Pares que melhoraram / pioraram em Top-1 | 35 / 25 | 40 / 32 | 52 / 40 | 28 / 20 | 27 / 26 |
+| IC 95% da diferença Top-1 | -1,92 a +9,58 pp | -3,45 a +9,58 pp | -2,30 a +11,88 pp | -2,30 a +8,43 pp | -4,98 a +5,75 pp |
+| McNemar exato | p=0,245 | p=0,410 | p=0,251 | p=0,312 | p=1,000 |
 
-Existe um sinal positivo em Top-1, mas os intervalos incluem zero e os testes
-emparelhados não são significativos. Este resultado **não demonstra ainda**
-que adicionar contexto melhora a classificação. Além disso, Top-3 e Top-6
-diminuíram ligeiramente, sugerindo que o contexto pode promover uma hipótese
-para o primeiro lugar sem melhorar todo o ranking diferencial.
+Os cinco deltas Top-1 são positivos, mas todos os intervalos incluem zero e
+nenhum teste emparelhado é significativo. O efeito torna-se praticamente nulo
+no E1 Vision (+0,38 pp). Estes resultados **não demonstram** que adicionar
+contexto melhora a classificação; mostram apenas uma tendência exploratória
+dependente do checkpoint e da métrica.
 
 ### 6.3 Skin tone no Clinical Context
 
 Os grupos Monk 1-3 e 4-6 têm suporte estatístico segundo o protocolo da
 benchmark; Monk 7-10 tem apenas 17 casos e deve permanecer descritivo.
 
-| Grupo | Casos | 4B imagem | 4B + contexto | 27B imagem | 27B + contexto |
-|---|---:|---:|---:|---:|---:|
-| Monk 1-3 | 164 | 30,49% | 34,15% | 39,63% | 42,68% |
-| Monk 4-6 | 80 | 23,75% | 27,50% | 37,50% | 40,00% |
-| Monk 7-10 | 17 | 11,76% | 17,65% | 29,41% | 35,29% |
+| Grupo | Casos | 4B imagem | 4B + contexto | 27B imagem | 27B + contexto | Qwen 3.8 27B imagem | Qwen 3.8 27B + contexto |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Monk 1-3 | 164 | 30,49% | 34,15% | 39,63% | 42,68% | 42,07% | 42,07% |
+| Monk 4-6 | 80 | 23,75% | 27,50% | 37,50% | 40,00% | 33,75% | 48,75% |
+| Monk 7-10 | 17 | 11,76% | 17,65% | 29,41% | 35,29% | 47,06% | 47,06% |
 
 Estas taxas são brutas e podem refletir diferenças de doença, fonte e
 qualidade da imagem. Não devem ser interpretadas como prova de fairness.
@@ -400,12 +510,28 @@ Assim:
   menos parâmetros;
 - continua adequado à hipótese central da tese como student oficial.
 
+### Evidência após especialização E1
+
+- E1 Frozen supera o 4B pré-treino nas sete tarefas de diagnóstico comuns;
+- E1 Vision LoRA obtém o melhor agregado comum, 57,28% de micro-accuracy, e
+  supera Frozen por 1,33 pp;
+- Vision LoRA é a melhor condição local no Clinical Context, com 46,74% Top-1
+  em imagem e 47,13% em imagem mais contexto;
+- o ganho visual não é uniforme: Frozen permanece ligeiramente melhor em DDI
+  e DDI Fairness, e o 27B continua melhor em quatro das sete tarefas externas;
+- como seis tarefas DermoBench não foram avaliadas nos checkpoints E1, estes
+  resultados não constituem um score global do DermoBench.
+
 ### Conclusão provisória
 
-O Qwen 3.6 27B é o modelo clinicamente mais forte nas tarefas determinísticas
-disponíveis, mas não é um teacher operacionalmente pronto sem controlo adicional
-de comprimento e formato. O Qwen 3.5 4B é mais fraco em accuracy, porém muito
-mais previsível e barato.
+Antes do fine-tuning, o Qwen 3.6 27B era o modelo clinicamente mais forte na
+maioria das tarefas determinísticas, mas não era um teacher operacionalmente
+pronto sem controlo adicional de comprimento e formato. Depois de três épocas
+label-only, o 4B especializado alcançou melhor agregado nas sete tarefas comuns
+e melhor desempenho no Clinical Context. Esta é evidência favorável à hipótese
+da tese — um SLM especializado pode superar um modelo maior genérico num
+domínio controlado — mas não prova superioridade universal: a direção depende
+da tarefa e o 27B ainda vence quatro das sete tarefas externas.
 
 Ainda não é metodologicamente correto escolher o teacher final apenas com esta
 nota. Faltam os judgments de descrição e rationale, e a cobertura de reasoning
@@ -445,6 +571,13 @@ truncados antes de formar o dataset sintético.
     direta nem um ranking formal.
 13. **Estado da fonte:** o estudo DermoGPT consultado é o arXiv v1 de 5 de
     janeiro de 2026 e deve ser tratado como preprint.
+14. **Cobertura E1 parcial:** as tarefas 1.1, 1.2, 1.3, 1.4, 3.1 e 3.2 não
+    foram avaliadas nos checkpoints E1; “—” não é zero.
+15. **Uma seed E1:** esta comparação usa apenas seed 3407 de treino e uma
+    geração de benchmark por caso; a estabilidade entre seeds ainda não foi
+    demonstrada.
+16. **Agregado sensível ao contrato:** a vantagem agregada do E1 Vision sobre
+    o 27B é ampliada pelo MCQ de 25 opções, onde o 27B teve muitos truncamentos.
 
 ## 10. Fallacy scan
 
@@ -461,8 +594,9 @@ truncados antes de formar o dataset sintético.
 - Regression to the mean: não aplicável a este desenho.
 - Survivorship/attrition: os casos de reasoning ausentes no 27B foram
   explicitamente divulgados e excluídos de um agregado global.
-- Look-elsewhere effect: nove testes determinísticos foram corrigidos por Holm;
-  restantes métricas são exploratórias.
+- Look-elsewhere effect: os nove testes pré-treino e os sete testes E1 versus
+  27B foram corrigidos por Holm nas respetivas famílias; restantes métricas
+  são exploratórias.
 - Garden of forking paths: a temperatura 0,6 foi selecionada numa análise
   anterior e deve ser tratada como configuração de sensibilidade congelada,
   não como um novo teste selado independente.
@@ -474,6 +608,12 @@ truncados antes de formar o dataset sintético.
 
 - `outputs/dermobench_full_v1/temp_0_6_thinking_off/`
 - `outputs/clinical_context_ablation_v1/temp_0_6_thinking_off/`
+- `outputs/qwen_3_8_27b_full_benchmarks/clinical_context_ablation/`
+- `outputs/e1_epoch3_historical_t06_benchmarks/`
+  - E1 Frozen e E1 Vision LoRA, 14 tarefas cada na campanha selecionada;
+  - cópia local verificada contra o RunPod: 227 ficheiros, 499.275.681 bytes;
+  - digest agregado SHA-256:
+    `244eaaaf27c55fa1ed6d51d8dd49a1b68de0a1eb9016ebfd1bb6c9734af574fa`.
 - `runs/benchmarks/dermobench_then_context_controller.log`
 - Ru et al. (2026), arXiv:2601.01868, Tabela 3.
 - Hugging Face `mendicant04/DermoBench`, card e task manifest consultados em

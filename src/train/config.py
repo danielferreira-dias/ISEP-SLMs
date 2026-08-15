@@ -207,7 +207,7 @@ class LoraConfig(StrictConfigModel):
 class TrainerConfig(StrictConfigModel):
     """Fixed SFT optimization budget."""
 
-    epochs: Literal[3] = 3
+    epochs: Literal[3, 5] = 3
     micro_batch_size: Literal[2] = 2
     gradient_accumulation_steps: Literal[4] = 4
     learning_rate: float = Field(default=2e-4, gt=0.0)
@@ -249,6 +249,16 @@ class TrainerConfig(StrictConfigModel):
         if self.seed not in {42, 3407, 2026}:
             raise ValueError("E1 seed must be one of 42, 3407, or 2026")
         return self
+
+
+class ContinuationConfig(StrictConfigModel):
+    """Pinned parent checkpoint for a two-epoch continued-training run."""
+
+    parent_run_directory: StrictPath
+    parent_checkpoint_id: Literal["checkpoint-2367"] = "checkpoint-2367"
+    parent_epoch: Literal[3] = 3
+    additional_epochs: Literal[2] = 2
+    parent_adapter_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 class EvaluationConfig(StrictConfigModel):
@@ -319,6 +329,7 @@ class TrainingConfig(StrictConfigModel):
     model: ModelConfig
     lora: LoraConfig
     trainer: TrainerConfig
+    continuation: ContinuationConfig | None = None
     evaluation: EvaluationConfig = EvaluationConfig()
     artifacts: ArtifactsConfig = ArtifactsConfig()
     project_root: StrictPath = Field(default=Path("."), exclude=True)
@@ -333,6 +344,14 @@ class TrainingConfig(StrictConfigModel):
             raise ValueError(
                 "vision_profile and finetune_vision_layers describe different "
                 "experimental conditions"
+            )
+        if self.continuation is None and self.trainer.epochs != 3:
+            raise ValueError("A five-epoch target requires a continuation checkpoint")
+        if self.continuation is not None and self.trainer.epochs != (
+            self.continuation.parent_epoch + self.continuation.additional_epochs
+        ):
+            raise ValueError(
+                "Continuation target must equal parent plus additional epochs"
             )
         return self
 

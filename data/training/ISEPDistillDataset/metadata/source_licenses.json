@@ -1,0 +1,26 @@
+{
+  "registry_version": "0.2.0",
+  "status": "private_research_release",
+  "default_policy": "exclude_until_explicitly_approved",
+  "sources": [
+    {
+      "source_id": "skincon_annotations",
+      "license_id": "UPSTREAM_ANNOTATION_TERMS",
+      "allowed_role": "private_research_annotation_overlay",
+      "image_terms": "source_dataset_terms_apply"
+    },
+    {
+      "source_id": "fitzpatrick17k",
+      "license_id": "CC_BY_NC_SA_3_0",
+      "allowed_role": "private_noncommercial_research_training",
+      "redistribution_status": "verify_release_packaging_before_including_image_bytes"
+    },
+    {
+      "source_id": "ddi",
+      "license_id": "DDI_RESEARCH_USE_AGREEMENT",
+      "allowed_role": "private_research_training_user_authorized_2026_08_14",
+      "redistribution_status": "private_repository_only_do_not_publish",
+      "benchmark_consequence": "no_longer_independent_external_evaluation_after_training"
+    }
+  ]
+}

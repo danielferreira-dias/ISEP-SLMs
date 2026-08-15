@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import inspect
 import os
+import time
 from collections.abc import Mapping
 from dataclasses import asdict, is_dataclass, replace
+from datetime import UTC, datetime
 from typing import Any
 
 from src.inference.base import (
@@ -16,7 +18,6 @@ from src.inference.base import (
     InferenceResult,
     InferenceSafetyRefusal,
     InferenceTransportError,
-    ReasoningCaptureMode,
     TokenUsage,
     build_reasoning_trace,
     extract_text,
@@ -76,14 +77,10 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         self._client = client
         self._async_client = async_client
         self.default_generation = generation
-        self.reasoning_capture = validate_reasoning_capture(
-            reasoning_capture
-        )
+        self.reasoning_capture = validate_reasoning_capture(reasoning_capture)
         self.embedded_reasoning_parser = embedded_reasoning_parser
         self.use_json_schema = use_json_schema
-        self.chat_template_kwargs = _mapping_values(
-            chat_template_kwargs
-        )
+        self.chat_template_kwargs = _mapping_values(chat_template_kwargs)
         if thinking_control not in {
             None,
             "chat_template",
@@ -129,6 +126,8 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         if self.stream_responses:
             payload["stream"] = True
             payload["stream_options"] = {"include_usage": True}
+        started_utc = datetime.now(UTC).isoformat()
+        started = time.perf_counter()
         try:
             response = self.client.chat.completions.create(**payload)
         except Exception as error:
@@ -145,8 +144,29 @@ class OpenAICompatibleChatBackend(InferenceBackend):
                 f"{self.model_id!r} ({provider_detail})"
             ) from None
         if self.stream_responses:
-            return self._parse_stream_response(response, request)
-        return self._parse_response(response, request)
+            return self._parse_stream_response(
+                response,
+                request,
+                request_started=started,
+                request_started_utc=started_utc,
+            )
+        result = self._parse_response(response, request)
+        completed = time.perf_counter()
+        return replace(
+            result,
+            metadata={
+                **dict(result.metadata),
+                "timing": _timing_metadata(
+                    started_utc=started_utc,
+                    completed_utc=datetime.now(UTC).isoformat(),
+                    total_seconds=completed - started,
+                    ttft_seconds=None,
+                    output_tokens=result.usage.output_tokens,
+                    streamed=False,
+                    stream_chunk_count=None,
+                ),
+            },
+        )
 
     async def acomplete(
         self,
@@ -158,10 +178,10 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         if self.stream_responses:
             payload["stream"] = True
             payload["stream_options"] = {"include_usage": True}
+        started_utc = datetime.now(UTC).isoformat()
+        started = time.perf_counter()
         try:
-            response = await self.async_client.chat.completions.create(
-                **payload
-            )
+            response = await self.async_client.chat.completions.create(**payload)
         except Exception as error:
             details = provider_error_details(error)
             provider_detail = provider_error_summary(details)
@@ -179,13 +199,25 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             return await self._parse_async_stream_response(
                 response,
                 request,
+                request_started=started,
+                request_started_utc=started_utc,
             )
         result = self._parse_response(response, request)
+        completed = time.perf_counter()
         return replace(
             result,
             metadata={
                 **dict(result.metadata),
                 "async_transport": True,
+                "timing": _timing_metadata(
+                    started_utc=started_utc,
+                    completed_utc=datetime.now(UTC).isoformat(),
+                    total_seconds=completed - started,
+                    ttft_seconds=None,
+                    output_tokens=result.usage.output_tokens,
+                    streamed=False,
+                    stream_chunk_count=None,
+                ),
             },
         )
 
@@ -263,12 +295,9 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             return value
         if env_name:
             raise InferenceConfigurationError(
-                f"Environment variable {env_name!r} is required for "
-                f"the {label}"
+                f"Environment variable {env_name!r} is required for the {label}"
             )
-        raise InferenceConfigurationError(
-            f"An inference {label} must be configured"
-        )
+        raise InferenceConfigurationError(f"An inference {label} must be configured")
 
     def _build_payload(
         self,
@@ -325,47 +354,30 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         _apply_chat_generation(
             payload,
             generation,
-            include_reasoning_effort=(
-                self.thinking_control != "openrouter_reasoning"
-            ),
+            include_reasoning_effort=(self.thinking_control != "openrouter_reasoning"),
             include_extended_sampling=self.include_extended_sampling,
             include_seed=self.include_seed,
         )
         extra_body = dict(payload.get("extra_body", {}))
         template_kwargs = dict(self.chat_template_kwargs)
-        configured_template_kwargs = generation.get(
-            "chat_template_kwargs"
-        )
-        template_kwargs.update(
-            _mapping_values(configured_template_kwargs)
-        )
+        configured_template_kwargs = generation.get("chat_template_kwargs")
+        template_kwargs.update(_mapping_values(configured_template_kwargs))
         thinking_mode = generation.get("thinking_mode")
         if thinking_mode not in {None, "enabled", "disabled"}:
-            raise InferenceRequestError(
-                "thinking_mode must be 'enabled' or 'disabled'"
-            )
+            raise InferenceRequestError("thinking_mode must be 'enabled' or 'disabled'")
         reasoning_max_tokens = generation.get("reasoning_max_tokens")
-        if (
-            reasoning_max_tokens is not None
-            and (
-                isinstance(reasoning_max_tokens, bool)
-                or not isinstance(reasoning_max_tokens, int)
-                or reasoning_max_tokens <= 0
-            )
+        if reasoning_max_tokens is not None and (
+            isinstance(reasoning_max_tokens, bool)
+            or not isinstance(reasoning_max_tokens, int)
+            or reasoning_max_tokens <= 0
         ):
             raise InferenceRequestError(
                 "reasoning_max_tokens must be a positive integer"
             )
         thinking_enabled = thinking_mode == "enabled"
-        if (
-            thinking_mode is not None
-            and self.thinking_control == "chat_template"
-        ):
+        if thinking_mode is not None and self.thinking_control == "chat_template":
             template_kwargs["thinking"] = thinking_mode == "enabled"
-        elif (
-            thinking_mode is not None
-            and self.thinking_control == "reasoning_effort"
-        ):
+        elif thinking_mode is not None and self.thinking_control == "reasoning_effort":
             payload["reasoning_effort"] = (
                 "high" if thinking_mode == "enabled" else "none"
             )
@@ -463,9 +475,7 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             final_text = ""
 
         usage = _chat_usage(read_field(response, "usage"))
-        full_reasoning, full_source, summary, summary_source = (
-            _chat_reasoning(message)
-        )
+        full_reasoning, full_source, summary, summary_source = _chat_reasoning(message)
         embedded = separate_embedded_reasoning(
             final_text,
             parser=self.embedded_reasoning_parser,
@@ -488,9 +498,7 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             metadata["provider_model"] = provider_model
         if embedded.parser is not None:
             metadata["embedded_reasoning_parser"] = embedded.parser
-            metadata["embedded_reasoning_block_complete"] = (
-                embedded.complete_block
-            )
+            metadata["embedded_reasoning_block_complete"] = embedded.complete_block
 
         return InferenceResult(
             model_id=self.model_id,
@@ -498,12 +506,8 @@ class OpenAICompatibleChatBackend(InferenceBackend):
             reasoning=reasoning,
             usage=usage,
             request_id=request.request_id,
-            provider_response_id=_optional_string(
-                read_field(response, "id")
-            ),
-            finish_reason=_optional_string(
-                read_field(choice, "finish_reason")
-            ),
+            provider_response_id=_optional_string(read_field(response, "id")),
+            finish_reason=_optional_string(read_field(choice, "finish_reason")),
             metadata=metadata,
         )
 
@@ -511,6 +515,9 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         self,
         response: Any,
         request: InferenceRequest,
+        *,
+        request_started: float | None = None,
+        request_started_utc: str | None = None,
     ) -> InferenceResult:
         """Collect an OpenAI-compatible stream into one normalized result."""
 
@@ -521,16 +528,18 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         finish_reason: str | None = None
         provider_response_id: str | None = None
         provider_model: str | None = None
+        started = request_started or time.perf_counter()
+        started_utc = request_started_utc or datetime.now(UTC).isoformat()
+        first_token_at: float | None = None
+        stream_chunk_count = 0
         close = getattr(response, "close", None)
         try:
             for chunk in response:
-                provider_response_id = (
-                    provider_response_id
-                    or _optional_string(read_field(chunk, "id"))
+                provider_response_id = provider_response_id or _optional_string(
+                    read_field(chunk, "id")
                 )
-                provider_model = (
-                    provider_model
-                    or _optional_string(read_field(chunk, "model"))
+                provider_model = provider_model or _optional_string(
+                    read_field(chunk, "model")
                 )
                 chunk_usage = read_field(chunk, "usage")
                 if chunk_usage is not None:
@@ -539,26 +548,26 @@ class OpenAICompatibleChatBackend(InferenceBackend):
                 if not choices:
                     continue
                 choice = choices[0]
-                current_finish = _optional_string(
-                    read_field(choice, "finish_reason")
-                )
+                current_finish = _optional_string(read_field(choice, "finish_reason"))
                 if current_finish is not None:
                     finish_reason = current_finish
                 delta = read_field(choice, "delta")
                 content = _stream_text(read_field(delta, "content"))
                 if content is not None:
                     content_parts.append(content)
-                reasoning = _stream_text(
+                reasoning_delta = _stream_text(
                     read_field(delta, "reasoning")
                     or read_field(delta, "reasoning_content")
                 )
-                summary = _stream_text(
-                    read_field(delta, "reasoning_summary")
-                )
-                if reasoning is not None:
-                    reasoning_parts.append(reasoning)
-                if summary is not None:
-                    summary_parts.append(summary)
+                summary_delta = _stream_text(read_field(delta, "reasoning_summary"))
+                if reasoning_delta is not None:
+                    reasoning_parts.append(reasoning_delta)
+                if summary_delta is not None:
+                    summary_parts.append(summary_delta)
+                if content or reasoning_delta or summary_delta:
+                    stream_chunk_count += 1
+                    if first_token_at is None:
+                        first_token_at = time.perf_counter()
         except Exception as error:
             details = provider_error_details(error)
             provider_detail = provider_error_summary(details)
@@ -575,6 +584,8 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         finally:
             if callable(close):
                 close()
+        completed = time.perf_counter()
+        completed_utc = datetime.now(UTC).isoformat()
 
         final_text = "".join(content_parts)
         embedded = separate_embedded_reasoning(
@@ -586,35 +597,42 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         if full_reasoning is None and embedded.reasoning_text is not None:
             full_reasoning = embedded.reasoning_text
         full_source = (
-            "stream.delta.reasoning"
-            if reasoning_parts
-            else embedded.reasoning_source
+            "stream.delta.reasoning" if reasoning_parts else embedded.reasoning_source
         )
         summary = "".join(summary_parts) or None
-        reasoning = build_reasoning_trace(
+        reasoning_trace = build_reasoning_trace(
             mode=self.reasoning_capture,
             full_text=full_reasoning,
             summary_text=summary,
             token_count=usage.reasoning_tokens,
             full_source=full_source,
             summary_source=(
-                "stream.delta.reasoning_summary"
-                if summary is not None
-                else None
+                "stream.delta.reasoning_summary" if summary is not None else None
             ),
         )
-        metadata: dict[str, Any] = {"streamed": True}
+        metadata: dict[str, Any] = {
+            "streamed": True,
+            "timing": _timing_metadata(
+                started_utc=started_utc,
+                completed_utc=completed_utc,
+                total_seconds=completed - started,
+                ttft_seconds=(
+                    first_token_at - started if first_token_at is not None else None
+                ),
+                output_tokens=usage.output_tokens,
+                streamed=True,
+                stream_chunk_count=stream_chunk_count,
+            ),
+        }
         if provider_model is not None:
             metadata["provider_model"] = provider_model
         if embedded.parser is not None:
             metadata["embedded_reasoning_parser"] = embedded.parser
-            metadata["embedded_reasoning_block_complete"] = (
-                embedded.complete_block
-            )
+            metadata["embedded_reasoning_block_complete"] = embedded.complete_block
         return InferenceResult(
             model_id=self.model_id,
             final_text=final_text,
-            reasoning=reasoning,
+            reasoning=reasoning_trace,
             usage=usage,
             request_id=request.request_id,
             provider_response_id=provider_response_id,
@@ -626,6 +644,9 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         self,
         response: Any,
         request: InferenceRequest,
+        *,
+        request_started: float | None = None,
+        request_started_utc: str | None = None,
     ) -> InferenceResult:
         """Collect an AsyncOpenAI stream into one normalized result."""
 
@@ -636,16 +657,18 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         finish_reason: str | None = None
         provider_response_id: str | None = None
         provider_model: str | None = None
+        started = request_started or time.perf_counter()
+        started_utc = request_started_utc or datetime.now(UTC).isoformat()
+        first_token_at: float | None = None
+        stream_chunk_count = 0
         close = getattr(response, "close", None)
         try:
             async for chunk in response:
-                provider_response_id = (
-                    provider_response_id
-                    or _optional_string(read_field(chunk, "id"))
+                provider_response_id = provider_response_id or _optional_string(
+                    read_field(chunk, "id")
                 )
-                provider_model = (
-                    provider_model
-                    or _optional_string(read_field(chunk, "model"))
+                provider_model = provider_model or _optional_string(
+                    read_field(chunk, "model")
                 )
                 chunk_usage = read_field(chunk, "usage")
                 if chunk_usage is not None:
@@ -654,26 +677,26 @@ class OpenAICompatibleChatBackend(InferenceBackend):
                 if not choices:
                     continue
                 choice = choices[0]
-                current_finish = _optional_string(
-                    read_field(choice, "finish_reason")
-                )
+                current_finish = _optional_string(read_field(choice, "finish_reason"))
                 if current_finish is not None:
                     finish_reason = current_finish
                 delta = read_field(choice, "delta")
                 content = _stream_text(read_field(delta, "content"))
                 if content is not None:
                     content_parts.append(content)
-                reasoning = _stream_text(
+                reasoning_delta = _stream_text(
                     read_field(delta, "reasoning")
                     or read_field(delta, "reasoning_content")
                 )
-                summary = _stream_text(
-                    read_field(delta, "reasoning_summary")
-                )
-                if reasoning is not None:
-                    reasoning_parts.append(reasoning)
-                if summary is not None:
-                    summary_parts.append(summary)
+                summary_delta = _stream_text(read_field(delta, "reasoning_summary"))
+                if reasoning_delta is not None:
+                    reasoning_parts.append(reasoning_delta)
+                if summary_delta is not None:
+                    summary_parts.append(summary_delta)
+                if content or reasoning_delta or summary_delta:
+                    stream_chunk_count += 1
+                    if first_token_at is None:
+                        first_token_at = time.perf_counter()
         except Exception as error:
             details = provider_error_details(error)
             provider_detail = provider_error_summary(details)
@@ -692,6 +715,8 @@ class OpenAICompatibleChatBackend(InferenceBackend):
                 close_result = close()
                 if inspect.isawaitable(close_result):
                     await close_result
+        completed = time.perf_counter()
+        completed_utc = datetime.now(UTC).isoformat()
 
         final_text = "".join(content_parts)
         embedded = separate_embedded_reasoning(
@@ -703,38 +728,43 @@ class OpenAICompatibleChatBackend(InferenceBackend):
         if full_reasoning is None and embedded.reasoning_text is not None:
             full_reasoning = embedded.reasoning_text
         full_source = (
-            "stream.delta.reasoning"
-            if reasoning_parts
-            else embedded.reasoning_source
+            "stream.delta.reasoning" if reasoning_parts else embedded.reasoning_source
         )
         summary = "".join(summary_parts) or None
-        reasoning = build_reasoning_trace(
+        reasoning_trace = build_reasoning_trace(
             mode=self.reasoning_capture,
             full_text=full_reasoning,
             summary_text=summary,
             token_count=usage.reasoning_tokens,
             full_source=full_source,
             summary_source=(
-                "stream.delta.reasoning_summary"
-                if summary is not None
-                else None
+                "stream.delta.reasoning_summary" if summary is not None else None
             ),
         )
         metadata: dict[str, Any] = {
             "streamed": True,
             "async_transport": True,
+            "timing": _timing_metadata(
+                started_utc=started_utc,
+                completed_utc=completed_utc,
+                total_seconds=completed - started,
+                ttft_seconds=(
+                    first_token_at - started if first_token_at is not None else None
+                ),
+                output_tokens=usage.output_tokens,
+                streamed=True,
+                stream_chunk_count=stream_chunk_count,
+            ),
         }
         if provider_model is not None:
             metadata["provider_model"] = provider_model
         if embedded.parser is not None:
             metadata["embedded_reasoning_parser"] = embedded.parser
-            metadata["embedded_reasoning_block_complete"] = (
-                embedded.complete_block
-            )
+            metadata["embedded_reasoning_block_complete"] = embedded.complete_block
         return InferenceResult(
             model_id=self.model_id,
             final_text=final_text,
-            reasoning=reasoning,
+            reasoning=reasoning_trace,
             usage=usage,
             request_id=request.request_id,
             provider_response_id=provider_response_id,
@@ -751,7 +781,7 @@ def _apply_chat_generation(
     include_extended_sampling: bool = True,
     include_seed: bool = True,
 ) -> None:
-    direct_fields = (
+    direct_fields: tuple[str, ...] = (
         "temperature",
         "top_p",
         "presence_penalty",
@@ -763,8 +793,7 @@ def _apply_chat_generation(
         direct_fields = ("reasoning_effort", *direct_fields)
     if not include_seed:
         direct_fields = tuple(
-            field_name for field_name in direct_fields
-            if field_name != "seed"
+            field_name for field_name in direct_fields if field_name != "seed"
         )
     for field_name in direct_fields:
         value = generation.get(field_name)
@@ -805,12 +834,9 @@ def _chat_reasoning(
             full_text = extract_text(reasoning)
         else:
             full_text = extract_text(
-                read_field(reasoning, "content")
-                or read_field(reasoning, "text")
+                read_field(reasoning, "content") or read_field(reasoning, "text")
             )
-            summary_text = extract_text(
-                read_field(reasoning, "summary")
-            )
+            summary_text = extract_text(read_field(reasoning, "summary"))
         if full_text:
             full_source = "reasoning"
         if summary_text:
@@ -831,27 +857,69 @@ def _chat_reasoning(
 
 def _chat_usage(value: Any) -> TokenUsage:
     input_tokens = safe_optional_int(
-        read_field(value, "prompt_tokens")
-        or read_field(value, "input_tokens")
+        read_field(value, "prompt_tokens") or read_field(value, "input_tokens")
     )
     output_tokens = safe_optional_int(
-        read_field(value, "completion_tokens")
-        or read_field(value, "output_tokens")
+        read_field(value, "completion_tokens") or read_field(value, "output_tokens")
     )
     total_tokens = safe_optional_int(read_field(value, "total_tokens"))
-    details = (
-        read_field(value, "completion_tokens_details")
-        or read_field(value, "output_tokens_details")
+    details = read_field(value, "completion_tokens_details") or read_field(
+        value, "output_tokens_details"
     )
-    reasoning_tokens = safe_optional_int(
-        read_field(details, "reasoning_tokens")
-    )
+    reasoning_tokens = safe_optional_int(read_field(details, "reasoning_tokens"))
     return TokenUsage(
         input_tokens=input_tokens,
         output_tokens=output_tokens,
         total_tokens=total_tokens,
         reasoning_tokens=reasoning_tokens,
     )
+
+
+def _timing_metadata(
+    *,
+    started_utc: str,
+    completed_utc: str,
+    total_seconds: float,
+    ttft_seconds: float | None,
+    output_tokens: int | None,
+    streamed: bool,
+    stream_chunk_count: int | None,
+) -> dict[str, Any]:
+    """Build client-observed timing metrics for one inference request.
+
+    TPOT is derived from provider-reported output-token usage and the elapsed
+    decode window. Stream chunks are not assumed to correspond one-to-one with
+    tokens, so the value is an average rather than a token-level distribution.
+    """
+
+    safe_total = max(0.0, total_seconds)
+    safe_ttft = (
+        min(max(0.0, ttft_seconds), safe_total) if ttft_seconds is not None else None
+    )
+    decode_seconds = max(0.0, safe_total - safe_ttft) if safe_ttft is not None else None
+    tpot_seconds: float | None = None
+    output_tokens_per_second: float | None = None
+    if (
+        decode_seconds is not None
+        and decode_seconds > 0.0
+        and output_tokens is not None
+        and output_tokens > 0
+    ):
+        decoded_intervals = max(output_tokens - 1, 1)
+        output_tokens_per_second = decoded_intervals / decode_seconds
+        tpot_seconds = decode_seconds / decoded_intervals
+    return {
+        "clock": "client_monotonic_perf_counter",
+        "request_started_utc": started_utc,
+        "request_completed_utc": completed_utc,
+        "end_to_end_latency_seconds": safe_total,
+        "time_to_first_token_seconds": safe_ttft,
+        "decode_window_seconds": decode_seconds,
+        "mean_time_per_output_token_seconds": tpot_seconds,
+        "output_tokens_per_second": output_tokens_per_second,
+        "streamed": streamed,
+        "stream_chunk_count": stream_chunk_count,
+    }
 
 
 def _optional_string(value: Any) -> str | None:
@@ -883,9 +951,7 @@ def _provider_error_detail(error: Exception) -> str:
                 details.append(f"code={_compact_error_field(code)}")
             message = provider_error.get("message")
             if isinstance(message, str) and message:
-                details.append(
-                    f"message={_compact_error_field(message)}"
-                )
+                details.append(f"message={_compact_error_field(message)}")
 
     if len(details) == 1:
         message = getattr(error, "message", None)
@@ -897,9 +963,7 @@ def _provider_error_detail(error: Exception) -> str:
         details.append(f"cause={type(cause).__name__}")
         cause_message = str(cause)
         if cause_message:
-            details.append(
-                f"cause_message={_compact_error_field(cause_message)}"
-            )
+            details.append(f"cause_message={_compact_error_field(cause_message)}")
     return "; ".join(details)
 
 

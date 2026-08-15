@@ -1,0 +1,8 @@
+# ISEPDermaBench fixed Validation teacher-screening cohort
+# task: visual_top_k
+# selection_unit: task_id
+# selected_units: 1
+# selected_tasks: 1
+# seed: 42
+# benchmark_release_sha256: 45c857ee52421d30e9da091954dbe9856a598b34b65436d305c587f60b810765
+SCIN_-5633718424385043835_IMAGE_3
