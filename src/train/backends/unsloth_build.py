@@ -217,7 +217,11 @@ def build_sft_config(api: UnslothApi, request: FineTuneRequest) -> object:
         "report_to": "none",
         "save_only_model": False,
         "completion_only_loss": True,
-        "include_tokens_per_second": True,
+        # Transformers 5 replaced the removed ``include_tokens_per_second``
+        # flag with explicit input-token accounting.  Enabling all-token
+        # accounting makes Trainer emit ``train_tokens_per_second`` while
+        # remaining compatible with the pinned TRL 0.24 SFTConfig.
+        "include_num_input_tokens_seen": "all",
     }
     scientific = frozenset(
         {
@@ -246,7 +250,7 @@ def build_sft_config(api: UnslothApi, request: FineTuneRequest) -> object:
             "gradient_checkpointing",
             "remove_unused_columns",
             "completion_only_loss",
-            "include_tokens_per_second",
+            "include_num_input_tokens_seen",
         }
     )
     return invoke(api.sft_config, required_keywords=scientific, **values)

@@ -290,6 +290,11 @@ class TrainBackendContractTests(unittest.TestCase):
         self.assertEqual(sft_config.kwargs["data_seed"], request.trainer.seed)
         self.assertFalse(sft_config.kwargs["save_only_model"])
         self.assertIsNone(sft_config.kwargs["max_length"])
+        self.assertEqual(
+            sft_config.kwargs["include_num_input_tokens_seen"],
+            "all",
+        )
+        self.assertNotIn("include_tokens_per_second", sft_config.kwargs)
 
     def test_runtime_mask_audit_proves_only_label_is_supervised(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

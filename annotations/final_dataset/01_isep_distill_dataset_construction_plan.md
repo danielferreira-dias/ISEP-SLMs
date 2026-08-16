@@ -3,7 +3,7 @@
 | Campo | Valor |
 | --- | --- |
 | Data da decisão | 2026-08-08 |
-| Estado | `diagnosis` e `morphology` v0.3.0; `caption` SkinCAP corrigido em v0.4.1 |
+| Estado | `diagnosis` e `morphology` v0.3.0; `caption` v0.4.1 executado em E2, mas rejeitado para reutilização direta em E3 após auditoria de completude |
 | Student de referência | Qwen 3.5 4B multimodal |
 | Objetivo | construir supervisão multimodal leakage-safe para especializar um modelo pequeno em perceção, descrição e diagnóstico dermatológico, mantendo cada afirmação clínica auditável |
 
@@ -1224,5 +1224,74 @@ Esta arquitetura de dados permite que a tese responda a perguntas causais mais l
 Esta especificação sintetiza a investigação académica e os audits locais registados nas referências internas. A cobertura SKINCON foi reproduzida em 14 de agosto de 2026 e registada em `data/training/ISEPDistillDataset/metadata/skincon_coverage.json`: 3.866 anotações utilizáveis, zero labels upstream em falta, 271 overlaps internos excluídos e 3.595 linhas de morfologia publicadas. O builder versionado materializou ainda as 7.541 linhas de `diagnosis`; os counts, splits, revisões e SHA-256 dos shards ficaram congelados em `metadata/release.json`.
 
 Em 15 de agosto de 2026, após o autor do dataset declarar possuir autorização escrita para criar derivados SkinCAP privados, foi materializada a release aditiva corrigida `isep_distill_dataset_v0.4.1`. A transformação `skincap_observation_prefix_v1` aceitou 3.250 de 3.318 candidatos técnicos: 2.767 em `sft_train` e 483 em `sft_dev`. A auditoria é conjunta sobre `diagnosis`, `morphology` e `caption`, com zero overlap de `leakage_group_id` entre train/dev. Os shards de treino não expõem a caption original, diagnóstico ou sufixo removido; conservam o target filtrado e hashes de proveniência. Como o texto humano original foi produzido com conhecimento do diagnóstico, `target_source=human_caption_gold_conditioned_filtered` e esta condição deve ser comparada como ablação, não apresentada como evidência answer-blind. `structured` e `open_response` continuam por gerar.
+
+Uma auditoria pós-E2 em 16 de agosto de 2026 alterou a interpretação de
+“corrigida”: 1.315 dos 3.250 targets de caption (40,46%) não tinham pontuação
+terminal ou eram semanticamente incompletos, incluindo 234 terminados em
+`It is` e 374 em `which is`. A release v0.4.1 permanece congelada como
+proveniência do E2, mas não deve ser reutilizada diretamente no E3. A evidência
+completa está registada em [E2 completo](../training_steps/04_e2_full_multitask_campaign_and_e1_comparison.md)
+e na [comparação E1–E2](../benchmarks/14_e1_vs_e2_internal_benchmark.md).
+
+## 25. Decisão pós-E2 para Stage A e Stage B no E3
+
+**Stage A e Stage B permanecem no E3.** O resultado do E2 reforça, em vez de
+eliminar, a necessidade da decomposição: o student aprendeu a verbalizar
+achados, mas não aprendeu a integrá-los num diferencial completo. O teacher
+deve, por isso, gerar e validar perceção e inferência como objetos separados
+antes da renderização dos targets.
+
+### Stage A: registo perceptual canónico
+
+- recebe apenas a imagem e instruções de observação; não recebe gold;
+- declara qualidade, avaliabilidade, vistas e limitações;
+- produz observações atómicas com presença, ausência no âmbito observado,
+  incerteza ou não avaliabilidade;
+- gera apenas descrições completas, terminadas em fronteira de frase;
+- falha o quality gate se terminar num fragmento, introduzir diagnóstico ou
+  inventar história/contexto não visível.
+
+Stage A alimenta principalmente `morphology` e `caption`, mas o seu JSON
+canónico também fornece IDs de evidência para Stage B. Não se reutiliza o
+prefixo truncado SkinCAP v0.4.1.
+
+### Stage B: diferencial grounded
+
+- volta a receber a imagem e a saída Stage A congelada;
+- não recebe gold na condição principal answer-blind;
+- declara qualquer correção a Stage A em vez de a alterar silenciosamente;
+- ordena o diferencial e liga cada hipótese a IDs de observações de suporte e
+  contradição;
+- identifica discriminadores em falta, confiança, risco e uma ação permitida;
+- falha o quality gate se apenas descrever a imagem, omitir o diferencial ou
+  referir evidência inexistente.
+
+O `gold_diagnosis` continua a entrar **apenas após as duas gerações**, para
+aceitação/rejeição parcial. Assim, uma Stage A válida pode ser preservada mesmo
+quando Stage B erra, sem transformar a label numa explicação retrospetiva.
+
+### Como chega ao student
+
+As duas stages são obrigatórias no **pipeline do teacher**, não necessariamente
+duas chamadas sequenciais do student em produção. O E3 principal pode treinar
+uma única resposta por tarefa, derivada do registo aceite:
+
+| Target E3 | Origem canónica | O que ensina |
+| --- | --- | --- |
+| `DIAGNOSIS` | gold humano normalizado | classe/ranking diagnóstico |
+| `MORPHOLOGY` | Stage A aceite | conceitos e limitações visíveis |
+| `CAPTION` | rendering completo de Stage A | descrição clínica curta sem fragmentos |
+| `GROUNDED_DIFFERENTIAL` | Stage A + Stage B aceites | descrição, Top-K, evidência, incerteza e discriminadores |
+
+Cada rendering deve ter token/instrução de tarefa inequívoco e um validador de
+completude específico. Uma variante student em duas chamadas pode ser estudada
+depois como ablação, mas não é requisito para demonstrar a utilidade do
+protocolo teacher em duas etapas.
+
+A ação `REQUEST_CLINICAL_CONTEXT` pode permanecer como campo canónico de Stage
+B. No entanto, ensinar e avaliar uma política interativa para pedir contexto
+continua separado como `D4_adaptive_context`, depois de E3 e da seleção do
+student estarem congelados. Esta separação evita confundir melhoria de
+distilação com uma nova capacidade agentic.
 
 O texto foi preparado com assistência de IA e deve ser revisto pelo autor da dissertação. Decisões clínicas, licenças e critérios de revisão especializada exigem validação humana antes da geração ou publicação do dataset.

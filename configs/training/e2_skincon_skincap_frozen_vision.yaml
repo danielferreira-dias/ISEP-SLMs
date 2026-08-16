@@ -1,10 +1,10 @@
-# Confirmatory E2: diagnosis + SKINCON + SkinCAP with visual LoRA enabled.
+# Confirmatory E2: diagnosis + SKINCON + SkinCAP with visual LoRA disabled.
 schema_version: 1
 
 experiment:
-  id: e2_skincon_skincap_unsloth_all
+  id: e2_skincon_skincap_frozen_vision
   phase: e2_skincon
-  vision_profile: unsloth_all
+  vision_profile: frozen_vision
 
 dataset:
   source_directory: data/training/ISEPDermData
@@ -77,7 +77,7 @@ lora:
   target_modules: all-linear
   use_rslora: false
   use_loftq: false
-  finetune_vision_layers: true
+  finetune_vision_layers: false
   finetune_language_layers: true
   finetune_attention_modules: true
   finetune_mlp_modules: true

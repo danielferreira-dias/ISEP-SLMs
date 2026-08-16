@@ -179,6 +179,10 @@ def _validate_known_pair(config_path: Path) -> bool:
             root / "e1_label_frozen_vision_continued.yaml",
             root / "e1_label_unsloth_all_continued.yaml",
         ),
+        (
+            root / "e2_skincon_skincap_frozen_vision.yaml",
+            root / "e2_skincon_skincap_unsloth_all.yaml",
+        ),
     )
     for frozen, visual in pairs:
         if config_path.resolve() in {frozen, visual}:

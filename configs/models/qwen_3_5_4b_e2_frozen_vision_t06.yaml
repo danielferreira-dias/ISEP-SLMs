@@ -1,0 +1,73 @@
+# E2 SKINCON + SkinCAP frozen-vision checkpoint with the historical Qwen profile.
+
+schema_version: 1
+
+model:
+  id: qwen_3_5_4b_e2_frozen_vision_t06
+  display_name: Qwen 3.5 4B E2 SKINCON + SkinCAP (Frozen Vision, t=0.6)
+  family: qwen
+  evaluation_role: candidate
+  training_stage: post_trained
+  task_adaptation_stage: e2_skincon_skincap_lora
+  domain: dermatology
+
+usage:
+  benchmark: true
+  fine_tuning: false
+
+capabilities:
+  modalities:
+    - text
+    - image
+  structured_output_modes:
+    - prompt_only
+    - json_schema
+
+source:
+  type: huggingface
+  repo_id: outputs/merged_models/e2_internal_benchmark_historical_t06_attempt3/qwen_3_5_4b_e2_frozen_vision_epoch3
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  access: private
+  license: apache-2.0
+
+processor:
+  repo_id: Qwen/Qwen3.5-4B
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+
+backend:
+  default_profile: vllm
+  profiles:
+    vllm:
+      type: local
+      engine: vllm
+      device: cuda
+      dtype: bfloat16
+      max_model_len: 32768
+      gpu_memory_utilization: 0.9
+      limit_images_per_prompt: 1
+      request_timeout_seconds: 300
+      model_env: ISEP_E2_FROZEN_REQUEST_MODEL
+      managed: false
+      managed_allowed: false
+
+reasoning:
+  enabled: false
+  parser: qwen3
+  exclude_from_structured_output: true
+  chat_template_kwargs:
+    enable_thinking: false
+
+generation:
+  profile: e2_historical_qwen4b_t06
+  thinking_mode: disabled
+  do_sample: true
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 20
+  min_p: 0.0
+  presence_penalty: 1.5
+  repetition_penalty: 1.0
+  seed: 42
+
+security:
+  trust_remote_code: false

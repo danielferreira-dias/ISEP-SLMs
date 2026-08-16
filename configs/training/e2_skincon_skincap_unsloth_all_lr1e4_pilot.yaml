@@ -1,8 +1,8 @@
-# Confirmatory E2: diagnosis + SKINCON + SkinCAP with visual LoRA enabled.
+# E2 learning-rate pilot: the 1e-4 counterpart of the 2e-4 Vision-LoRA smoke.
 schema_version: 1
 
 experiment:
-  id: e2_skincon_skincap_unsloth_all
+  id: e2_skincon_skincap_unsloth_all_lr1e4_pilot
   phase: e2_skincon
   vision_profile: unsloth_all
 

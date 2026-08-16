@@ -324,7 +324,6 @@ class TrainerConfig(StrictConfigModel):
     @model_validator(mode="after")
     def _validate_fixed_recipe(self) -> TrainerConfig:
         fixed = {
-            "learning_rate": (self.learning_rate, 2e-4),
             "weight_decay": (self.weight_decay, 0.001),
             "warmup_ratio": (self.warmup_ratio, 0.05),
             "max_grad_norm": (self.max_grad_norm, 1.0),
@@ -438,9 +437,18 @@ class TrainingConfig(StrictConfigModel):
             )
         if self.experiment.phase is TrainingPhaseName.E1_LABEL and self.e2 is not None:
             raise ValueError("E1 must not declare an E2 dataset")
+        if (
+            self.experiment.phase is TrainingPhaseName.E1_LABEL
+            and self.trainer.learning_rate != 2e-4
+        ):
+            raise ValueError("E1 fixes learning_rate at 2e-4")
         if self.experiment.phase is TrainingPhaseName.E2_SKINCON and self.e2 is None:
             raise ValueError("E2 requires the pinned ISEPDistillDataset contract")
         if self.experiment.phase is TrainingPhaseName.E2_SKINCON:
+            if self.trainer.learning_rate not in {1e-4, 2e-4}:
+                raise ValueError(
+                    "E2 learning-rate pilots are restricted to 1e-4 or 2e-4"
+                )
             if self.continuation is not None:
                 raise ValueError("Primary E2 starts from the pinned base, not E1")
             if self.trainer.epochs != 3:

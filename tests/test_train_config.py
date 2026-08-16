@@ -85,6 +85,52 @@ class TrainingConfigTests(unittest.TestCase):
             "b215f0474e4931b5951da768e79a0d579d26919d",
         )
 
+    def test_e2_confirmatory_pair_differs_only_in_visual_lora(self) -> None:
+        project_root = Path(__file__).resolve().parents[1]
+        frozen = load_training_config(
+            project_root
+            / "configs"
+            / "training"
+            / "e2_skincon_skincap_frozen_vision.yaml"
+        )
+        visual = load_training_config(
+            project_root
+            / "configs"
+            / "training"
+            / "e2_skincon_skincap_unsloth_all.yaml"
+        )
+
+        self.assertEqual(frozen.trainer.learning_rate, 1e-4)
+        self.assertEqual(visual.trainer.learning_rate, 1e-4)
+        self.assertEqual(frozen.trainer.seed, 42)
+        self.assertEqual(visual.trainer.seed, 42)
+        validate_controlled_pair(frozen, visual)
+
+    def test_e2_lr1e4_pilot_is_valid_without_weakening_e1(self) -> None:
+        project_root = Path(__file__).resolve().parents[1]
+        visual = load_training_config(
+            project_root
+            / "configs"
+            / "training"
+            / "e2_skincon_skincap_unsloth_all_lr1e4_pilot.yaml"
+        )
+        frozen = load_training_config(
+            project_root
+            / "configs"
+            / "training"
+            / "e2_skincon_skincap_frozen_vision_lr1e4_pilot.yaml"
+        )
+
+        self.assertEqual(visual.experiment.phase, TrainingPhaseName.E2_SKINCON)
+        self.assertEqual(visual.trainer.learning_rate, 1e-4)
+        self.assertEqual(frozen.trainer.learning_rate, 1e-4)
+        validate_controlled_pair(frozen, visual)
+
+        e1_document = _minimal_document()
+        e1_document["trainer"] = {"learning_rate": 1e-4}
+        with self.assertRaisesRegex(ValidationError, "E1 fixes learning_rate"):
+            TrainingConfig.model_validate(e1_document, strict=True)
+
     def test_unknown_yaml_field_is_rejected(self) -> None:
         document = _minimal_document()
         document["unexpected"] = True

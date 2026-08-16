@@ -45,10 +45,14 @@ Each annotation should identify:
 11. [Internal Benchmark temperature sensitivity](benchmarks/11_internal_benchmark_temperature_sensitivity.md)
 12. [DermoBench and Clinical Context comparison](benchmarks/12_dermobench_and_clinical_context_qwen_comparison.md)
 13. [Same-hardware E1 quality-efficiency Pareto comparison](benchmarks/13_same_hardware_efficiency_pareto_e1.md)
+14. [ISEPDermaBench: E1 label-only versus E2 multitask](benchmarks/14_e1_vs_e2_internal_benchmark.md)
 
 ## Training steps
 
 1. [E1 label-only: frozen vision versus Vision LoRA](training_steps/01_e1_label_only_vision_lora_ablation.md)
+2. [E1 continued fine-tuning: epochs 4 and 5](training_steps/02_e1_continued_fine_tuning_epochs_4_5.md)
+3. [E2 learning-rate and visual-LoRA smoke pilots](training_steps/03_e2_learning_rate_and_vision_smoke_pilots.md)
+4. [E2 full multitask campaign and E1 comparison](training_steps/04_e2_full_multitask_campaign_and_e1_comparison.md)
 
 ## Final dataset
 
