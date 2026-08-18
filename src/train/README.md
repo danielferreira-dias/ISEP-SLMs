@@ -216,6 +216,12 @@ fabricated.
   vision condition; single-seed runs are pilots. Confirmatory `compare` refuses
   any set other than the paired six runs.
 
-`E1_label` and human-only `E2_skincon` are executable in this version. E3
-teacher supervision, reinforcement learning, QLoRA, crop experiments and
-multi-GPU training require later, separately reviewed phases.
+`E1_label` and human-only `E2_skincon` are executable training phases. E3 now
+has an executable, gated teacher-generation pilot for GPT-5.6 Sol at medium
+reasoning effort, a source-traceable 66-concept Stage-A terminology contract,
+strict Stage-A/Stage-B review contracts, durable progress, and five CPU-tested
+task renderings. It remains absent from the student-training
+phase registry until a versioned teacher release passes the offline preflight,
+one-case external smoke, 100-case generation pilot, and materialization audit.
+Reinforcement learning, QLoRA, crop experiments and multi-GPU training require
+later, separately reviewed phases.

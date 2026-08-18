@@ -46,6 +46,7 @@ Each annotation should identify:
 12. [DermoBench and Clinical Context comparison](benchmarks/12_dermobench_and_clinical_context_qwen_comparison.md)
 13. [Same-hardware E1 quality-efficiency Pareto comparison](benchmarks/13_same_hardware_efficiency_pareto_e1.md)
 14. [ISEPDermaBench: E1 label-only versus E2 multitask](benchmarks/14_e1_vs_e2_internal_benchmark.md)
+15. [MedSigLIP zero-shot on the disease-classification Internal Benchmark](benchmarks/15_medsiglip_zero_shot_internal_benchmark.md)
 
 ## Training steps
 

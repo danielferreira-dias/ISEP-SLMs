@@ -1,0 +1,64 @@
+schema_version: 2
+prompt_id: e3_teacher_stage_a_answer_blind_terminology_v2
+required_lexicon_id: e3_dermatology_terminology_v1
+system_prompt: >-
+  You are producing private research supervision for a dermatology vision
+  model. Inspect only the supplied image. Never infer or name a diagnosis,
+  disease, taxonomy class, private label, clinical history, symptom, palpation
+  finding, test result, management plan, or prognosis. Use the supplied frozen
+  terminology exactly and only within its allowed image modalities. Distinguish
+  visible absence from information that is not shown or not assessable. Return
+  only the JSON object required by the supplied strict schema. Do not include
+  markdown or commentary.
+user_prompt_template: |-
+  Create an answer-blind perceptual record for this image.
+
+  First classify image_modality as clinical_photo, dermoscopy, or unknown from
+  the visible image itself. Never infer modality from a disease hypothesis. A
+  dermoscopy-only concept is forbidden unless image_modality is dermoscopy.
+
+  Use the frozen terminology catalogue {lexicon_id} below. Every observation
+  must copy one exact concept_id and its exact concept_label. Keep observations
+  atomic: colour, border, surface, shape, arrangement, distribution, profile,
+  and primary-lesion type belong in separate observations. concept_detail may
+  add concise visible detail but must not introduce another concept or a
+  diagnosis. For concepts marked conditional, use uncertain or lower confidence
+  whenever the necessary scale, colour reliability, anatomical overview, or
+  profile is unavailable.
+
+  Status semantics:
+  - present: directly visible within the stated scope;
+  - absent_in_observed_scope: specifically searched for and visibly absent only
+    within that scope;
+  - uncertain: the image suggests the concept but does not support a firm claim;
+  - not_assessable: the required visual evidence cannot be evaluated;
+  - not_shown: the relevant anatomical region or view is outside the image.
+
+  Safe field-use examples are illustrative only and must never be copied unless
+  the finding is visible:
+  1. Visible superficial flakes: concept_id=surface_change.scale;
+     concept_label=scale; concept_detail=fine superficial flakes;
+     status=present; scope=index lesion.
+  2. No visible tissue loss within the shown lesion: concept_id=surface_change.ulcer;
+     concept_label=ulcer; concept_detail=null;
+     status=absent_in_observed_scope; scope=shown lesion only.
+  3. A cropped close-up cannot establish body-wide involvement:
+     concept_id=distribution.generalized; concept_label=generalized distribution;
+     concept_detail=null; status=not_assessable; scope=whole-body distribution.
+  4. A possible purple hue under a colour cast: concept_id=color.violaceous;
+     concept_label=violaceous; concept_detail=possible purple hue under colour cast;
+     status=uncertain; confidence=low.
+
+  Forbidden examples include diagnosis-linked wording, such as naming a disease
+  or saying compatible with a disease; non-visible symptoms; and palpation or
+  temporal claims such as firm, fluctuant, warm, painful, itchy, chronic, or
+  rapidly changing.
+
+  Record whether the image is evaluable; available views and quality limits; one
+  dominant visual pattern; observations with stable IDs obs_01, obs_02, and so
+  on; non-assessable features; and one complete clinical caption containing only
+  visible findings. Observation provenance must identify the visible image
+  region or scope. Do not diagnose.
+
+  Frozen terminology catalogue:
+  {lexicon_json}

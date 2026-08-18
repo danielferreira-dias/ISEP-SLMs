@@ -58,14 +58,10 @@ class AzureResponsesBackend(InferenceBackend):
         self.api_version = api_version
         self._client = client
         self.default_generation = generation
-        self.reasoning_capture = validate_reasoning_capture(
-            reasoning_capture
-        )
+        self.reasoning_capture = validate_reasoning_capture(reasoning_capture)
         self.use_json_schema = use_json_schema
         self.reasoning_summary = reasoning_summary
-        self.supports_sampling_parameters = (
-            supports_sampling_parameters
-        )
+        self.supports_sampling_parameters = supports_sampling_parameters
         self.timeout_seconds = timeout_seconds
 
     @property
@@ -85,9 +81,7 @@ class AzureResponsesBackend(InferenceBackend):
         except Exception as error:
             details = provider_error_details(error)
             provider_detail = provider_error_summary(details)
-            detail_suffix = (
-                f" ({provider_detail})" if provider_detail else ""
-            )
+            detail_suffix = f" ({provider_detail})" if provider_detail else ""
             if is_safety_refusal(details):
                 raise InferenceSafetyRefusal(
                     f"Responses API safety refusal for model "
@@ -148,12 +142,9 @@ class AzureResponsesBackend(InferenceBackend):
             return value
         if env_name:
             raise InferenceConfigurationError(
-                f"Environment variable {env_name!r} is required for "
-                f"the Azure {label}"
+                f"Environment variable {env_name!r} is required for the Azure {label}"
             )
-        raise InferenceConfigurationError(
-            f"An Azure {label} must be configured"
-        )
+        raise InferenceConfigurationError(f"An Azure {label} must be configured")
 
     def _build_payload(
         self,
@@ -229,20 +220,22 @@ class AzureResponsesBackend(InferenceBackend):
         response: Any,
         request: InferenceRequest,
     ) -> InferenceResult:
+        refusal_details = _responses_refusal_details(response)
+        if refusal_details is not None:
+            raise InferenceSafetyRefusal(
+                f"Responses API safety refusal for model {self.model_id!r}",
+                details=refusal_details,
+            )
         final_text = extract_text(read_field(response, "output_text"))
         if final_text is None:
-            final_text = _responses_final_text(
-                read_field(response, "output", ())
-            )
+            final_text = _responses_final_text(read_field(response, "output", ()))
         usage = _responses_usage(read_field(response, "usage"))
         summary, summary_source = _responses_reasoning(response)
         # The Responses API exposes an official reasoning summary, not raw
         # chain of thought. In full mode, retain all reasoning information
         # actually returned by the provider: the same official summary.
         full = summary if self.reasoning_capture == "full" else None
-        full_source = (
-            summary_source if self.reasoning_capture == "full" else None
-        )
+        full_source = summary_source if self.reasoning_capture == "full" else None
         reasoning = build_reasoning_trace(
             mode=self.reasoning_capture,
             full_text=full,
@@ -253,13 +246,8 @@ class AzureResponsesBackend(InferenceBackend):
         )
         status = read_field(response, "status")
         incomplete_details = read_field(response, "incomplete_details")
-        incomplete_reason = _optional_string(
-            read_field(incomplete_details, "reason")
-        )
-        truncated = (
-            status == "incomplete"
-            and incomplete_reason == "max_output_tokens"
-        )
+        incomplete_reason = _optional_string(read_field(incomplete_details, "reason"))
+        truncated = status == "incomplete" and incomplete_reason == "max_output_tokens"
         provider_model = read_field(response, "model")
         metadata: dict[str, Any] = {}
         if isinstance(provider_model, str):
@@ -275,12 +263,8 @@ class AzureResponsesBackend(InferenceBackend):
             reasoning=reasoning,
             usage=usage,
             request_id=request.request_id,
-            provider_response_id=_optional_string(
-                read_field(response, "id")
-            ),
-            finish_reason=(
-                "length" if truncated else _optional_string(status)
-            ),
+            provider_response_id=_optional_string(read_field(response, "id")),
+            finish_reason=("length" if truncated else _optional_string(status)),
             metadata=metadata,
         )
 
@@ -302,9 +286,7 @@ def _provider_error_detail(error: Exception) -> str | None:
                 details.append(f"code={_compact_error_field(code)}")
             message = provider_error.get("message")
             if isinstance(message, str) and message:
-                details.append(
-                    f"message={_compact_error_field(message)}"
-                )
+                details.append(f"message={_compact_error_field(message)}")
 
     if len(details) == 1:
         message = getattr(error, "message", None)
@@ -316,9 +298,7 @@ def _provider_error_detail(error: Exception) -> str | None:
         details.append(f"cause={type(cause).__name__}")
         cause_message = str(cause)
         if cause_message:
-            details.append(
-                f"cause_message={_compact_error_field(cause_message)}"
-            )
+            details.append(f"cause_message={_compact_error_field(cause_message)}")
 
     return "; ".join(details) or None
 
@@ -355,6 +335,39 @@ def _responses_final_text(output: Any) -> str | None:
             if (text := extract_text(part)) is not None:
                 text_parts.append(text)
     return "\n".join(text_parts) or None
+
+
+def _responses_refusal_details(response: Any) -> dict[str, Any] | None:
+    """Detect returned refusal objects without retaining refusal prose."""
+
+    incomplete = read_field(response, "incomplete_details")
+    reason = read_field(incomplete, "reason")
+    if isinstance(reason, str) and any(
+        token in reason.casefold()
+        for token in ("content_filter", "content_policy", "safety")
+    ):
+        return {"type": "response_refusal", "code": reason}
+
+    output = read_field(response, "output", ())
+    if not isinstance(output, Sequence) or isinstance(
+        output,
+        (str, bytes, bytearray),
+    ):
+        return None
+    for item in output:
+        content = read_field(item, "content", ())
+        if not isinstance(content, Sequence) or isinstance(
+            content,
+            (str, bytes, bytearray),
+        ):
+            continue
+        for part in content:
+            if read_field(part, "type") == "refusal":
+                return {
+                    "type": "response_refusal",
+                    "code": "provider_refusal",
+                }
+    return None
 
 
 def _responses_reasoning(
@@ -396,9 +409,7 @@ def _responses_usage(value: Any) -> TokenUsage:
     output_tokens = safe_optional_int(read_field(value, "output_tokens"))
     total_tokens = safe_optional_int(read_field(value, "total_tokens"))
     details = read_field(value, "output_tokens_details")
-    reasoning_tokens = safe_optional_int(
-        read_field(details, "reasoning_tokens")
-    )
+    reasoning_tokens = safe_optional_int(read_field(details, "reasoning_tokens"))
     return TokenUsage(
         input_tokens=input_tokens,
         output_tokens=output_tokens,

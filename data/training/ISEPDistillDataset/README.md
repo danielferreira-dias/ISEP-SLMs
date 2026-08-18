@@ -79,18 +79,30 @@ split. This cross-task invariant is checked by the runtime before training.
 
 ## Objective
 
-The dataset will support two controlled thesis phases after the existing
-label-only baseline:
+The dataset supports the completed human-only E2 phase and the future
+teacher-derived E3 phase after the label-only baseline:
 
-- `E2_structured`: supervision for visual concepts, short captions, grounded
-  differentials, evidence links, uncertainty, and next action.
-- `E3_hard_kd`: the best E2 condition plus filtered response targets generated
-  by a frozen open-weight teacher.
+- `E2_skincon`: canonical diagnosis labels, SKINCON visual concepts, and the
+  frozen SkinCAP v0.4.1 caption ablation. The caption release is retained as E2
+  provenance but is not reused directly in E3 after its completeness audit.
+- `E3_hard_kd`: five task-isolated renderings built from answer-blind Stage-A
+  targets, gold-conditioned Stage-B targets, and normalized human diagnosis
+  replay.
 
-The core teacher protocol is answer-blind and two-stage. Stage A describes only
-what is observable in the image. Stage B receives the image and the frozen
-Stage A output, then produces a differential and evidence links. The gold
-diagnosis is used only after generation for filtering and partial acceptance.
+The active teacher protocol is versioned and two-stage. Stage A describes only
+what is observable in the image using the frozen, diagnosis-free
+`e3_dermatology_terminology_v1` catalogue. Observations carry a normalized
+`concept_id`, exact `concept_label`, optional visible detail, and an explicit
+clinical-photo/dermoscopy/unknown modality. Stage B receives the image and the
+frozen Stage A output together with the private normalized gold diagnosis. The
+gold is the required leading diagnostic anchor, but is not visual evidence:
+unsupported claims remain forbidden. Stage B also produces an independent
+information-sufficiency/context decision that asks what would be needed at
+deployment if the label were unknown. Historical answer-blind Stage-B v1
+remains available as an ablation and must never be mixed silently with v2.
+Every attempted teacher call records a typed generation outcome separately from
+scientific review: `succeeded`, `provider_safety_refusal`, `transport_error`,
+`timeout`, `empty_response`, or `invalid_schema`.
 
 ## Configuration roadmap
 
@@ -99,8 +111,11 @@ diagnosis is used only after generation for filtering and partial acceptance.
 | `diagnosis` **released** | One diagnostic task per image | Canonical label | Normalized gold label |
 | `morphology` **released** | One perception task per image | Visible SKINCON concepts | All eligible SKINCON |
 | `caption` **released** | One description task per image | Short visible observation | Authorized, filtered SkinCAP prefix |
-| `structured` | One complete clinical task per image | Observations, differential, evidence, uncertainty, action | Accepted Stage A and Stage B |
-| `open_response` | One open clinical task per image | Short natural-language response consistent with the canonical JSON | Rendering of the accepted structured target |
+| `e3_diagnosis` | One diagnostic task per image | Exact canonical label | Normalized human gold; independent of teacher acceptance |
+| `e3_morphology` | One perception task per image | Stage-A JSON without caption or diagnosis | Accepted answer-blind Stage A |
+| `e3_caption` | One description task per image | Complete clinical caption without diagnosis | Accepted answer-blind Stage A |
+| `e3_grounded_differential` | One integrated task per image | Description, ranked differential, evidence, confidence, limitations and missing discriminators | Accepted Stage A and Stage B |
+| `e3_context_policy` | One policy task per image | Information sufficiency plus `ANSWER_DIFFERENTIAL` or an explicit `REQUEST_CONTEXT` question | Accepted Stage A and Stage B |
 
 The optional `preferences`, feature-distillation, logit-distillation, and
 on-policy artifacts are not part of the first core dataset release.
@@ -128,6 +143,7 @@ excluded by the explicit `configs` manifest above.
 | Identity | `sample_id`, `case_id`, `task_id`, `image_asset_id`, `view_type` |
 | Leakage control | `leakage_group_id`, `split`, `split_inherited_from_e1`, `split_source` where applicable |
 | Provenance | `source_dataset`, `source_sample_id`, `license_id`, `image_sha256` |
+| Teacher call | `generation_status`, `provider`, sanitized request/response IDs, finish reason, provider error code, safety categories |
 | Gold | `disease_id`, `gold_diagnosis`, `gold_provenance`, `taxonomy_version` |
 | Human morphology | `skincon.ontology_version`, `skincon.source_subset`, `skincon.positive_concepts`, `skincon.all_concepts_annotated` |
 | Target | `target_variant`, `target_source`, config-specific structured fields, `messages` |
@@ -158,9 +174,21 @@ an all-null placeholder target.
   as independent external generalization evidence.
 - `caption` contains 3,250 filtered SkinCAP observations. Raw captions,
   diagnoses, and removed suffixes are excluded from trainer-visible shards.
-- `structured` requires accepted Stage A and Stage B components.
-- `open_response` is created only when an accepted canonical structured target
-  can be rendered consistently.
+- `e3_morphology` and `e3_caption` require accepted Stage A only; they remain
+  available when Stage B is rejected.
+- `e3_grounded_differential` requires accepted Stage A and Stage B, valid
+  evidence links, and agreement between the leading accepted differential and
+  private gold after generation.
+- `e3_context_policy` has the same accepted A+B and post-generation gold gate,
+  but reads only the separate Stage-B sufficiency decision and its explicit
+  context requests. This keeps policy supervision measurable and permits an
+  ablation that excludes it without changing diagnostic targets.
+- Context questions are excluded from `e3_grounded_differential`; diagnostic
+  prose is not copied into the context-policy target.
+- Provider safety refusals are `not_applicable` reviews with no target and no
+  clinical rejection reason. A refusal in Stage A prevents Stage B; a refusal
+  in Stage B preserves accepted Stage-A supervision. Provider failures are not
+  retried or rerouted silently and remain excluded from student targets.
 
 The release manifest reports exact shards, hashes, coverage and split counts in
 `metadata/release.json` for v0.3 and
@@ -210,7 +238,7 @@ ISEPDistillDataset/
 
 The Parquet shards were written by the versioned builder after split, license,
 leakage, schema, image-decode, and checksum gates passed. `diagnosis`,
-`morphology`, and `caption` are materialized; `structured` and `open_response`
+`morphology`, and `caption` are materialized; all four `e3_*` configurations
 remain planned configs.
 
 ## Versioning policy

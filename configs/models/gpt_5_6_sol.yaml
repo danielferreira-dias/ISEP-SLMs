@@ -1,0 +1,47 @@
+# Proprietary Azure OpenAI multimodal teacher candidate.
+
+schema_version: 1
+
+model:
+  id: gpt_5_6_sol
+  display_name: GPT-5.6 Sol (Azure)
+  family: gpt
+  evaluation_role: teacher_candidate
+  training_stage: provider_managed
+  task_adaptation_stage: none
+  domain: general
+
+usage:
+  benchmark: true
+  fine_tuning: false
+
+capabilities:
+  modalities:
+    - text
+    - image
+  structured_output_modes:
+    - prompt_only
+    - json_schema
+
+source:
+  type: provider_api
+  provider: openai
+  model_name: gpt-5.6-sol
+
+backend:
+  default_profile: azure
+  profiles:
+    azure:
+      type: api
+      engine: azure_openai
+      api_style: responses
+      endpoint_env: GPT_5_6_SOL_AZURE_ENDPOINT
+      api_key_env: GPT_5_6_SOL_AZURE_API_KEY
+      deployment_env: GPT_5_6_SOL_AZURE_DEPLOYMENT
+
+generation:
+  profile: e3_teacher_medium
+  reasoning_effort: medium
+
+security:
+  trust_remote_code: false

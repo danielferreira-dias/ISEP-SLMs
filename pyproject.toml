@@ -23,6 +23,8 @@ dependencies = [
 
 [project.scripts]
 isep-benchmark = "src.benchmark.cli:main"
+isep-e3-progress = "src.train.e3.progress_cli:main"
+isep-e3-teacher = "src.train.e3.generation_cli:main"
 isep-train = "src.train.cli:main"
 
 [tool.setuptools.packages.find]

@@ -682,6 +682,45 @@ class OpenAICompatibleBackendTests(unittest.TestCase):
 
 
 class ResponsesBackendTests(unittest.TestCase):
+    def test_returned_responses_refusal_is_typed_without_refusal_text(
+        self,
+    ) -> None:
+        secret_refusal = "private provider refusal explanation"
+        response = SimpleNamespace(
+            id="resp_refusal",
+            status="completed",
+            incomplete_details=None,
+            output_text=None,
+            output=[
+                SimpleNamespace(
+                    type="message",
+                    content=[
+                        SimpleNamespace(
+                            type="refusal",
+                            refusal=secret_refusal,
+                        )
+                    ],
+                )
+            ],
+            usage=None,
+        )
+        backend = AzureResponsesBackend(
+            model_id="gpt",
+            client=_FakeClient(responses_response=response),
+        )
+
+        with self.assertRaises(InferenceSafetyRefusal) as context:
+            backend.generate_result(
+                system_prompt="System",
+                user_prompt="User",
+                image_bytes=b"image",
+                schema={},
+            )
+
+        self.assertEqual(context.exception.details["code"], "provider_refusal")
+        self.assertNotIn(secret_refusal, str(context.exception))
+        self.assertNotIn(secret_refusal, str(context.exception.details))
+
     def test_content_policy_error_becomes_structured_safety_refusal(
         self,
     ) -> None:

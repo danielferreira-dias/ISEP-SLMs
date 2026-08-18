@@ -534,7 +534,13 @@ O pilot deve ser estratificado por classe, source, dificuldade, qualidade de ima
 | `G3_answer_blind_two_stage` | A vê imagem. B vê imagem + A. Nenhuma vê gold | a decomposição auditável melhora grounding sem hindsight? |
 | `G4_gold_conditioned` | A answer-blind. B recebe gold | quanto da melhoria é racionalização condicionada pela resposta? |
 
-`G3` é a proposta principal. `G4` deve ser guardada como braço experimental separado, nunca misturada silenciosamente com o corpus answer-blind.
+O desenho inicialmente proposto tratava `G3` como condição principal e `G4`
+como braço experimental. A decisão de 17 de agosto de 2026 inverte esta ordem
+para a construção do corpus: `G4` passa a ser a condição operacional principal,
+porque o piloto answer-blind desperdiçou demasiados outputs Stage B cujo
+diagnóstico principal não coincidia com o gold. `G3` permanece como controlo
+científico para medir diagnóstico independente. As duas condições nunca podem
+ser misturadas silenciosamente.
 
 A comparação `G3` versus `G4` existe porque os dois processos respondem a perguntas diferentes. SkinGPT-R1 usa uma descrição inicial sem diagnóstico e uma rationale posterior condicionada pelo gold ([Shen et al., 2025](https://arxiv.org/abs/2511.15242)); esse desenho pode produzir explicações pedagogicamente úteis, mas também pode racionalizar retrospetivamente a resposta. SkinFlow fornece outro precedente para descrever antes de diagnosticar ([Liu et al., 2026](https://arxiv.org/abs/2601.09136)). A proposta ISEP mantém a descrição inicial, mas esconde o gold também da inferência principal, permitindo medir separadamente o benefício de decomposição e o benefício artificial de conhecer a resposta.
 
@@ -543,6 +549,10 @@ O pilot deve medir acceptance rate, erros de schema, unsupported claims, concord
 ### Fase 3: gerar Etapa A answer-blind
 
 O input permitido contém imagem, modalidade conhecida e instruções de output. Não contém `gold_diagnosis`, caption que revele a doença, disease-specific metadata, texto de benchmark ou respostas anteriores.
+
+A terminologia da descrição é congelada antes das chamadas ao teacher; não existe pesquisa web por amostra. A primeira versão usa a [revisão ILDS de 2016](https://www.ilds.org/what-we-do/project-and-programme/glossary-for-dermatology-terms/) como fonte principal da morfologia clínica, com a [AAD](https://www.aad.org/member/education/residents/bdc/morphology) e a [DermNet](https://dermnetnz.org/topics/terminology) como verificação do esquema descritivo. Os elementos dermatoscópicos vêm do [terceiro consenso da International Dermoscopy Society](https://pubmed.ncbi.nlm.nih.gov/26896294/) e só podem ser usados quando a própria imagem é classificada como dermatoscopia. O manifest regista `lexicon_id`, SHA-256 do recurso, fontes, versão do prompt e hash do prompt já renderizado com o catálogo.
+
+Cada observação usa `concept_id`, `concept_label` canónico e `concept_detail` opcional. O schema do provider enumera os IDs permitidos e a validação local rejeita conceito desconhecido, label divergente e conceito incompatível com a modalidade. Os exemplos do prompt ensinam apenas a mecânica do contrato — presença visível, ausência limitada ao campo observado, não-avaliabilidade e incerteza cromática — sem associar padrões a doenças. Palpação, sintomas, evolução e outros factos não visíveis continuam proibidos.
 
 A geração deve ser determinista ou de baixa variabilidade na primeira release. Se forem produzidos vários candidatos, o número e a estratégia de seleção devem ser congelados antes de olhar para o resultado final. Não se deve escolher retrospetivamente a resposta que coincide com o gold sem registar esse processo.
 
@@ -1118,7 +1128,7 @@ Feature KD, on-policy distillation, Vision LoRA, multi-scale ou `FDLinear` só a
 
 | Risco | Consequência | Controlo |
 | --- | --- | --- |
-| Gold leakage | rationales convincentes mas não fiéis à imagem | answer-blind nas Etapas A/B e comparação com gold apenas depois |
+| Hindsight no Stage B gold-conditioned | rationales convincentes mas sem apoio visual | Stage A answer-blind; evidence IDs obrigatórios; claims sem suporte tratados como discriminadores em falta; provenance `gold_visible_to_teacher`; controlo G3 answer-blind |
 | Teacher hallucination | sinais, história ou exames inventados | evidence IDs, provenance, schema e revisão |
 | Dataset composto por casos fáceis | falsa melhoria e pior generalização | acceptance report estratificado e revisão de rejeitados |
 | Duplicados entre treino e benchmark | estimativa otimista | exact/perceptual hashing e split por grupo |
@@ -1170,7 +1180,7 @@ O dataset card deve explicar que respostas sintéticas são supervisão gerada e
 
 O `ISEPDistillDataset` deve ser construído como um conjunto de targets clínicos curtos, separados por capacidade e ligados por provenance. A mesma imagem terá várias respostas porque ensina várias tarefas. Não porque se pretende apresentar respostas alternativas indistinguíveis ao student.
 
-A decisão mais defensável é usar multi-step reasoning no teacher como protocolo externo de geração e verificação, mantendo o target do student compacto. A Etapa A answer-blind protege o valor científico da experiência. A Etapa B volta a observar a imagem e liga hipóteses a evidência. O gold filtra depois. JSON e resposta aberta coexistem, mas em tarefas distintas e com consistência obrigatória.
+A decisão mais defensável é usar multi-step reasoning no teacher como protocolo externo de geração e verificação, mantendo o target do student compacto. A Etapa A answer-blind protege o valor perceptual da experiência. Na condição operacional v2, a Etapa B volta a observar a imagem, recebe o gold privado como âncora e liga hipóteses a evidência; a condição G3 sem gold preserva a medição de diagnóstico independente. JSON e resposta aberta coexistem, mas em tarefas distintas e com consistência obrigatória.
 
 SKINCON é imediatamente útil para supervisionar visão e morfologia. SkinCAP/SkinCoT são úteis apenas depois de resolver licença, overlap e gold-conditioning. SkinFlow reforça a prioridade de descrição visual, mas o seu `FDLinear` deve permanecer uma ablation. Para aproximar a visão do Qwen 4B à do Qwen 27B, o dataset é necessário mas não suficiente. Será preciso testar adaptação visual ou feature distillation no treino do modelo.
 
@@ -1258,7 +1268,8 @@ prefixo truncado SkinCAP v0.4.1.
 ### Stage B: diferencial grounded
 
 - volta a receber a imagem e a saída Stage A congelada;
-- não recebe gold na condição principal answer-blind;
+- na condição operacional v2 recebe o `gold_diagnosis` privado como âncora
+  diagnóstica obrigatória; a condição v1 answer-blind permanece como controlo;
 - declara qualquer correção a Stage A em vez de a alterar silenciosamente;
 - ordena o diferencial e liga cada hipótese a IDs de observações de suporte e
   contradição;
@@ -1266,9 +1277,15 @@ prefixo truncado SkinCAP v0.4.1.
 - falha o quality gate se apenas descrever a imagem, omitir o diferencial ou
   referir evidência inexistente.
 
-O `gold_diagnosis` continua a entrar **apenas após as duas gerações**, para
-aceitação/rejeição parcial. Assim, uma Stage A válida pode ser preservada mesmo
-quando Stage B erra, sem transformar a label numa explicação retrospetiva.
+O `gold_diagnosis` não entra no Stage A nem em qualquer input do student. No
+Stage B v2, entra como âncora privada para impedir que o custo de geração seja
+gasto em rationales de uma classe errada. Conhecer a âncora não autoriza
+evidência retrospetiva: cada afirmação visual continua ligada ao Stage A ou é
+declarada como discriminador em falta. A política de contexto é decidida em
+separado, perguntando se a imagem seria suficiente em deployment sem acesso à
+âncora. `gold_visible_to_teacher=true` fica registado na provenance e a taxa de
+match Top-1 passa a significar **anchor compliance**, não accuracy diagnóstica
+answer-blind.
 
 ### Como chega ao student
 

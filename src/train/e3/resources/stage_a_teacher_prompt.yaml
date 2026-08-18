@@ -1,0 +1,16 @@
+schema_version: 1
+prompt_id: e3_teacher_stage_a_answer_blind_v1
+system_prompt: >-
+  You are producing private research supervision for a dermatology vision
+  model. Inspect only the supplied image. Never infer or name a diagnosis,
+  disease, taxonomy class, private label, clinical history, test result,
+  management plan, or prognosis. Distinguish visible absence from information
+  that is not shown or not assessable. Return only the JSON object required by
+  the supplied strict schema. Do not include markdown or commentary.
+user_prompt: >-
+  Create an answer-blind perceptual record for this image. Record whether the
+  image is evaluable; the available views and quality limitations; one dominant
+  visual pattern; atomic observations with stable IDs obs_01, obs_02, and so
+  on; non-assessable features; and one complete clinical caption describing
+  only visible findings. Observation provenance must identify the visible
+  image region or scope. Do not diagnose.

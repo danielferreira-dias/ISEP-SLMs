@@ -1,0 +1,536 @@
+schema_version: 1
+lexicon_id: e3_dermatology_terminology_v1
+language: en
+scope: >-
+  Answer-blind, image-observable terminology for clinical dermatology photographs
+  and confirmed dermoscopy. Definitions are concise research adaptations of the
+  cited standards; disease examples and diagnosis-linked metaphors are excluded.
+
+sources:
+  - source_id: ilds_2016
+    title: The 2016 International League of Dermatological Societies' revised glossary for the description of cutaneous lesions
+    organization: International League of Dermatological Societies
+    publication_year: 2016
+    url: https://www.ilds.org/what-we-do/project-and-programme/glossary-for-dermatology-terms/
+    accessed_on: 2026-08-16
+    role: Primary international consensus for clinical lesion morphology, distribution, shape, surface, and profile terminology.
+  - source_id: aad_morphology
+    title: Learning module - Morphology
+    organization: American Academy of Dermatology
+    url: https://www.aad.org/member/education/residents/bdc/morphology
+    accessed_on: 2026-08-16
+    role: Systematic clinical description framework and educational cross-check.
+  - source_id: dermnet_terminology
+    title: Terminology in dermatology
+    organization: DermNet New Zealand Trust
+    url: https://dermnetnz.org/topics/terminology
+    accessed_on: 2026-08-16
+    role: Clinical cross-check for distribution, configuration, colour, morphology, surface, and secondary change.
+  - source_id: ids_2016
+    title: Standardization of terminology in dermoscopy/dermatoscopy - Results of the third consensus conference of the International Society of Dermoscopy
+    organization: International Dermoscopy Society
+    publication_year: 2016
+    url: https://pubmed.ncbi.nlm.nih.gov/26896294/
+    accessed_on: 2026-08-16
+    role: Consensus source for descriptive dermoscopic elements; enabled only for confirmed dermoscopy.
+
+concepts:
+  - concept_id: primary_lesion.macule
+    label: macule
+    category: primary_lesion
+    definition: Circumscribed flat colour change without visible elevation.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Distinguishing macule from patch by size requires a trustworthy scale.
+  - concept_id: primary_lesion.patch
+    label: patch
+    category: primary_lesion
+    definition: Larger circumscribed flat colour change without visible elevation.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Distinguishing patch from macule by size requires a trustworthy scale.
+  - concept_id: primary_lesion.papule
+    label: papule
+    category: primary_lesion
+    definition: Small, visibly elevated solid lesion.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, aad_morphology]
+    usage_note: Use uncertainty when elevation or the size boundary cannot be established from the available view.
+  - concept_id: primary_lesion.plaque
+    label: plaque
+    category: primary_lesion
+    definition: Broad circumscribed lesion that is visibly elevated or thickened.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, aad_morphology]
+    usage_note: Use uncertainty when thickness or the size boundary cannot be established from the image.
+  - concept_id: primary_lesion.nodule
+    label: nodule
+    category: primary_lesion
+    definition: Larger solid lesion with visible elevation or apparent depth.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: An image cannot confirm palpability, consistency, mobility, or subcutaneous depth.
+  - concept_id: primary_lesion.vesicle
+    label: vesicle
+    category: primary_lesion
+    definition: Small circumscribed lesion with visibly fluid-like contents.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Distinguishing vesicle from bulla by size requires a trustworthy scale.
+  - concept_id: primary_lesion.bulla
+    label: bulla
+    category: primary_lesion
+    definition: Larger circumscribed lesion with visibly fluid-like contents.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Distinguishing bulla from vesicle by size requires a trustworthy scale.
+  - concept_id: primary_lesion.pustule
+    label: pustule
+    category: primary_lesion
+    definition: Circumscribed lesion with visibly opaque pale or yellow contents.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Do not infer infection from appearance alone.
+
+  - concept_id: surface_change.scale
+    label: scale
+    category: surface_change
+    definition: Visible superficial keratin forming flakes or flat plates.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: surface_change.crust
+    label: crust
+    category: surface_change
+    definition: Dried material visibly adherent to the skin surface.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Do not infer whether the material is serum, blood, or pus unless visually supported.
+  - concept_id: surface_change.erosion
+    label: erosion
+    category: surface_change
+    definition: Superficial visible loss of epidermal surface.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Depth is often uncertain in a single two-dimensional image.
+  - concept_id: surface_change.ulcer
+    label: ulcer
+    category: surface_change
+    definition: Visible tissue loss extending deeper than a superficial erosion.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Use uncertainty when depth cannot be established.
+  - concept_id: surface_change.fissure
+    label: fissure
+    category: surface_change
+    definition: Narrow linear split in the skin surface.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: surface_change.lichenification
+    label: lichenification
+    category: surface_change
+    definition: Visible thickening with accentuated skin markings.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Describe the visible pattern without inferring chronic scratching.
+  - concept_id: surface_change.atrophy
+    label: atrophy
+    category: surface_change
+    definition: Visibly thinned or depressed skin relative to adjacent skin.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: An image cannot establish the affected tissue layer or palpation findings.
+  - concept_id: surface_change.scar
+    label: scar
+    category: surface_change
+    definition: Visibly altered fibrous-appearing area replacing normal surface architecture.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Do not infer the cause or age of the change.
+
+  - concept_id: color.erythematous
+    label: erythematous
+    category: color
+    definition: Red or pink hue relative to nearby skin.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Respect the recorded colour reliability and variation across skin tones and illumination.
+  - concept_id: color.violaceous
+    label: violaceous
+    category: color
+    definition: Purple or violet hue relative to nearby skin.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: color.brown
+    label: brown
+    category: color
+    definition: Predominantly brown visible pigmentation.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: color.black
+    label: black
+    category: color
+    definition: Predominantly black visible pigmentation.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: color.blue
+    label: blue
+    category: color
+    definition: Predominantly blue visible pigmentation.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: color.gray
+    label: gray
+    category: color
+    definition: Predominantly gray visible pigmentation.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: color.white
+    label: white
+    category: color
+    definition: Predominantly white visible area or structure.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: color.yellow
+    label: yellow
+    category: color
+    definition: Predominantly yellow visible area or structure.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: color.hypopigmented
+    label: hypopigmented
+    category: color
+    definition: Lighter pigmentation than the adjacent reference skin without complete visible pigment loss.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [dermnet_terminology]
+  - concept_id: color.depigmented
+    label: depigmented
+    category: color
+    definition: Area appearing to have complete or near-complete pigment loss relative to adjacent skin.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [dermnet_terminology]
+    usage_note: Use uncertainty when lighting, exposure, or skin-tone reference is inadequate.
+  - concept_id: color.multicolored
+    label: multicolored
+    category: color
+    definition: Two or more visibly distinct colour regions within the observed lesion.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: conditional
+    source_ids: [ilds_2016, ids_2016]
+
+  - concept_id: border.well_circumscribed
+    label: well circumscribed
+    category: border
+    definition: Distinct visible transition between involved and adjacent skin.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016]
+  - concept_id: border.poorly_circumscribed
+    label: poorly circumscribed
+    category: border
+    definition: Indistinct visible transition between involved and adjacent skin.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016]
+  - concept_id: border.regular
+    label: regular border
+    category: border
+    definition: Border with relatively uniform contour and spacing around the observed lesion.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [aad_morphology, dermnet_terminology]
+  - concept_id: border.irregular
+    label: irregular border
+    category: border
+    definition: Border with visibly nonuniform contour or spacing around the observed lesion.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [aad_morphology, dermnet_terminology]
+
+  - concept_id: shape.annular
+    label: annular
+    category: shape
+    definition: Ring-shaped configuration with relative central clearing.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: shape.arciform
+    label: arciform
+    category: shape
+    definition: Curved configuration forming part of a ring.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016]
+  - concept_id: shape.polycyclic
+    label: polycyclic
+    category: shape
+    definition: Configuration formed by adjoining or coalescing ring-like contours.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: shape.serpiginous
+    label: serpiginous
+    category: shape
+    definition: Wavy, progressively curving outline.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: shape.oval
+    label: oval
+    category: shape
+    definition: Rounded shape elongated along one axis.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016]
+  - concept_id: shape.polygonal
+    label: polygonal
+    category: shape
+    definition: Outline with multiple visible angles or straight segments.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016]
+  - concept_id: shape.reticulate
+    label: reticulate
+    category: shape
+    definition: Net-like or lacy visible configuration.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: shape.round
+    label: round
+    category: shape
+    definition: Approximately circular visible outline.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+
+  - concept_id: profile.domed
+    label: domed
+    category: profile
+    definition: Hemispherical visible elevation in profile.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Requires a view that supports surface profile assessment.
+  - concept_id: profile.flat_topped
+    label: flat topped
+    category: profile
+    definition: Elevated lesion with a visibly level upper surface.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Requires a view that supports surface profile assessment.
+  - concept_id: profile.umbilicated
+    label: umbilicated
+    category: profile
+    definition: Visible small central depression within an elevated lesion.
+    allowed_modalities: [clinical_photo]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: profile.verruciform
+    label: verruciform
+    category: profile
+    definition: Surface with multiple visible wart-like projections.
+    allowed_modalities: [clinical_photo]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+
+  - concept_id: arrangement.grouped
+    label: grouped
+    category: arrangement
+    definition: Multiple lesions visibly clustered within the observed field.
+    allowed_modalities: [clinical_photo]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: arrangement.linear
+    label: linear arrangement
+    category: arrangement
+    definition: Multiple lesions aligned along an approximately straight or curved line.
+    allowed_modalities: [clinical_photo]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: arrangement.discrete
+    label: discrete
+    category: arrangement
+    definition: Multiple lesions separated by visibly unaffected skin.
+    allowed_modalities: [clinical_photo]
+    image_observability: direct
+    source_ids: [dermnet_terminology]
+  - concept_id: arrangement.confluent
+    label: confluent
+    category: arrangement
+    definition: Adjacent lesions visibly merging into a larger area.
+    allowed_modalities: [clinical_photo]
+    image_observability: direct
+    source_ids: [dermnet_terminology]
+
+  - concept_id: distribution.acral
+    label: acral distribution
+    category: distribution
+    definition: Visible involvement of distal extremities or other acral sites.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Requires sufficient anatomical context to identify the site.
+  - concept_id: distribution.asymmetrical
+    label: asymmetrical distribution
+    category: distribution
+    definition: Lesion distribution lacking symmetry across an assessable axis.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Requires an anatomical overview containing the comparison axis.
+  - concept_id: distribution.dermatomal
+    label: dermatomal distribution
+    category: distribution
+    definition: Segmental band-like distribution compatible with a visible cutaneous territory.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Requires adequate anatomical coverage; do not infer innervation from a cropped close-up.
+  - concept_id: distribution.generalized
+    label: generalized distribution
+    category: distribution
+    definition: Visible lesions involving most of the assessable body surface.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Requires a broad anatomical overview.
+  - concept_id: distribution.extensor
+    label: extensor distribution
+    category: distribution
+    definition: Visible involvement of extensor aspects of the limbs or joints.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Requires sufficient anatomical context to identify the surface.
+  - concept_id: distribution.flexural
+    label: flexural distribution
+    category: distribution
+    definition: Visible involvement of flexural aspects or skin folds.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016, dermnet_terminology]
+    usage_note: Requires sufficient anatomical context to identify the surface.
+  - concept_id: distribution.follicular_perifollicular
+    label: follicular or perifollicular distribution
+    category: distribution
+    definition: Visible localization within or immediately around hair follicles.
+    allowed_modalities: [clinical_photo, dermoscopy]
+    image_observability: direct
+    source_ids: [ilds_2016, dermnet_terminology]
+  - concept_id: distribution.localized
+    label: localized distribution
+    category: distribution
+    definition: Visible lesions confined to one or a few assessable anatomical areas.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Do not infer localization from a cropped image that excludes the rest of the body.
+  - concept_id: distribution.palmar_plantar
+    label: palmar or plantar distribution
+    category: distribution
+    definition: Visible involvement of palms, soles, or both.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Requires sufficient anatomical context to identify palm or sole.
+  - concept_id: distribution.periorificial
+    label: periorificial distribution
+    category: distribution
+    definition: Visible localization around an identifiable body opening.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Requires sufficient anatomical context to identify the opening.
+  - concept_id: distribution.symmetrical
+    label: symmetrical distribution
+    category: distribution
+    definition: Lesion distribution showing symmetry across an assessable axis.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Requires an anatomical overview containing the comparison axis.
+  - concept_id: distribution.unilateral
+    label: unilateral distribution
+    category: distribution
+    definition: Visible lesions confined to one side of an assessable anatomical region.
+    allowed_modalities: [clinical_photo]
+    image_observability: conditional
+    source_ids: [ilds_2016]
+    usage_note: Requires an anatomical overview containing both sides or a clear midline reference.
+
+  - concept_id: dermoscopy_element.line
+    label: dermoscopic line
+    category: dermoscopy_element
+    definition: Elongated dermoscopic structure whose length clearly exceeds its width.
+    allowed_modalities: [dermoscopy]
+    image_observability: direct
+    source_ids: [ids_2016]
+  - concept_id: dermoscopy_element.dot
+    label: dermoscopic dot
+    category: dermoscopy_element
+    definition: Small, approximately round dermoscopic structure.
+    allowed_modalities: [dermoscopy]
+    image_observability: direct
+    source_ids: [ids_2016]
+  - concept_id: dermoscopy_element.clod
+    label: dermoscopic clod
+    category: dermoscopy_element
+    definition: Solid circumscribed dermoscopic structure larger than a dot.
+    allowed_modalities: [dermoscopy]
+    image_observability: direct
+    source_ids: [ids_2016]
+  - concept_id: dermoscopy_element.circle
+    label: dermoscopic circle
+    category: dermoscopy_element
+    definition: Curved dermoscopic line forming a complete or near-complete loop.
+    allowed_modalities: [dermoscopy]
+    image_observability: direct
+    source_ids: [ids_2016]
+  - concept_id: dermoscopy_element.pseudopod
+    label: dermoscopic pseudopod
+    category: dermoscopy_element
+    definition: Bulbous dermoscopic projection connected to a line at the lesion edge.
+    allowed_modalities: [dermoscopy]
+    image_observability: direct
+    source_ids: [ids_2016]
+  - concept_id: dermoscopy_element.structureless_zone
+    label: dermoscopic structureless zone
+    category: dermoscopy_element
+    definition: Dermoscopic area lacking a dominant repeated basic element.
+    allowed_modalities: [dermoscopy]
+    image_observability: direct
+    source_ids: [ids_2016]
+  - concept_id: dermoscopy_element.vessel
+    label: dermoscopic vessel
+    category: dermoscopy_element
+    definition: Visible vascular structure assessed by morphology and arrangement under dermoscopy.
+    allowed_modalities: [dermoscopy]
+    image_observability: direct
+    source_ids: [ids_2016]

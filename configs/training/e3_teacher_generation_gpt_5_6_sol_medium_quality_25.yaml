@@ -1,0 +1,45 @@
+# Frozen configuration for the 25-case E3 teacher quality slice.
+
+schema_version: 1
+
+campaign:
+  id: e3-gpt-5-6-sol-medium-quality-25-20260816
+
+model:
+  config: configs/models/gpt_5_6_sol.yaml
+  required_model_id: gpt_5_6_sol
+  reasoning_effort: medium
+  structured_output_mode: json_schema
+
+dataset:
+  release_root: data/training/ISEPDistillDataset
+  release_manifest: data/training/ISEPDistillDataset/metadata/release.json
+  taxonomy: data/training/ISEPDermData/metadata/taxonomy.json
+  config: diagnosis
+  splits:
+    - sft_train
+    - sft_dev
+  selection:
+    strategy: stratified_round_robin
+    seed: 42
+    pilot_samples: 25
+    max_per_leakage_group: 1
+
+prompts:
+  stage_a: src/train/e3/resources/stage_a_teacher_prompt_v2.yaml
+  stage_b: src/train/e3/resources/stage_b_teacher_prompt.yaml
+
+terminology:
+  resource: src/train/e3/resources/dermatology_terminology_v1.yaml
+  required_lexicon_id: e3_dermatology_terminology_v1
+
+generation:
+  stage_a_max_output_tokens: 2400
+  stage_b_max_output_tokens: 3600
+  sequential: true
+  retries: 0
+  stop_on_transport_error: true
+
+integrity:
+  verify_selected_shard_sha256: true
+  verify_image_sha256: true

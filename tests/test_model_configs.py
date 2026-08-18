@@ -71,6 +71,7 @@ class TypedModelConfigTests(unittest.TestCase):
             "gemini_3_5_flash_lite_openrouter",
             "gemini_3_7_flash_medium_openrouter",
             "gpt_5_6_luna",
+            "gpt_5_6_sol",
             "mimo_v2_5_openrouter",
             "minimax_m3_openrouter",
             "qwen_3_5_4b",
@@ -79,6 +80,8 @@ class TypedModelConfigTests(unittest.TestCase):
             "qwen_3_5_4b_e1_vision_lora",
             "qwen_3_5_4b_e1_vision_lora_attribution",
             "qwen_3_5_4b_e1_vision_lora_t06",
+            "qwen_3_5_4b_e2_frozen_vision_t06",
+            "qwen_3_5_4b_e2_vision_lora_t06",
             "qwen_3_6_27b",
             "qwen_3_7_flash_openrouter",
             "qwen_3_8_27b",
@@ -87,8 +90,8 @@ class TypedModelConfigTests(unittest.TestCase):
         self.assertEqual({item.model.id for item in configs}, expected_ids)
         local = [item for item in configs if isinstance(item, LocalModelConfig)]
         api = [item for item in configs if isinstance(item, AzureModelConfig)]
-        self.assertEqual(len(local), 8)
-        self.assertEqual(len(api), 7)
+        self.assertEqual(len(local), 10)
+        self.assertEqual(len(api), 8)
         for config in local:
             profile = config.backend.active_profile
             self.assertIn(profile.engine, {"vllm", "transformers"})
@@ -101,6 +104,28 @@ class TypedModelConfigTests(unittest.TestCase):
             "json_schema",
             model.capabilities.structured_output_modes,
         )
+
+    def test_sol_azure_profile_is_multimodal_responses_api(self) -> None:
+        sol = load_model_config("gpt_5_6_sol", root=ROOT)
+        self.assertEqual(sol.model.display_name, "GPT-5.6 Sol (Azure)")
+        self.assertEqual(sol.source.model_name, "gpt-5.6-sol")
+        self.assertEqual(sol.backend.active_profile.engine, "azure_openai")
+        self.assertEqual(sol.backend.active_profile.api_style, "responses")
+        self.assertEqual(
+            sol.backend.active_profile.endpoint_env,
+            "GPT_5_6_SOL_AZURE_ENDPOINT",
+        )
+        self.assertEqual(
+            sol.backend.active_profile.deployment_env,
+            "GPT_5_6_SOL_AZURE_DEPLOYMENT",
+        )
+        self.assertEqual(
+            sol.backend.active_profile.api_key_env,
+            "GPT_5_6_SOL_AZURE_API_KEY",
+        )
+        self.assertEqual(sol.capabilities.modalities, ("text", "image"))
+        self.assertEqual(sol.generation.profile, "e3_teacher_medium")
+        self.assertEqual(sol.generation.reasoning_effort, "medium")
 
     def test_openrouter_profiles_use_explicit_provider_model_slugs(self) -> None:
         expected = {
