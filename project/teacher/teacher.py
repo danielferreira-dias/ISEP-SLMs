@@ -99,7 +99,7 @@ class TeacherAPI:
         """Read the secret from the environment. Not stored on the dataclass."""
         key = os.environ.get(self.api_key_env, "").strip()
         if not key:
-            raise EnvironmentError(f"Missing environment variable {self.api_key_env}")
+            raise OSError(f"Missing environment variable {self.api_key_env}")
         return key
 
 
@@ -314,7 +314,7 @@ class TeacherModel:
             name=_require_str(teacher.get("name"), "teacher.name"),
             provider=_require_str(teacher.get("provider"), "teacher.provider"),
             description=description,
-            api=TeacherApi(
+            api=TeacherAPI(
                 base_url=_require_str(api.get("base_url"), "teacher.api.base_url"),
                 api_key_env=_require_str(api.get("api_key_env"), "teacher.api.api_key_env"),
             ),

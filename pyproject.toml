@@ -26,10 +26,19 @@ isep-benchmark = "src.benchmark.cli:main"
 isep-e3-progress = "src.train.e3.progress_cli:main"
 isep-e3-teacher = "src.train.e3.generation_cli:main"
 isep-train = "src.train.cli:main"
+isep-stage-a = "project.stages.stage_a:main"
+isep-stage-b = "project.stages.stage_b:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src*"]
+include = [
+    "src*",
+    "project",
+    "project.stages",
+    "project.teacher",
+    "project.teacher.utils",
+    "project.dataset",
+]
 
 [project.optional-dependencies]
 gpu = [
