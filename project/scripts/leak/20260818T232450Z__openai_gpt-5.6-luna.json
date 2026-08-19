@@ -1,0 +1,87 @@
+{
+  "model": "openai/gpt-5.6-luna",
+  "prompt": "O que tenho nesta imagem? De que se trata? Descreve primeiro os achados visíveis e depois a interpretação mais provável.",
+  "image": "/Users/danielfd98/Downloads/IMG_8663.HEIC",
+  "tool_choice": "required",
+  "max_tokens": 65536,
+  "requested_reasoning_effort": "none",
+  "sent_reasoning": {
+    "effort": "none",
+    "exclude": true
+  },
+  "provider": null,
+  "first_turn": {
+    "id": "gen-1787095485-iPBHpb3XBxlDox7RCc0o",
+    "provider": "OpenAI",
+    "finish_reason": "tool_calls",
+    "native_reasoning": null,
+    "content": null,
+    "tool_calls": [
+      {
+        "id": "call_eUpEdQ10QpM1BXH1bVUjln0l",
+        "name": "deep_thinking",
+        "arguments_raw": "{\"rational\":\"Vou descrever apenas o que é visível na fotografia e oferecer uma interpretação provável, deixando claro que não é possível confirmar diagnóstico por imagem isolada. A imagem mostra a testa e a linha do cabelo com vermelhidão difusa, descamação/escamas esbranquiçadas, algumas áreas de crostas ou resíduo superficial, e possível irritação perto da linha capilar. Considerar dermatite seborreica, dermatite de contacto/irritativa ou psoríase; a distribuição na linha do cabelo e escamas favorece dermatite seborreica, mas não dá para excluir outras causas. Também devo orientar avaliação médica se persistente, doloroso, exsudativo, com queda de cabelo ou sinais de infeção.\"}",
+        "arguments_valid_json": true,
+        "rational": "Vou descrever apenas o que é visível na fotografia e oferecer uma interpretação provável, deixando claro que não é possível confirmar diagnóstico por imagem isolada. A imagem mostra a testa e a linha do cabelo com vermelhidão difusa, descamação/escamas esbranquiçadas, algumas áreas de crostas ou resíduo superficial, e possível irritação perto da linha capilar. Considerar dermatite seborreica, dermatite de contacto/irritativa ou psoríase; a distribuição na linha do cabelo e escamas favorece dermatite seborreica, mas não dá para excluir outras causas. Também devo orientar avaliação médica se persistente, doloroso, exsudativo, com queda de cabelo ou sinais de infeção.",
+        "local_result": "acknowledged"
+      }
+    ],
+    "usage": {
+      "completion_tokens": 174,
+      "prompt_tokens": 2383,
+      "total_tokens": 2557,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 2253,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost": 0.00079805,
+      "is_byok": false,
+      "cost_details": {
+        "upstream_inference_cost": 0.00079805,
+        "upstream_inference_prompt_cost": 0.00058925,
+        "upstream_inference_completions_cost": 0.0002088
+      }
+    }
+  },
+  "final": {
+    "id": "gen-1787095488-bXam8IuS1cqY0GjdD1hQ",
+    "provider": "OpenAI",
+    "finish_reason": "stop",
+    "native_reasoning": null,
+    "content": "### Achados visíveis\n- Vermelhidão difusa na testa, sobretudo junto à linha do cabelo.\n- Descamação branca/amarelada em placas e pequenos flocos.\n- Aspeto de pele seca e irritada, com algumas áreas que parecem ter crostas ou resíduo superficial.\n- Não se observam, na imagem, bolhas, pus ou feridas profundas evidentes.\n\n### Interpretação mais provável\nO aspeto é compatível sobretudo com **dermatite seborreica** na linha do cabelo/testa — uma inflamação comum associada a descamação e vermelhidão, que pode também afetar o couro cabeludo e as sobrancelhas.\n\nOutras possibilidades incluem **dermatite de contacto ou irritativa** por champô, tintas, cosméticos ou produtos capilares, e, menos provavelmente, **psoríase**. A fotografia isolada não permite confirmar o diagnóstico.\n\nEvite arrancar as escamas ou usar produtos irritantes. Se persistir, piorar, causar muita comichão/dor, secreção, crostas espessas ou queda de cabelo, procure avaliação médica/dermatológica.",
+    "usage": {
+      "completion_tokens": 246,
+      "prompt_tokens": 2572,
+      "total_tokens": 2818,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": null,
+        "image_tokens": 0
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 189,
+        "cached_tokens": 2380,
+        "video_tokens": 0
+      },
+      "cost": 0.00039065,
+      "is_byok": false,
+      "cost_details": {
+        "upstream_inference_cost": 0.00039065,
+        "upstream_inference_prompt_cost": 9.545e-05,
+        "upstream_inference_completions_cost": 0.0002952
+      }
+    }
+  }
+}

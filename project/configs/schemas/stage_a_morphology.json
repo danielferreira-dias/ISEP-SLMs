@@ -1,0 +1,204 @@
+{
+  "title": "dermatology_morphology",
+  "description": "Stage A teacher output. Visual findings only. No diagnosis, no gold label, no disease-associated inference. Palpation and unseen body sites are not_assessable, not invented.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "image_quality",
+    "modality",
+    "primary_lesion",
+    "size",
+    "color",
+    "shape",
+    "border",
+    "surface",
+    "secondary_morphology",
+    "configuration",
+    "distribution",
+    "additional_features"
+  ],
+  "properties": {
+    "image_quality": {
+      "type": "string",
+      "description": "Whether the image is sufficient for a visual description. not_evaluable requires remaining fields to be not_assessable or empty.",
+      "enum": ["evaluable", "limited", "not_evaluable"]
+    },
+    "modality": {
+      "type": "string",
+      "description": "Acquisition type. Dermoscopic signs in additional_features are allowed only when this is dermoscopy.",
+      "enum": ["clinical", "dermoscopy", "unknown"]
+    },
+    "primary_lesion": {
+      "type": "string",
+      "description": "Dominant primary lesion morphology. Pigmentation belongs in color. Scale, crust and ulceration belong in secondary_morphology unless the presenting lesion is itself an ulcer or erosion.",
+      "enum": [
+        "macule",
+        "patch",
+        "papule",
+        "plaque",
+        "nodule",
+        "tumor",
+        "vesicle",
+        "bulla",
+        "pustule",
+        "wheal",
+        "cyst",
+        "comedo",
+        "burrow",
+        "ulcer",
+        "erosion",
+        "not_assessable"
+      ]
+    },
+    "size": {
+      "type": "string",
+      "description": "Approximate size in the frame. Do not invent millimetres. cannot_assess if there is no scale or the crop prevents judgement.",
+      "enum": [
+        "cannot_assess",
+        "punctate",
+        "few_mm",
+        "about_1_cm",
+        "few_cm",
+        "large_or_extensive"
+      ]
+    },
+    "color": {
+      "type": "array",
+      "description": "Visible colours. Use not_assessable as the only item when colour cannot be judged.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "brown",
+          "black",
+          "red",
+          "pink",
+          "purple",
+          "blue",
+          "gray",
+          "white",
+          "yellow",
+          "orange",
+          "skin-colored",
+          "hypopigmented",
+          "not_assessable"
+        ]
+      }
+    },
+    "shape": {
+      "type": "string",
+      "description": "Form or symmetry of the individual lesion. Arrangement of multiple lesions belongs in configuration.",
+      "enum": [
+        "round",
+        "oval",
+        "irregular",
+        "symmetric",
+        "asymmetric",
+        "not_assessable"
+      ]
+    },
+    "border": {
+      "type": "string",
+      "description": "Visible margin / demarcation of the lesion.",
+      "enum": [
+        "well-defined",
+        "ill-defined",
+        "regular",
+        "irregular",
+        "raised",
+        "fading",
+        "not_assessable"
+      ]
+    },
+    "surface": {
+      "type": "string",
+      "description": "Contour or texture that is not a named secondary change. Do not infer palpation.",
+      "enum": [
+        "flat",
+        "elevated",
+        "smooth",
+        "keratotic",
+        "verrucous",
+        "exudative",
+        "not_assessable"
+      ]
+    },
+    "secondary_morphology": {
+      "type": "array",
+      "description": "Visible secondary surface changes. Empty if none are clearly present.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "scale",
+          "crust",
+          "erosion",
+          "ulceration",
+          "fissure",
+          "lichenification",
+          "excoriation",
+          "atrophy"
+        ]
+      }
+    },
+    "configuration": {
+      "type": "string",
+      "description": "How lesions are arranged in the visible field, not the inferred full-body pattern.",
+      "enum": [
+        "solitary",
+        "grouped",
+        "clustered",
+        "annular",
+        "arcuate",
+        "linear",
+        "serpiginous",
+        "polycyclic",
+        "targetoid",
+        "scattered",
+        "disseminated",
+        "not_assessable"
+      ]
+    },
+    "distribution": {
+      "type": "string",
+      "description": "Body-site pattern that is actually visible. Do not infer unseen sites.",
+      "enum": [
+        "localized",
+        "generalized",
+        "acral",
+        "flexural",
+        "extensor",
+        "photodistributed",
+        "intertriginous",
+        "dermatomal",
+        "not_assessable"
+      ]
+    },
+    "additional_features": {
+      "type": "array",
+      "description": "Optional extra visual signs. Empty if none are clearly visible. Dermoscopic-only signs (blue-white veil, pigment network, atypical pigment network, dots and globules, streaks, regression structures, structureless area, shiny white lines, milia-like cysts) require modality=dermoscopy.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "heterogeneous pigmentation",
+          "homogeneous pigmentation",
+          "blue-white veil",
+          "pigment network",
+          "atypical pigment network",
+          "dots and globules",
+          "streaks",
+          "regression structures",
+          "structureless area",
+          "shiny white lines",
+          "telangiectasia",
+          "milia-like cysts",
+          "follicular plugging",
+          "central scar",
+          "satellite lesions",
+          "collarette scale",
+          "purpura",
+          "necrosis",
+          "weeping"
+        ]
+      }
+    }
+  }
+}

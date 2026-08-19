@@ -1,0 +1,53 @@
+evaluation:
+  quality:
+    internal_classification:
+      enabled: true
+      direction: maximize
+
+    internal_morphology:
+      enabled: true
+      direction: maximize
+
+    dermobench:
+      enabled: true
+      direction: maximize
+
+    medqa:
+      enabled: true
+      direction: maximize
+      role: retention
+
+    mmlu_medical:
+      enabled: true
+      direction: maximize
+      role: retention
+
+  efficiency:
+    cost_per_1000_cases:
+      direction: minimize
+
+    latency_p50_ms:
+      direction: minimize
+
+    latency_p95_ms:
+      direction: minimize
+
+    throughput_cases_per_second:
+      direction: maximize
+
+    peak_vram_gb:
+      direction: minimize
+
+  composite:
+    dermatology_quality:
+      internal_classification: 0.30
+      internal_morphology: 0.30
+      dermobench: 0.40
+
+  pareto:
+    plots:
+      - x: cost_per_1000_cases
+        y: dermatology_quality
+
+      - x: latency_p95_ms
+        y: dermatology_quality

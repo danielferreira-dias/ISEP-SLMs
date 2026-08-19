@@ -1,0 +1,54 @@
+description: >
+  Teacher config for Stage A (morphology) and Stage B (reasoning).
+  Calls OpenRouter google/gemini-3.7-flash and pins routing to
+  Google Vertex only. The same teacher is invoked twice: A is
+  answer-blind; B receives the frozen A record plus the gold
+  diagnosis as a private anchor. Stage B must not regenerate
+  morphology.
+
+teacher:
+  name: gemini_3_7_flash
+  provider: openrouter
+
+  api:
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+
+  model:
+    id: "google/gemini-3.7-flash"
+    multimodal: true
+
+  routing:
+    only: [google-vertex]
+    allow_fallbacks: false
+    require_parameters: true
+
+  generation:
+    max_tokens: 16384
+    seed: 42
+
+  reasoning:
+    effort: "high"
+    exclude: true
+
+  output:
+    structured: true
+    stages:
+      A:
+        name: morphology
+        prompt_ref: configs/teacher_configs/prompts/stage_a.md
+        response_format:
+          type: json_schema
+          json_schema:
+            name: dermatology_morphology
+            strict: true
+            schema_ref: configs/schemas/stage_a_morphology.json
+      B:
+        name: reasoning
+        prompt_ref: configs/teacher_configs/prompts/stage_b.md
+        response_format:
+          type: json_schema
+          json_schema:
+            name: dermatology_reasoning
+            strict: true
+            schema_ref: configs/schemas/stage_b_reasoning.json
