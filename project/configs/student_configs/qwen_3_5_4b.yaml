@@ -1,0 +1,169 @@
+# Student model configuration
+# Target: multimodal dermatology SFT with Qwen3.5-4B + Unsloth
+#
+# Sources:
+# - https://unsloth.ai/docs/models/qwen3.5/fine-tune
+# - https://unsloth.ai/docs/basics/vision-fine-tuning
+# - https://huggingface.co/Qwen/Qwen3.5-4B
+#
+# Notes:
+# - Qwen3.5-4B is a 4B causal LM with a vision encoder.
+# - Unsloth recommends BF16/16-bit LoRA for Qwen3.5.
+# - 4-bit QLoRA is intentionally disabled here because Unsloth currently
+#   advises against QLoRA for Qwen3.5 due to larger quantization differences.
+
+student:
+  name: "qwen3_5_4b_dermatology"
+  backend: "unsloth"
+
+  model:
+    # Optimized Unsloth loader repository.
+    id: "unsloth/Qwen3.5-4B"
+    link_unsloth_qwen: https://huggingface.co/unsloth/Qwen3.5-4B
+
+    # Canonical upstream model for provenance / experiment tracking.
+    canonical_id: "Qwen/Qwen3.5-4B"
+    link_qwen: https://huggingface.co/Qwen/Qwen3.5-4B
+
+    architecture: "vision_language_model"
+    parameter_count: "4B"
+    multimodal: true
+
+    # Start small for training stability and VRAM usage.
+    # Increase to 4096+ only after the baseline run is stable.
+    max_seq_length: 2048
+
+    fast_inference: false
+    full_finetuning: false
+
+  precision:
+    # Recommended for Qwen3.5 LoRA training by Unsloth.
+    load_in_16bit: true
+    load_in_4bit: false
+    load_in_8bit: false
+
+    # Let runtime select BF16 when supported, FP16 otherwise.
+    bf16: "auto"
+    fp16_fallback: true
+
+  vision:
+    enabled: true
+
+    # Dermatology is a visual domain shift, so keep vision adaptation enabled.
+    finetune_vision_layers: true
+    finetune_language_layers: true
+    finetune_attention_modules: true
+    finetune_mlp_modules: true
+
+    data_collator: "UnslothVisionDataCollator"
+
+    preprocessing:
+      # Unsloth recommends roughly 300–1000 px images for practical
+      # vision fine-tuning efficiency.
+      recommended_min_dimension_px: 300
+      recommended_max_dimension_px: 1000
+      resize: "min"
+
+  lora:
+    enabled: true
+
+    # Recommended Unsloth baseline.
+    r: 16
+    lora_alpha: 16
+    lora_dropout: 0.0
+    bias: "none"
+
+    # Apply LoRA broadly across major linear layers.
+    target_modules: "all-linear"
+
+    modules_to_save:
+      - "lm_head"
+      - "embed_tokens"
+
+    use_rslora: false
+    loftq_config: null
+
+    # Unsloth-specific gradient checkpointing reduces VRAM usage.
+    use_gradient_checkpointing: "unsloth"
+
+    random_state: 42
+
+  training:
+    stage: "sft"
+
+    # Memory-safe baseline for multimodal training.
+    # Increase batch size if the GPU has sufficient VRAM.
+    per_device_train_batch_size: 1
+    gradient_accumulation_steps: 8
+
+    # Start with one full epoch; 1–3 epochs is the usual Unsloth range.
+    num_train_epochs: 3
+
+    # Generic Unsloth SFT baseline.
+    # For thesis ablations, also test 1e-4 and 5e-5.
+    learning_rate: 2.0e-4
+
+    optimizer: "adamw_8bit"
+    weight_decay: 0.01
+
+    warmup_ratio: 0.05
+    lr_scheduler_type: "linear"
+
+    max_length: 2048
+
+    # Required/recommended for multimodal datasets in TRL/Unsloth.
+    remove_unused_columns: false
+    dataset_text_field: ""
+    skip_prepare_dataset: true
+
+    seed: 3407
+
+  evaluation:
+    enabled: true
+    strategy: "steps"
+    eval_steps: 100
+
+    # Keep checkpoint selection reproducible.
+    load_best_model_at_end: true
+    metric_for_best_model: "eval_loss"
+    greater_is_better: false
+
+  checkpointing:
+    output_dir: "outputs/qwen3_5_4b_dermatology_sft"
+    save_strategy: "steps"
+    save_steps: 100
+    save_total_limit: 3
+
+    save_lora_only: true
+
+  logging:
+    logging_steps: 10
+    report_to: "none"
+
+  reproducibility:
+    seed: 3407
+
+  # Suggested hyperparameter sweep after establishing the baseline.
+  sweep:
+    enabled: false
+
+    learning_rate:
+      - 2.0e-4
+      - 1.0e-4
+      - 5.0e-5
+
+    lora_r:
+      - 16
+      - 32
+
+    lora_alpha:
+      - 16
+      - 32
+
+    num_train_epochs:
+      - 1
+      - 2
+
+    max_seq_length:
+      - 2048
+      - 4096

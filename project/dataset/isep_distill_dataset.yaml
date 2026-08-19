@@ -1,0 +1,9 @@
+dataset:
+  huggingface:
+    repo_id: "danielfdias98/ISEPDistillDataset"
+    revision: "main"
+    token_env: "HF_TOKEN"
+
+  loading:
+    config: "auto"
+    split: "auto"
