@@ -2,22 +2,26 @@
 
 import argparse
 import logging
+from collections.abc import Iterable
 from pathlib import Path
 
 from pydantic import ValidationError
 
+from project.dataset.examples import (
+    DistillExample,
+    examples_from_manifest,
+    iter_distill_examples,
+)
 from project.teacher.client import StageCompleter, TeacherClient, TeacherCompletionError
-from project.teacher.utils.images import encode_image_data_url
-from project.teacher.utils.jsonl import append_jsonl, completed_ids, load_manifest
 from project.teacher.schemas import (
     ImageSample,
-    ManifestRow,
     RecordStatus,
     StageAFileRow,
-    image_sample_from_manifest,
     parse_stage_a,
 )
-from project.teacher.teacher import DEFAULT_CONFIG, TeacherModel
+from project.teacher.teacher import DEFAULT_CONFIG, PROJECT_ROOT, TeacherModel
+from project.teacher.utils.images import encode_pil_image_data_url
+from project.teacher.utils.jsonl import append_jsonl, completed_ids
 
 LOGGER = logging.getLogger("project.stages")
 
@@ -103,20 +107,21 @@ def run_stage_a(
     *,
     teacher: TeacherModel,
     completer: StageCompleter,
-    manifest_path: Path,
+    examples: Iterable[DistillExample],
     output_path: Path,
     limit: int | None = None,
     resume: bool = True,
 ) -> int:
-    """Generate Stage A for each remaining manifest row.
+    """Generate Stage A for each remaining example.
 
     Resume skips sample ids that already have ``status=ok``. ``--limit``
-    counts remaining work, not the first N manifest lines.
+    counts remaining work, not the first N examples. Gold on the example
+    is not sent to the teacher.
 
     Args:
         teacher: Loaded YAML config.
         completer: Stage A completer.
-        manifest_path: Input JSONL.
+        examples: Hub or manifest examples.
         output_path: Destination JSONL.
         limit: Optional cap on new attempts.
         resume: Skip ids already ok in ``output_path``.
@@ -124,19 +129,18 @@ def run_stage_a(
     Returns:
         Count of rows written with ``status=error``.
     """
-    rows = load_manifest(manifest_path)
     skip = completed_ids(output_path) if resume else set()
     failures = 0
     attempted = 0
 
-    for row in rows:
-        if row.sample_id in skip:
+    for example in examples:
+        if example.sample_id in skip:
             continue
         if limit is not None and attempted >= limit:
             break
 
         attempted += 1
-        record = _generate_one(teacher, completer, row)
+        record = _generate_one(teacher, completer, example)
         append_jsonl(output_path, record)
         if record.status is RecordStatus.ERROR:
             failures += 1
@@ -147,23 +151,26 @@ def run_stage_a(
 def _generate_one(
     teacher: TeacherModel,
     completer: StageCompleter,
-    row: ManifestRow,
+    example: DistillExample,
 ) -> StageAFileRow:
-    """Encode one image and run Stage A. Gold on ``row`` is not passed through."""
-    sample = image_sample_from_manifest(row, project_root=teacher.project_root)
+    """Encode one PIL image and run Stage A. Gold is not passed through."""
+    sample = ImageSample(
+        sample_id=example.sample_id,
+        image_path=Path(example.source_ref),
+    )
 
     try:
-        image_data_url = encode_image_data_url(sample.image_path)
-    except (FileNotFoundError, ValueError) as exc:
-        LOGGER.exception("Stage A image failed for %s", sample.sample_id)
+        image_data_url = encode_pil_image_data_url(example.image)
+    except (TypeError, ValueError, OSError) as exc:
+        LOGGER.exception("Stage A image failed for %s", example.sample_id)
         return StageAFileRow(
-            sample_id=sample.sample_id,
+            sample_id=example.sample_id,
             status=RecordStatus.ERROR,
             morphology=None,
             error=_short_error(exc),
             usage=None,
             teacher=teacher.name,
-            image_path=str(sample.image_path),
+            image_path=example.source_ref,
         )
 
     return generate_morphology(completer, teacher, sample, image_data_url)
@@ -177,9 +184,20 @@ def _short_error(exc: BaseException) -> str:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse Stage A CLI arguments."""
     parser = argparse.ArgumentParser(description="Generate Stage A morphology JSONL.")
-    parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=PROJECT_ROOT / "data" / "morphology" / "stage_a.jsonl",
+    )
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument("--hub-config", default="diagnosis")
+    parser.add_argument("--hub-split", default="sft_train")
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=None,
+        help="Optional JSONL of local files. Default is ISEPDistillDataset.",
+    )
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
         "--no-resume",
@@ -190,7 +208,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> None:
-    """Load config, run Stage A, exit 1 if any sample failed."""
+    """Load the Hub dataset (or a manifest), run Stage A, exit 1 on errors."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(levelname)s %(name)s: %(message)s",
@@ -198,10 +216,20 @@ def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
     teacher = TeacherModel.from_yaml(args.config)
     completer = TeacherClient(teacher)
+    if args.manifest is not None:
+        examples: Iterable[DistillExample] = examples_from_manifest(
+            args.manifest,
+            project_root=teacher.project_root,
+        )
+    else:
+        examples = iter_distill_examples(
+            config=args.hub_config,
+            split=args.hub_split,
+        )
     failures = run_stage_a(
         teacher=teacher,
         completer=completer,
-        manifest_path=args.manifest,
+        examples=examples,
         output_path=args.output,
         limit=args.limit,
         resume=not args.no_resume,

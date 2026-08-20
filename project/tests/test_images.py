@@ -5,7 +5,10 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from project.teacher.utils.images import encode_image_data_url
+from project.teacher.utils.images import (
+    encode_image_data_url,
+    encode_pil_image_data_url,
+)
 
 
 def test_encode_png_returns_jpeg_data_url(tmp_path: Path) -> None:
@@ -26,3 +29,9 @@ def test_encode_heic_raises(tmp_path: Path) -> None:
 def test_missing_image_raises(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
         encode_image_data_url(tmp_path / "missing.jpg")
+
+
+def test_encode_pil_image_data_url() -> None:
+    image = Image.new("RGB", (64, 32), "blue")
+    url = encode_pil_image_data_url(image, max_side=32)
+    assert url.startswith("data:image/jpeg;base64,")

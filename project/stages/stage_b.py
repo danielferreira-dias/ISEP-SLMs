@@ -2,21 +2,18 @@
 
 import argparse
 import logging
+from collections.abc import Iterable
 from pathlib import Path
 
 from pydantic import ValidationError
 
-from project.teacher.client import StageCompleter, TeacherClient, TeacherCompletionError
-from project.teacher.utils.images import encode_image_data_url
-from project.teacher.utils.jsonl import (
-    append_jsonl,
-    completed_ids,
-    index_ok_stage_a,
-    load_manifest,
-    load_stage_a_rows,
+from project.dataset.examples import (
+    DistillExample,
+    examples_from_manifest,
+    iter_distill_examples,
 )
+from project.teacher.client import StageCompleter, TeacherClient, TeacherCompletionError
 from project.teacher.schemas import (
-    ManifestRow,
     RecordStatus,
     StageAFileRow,
     StageAMorphology,
@@ -24,7 +21,14 @@ from project.teacher.schemas import (
     UsageInfo,
     parse_stage_b,
 )
-from project.teacher.teacher import DEFAULT_CONFIG, TeacherModel
+from project.teacher.teacher import DEFAULT_CONFIG, PROJECT_ROOT, TeacherModel
+from project.teacher.utils.images import encode_pil_image_data_url
+from project.teacher.utils.jsonl import (
+    append_jsonl,
+    completed_ids,
+    index_ok_stage_a,
+    load_stage_a_rows,
+)
 from project.teacher.validate import validate_stage_b
 
 LOGGER = logging.getLogger("project.stages")
@@ -70,7 +74,7 @@ def build_stage_b_messages(
 def generate_reasoning(
     completer: StageCompleter,
     teacher: TeacherModel,
-    row: ManifestRow,
+    example: DistillExample,
     stage_a: StageAFileRow,
     image_data_url: str,
 ) -> StageBFileRow:
@@ -79,7 +83,7 @@ def generate_reasoning(
     Args:
         completer: HTTP client or test fake.
         teacher: Loaded config.
-        row: Manifest row that supplies gold_diagnosis.
+        example: Hub example that supplies gold_diagnosis and source_ref.
         stage_a: Frozen ok Stage A row.
         image_data_url: Encoded image.
 
@@ -87,35 +91,35 @@ def generate_reasoning(
         ok, rejected, or error row. Does not rewrite Stage A.
     """
     if stage_a.morphology is None:
-        return _error_row(teacher, row, "missing_stage_a_morphology")
+        return _error_row(teacher, example, "missing_stage_a_morphology")
 
     messages = build_stage_b_messages(
         teacher,
         image_data_url,
         stage_a.morphology,
-        row.gold_diagnosis,
+        example.gold_diagnosis,
     )
 
     try:
         response = completer.complete_stage("B", messages)
         parsed = parse_stage_b(response.content_json)
     except (TeacherCompletionError, ValidationError, TypeError, ValueError) as exc:
-        LOGGER.exception("Stage B failed for %s", row.sample_id)
-        return _error_row(teacher, row, _short_error(exc), usage=None)
+        LOGGER.exception("Stage B failed for %s", example.sample_id)
+        return _error_row(teacher, example, _short_error(exc), usage=None)
 
-    check = validate_stage_b(stage_a.morphology, parsed, row.gold_diagnosis)
+    check = validate_stage_b(stage_a.morphology, parsed, example.gold_diagnosis)
     status = RecordStatus.OK if check.ok else RecordStatus.REJECTED
     return StageBFileRow(
-        sample_id=row.sample_id,
+        sample_id=example.sample_id,
         status=status,
         reasoning=parsed,
         reasons=check.reasons,
         error=None,
         usage=response.usage,
         teacher=teacher.name,
-        gold_diagnosis=row.gold_diagnosis,
+        gold_diagnosis=example.gold_diagnosis,
         stage_a_sample_id=stage_a.sample_id,
-        image_path=str(row.image_path),
+        image_path=example.source_ref,
     )
 
 
@@ -123,18 +127,18 @@ def run_stage_b(
     *,
     teacher: TeacherModel,
     completer: StageCompleter,
-    manifest_path: Path,
+    examples: Iterable[DistillExample],
     stage_a_path: Path,
     output_path: Path,
     limit: int | None = None,
     resume: bool = True,
 ) -> int:
-    """Generate Stage B for samples that have an ok Stage A row.
+    """Generate Stage B for examples that have an ok Stage A row.
 
     Args:
         teacher: Loaded YAML config.
         completer: Stage B completer.
-        manifest_path: Same manifest as Stage A.
+        examples: Same Hub/manifest stream as Stage A.
         stage_a_path: Stage A JSONL.
         output_path: Stage B JSONL.
         limit: Cap on new attempts after resume.
@@ -143,24 +147,22 @@ def run_stage_b(
     Returns:
         Count of error rows written (rejected does not count as process failure).
     """
-    manifest = {row.sample_id: row for row in load_manifest(manifest_path)}
     stage_a_ok = index_ok_stage_a(load_stage_a_rows(stage_a_path))
     skip = completed_ids(output_path) if resume else set()
     failures = 0
     attempted = 0
 
-    for sample_id, stage_a in stage_a_ok.items():
-        if sample_id in skip:
+    for example in examples:
+        if example.sample_id in skip:
             continue
-        row = manifest.get(sample_id)
-        if row is None:
-            LOGGER.error("Stage A sample %s is missing from the manifest", sample_id)
+        stage_a = stage_a_ok.get(example.sample_id)
+        if stage_a is None:
             continue
         if limit is not None and attempted >= limit:
             break
 
         attempted += 1
-        record = _generate_one(teacher, completer, row, stage_a)
+        record = _generate_one(teacher, completer, example, stage_a)
         append_jsonl(output_path, record)
         if record.status is RecordStatus.ERROR:
             failures += 1
@@ -171,41 +173,37 @@ def run_stage_b(
 def _generate_one(
     teacher: TeacherModel,
     completer: StageCompleter,
-    row: ManifestRow,
+    example: DistillExample,
     stage_a: StageAFileRow,
 ) -> StageBFileRow:
-    """Encode the image and run Stage B for one joined sample."""
-    image_path = Path(row.image_path)
-    if not image_path.is_absolute():
-        image_path = teacher.project_root / image_path
-
+    """Encode the PIL image and run Stage B for one joined sample."""
     try:
-        image_data_url = encode_image_data_url(image_path)
-    except (FileNotFoundError, ValueError) as exc:
-        LOGGER.exception("Stage B image failed for %s", row.sample_id)
-        return _error_row(teacher, row, _short_error(exc))
+        image_data_url = encode_pil_image_data_url(example.image)
+    except (TypeError, ValueError, OSError) as exc:
+        LOGGER.exception("Stage B image failed for %s", example.sample_id)
+        return _error_row(teacher, example, _short_error(exc))
 
-    return generate_reasoning(completer, teacher, row, stage_a, image_data_url)
+    return generate_reasoning(completer, teacher, example, stage_a, image_data_url)
 
 
 def _error_row(
     teacher: TeacherModel,
-    row: ManifestRow,
+    example: DistillExample,
     error: str,
     usage: UsageInfo | None = None,
 ) -> StageBFileRow:
     """Build a Stage B error record."""
     return StageBFileRow(
-        sample_id=row.sample_id,
+        sample_id=example.sample_id,
         status=RecordStatus.ERROR,
         reasoning=None,
         reasons=(),
         error=error,
         usage=usage,
         teacher=teacher.name,
-        gold_diagnosis=row.gold_diagnosis,
-        stage_a_sample_id=row.sample_id,
-        image_path=row.image_path,
+        gold_diagnosis=example.gold_diagnosis,
+        stage_a_sample_id=example.sample_id,
+        image_path=example.source_ref,
     )
 
 
@@ -217,10 +215,25 @@ def _short_error(exc: BaseException) -> str:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse Stage B CLI arguments."""
     parser = argparse.ArgumentParser(description="Generate Stage B reasoning JSONL.")
-    parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--stage-a", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--stage-a",
+        type=Path,
+        default=PROJECT_ROOT / "data" / "morphology" / "stage_a.jsonl",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=PROJECT_ROOT / "data" / "reasoning" / "stage_b.jsonl",
+    )
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument("--hub-config", default="diagnosis")
+    parser.add_argument("--hub-split", default="sft_train")
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=None,
+        help="Optional JSONL of local files. Default is ISEPDistillDataset.",
+    )
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
         "--no-resume",
@@ -231,7 +244,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> None:
-    """Load config, run Stage B, exit 1 if any sample errored."""
+    """Load the Hub dataset (or a manifest), run Stage B, exit 1 on errors."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(levelname)s %(name)s: %(message)s",
@@ -239,10 +252,20 @@ def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
     teacher = TeacherModel.from_yaml(args.config)
     completer = TeacherClient(teacher)
+    if args.manifest is not None:
+        examples: Iterable[DistillExample] = examples_from_manifest(
+            args.manifest,
+            project_root=teacher.project_root,
+        )
+    else:
+        examples = iter_distill_examples(
+            config=args.hub_config,
+            split=args.hub_split,
+        )
     failures = run_stage_b(
         teacher=teacher,
         completer=completer,
-        manifest_path=args.manifest,
+        examples=examples,
         stage_a_path=args.stage_a,
         output_path=args.output,
         limit=args.limit,

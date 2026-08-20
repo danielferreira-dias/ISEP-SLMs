@@ -13,7 +13,7 @@ _HEIC_SUFFIXES = {".heic", ".heif"}
 
 
 def encode_image_data_url(path: Path, *, max_side: int = MAX_IMAGE_SIDE) -> str:
-    """Load an image, cap the long edge, and return a JPEG data URL.
+    """Load a file, cap the long edge, and return a JPEG data URL.
 
     PNG/JPEG/WebP are decoded with Pillow. HEIC is rejected until a decoder
     dependency is added. The data URL is never logged by this function.
@@ -38,13 +38,28 @@ def encode_image_data_url(path: Path, *, max_side: int = MAX_IMAGE_SIDE) -> str:
 
     try:
         with Image.open(path) as image:
-            rgb = image.convert("RGB")
-            resized = _fit_long_edge(rgb, max_side=max_side)
-            jpeg_bytes = _to_jpeg_bytes(resized)
+            return encode_pil_image_data_url(image, max_side=max_side)
     except UnidentifiedImageError as exc:
         raise ValueError(f"Unsupported or corrupt image: {path}") from exc
 
-    encoded = base64.b64encode(jpeg_bytes).decode("ascii")
+
+def encode_pil_image_data_url(
+    image: Image.Image,
+    *,
+    max_side: int = MAX_IMAGE_SIDE,
+) -> str:
+    """Cap a PIL image's long edge and return a JPEG data URL.
+
+    Args:
+        image: In-memory image, including Hub ``datasets`` decoded columns.
+        max_side: Longest edge in pixels after resize.
+
+    Returns:
+        A ``data:image/jpeg;base64,...`` string.
+    """
+    rgb = image.convert("RGB")
+    resized = _fit_long_edge(rgb, max_side=max_side)
+    encoded = base64.b64encode(_to_jpeg_bytes(resized)).decode("ascii")
     return f"data:image/jpeg;base64,{encoded}"
 
 

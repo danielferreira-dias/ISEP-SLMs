@@ -6,15 +6,16 @@ from typing import Literal
 
 from PIL import Image
 
+from project.dataset.examples import DistillExample
 from project.stages.stage_a import (
     build_stage_a_messages,
     generate_morphology,
     run_stage_a,
 )
 from project.teacher.client import TeacherResponse
-from project.teacher.utils.jsonl import completed_ids
 from project.teacher.schemas import ImageSample, RecordStatus
 from project.teacher.teacher import TeacherModel
+from project.teacher.utils.jsonl import completed_ids
 from project.tests.fixtures import STAGE_A_PAYLOAD, fake_response
 
 
@@ -64,17 +65,11 @@ def test_run_stage_a_resume_skips_ok(tmp_path: Path) -> None:
     image = tmp_path / "s001.png"
     Image.new("RGB", (32, 32), "red").save(image)
 
-    manifest = tmp_path / "samples.jsonl"
-    manifest.write_text(
-        json.dumps(
-            {
-                "sample_id": "s001",
-                "image_path": str(image),
-                "gold_diagnosis": "melanoma",
-            }
-        )
-        + "\n",
-        encoding="utf-8",
+    example = DistillExample(
+        sample_id="s001",
+        gold_diagnosis="melanoma",
+        image=Image.open(image).convert("RGB"),
+        source_ref=str(image),
     )
     output = tmp_path / "stage_a.jsonl"
     output.write_text(
@@ -97,7 +92,7 @@ def test_run_stage_a_resume_skips_ok(tmp_path: Path) -> None:
     failures = run_stage_a(
         teacher=teacher,
         completer=completer,
-        manifest_path=manifest,
+        examples=[example],
         output_path=output,
         resume=True,
     )

@@ -6,6 +6,7 @@ from typing import Literal
 
 from PIL import Image
 
+from project.dataset.examples import DistillExample
 from project.stages.stage_b import (
     build_stage_b_messages,
     generate_reasoning,
@@ -13,7 +14,6 @@ from project.stages.stage_b import (
 )
 from project.teacher.client import TeacherResponse
 from project.teacher.schemas import (
-    ManifestRow,
     RecordStatus,
     StageAFileRow,
     parse_stage_a,
@@ -60,10 +60,11 @@ def test_stage_b_messages_contain_gold_and_frozen_a() -> None:
 
 def test_generate_reasoning_rejects_gold_mismatch(tmp_path: Path) -> None:
     teacher = TeacherModel.from_yaml()
-    row = ManifestRow(
+    example = DistillExample(
         sample_id="s001",
-        image_path=str(tmp_path / "s001.jpg"),
         gold_diagnosis="psoriasis",
+        image=Image.new("RGB", (8, 8), "red"),
+        source_ref=str(tmp_path / "s001.jpg"),
     )
     stage_a = StageAFileRow(
         sample_id="s001",
@@ -72,13 +73,13 @@ def test_generate_reasoning_rejects_gold_mismatch(tmp_path: Path) -> None:
         error=None,
         usage=None,
         teacher=teacher.name,
-        image_path=row.image_path,
+        image_path=example.source_ref,
     )
     completer = _FakeCompleter(STAGE_B_PAYLOAD)
     result = generate_reasoning(
         completer,
         teacher,
-        row,
+        example,
         stage_a,
         "data:image/jpeg;base64,abc",
     )
@@ -91,17 +92,11 @@ def test_run_stage_b_writes_ok_row(tmp_path: Path) -> None:
     image = tmp_path / "s001.png"
     Image.new("RGB", (32, 32), "brown").save(image)
 
-    manifest = tmp_path / "samples.jsonl"
-    manifest.write_text(
-        json.dumps(
-            {
-                "sample_id": "s001",
-                "image_path": str(image),
-                "gold_diagnosis": "melanoma",
-            }
-        )
-        + "\n",
-        encoding="utf-8",
+    example = DistillExample(
+        sample_id="s001",
+        gold_diagnosis="melanoma",
+        image=Image.open(image).convert("RGB"),
+        source_ref=str(image),
     )
     stage_a_path = tmp_path / "stage_a.jsonl"
     stage_a_path.write_text(
@@ -123,7 +118,7 @@ def test_run_stage_b_writes_ok_row(tmp_path: Path) -> None:
     failures = run_stage_b(
         teacher=teacher,
         completer=_FakeCompleter(STAGE_B_PAYLOAD),
-        manifest_path=manifest,
+        examples=[example],
         stage_a_path=stage_a_path,
         output_path=output,
     )
