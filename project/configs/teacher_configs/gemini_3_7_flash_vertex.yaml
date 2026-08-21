@@ -1,0 +1,72 @@
+description: >
+  Same Gemini 3.7 Flash teacher as the OpenRouter config, called
+  through Vertex (Gemini Enterprise Agent Platform) in project
+  here4beer-472720. Authentication is Application Default
+  Credentials, not OPENROUTER_API_KEY. Stage A remains
+  answer-blind; Stage B receives the frozen A record plus gold.
+
+teacher:
+  name: gemini_3_7_flash
+  provider: vertex
+
+  api:
+    project: here4beer-472720
+    location: global
+
+  model:
+    id: "gemini-3.7-flash"
+    multimodal: true
+
+  generation:
+    max_tokens: 16384
+    seed: 42
+
+  reasoning:
+    effort: "medium"
+    exclude: true
+
+  # Application-level Tenacity policy. The Google SDK retry loop is disabled
+  # so these limits are the single auditable transport retry policy.
+  retry:
+    max_attempts: 6
+    initial_delay_seconds: 2.0
+    max_delay_seconds: 60.0
+    exponential_base: 2.0
+    jitter_seconds: 1.0
+    retryable_status_codes: [408, 429, 500, 502, 503, 504]
+
+  # Local estimate only. Vertex returns token usage, not the finalized invoice
+  # or remaining promotional-credit balance. These are Standard/global list
+  # prices published for Gemini 3.7 Flash through 2026-12-31.
+  pricing:
+    input_per_million_tokens_usd: 0.75
+    output_per_million_tokens_usd: 3.75
+    traffic_type: standard_global
+    effective_through: "2026-12-31"
+    source_url: "https://cloud.google.com/vertex-ai/generative-ai/pricing"
+
+  output:
+    structured: true
+    stages:
+      A:
+        name: morphology
+        prompt_ref: configs/teacher_configs/prompts/stage_a.md
+        prompt_version: e3_stage_a_v1
+        prompt_sha256: c28f6ff4f9a47ba23bc02f2a6d14541ee5afeeaf134bca5cf48936f150121a4f
+        response_format:
+          type: json_schema
+          json_schema:
+            name: dermatology_morphology
+            strict: true
+            schema_ref: configs/schemas/stage_a_morphology.json
+      B:
+        name: reasoning
+        prompt_ref: configs/teacher_configs/prompts/stage_b.md
+        prompt_version: e3_stage_b_v1
+        prompt_sha256: b8239b38c24eac6037c22bcfcbc3573deb37cd5011c97d234e4179f20718125e
+        response_format:
+          type: json_schema
+          json_schema:
+            name: dermatology_reasoning
+            strict: true
+            schema_ref: configs/schemas/stage_b_reasoning.json
