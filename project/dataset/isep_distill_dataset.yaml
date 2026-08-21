@@ -1,7 +1,8 @@
 dataset:
   huggingface:
     repo_id: "danielfdias98/ISEPDistillDataset"
-    revision: "main"
+    # Immutable Hub commit for the validated v0.4.1 release (queried 2026-08-20).
+    revision: "b215f0474e4931b5951da768e79a0d579d26919d"
     token_env: "HF_TOKEN"
 
   loading:

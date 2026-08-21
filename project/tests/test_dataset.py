@@ -1,5 +1,6 @@
 """Unit tests for the ISEPDistillDataset YAML loader."""
 
+import os
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -20,6 +21,7 @@ from project.dataset.dataset import (
 )
 
 DEFAULT_REPO = "danielfdias98/ISEPDistillDataset"
+PINNED_REVISION = "b215f0474e4931b5951da768e79a0d579d26919d"
 
 
 def _default_payload() -> dict[str, Any]:
@@ -62,7 +64,7 @@ class FakeHub:
         token: str,
     ) -> tuple[str, ...]:
         assert repo_id == DEFAULT_REPO
-        assert revision == "main"
+        assert revision == PINNED_REVISION
         assert token == self.expected_token
         return tuple(self.catalogs)
 
@@ -141,7 +143,7 @@ class TestFromYamlDefaultConfig:
 
         assert spec.config_path == DEFAULT_CONFIG
         assert spec.huggingface.repo_id == DEFAULT_REPO
-        assert spec.huggingface.revision == "main"
+        assert spec.huggingface.revision == PINNED_REVISION
         assert spec.huggingface.token_env == "HF_TOKEN"
         assert spec.loading.config == AUTO
         assert spec.loading.split == AUTO
@@ -169,6 +171,17 @@ class TestInvalidConfigs:
 
 
 class TestLoad:
+    def test_load_does_not_copy_token_to_other_environment_names(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("HF_TOKEN", "test-token")
+        monkeypatch.delenv("HUGGING_FACE_HUB_TOKEN", raising=False)
+
+        DistillDataset.load(hub=_hub(), config="diagnosis", split="sft_dev")
+
+        assert "HUGGING_FACE_HUB_TOKEN" not in os.environ
+
     def test_auto_loads_every_config_and_split(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -253,13 +266,15 @@ class TestLoad:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.delenv("HF_TOKEN", raising=False)
-        with pytest.raises(OSError, match="Missing environment variable HF_TOKEN"):
+        monkeypatch.setattr("project.dataset.dataset._stored_hub_token", lambda: None)
+        with pytest.raises(OSError, match="No Hugging Face token found"):
             DistillDataset.load(hub=_hub(), project_root=tmp_path)
 
     def test_token_falls_back_to_dotenv(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.delenv("HF_TOKEN", raising=False)
+        monkeypatch.setattr("project.dataset.dataset._stored_hub_token", lambda: None)
         (tmp_path / ".env").write_text("HF_TOKEN=dotenv-token\n", encoding="utf-8")
         spec = DistillDatasetSpec.from_yaml(DEFAULT_CONFIG, project_root=tmp_path)
         hub = FakeHub(
@@ -270,6 +285,17 @@ class TestLoad:
         loaded = DistillDataset.from_spec(spec, hub=hub)
         assert loaded.configs() == ("diagnosis", "morphology", "caption")
         assert hub.calls[0] == ("diagnosis", "sft_train", "dotenv-token")
+
+    def test_cli_credential_wins_over_dotenv(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.delenv("HF_TOKEN", raising=False)
+        monkeypatch.setattr(
+            "project.dataset.dataset._stored_hub_token", lambda: "stored-token"
+        )
+        (tmp_path / ".env").write_text("HF_TOKEN=dotenv-token\n", encoding="utf-8")
+        spec = DistillDatasetSpec.from_yaml(DEFAULT_CONFIG, project_root=tmp_path)
+        assert spec.token() == "stored-token"
 
     def test_environment_token_wins_over_dotenv(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch

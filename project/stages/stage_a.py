@@ -2,7 +2,7 @@
 
 import argparse
 import logging
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -12,15 +12,21 @@ from project.dataset.examples import (
     examples_from_manifest,
     iter_distill_examples,
 )
-from project.teacher.client import StageCompleter, TeacherClient, TeacherCompletionError
+from project.teacher.client import (
+    StageCompleter,
+    TeacherCompletionError,
+    create_teacher_client,
+)
+from project.teacher.provenance import generation_provenance
 from project.teacher.schemas import (
+    ImagePreprocessingInfo,
     ImageSample,
     RecordStatus,
     StageAFileRow,
     parse_stage_a,
 )
 from project.teacher.teacher import DEFAULT_CONFIG, PROJECT_ROOT, TeacherModel
-from project.teacher.utils.images import encode_pil_image_data_url
+from project.teacher.utils.images import prepare_pil_image
 from project.teacher.utils.jsonl import append_jsonl, completed_ids
 
 LOGGER = logging.getLogger("project.stages")
@@ -62,6 +68,8 @@ def generate_morphology(
     teacher: TeacherModel,
     sample: ImageSample,
     image_data_url: str,
+    image_preprocessing: ImagePreprocessingInfo | None = None,
+    source_ref: str | None = None,
 ) -> StageAFileRow:
     """Call the teacher and parse Stage A JSON.
 
@@ -70,26 +78,34 @@ def generate_morphology(
         teacher: Loaded config (name stored on the row).
         sample: Image identity without gold.
         image_data_url: Encoded image.
+        image_preprocessing: Hash-addressed manifest of the encoded image.
+        source_ref: Original URI/path. Avoids normalizing Hub URIs as Paths.
 
     Returns:
         An ok row or an error row. Never includes gold_diagnosis.
     """
     messages = build_stage_a_messages(teacher, image_data_url)
-    image_path = str(sample.image_path)
+    image_path = source_ref or str(sample.image_path)
 
+    usage = None
     try:
         response = completer.complete_stage("A", messages)
+        usage = response.usage
         morphology = parse_stage_a(response.content_json)
     except (TeacherCompletionError, ValidationError, TypeError, ValueError) as exc:
         LOGGER.exception("Stage A failed for %s", sample.sample_id)
+        if isinstance(exc, TeacherCompletionError) and exc.usage is not None:
+            usage = exc.usage
         return StageAFileRow(
             sample_id=sample.sample_id,
             status=RecordStatus.ERROR,
             morphology=None,
             error=_short_error(exc),
-            usage=None,
+            usage=usage,
             teacher=teacher.name,
             image_path=image_path,
+            image_preprocessing=image_preprocessing,
+            provenance=generation_provenance(teacher, "A"),
         )
 
     return StageAFileRow(
@@ -100,6 +116,8 @@ def generate_morphology(
         usage=response.usage,
         teacher=teacher.name,
         image_path=image_path,
+        image_preprocessing=image_preprocessing,
+        provenance=generation_provenance(teacher, "A", response=response),
     )
 
 
@@ -111,6 +129,7 @@ def run_stage_a(
     output_path: Path,
     limit: int | None = None,
     resume: bool = True,
+    on_record: Callable[[StageAFileRow], None] | None = None,
 ) -> int:
     """Generate Stage A for each remaining example.
 
@@ -125,6 +144,7 @@ def run_stage_a(
         output_path: Destination JSONL.
         limit: Optional cap on new attempts.
         resume: Skip ids already ok in ``output_path``.
+        on_record: Optional observer called after each durable JSONL append.
 
     Returns:
         Count of rows written with ``status=error``.
@@ -142,6 +162,8 @@ def run_stage_a(
         attempted += 1
         record = _generate_one(teacher, completer, example)
         append_jsonl(output_path, record)
+        if on_record is not None:
+            on_record(record)
         if record.status is RecordStatus.ERROR:
             failures += 1
 
@@ -160,7 +182,7 @@ def _generate_one(
     )
 
     try:
-        image_data_url = encode_pil_image_data_url(example.image)
+        prepared = prepare_pil_image(example.image)
     except (TypeError, ValueError, OSError) as exc:
         LOGGER.exception("Stage A image failed for %s", example.sample_id)
         return StageAFileRow(
@@ -171,9 +193,18 @@ def _generate_one(
             usage=None,
             teacher=teacher.name,
             image_path=example.source_ref,
+            image_preprocessing=None,
+            provenance=None,
         )
 
-    return generate_morphology(completer, teacher, sample, image_data_url)
+    return generate_morphology(
+        completer,
+        teacher,
+        sample,
+        prepared.data_url,
+        prepared.info,
+        example.source_ref,
+    )
 
 
 def _short_error(exc: BaseException) -> str:
@@ -215,7 +246,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     args = parse_args(argv)
     teacher = TeacherModel.from_yaml(args.config)
-    completer = TeacherClient(teacher)
+    completer = create_teacher_client(teacher)
     if args.manifest is not None:
         examples: Iterable[DistillExample] = examples_from_manifest(
             args.manifest,

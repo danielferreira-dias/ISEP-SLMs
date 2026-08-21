@@ -4,9 +4,10 @@ Public entry point: ``DistillDataset.load()``.
 
 The YAML names the Hub repo and whether config/split should be discovered
 (``auto``) or pinned. Broken configs fail here, before ``datasets`` is called.
-The Hub token is read from ``token_env`` at load time, then from a nearby
-``.env`` file, and is never stored on the dataclass. Before Hub calls the
-resolved token is exported to ``HF_TOKEN`` so ``huggingface_hub`` sees it.
+The Hub token is read from ``token_env`` at load time, then from the Hugging
+Face CLI credential store, and finally from a nearby ``.env`` file. It is never
+stored on the dataclass or copied to other process environment variables. It is
+passed directly to the Hub clients.
 """
 
 from __future__ import annotations
@@ -99,12 +100,14 @@ def _parse_dotenv(path: Path) -> dict[str, str]:
     return values
 
 
-def _export_hub_token(token: str, token_env: str) -> None:
-    """Copy the resolved token into the env vars Hugging Face libraries read."""
-
-    os.environ[token_env] = token
-    os.environ["HF_TOKEN"] = token
-    os.environ["HUGGING_FACE_HUB_TOKEN"] = token
+def _stored_hub_token() -> str | None:
+    """Read the active Hugging Face CLI credential without exposing it."""
+    try:
+        from huggingface_hub import get_token
+    except ImportError:
+        return None
+    token = get_token()
+    return token.strip() if isinstance(token, str) and token.strip() else None
 
 
 def _readme_front_matter(text: str) -> dict[str, object]:
@@ -231,8 +234,9 @@ class HuggingFaceRef:
     def token(self, *, dotenv_paths: Sequence[Path] = ()) -> str:
         """Read the Hub secret named by ``token_env``.
 
-        The process environment wins. If it is blank, nearby ``.env`` files are
-        checked in order. The token is returned, never stored.
+        The process environment wins. If it is blank, the active Hugging Face
+        CLI credential is used, followed by nearby ``.env`` files in order. The
+        token is returned, never stored.
 
         Args:
             dotenv_paths: Optional ``.env`` files to read after the environment.
@@ -249,6 +253,10 @@ class HuggingFaceRef:
         if key:
             return key
 
+        stored = _stored_hub_token()
+        if stored:
+            return stored
+
         for path in dotenv_paths:
             if not path.is_file():
                 continue
@@ -256,7 +264,10 @@ class HuggingFaceRef:
             if parsed:
                 return parsed
 
-        raise OSError(f"Missing environment variable {self.token_env}")
+        raise OSError(
+            f"No Hugging Face token found in {self.token_env}, "
+            "the CLI credential store, or nearby .env files"
+        )
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -346,7 +357,7 @@ class DistillDatasetSpec:
         )
 
     def token(self) -> str:
-        """Read the Hub token from the environment, then nearby ``.env`` files."""
+        """Resolve the Hub token without retaining it on the dataset spec."""
 
         return self.huggingface.token(
             dotenv_paths=(
@@ -424,7 +435,6 @@ class HuggingFaceDatasetHub:
     ) -> object:
         """Return one Hugging Face ``Dataset`` for a config/split pair."""
 
-        _export_hub_token(token, "HF_TOKEN")
         load_dataset = _datasets_api("load_dataset")
         return load_dataset(
             repo_id,
@@ -442,7 +452,6 @@ class HuggingFaceDatasetHub:
     ) -> tuple[tuple[str, tuple[str, ...]], ...]:
         """Parse ``(config, splits)`` from the cached dataset card."""
 
-        _export_hub_token(token, "HF_TOKEN")
         key = (repo_id, revision)
         if key not in self._readme:
             self._readme[key] = _download_dataset_readme(

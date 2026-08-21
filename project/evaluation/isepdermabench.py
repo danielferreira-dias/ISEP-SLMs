@@ -1,16 +1,15 @@
-"""
-Internal Benchmark specific for dermatology accuracy, it's split into different tasks:
+"""Planned ISEPDermaBench evaluation adapter.
 
 https://huggingface.co/datasets/danielfdias98/ISEPDermaBench
 
-Tasks:
+The benchmark includes:
 
-Grounded Diagnosis: Evaluate model based on top-k accuracy of diagonsis
-Context Ablation: Evaluate the model before missing Context and After
-Visual Confusion: Diagnosis on easy and hard pairs between similar diseases
-General Hallucation: Evaluate Hallucation on the Model
+- grounded diagnosis and visual top-k classification;
+- context ablation before and after additional context;
+- visual confusion sets between similar diseases;
+- unsupported-claim and hallucination analysis;
+- open-ended diagnosis with a separately authorized LLM judge;
+- evidence grounding with a separately authorized LLM judge.
 
-Open Ended: Diagnosis of the model based on a free-text ( Requires LLM as a Judge )
-Evidence Grouding: Grounding of the Model based on the evidence described ( Requires LLM as a Judge )
-
+This module must not select E3 checkpoints; the fixed benchmark is final-only.
 """

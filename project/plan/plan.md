@@ -1,5 +1,5 @@
 # Pipeline de Treino — Dermatology SLM/VLM
-**Versão:** 18 de agosto de 2026
+**Versão:** 20 de agosto de 2026
 
 ## Objetivo
 
@@ -34,11 +34,11 @@ STAGE A — Morphology Dataset Generation
         ↓
 STAGE B — Reasoning Dataset Generation
         ↓
-STAGE C — Supervised Fine-Tuning (SFT)
+STAGE C — E3 Supervised Fine-Tuning (SFT)
         ↓
-STAGE D — On-Policy Distillation (OPD)
+STAGE D — E4 On-Policy Distillation (OPD, opcional)
         ↓
-STAGE E — RL / GRPO
+STAGE E — E5 RL / GRPO (opcional)
         ↓
 FINAL MODEL
 ```
@@ -46,11 +46,15 @@ FINAL MODEL
 Conceptualmente:
 
 ```text
-Stage A/B → construir dados de alta qualidade
-Stage C   → ensinar "como raciocinar"
-Stage D   → ensinar a raciocinar autonomamente
-Stage E   → otimizar diretamente o comportamento desejado
+Stage A/B → construir e auditar dados grounded de alta qualidade
+Stage C   → E3: hard distillation/SFT com justificação clínica estruturada
+Stage D   → E4: experiência on-policy separada, se E3 justificar
+Stage E   → E5: experiência GRPO separada, após auditoria dos rewards
 ```
+
+O âmbito de implementação atual termina em Stage A/B. Cada stage posterior
+produz um checkpoint independente; não é obrigatório executar D ou E para
+considerar E3 completo.
 
 ---
 
@@ -76,16 +80,58 @@ Exemplo:
 
 ```json
 {
-  "primary_lesion": "pigmented macule",
-  "color": ["brown", "black"],
-  "shape": "asymmetric",
-  "border": "irregular",
-  "surface": "flat",
-  "distribution": "solitary",
-  "additional_features": [
-    "heterogeneous pigmentation",
-    "blue-white veil"
-  ]
+  "image_assessment": {
+    "is_evaluable": true,
+    "image_modality": "clinical",
+    "views_available": ["close clinical view"],
+    "quality_defects": ["tight_crop"],
+    "has_anatomic_overview": false,
+    "has_scale": false,
+    "has_lateral_profile": false,
+    "distribution_assessability": "partial",
+    "color_reliability": "reliable"
+  },
+  "dominant_visual_pattern": "Solitary asymmetric pigmented macule.",
+  "observations": [
+    {
+      "id": "obs_001",
+      "concept_id": "lesion.primary",
+      "value": "macule",
+      "status": "present",
+      "scope": "central lesion",
+      "confidence": "high",
+      "evidence_region": "central pigmented lesion"
+    },
+    {
+      "id": "obs_002",
+      "concept_id": "lesion.symmetry",
+      "value": "asymmetric",
+      "status": "present",
+      "scope": "central lesion",
+      "confidence": "high",
+      "evidence_region": "overall lesion silhouette"
+    },
+    {
+      "id": "obs_003",
+      "concept_id": "lesion.color",
+      "value": "brown and black",
+      "status": "present",
+      "scope": "central lesion",
+      "confidence": "high",
+      "evidence_region": "throughout the central lesion"
+    },
+    {
+      "id": "obs_004",
+      "concept_id": "lesion.border_regularity",
+      "value": "irregular",
+      "status": "present",
+      "scope": "central lesion",
+      "confidence": "high",
+      "evidence_region": "peripheral lesion margin"
+    }
+  ],
+  "not_assessable_features": ["full-body distribution"],
+  "clinical_caption": "A solitary asymmetric brown-black macule has an irregular peripheral margin."
 }
 ```
 
@@ -114,33 +160,60 @@ IMAGE
       ↓
 TEACHER B
       ↓
-DDx
-+ REASONING
-+ DIAGNOSIS
+COMPACT GROUNDED FACTS
++ DIAGNOSIS-vs-ALTERNATIVE COMPARISONS
++ LIMITATIONS
++ RESPONSE POLICY
++ CLINICAL REASONING
 ```
 
 Exemplo:
 
 ```json
 {
-  "morphology": {
-    "primary_lesion": "pigmented macule",
-    "shape": "asymmetric",
-    "border": "irregular",
-    "additional_features": [
-      "heterogeneous pigmentation",
-      "blue-white veil"
-    ]
-  },
-  "differential_diagnosis": [
-    "melanoma",
-    "atypical nevus",
-    "pigmented basal cell carcinoma"
+  "anchor_evidence_status": "supported",
+  "annotation_conflict": false,
+  "annotation_conflict_reason": null,
+  "diagnostic_confidence": "moderate",
+  "diagnosis": "melanoma",
+  "differential_comparisons": [
+    {
+      "alternative": "atypical nevus",
+      "features_favoring_diagnosis": ["obs_002", "obs_003", "obs_004"],
+      "features_favoring_alternative": ["obs_001"],
+      "comparison": "Melanoma is favored over an atypical nevus by the marked asymmetry, irregular margin, and brown-black color variation."
+    }
   ],
-  "reasoning": "The marked asymmetry, irregular border and blue-white veil favor melanoma over an atypical nevus.",
-  "diagnosis": "melanoma"
+  "limitations": ["duration_and_evolution", "dermoscopy"],
+  "response_policy": "ANSWER_DIFFERENTIAL",
+  "non_evaluable_reason": null,
+  "clinical_reasoning": "The visible asymmetric brown-black macule with an irregular margin supports melanoma with moderate confidence. Melanoma is favored over an atypical nevus because the asymmetry, border irregularity, and color variation are more concerning, although the macular and solitary presentation remains compatible with that alternative. Evolution and dermoscopic structures cannot be assessed from this image."
 }
 ```
+
+Stage B nunca reescreve Stage A. O JSON é um contrato interno compacto para
+validação, proveniência e auditoria. Dentro desse contrato,
+`clinical_reasoning` é o texto natural escrito diretamente pelo Teacher e
+preservado verbatim como target do Student. Cada comparação tem de explicitar
+as features que favorecem o gold e as que ainda tornam a alternativa plausível,
+além de explicar por que são diferentes. O texto final deve sintetizar esses
+factos sem expor raw chain-of-thought ou inventar observações.
+
+O estado `supported` exige pelo menos um achado discriminativo que separe o
+gold das alternativas; compatibilidade inespecífica fica em `weak`. O label
+privado nunca pode aumentar artificialmente a força da evidência. Stage B não
+introduz positivos ou negativos ausentes de Stage A, não infere exposição,
+sintomas, palpação, evolução ou causalidade, e não produz recomendações de
+tratamento, biópsia ou excisão. A confiança no texto deve coincidir com o campo
+estruturado (`low`, `moderate` ou `high`) sem intervalos híbridos.
+
+Para imagens avaliáveis, a política é sempre `ANSWER_DIFFERENTIAL`: informação
+clínica, dermoscopia ou evolução ausentes podem ser registadas como limitações,
+mas não originam perguntas nem recusa. `REQUEST_NEW_IMAGE` existe apenas quando
+Stage A marcou `is_evaluable=false`; nesse caso não se gera um diagnóstico no
+texto do Student. Um gold sem suporte numa imagem avaliável, ou um possível
+conflito de anotação, é preservado para auditoria e excluído do target de treino
+em vez de gerar evidência fictícia.
 
 ### Porque damos o label ao Teacher?
 
@@ -151,7 +224,10 @@ Ground truth = destino correto
 Teacher      = ensina o caminho para chegar lá
 ```
 
-Não usamos o Teacher como fonte de verdade do diagnóstico quando já possuímos ground truth.
+Não usamos o Teacher como fonte de verdade do diagnóstico quando já possuímos
+ground truth. Também não tratamos o ground truth como prova de que a evidência
+está visível: `anchor_evidence_status` pode ser `supported`, `weak` ou
+`unsupported`, sem obrigar o Teacher a inventar suporte.
 
 ---
 
@@ -166,19 +242,96 @@ Dataset enriquecido
 
         +
 
-SkinCoT
+SkinCoT normalizado (braço auxiliar opcional)
 
         ↓
-FINAL SFT DATASET
+E3 SFT DATASET RELEASE
 ```
 
-Cada exemplo idealmente contém:
+O dataset primário é A+B. SkinCoT não é importado como raw chain-of-thought:
+exige auditoria de licença e overlap, revisão/normalização e proveniência
+`target_source=human_reviewed_external`. Deve permanecer uma ablation separada
+até demonstrar benefício.
+
+### Separação entre representação interna e target do Student
+
+Cada exemplo aceite preserva duas representações:
+
+1. `stage_a` + `stage_b`: JSON interno, versionado e auditável;
+2. `stage_b.clinical_reasoning`: resposta clínica natural escrita pelo Teacher.
+
+Não existe renderer local nem banco de templates. O target é preservado
+verbatim, enquanto os campos estruturados permitem verificar que o texto cita o
+gold, cobre todas as alternativas e se mantém ligado aos IDs de evidência de
+Stage A. A proveniência guarda modelo, provider, seed, limite de output, nível
+de reasoning, política de exclusão do reasoning, prompt, schema e tentativa;
+isto torna a origem auditável, embora não prometa reprodução byte a byte por
+uma API externa. A geração principal via Vertex usa reasoning `medium`; os
+pilotos anteriores em `high` são outro protocolo e não podem ser retomados no
+mesmo output.
+
+Para Vertex, cada tentativa preserva também tokens de input, output, total e
+thinking quando o provider os disponibiliza. A interface calcula uma estimativa
+acumulada em USD a partir de preços Standard/global fixados e datados no YAML;
+essa estimativa é separada da faturação final e do saldo de créditos. Um limite
+local opcional interrompe a campanha antes do pedido seguinte, enquanto o limite
+efetivo deve ser configurado adicionalmente em Cloud Billing.
+
+Exemplo de `clinical_reasoning`:
+
+```text
+The visible asymmetric brown-black macule with an irregular margin supports
+melanoma with moderate confidence. Melanoma is favored over an atypical nevus
+because the asymmetry, border irregularity, and color variation are more
+concerning, although the macular and solitary presentation remains compatible
+with that alternative. Evolution and dermoscopic structures cannot be assessed
+from this image.
+```
+
+O Student não é treinado para repetir chaves JSON. A variação linguística vem do
+Teacher, não de fórmulas locais; por isso, a release deve medir repetição,
+comprimento e concentração estilística antes do treino e rejeitar padrões
+degenerados.
+
+### Fundamentação do formato híbrido
+
+Esta separação é coerente com precedentes próximos, sem afirmar que exista um
+único formato universalmente superior:
+
+- SkinCaRe/SkinCoT constrói conteúdo clínico hierárquico em linguagem natural,
+  embora use estrutura e normalização durante a criação dos dados
+  ([SkinCaRe, 2024](https://arxiv.org/html/2405.18004v2)).
+- SkinGPT-4 separa a descrição das features visuais do diagnóstico e mostra nas
+  ablations que ensinar apenas features ou apenas diagnóstico perde parte do
+  comportamento pretendido
+  ([SkinGPT-4, 2024](https://pmc.ncbi.nlm.nih.gov/articles/PMC11226626/)).
+- LLaVA-Med e BioMed-VITAL armazenam os exemplos em contentores estruturados,
+  mas mantêm as respostas do Assistant em texto natural
+  ([LLaVA-Med, 2023](https://proceedings.neurips.cc/paper_files/paper/2023/file/5abcdf8ecdcacba028c6662789194572-Paper-Datasets_and_Benchmarks.pdf),
+  [BioMed-VITAL, 2024](https://proceedings.neurips.cc/paper_files/paper/2024/hash/aec33ab89b5986605cd7c331396e7e5c-Abstract-Datasets_and_Benchmarks_Track.html)).
+- JSON continua adequado para interoperabilidade e extração de campos, como em
+  geração estruturada de relatórios radiológicos, mas essa finalidade é distinta
+  da aprendizagem de uma resposta clínica natural
+  ([Adams et al., 2023](https://pubs.rsna.org/doi/10.1148/radiol.230725)).
+- Resultados recentes em reasoning dermatológico também descrevem repetição e
+  latência associadas a trajetórias longas, reforçando a opção por justificações
+  curtas e verificáveis em vez de raw chain-of-thought
+  ([SkinGPT-R1, 2025](https://arxiv.org/html/2511.15242v2)).
+
+Logo, JSON é o plano de controlo e auditoria; `clinical_reasoning` é o alvo
+principal de imitação. A linguagem é produzida pelo Teacher, mas continua
+limitada por evidência estruturada e por gates verificáveis. Esta opção evita
+ensinar ao Student a assinatura rígida de um renderer, em troca de menor
+determinismo textual e da necessidade de auditar diversidade e repetição.
+
+Cada exemplo A+B aceite contém semanticamente:
 
 ```text
 Image
 → Morphology
 → Differential Diagnosis
-→ Reasoning
+→ Explicit diagnosis-vs-alternative comparison
+→ Concise grounded natural-language justification
 → Diagnosis
 ```
 
@@ -211,9 +364,40 @@ Ensina:
 - linguagem morfológica;
 - relação entre visual features e doença;
 - estrutura de differential diagnosis;
-- estrutura de clinical reasoning;
-- formato de output;
+- comparação explícita das features que favorecem o diagnóstico face às
+  alternativas;
+- justificação clínica curta e grounded;
+- resposta natural sem obrigar o modelo a copiar uma família fixa de templates;
 - diagnóstico final.
+
+### Materialização multitarefa implementada
+
+O Stage C não consome diretamente os JSONL extensos de auditoria. O comando
+`isep-materialize-e3` volta a carregar o split `diagnosis` da revisão privada e
+fixada de ISEPDistillDataset, reconcilia cada `sample_id` com os outputs Stage A
+e Stage B e escreve um Parquet multimodal com uma conversa independente por
+tarefa. A expansão é:
+
+| Condição do exemplo | Tarefas materializadas | Origem do target |
+| --- | --- | --- |
+| Todos os exemplos da fonte | `diagnosis` | diagnóstico humano e prompt congelado |
+| Stage A aceite | `morphology` | JSON canónico sem `clinical_caption` |
+| Stage A aceite | `caption` | `clinical_caption` answer-blind |
+| Stage B aceite e imagem avaliável | `grounded_differential` | `clinical_reasoning` preservado verbatim |
+| Stage B aceite e imagem não avaliável | `request_new_image` | `clinical_reasoning` sem revelar o gold |
+
+Os dois últimos comportamentos são mutuamente exclusivos. Assim, um exemplo
+totalmente aceite gera quatro rows: diagnóstico, morfologia, caption e uma única
+resposta clínica condicional. Esta decisão evita ensinar para a mesma imagem
+dois comportamentos incompatíveis. Falhas do Teacher não eliminam o target
+humano de diagnóstico; apenas reduzem as tarefas dependentes desse stage e são
+registadas no manifest de cobertura.
+
+O release materializado inclui imagem, `messages`, IDs de tarefa, origem e hash
+do target, referência e hash da imagem, grupo de leakage, IDs das tentativas A/B
+e um manifest de integridade com contagens, bytes e SHA-256. A geração completa
+é fail-closed por omissão; materialização parcial e overwrite requerem flags
+explícitas.
 
 ### Limitação
 
@@ -523,26 +707,27 @@ Ensina **quais comportamentos maximizam diretamente os nossos objetivos**.
 STAGE A
 Image
 → Teacher A sem label
-→ Morphology
+→ Image assessment + atomic observations
         ↓
 STAGE B
 Image + Morphology + Ground Truth
 → Teacher B
-→ DDx + Reasoning + Diagnosis
+→ Compact evidence + explicit differential comparisons + limitations
+→ Teacher-generated clinical_reasoning preserved verbatim
         ↓
-STAGE C
+STAGE C / E3
 Generated Dataset + SkinCoT
 → SFT
-→ SFT Checkpoint
+→ E3 SFT Checkpoint
         ↓
-STAGE D
+STAGE D / E4 OPCIONAL
 Student sem label gera trajetória
 → Teacher vê trajetória + ground truth
 → Teacher logits
 → On-Policy Distillation
 → OPD Checkpoint
         ↓
-STAGE E
+STAGE E / E5 OPCIONAL
 Student gera structured output
 → Diagnosis/Morphology/DDx/Hierarchy rewards
 → GRPO
@@ -553,16 +738,21 @@ Student gera structured output
 
 ## 14. Checkpoints e ablations
 
-A pipeline é sequencial, mas devemos avaliar depois de cada stage:
+A pipeline preserva checkpoints independentes e comparáveis. E4/E5 só avançam
+depois de E3 ser congelado e analisado:
 
 ```text
-Base
+Qwen3.5-4B Base
   ↓ benchmark
-SFT
+E1 selected
   ↓ benchmark
-SFT + OPD
+E2 selected
   ↓ benchmark
-SFT + OPD + GRPO
+E3 SFT selected
+  ↓ benchmark
+E4 OPD selected (se executado)
+  ↓ benchmark
+E5 GRPO selected (se executado)
 ```
 
 Exemplo:
@@ -574,7 +764,9 @@ Exemplo:
 | + OPD | 82 | 64 |
 | + GRPO | 84 | 68 |
 
-Isto mostra ganho **incremental**.
+Isto mostra ganho **incremental** sem apagar os baselines históricos. O
+checkpoint de cada condição é escolhido exclusivamente em `sft_dev`; o
+ISEPDermaBench e o DermoBench são avaliações finais, nunca seletores de epoch.
 
 Para atribuição mais rigorosa, fazer também ablations:
 
@@ -604,6 +796,23 @@ Pode ser implementado com:
 - vLLM quando o modelo for suportado.
 
 **Estado:** fazível diretamente.
+
+O runner operacional é `isep-generate-e3`. Ele fixa uma única coorte ordenada,
+executa Stage A até cobertura aceite completa e só depois inicia Stage B sobre
+os mesmos `sample_id`. A interface de terminal apresenta progresso, imagens em
+falta, resultados aceites/falhados, amostra atual, ETA e custo estimado
+acumulado quando a configuração fixa preços. Uma falha de provider,
+schema ou validação termina a campanha com código não-zero e impede a passagem
+de A para B. O cliente Vertex usa uma única política Tenacity configurada e
+limitada para erros HTTP transitórios (`408`, `429`, `500`, `502`, `503`,
+`504`), com seis tentativas totais e backoff exponencial com jitter; o retry
+implícito do SDK fica desativado para não multiplicar tentativas. Segurança,
+schema e validação clínica nunca são regenerados automaticamente. Cada row
+regista quantos pedidos físicos foram necessários. Uma nova invocação é uma
+decisão explícita e retoma apenas os registos ainda não aceites, preservando
+todas as tentativas no JSONL de auditoria. A retoma também verifica a identidade
+do modelo, seed e hashes do prompt/schema; uma alteração de protocolo exige
+novos outputs e nunca é misturada silenciosamente com registos anteriores.
 
 ---
 
@@ -1108,7 +1317,7 @@ A. Teacher inference
    → morphology
 
 B. Teacher inference + label
-   → DDx/reasoning
+   → compact DDx evidence, pairwise comparisons, and clinical_reasoning
 
 C. TRL SFTTrainer
    → Student SFT

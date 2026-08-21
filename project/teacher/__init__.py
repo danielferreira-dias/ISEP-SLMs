@@ -1,1 +1,1 @@
-"""Teacher inference: config, OpenRouter client, schemas, and validation."""
+"""Teacher inference: config, OpenRouter/Vertex clients, schemas, and validation."""

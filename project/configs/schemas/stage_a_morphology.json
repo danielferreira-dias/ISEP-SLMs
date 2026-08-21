@@ -1,204 +1,233 @@
 {
-  "title": "dermatology_morphology",
-  "description": "Stage A teacher output. Visual findings only. No diagnosis, no gold label, no disease-associated inference. Palpation and unseen body sites are not_assessable, not invented.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "image_quality",
-    "modality",
-    "primary_lesion",
-    "size",
-    "color",
-    "shape",
-    "border",
-    "surface",
-    "secondary_morphology",
-    "configuration",
-    "distribution",
-    "additional_features"
-  ],
-  "properties": {
-    "image_quality": {
-      "type": "string",
-      "description": "Whether the image is sufficient for a visual description. not_evaluable requires remaining fields to be not_assessable or empty.",
-      "enum": ["evaluable", "limited", "not_evaluable"]
-    },
-    "modality": {
-      "type": "string",
-      "description": "Acquisition type. Dermoscopic signs in additional_features are allowed only when this is dermoscopy.",
-      "enum": ["clinical", "dermoscopy", "unknown"]
-    },
-    "primary_lesion": {
-      "type": "string",
-      "description": "Dominant primary lesion morphology. Pigmentation belongs in color. Scale, crust and ulceration belong in secondary_morphology unless the presenting lesion is itself an ulcer or erosion.",
+  "$defs": {
+    "ConfidenceLevel": {
+      "description": "Closed confidence vocabulary for observations and diagnoses.",
       "enum": [
-        "macule",
-        "patch",
-        "papule",
-        "plaque",
-        "nodule",
-        "tumor",
-        "vesicle",
-        "bulla",
-        "pustule",
-        "wheal",
-        "cyst",
-        "comedo",
-        "burrow",
-        "ulcer",
-        "erosion",
-        "not_assessable"
-      ]
+        "low",
+        "moderate",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
     },
-    "size": {
-      "type": "string",
-      "description": "Approximate size in the frame. Do not invent millimetres. cannot_assess if there is no scale or the crop prevents judgement.",
+    "ImageAssessment": {
+      "additionalProperties": false,
+      "description": "What can and cannot be assessed from the supplied image.",
+      "properties": {
+        "color_reliability": {
+          "enum": [
+            "reliable",
+            "limited",
+            "not_assessable"
+          ],
+          "title": "Color Reliability",
+          "type": "string"
+        },
+        "distribution_assessability": {
+          "enum": [
+            "full",
+            "partial",
+            "not_assessable"
+          ],
+          "title": "Distribution Assessability",
+          "type": "string"
+        },
+        "has_anatomic_overview": {
+          "title": "Has Anatomic Overview",
+          "type": "boolean"
+        },
+        "has_lateral_profile": {
+          "title": "Has Lateral Profile",
+          "type": "boolean"
+        },
+        "has_scale": {
+          "title": "Has Scale",
+          "type": "boolean"
+        },
+        "image_modality": {
+          "$ref": "#/$defs/ImageModality"
+        },
+        "is_evaluable": {
+          "title": "Is Evaluable",
+          "type": "boolean"
+        },
+        "quality_defects": {
+          "items": {
+            "$ref": "#/$defs/QualityDefect"
+          },
+          "title": "Quality Defects",
+          "type": "array"
+        },
+        "views_available": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Views Available",
+          "type": "array"
+        }
+      },
+      "required": [
+        "is_evaluable",
+        "image_modality",
+        "views_available",
+        "quality_defects",
+        "has_anatomic_overview",
+        "has_scale",
+        "has_lateral_profile",
+        "distribution_assessability",
+        "color_reliability"
+      ],
+      "title": "ImageAssessment",
+      "type": "object"
+    },
+    "ImageModality": {
+      "description": "Acquisition type declared by Stage A.",
       "enum": [
-        "cannot_assess",
-        "punctate",
-        "few_mm",
-        "about_1_cm",
-        "few_cm",
-        "large_or_extensive"
-      ]
+        "clinical",
+        "dermoscopy",
+        "unknown"
+      ],
+      "title": "ImageModality",
+      "type": "string"
     },
-    "color": {
-      "type": "array",
-      "description": "Visible colours. Use not_assessable as the only item when colour cannot be judged.",
-      "items": {
-        "type": "string",
-        "enum": [
-          "brown",
-          "black",
-          "red",
-          "pink",
-          "purple",
-          "blue",
-          "gray",
-          "white",
-          "yellow",
-          "orange",
-          "skin-colored",
-          "hypopigmented",
-          "not_assessable"
-        ]
-      }
+    "Observation": {
+      "additionalProperties": false,
+      "description": "One atomic, image-grounded clinical observation from Stage A.",
+      "properties": {
+        "concept_id": {
+          "$ref": "#/$defs/ObservationConcept"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        },
+        "evidence_region": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Evidence Region"
+        },
+        "id": {
+          "description": "Sequential observation identifier with exactly three digits; the tenth identifier is obs_010, never obs_0010.",
+          "pattern": "^obs_[0-9]{3}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "scope": {
+          "minLength": 1,
+          "title": "Scope",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/ObservationStatus"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "concept_id",
+        "value",
+        "status",
+        "scope",
+        "confidence",
+        "evidence_region"
+      ],
+      "title": "Observation",
+      "type": "object"
     },
-    "shape": {
-      "type": "string",
-      "description": "Form or symmetry of the individual lesion. Arrangement of multiple lesions belongs in configuration.",
+    "ObservationConcept": {
       "enum": [
-        "round",
-        "oval",
-        "irregular",
-        "symmetric",
-        "asymmetric",
-        "not_assessable"
-      ]
+        "image.anatomic_site",
+        "lesion.count",
+        "lesion.primary",
+        "lesion.size",
+        "lesion.color",
+        "lesion.shape",
+        "lesion.symmetry",
+        "lesion.border_demarcation",
+        "lesion.border_regularity",
+        "lesion.profile",
+        "lesion.surface_texture",
+        "lesion.secondary_change",
+        "lesion.configuration",
+        "lesion.distribution",
+        "lesion.additional_feature"
+      ],
+      "type": "string"
     },
-    "border": {
-      "type": "string",
-      "description": "Visible margin / demarcation of the lesion.",
+    "ObservationStatus": {
+      "description": "Evidence states that do not invent unobserved absence.",
       "enum": [
-        "well-defined",
-        "ill-defined",
-        "regular",
-        "irregular",
-        "raised",
-        "fading",
-        "not_assessable"
-      ]
+        "present",
+        "absent_in_observed_scope",
+        "uncertain",
+        "not_assessable",
+        "not_shown"
+      ],
+      "title": "ObservationStatus",
+      "type": "string"
     },
-    "surface": {
-      "type": "string",
-      "description": "Contour or texture that is not a named secondary change. Do not infer palpation.",
+    "QualityDefect": {
       "enum": [
-        "flat",
-        "elevated",
-        "smooth",
-        "keratotic",
-        "verrucous",
-        "exudative",
-        "not_assessable"
-      ]
-    },
-    "secondary_morphology": {
-      "type": "array",
-      "description": "Visible secondary surface changes. Empty if none are clearly present.",
-      "items": {
-        "type": "string",
-        "enum": [
-          "scale",
-          "crust",
-          "erosion",
-          "ulceration",
-          "fissure",
-          "lichenification",
-          "excoriation",
-          "atrophy"
-        ]
-      }
-    },
-    "configuration": {
-      "type": "string",
-      "description": "How lesions are arranged in the visible field, not the inferred full-body pattern.",
-      "enum": [
-        "solitary",
-        "grouped",
-        "clustered",
-        "annular",
-        "arcuate",
-        "linear",
-        "serpiginous",
-        "polycyclic",
-        "targetoid",
-        "scattered",
-        "disseminated",
-        "not_assessable"
-      ]
-    },
-    "distribution": {
-      "type": "string",
-      "description": "Body-site pattern that is actually visible. Do not infer unseen sites.",
-      "enum": [
-        "localized",
-        "generalized",
-        "acral",
-        "flexural",
-        "extensor",
-        "photodistributed",
-        "intertriginous",
-        "dermatomal",
-        "not_assessable"
-      ]
-    },
-    "additional_features": {
-      "type": "array",
-      "description": "Optional extra visual signs. Empty if none are clearly visible. Dermoscopic-only signs (blue-white veil, pigment network, atypical pigment network, dots and globules, streaks, regression structures, structureless area, shiny white lines, milia-like cysts) require modality=dermoscopy.",
-      "items": {
-        "type": "string",
-        "enum": [
-          "heterogeneous pigmentation",
-          "homogeneous pigmentation",
-          "blue-white veil",
-          "pigment network",
-          "atypical pigment network",
-          "dots and globules",
-          "streaks",
-          "regression structures",
-          "structureless area",
-          "shiny white lines",
-          "telangiectasia",
-          "milia-like cysts",
-          "follicular plugging",
-          "central scar",
-          "satellite lesions",
-          "collarette scale",
-          "purpura",
-          "necrosis",
-          "weeping"
-        ]
-      }
+        "blur",
+        "low_resolution",
+        "poor_lighting",
+        "color_cast",
+        "occlusion",
+        "compression_artifact",
+        "tight_crop",
+        "other"
+      ],
+      "type": "string"
     }
-  }
+  },
+  "additionalProperties": false,
+  "description": "Answer-blind Stage A target containing visual findings only.",
+  "properties": {
+    "clinical_caption": {
+      "minLength": 1,
+      "title": "Clinical Caption",
+      "type": "string"
+    },
+    "dominant_visual_pattern": {
+      "minLength": 1,
+      "title": "Dominant Visual Pattern",
+      "type": "string"
+    },
+    "image_assessment": {
+      "$ref": "#/$defs/ImageAssessment"
+    },
+    "not_assessable_features": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Not Assessable Features",
+      "type": "array"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/Observation"
+      },
+      "title": "Observations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "image_assessment",
+    "dominant_visual_pattern",
+    "observations",
+    "not_assessable_features",
+    "clinical_caption"
+  ],
+  "title": "StageAMorphology",
+  "type": "object"
 }

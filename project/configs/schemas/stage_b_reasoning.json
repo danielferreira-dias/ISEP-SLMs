@@ -1,320 +1,166 @@
 {
-  "title": "dermatology_reasoning",
-  "description": "Stage B teacher output. The gold diagnosis is provided as a private anchor and must be copied into diagnosis. Do not regenerate morphology. supporting and contradicting may only cite field/value pairs already present in the frozen Stage A record.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "differential_diagnosis",
-    "reasoning",
-    "diagnosis"
-  ],
-  "properties": {
-    "differential_diagnosis": {
-      "type": "array",
-      "description": "Ranked differential. Rank 1 must be the provided gold diagnosis. Cite Stage A findings only. Do not invent visual evidence.",
-      "minItems": 2,
-      "maxItems": 5,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "rank",
-          "disease",
-          "supporting",
-          "contradicting",
-          "missing"
-        ],
-        "properties": {
-          "rank": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5,
-            "description": "1 is the most likely hypothesis and must match the gold diagnosis."
-          },
-          "disease": {
-            "type": "string",
-            "description": "Disease name. Rank 1 must equal the provided gold diagnosis."
-          },
-          "supporting": {
-            "type": "array",
-            "description": "Stage A findings that favour this hypothesis. Rank 1 must have at least one item.",
-            "minItems": 0,
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["field", "value"],
-              "properties": {
-                "field": {
-                  "type": "string",
-                  "enum": [
-                    "primary_lesion",
-                    "size",
-                    "color",
-                    "shape",
-                    "border",
-                    "surface",
-                    "secondary_morphology",
-                    "configuration",
-                    "distribution",
-                    "additional_features"
-                  ]
-                },
-                "value": {
-                  "type": "string",
-                  "enum": [
-                    "macule",
-                    "patch",
-                    "papule",
-                    "plaque",
-                    "nodule",
-                    "tumor",
-                    "vesicle",
-                    "bulla",
-                    "pustule",
-                    "wheal",
-                    "cyst",
-                    "comedo",
-                    "burrow",
-                    "ulcer",
-                    "erosion",
-                    "cannot_assess",
-                    "punctate",
-                    "few_mm",
-                    "about_1_cm",
-                    "few_cm",
-                    "large_or_extensive",
-                    "brown",
-                    "black",
-                    "red",
-                    "pink",
-                    "purple",
-                    "blue",
-                    "gray",
-                    "white",
-                    "yellow",
-                    "orange",
-                    "skin-colored",
-                    "hypopigmented",
-                    "round",
-                    "oval",
-                    "irregular",
-                    "symmetric",
-                    "asymmetric",
-                    "well-defined",
-                    "ill-defined",
-                    "regular",
-                    "raised",
-                    "fading",
-                    "flat",
-                    "elevated",
-                    "smooth",
-                    "keratotic",
-                    "verrucous",
-                    "exudative",
-                    "scale",
-                    "crust",
-                    "ulceration",
-                    "fissure",
-                    "lichenification",
-                    "excoriation",
-                    "atrophy",
-                    "solitary",
-                    "grouped",
-                    "clustered",
-                    "annular",
-                    "arcuate",
-                    "linear",
-                    "serpiginous",
-                    "polycyclic",
-                    "targetoid",
-                    "scattered",
-                    "disseminated",
-                    "localized",
-                    "generalized",
-                    "acral",
-                    "flexural",
-                    "extensor",
-                    "photodistributed",
-                    "intertriginous",
-                    "dermatomal",
-                    "heterogeneous pigmentation",
-                    "homogeneous pigmentation",
-                    "blue-white veil",
-                    "pigment network",
-                    "atypical pigment network",
-                    "dots and globules",
-                    "streaks",
-                    "regression structures",
-                    "structureless area",
-                    "shiny white lines",
-                    "telangiectasia",
-                    "milia-like cysts",
-                    "follicular plugging",
-                    "central scar",
-                    "satellite lesions",
-                    "collarette scale",
-                    "purpura",
-                    "necrosis",
-                    "weeping",
-                    "not_assessable"
-                  ]
-                }
-              }
-            }
-          },
-          "contradicting": {
-            "type": "array",
-            "description": "Stage A findings that argue against this hypothesis. Empty if none.",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": ["field", "value"],
-              "properties": {
-                "field": {
-                  "type": "string",
-                  "enum": [
-                    "primary_lesion",
-                    "size",
-                    "color",
-                    "shape",
-                    "border",
-                    "surface",
-                    "secondary_morphology",
-                    "configuration",
-                    "distribution",
-                    "additional_features"
-                  ]
-                },
-                "value": {
-                  "type": "string",
-                  "enum": [
-                    "macule",
-                    "patch",
-                    "papule",
-                    "plaque",
-                    "nodule",
-                    "tumor",
-                    "vesicle",
-                    "bulla",
-                    "pustule",
-                    "wheal",
-                    "cyst",
-                    "comedo",
-                    "burrow",
-                    "ulcer",
-                    "erosion",
-                    "cannot_assess",
-                    "punctate",
-                    "few_mm",
-                    "about_1_cm",
-                    "few_cm",
-                    "large_or_extensive",
-                    "brown",
-                    "black",
-                    "red",
-                    "pink",
-                    "purple",
-                    "blue",
-                    "gray",
-                    "white",
-                    "yellow",
-                    "orange",
-                    "skin-colored",
-                    "hypopigmented",
-                    "round",
-                    "oval",
-                    "irregular",
-                    "symmetric",
-                    "asymmetric",
-                    "well-defined",
-                    "ill-defined",
-                    "regular",
-                    "raised",
-                    "fading",
-                    "flat",
-                    "elevated",
-                    "smooth",
-                    "keratotic",
-                    "verrucous",
-                    "exudative",
-                    "scale",
-                    "crust",
-                    "ulceration",
-                    "fissure",
-                    "lichenification",
-                    "excoriation",
-                    "atrophy",
-                    "solitary",
-                    "grouped",
-                    "clustered",
-                    "annular",
-                    "arcuate",
-                    "linear",
-                    "serpiginous",
-                    "polycyclic",
-                    "targetoid",
-                    "scattered",
-                    "disseminated",
-                    "localized",
-                    "generalized",
-                    "acral",
-                    "flexural",
-                    "extensor",
-                    "photodistributed",
-                    "intertriginous",
-                    "dermatomal",
-                    "heterogeneous pigmentation",
-                    "homogeneous pigmentation",
-                    "blue-white veil",
-                    "pigment network",
-                    "atypical pigment network",
-                    "dots and globules",
-                    "streaks",
-                    "regression structures",
-                    "structureless area",
-                    "shiny white lines",
-                    "telangiectasia",
-                    "milia-like cysts",
-                    "follicular plugging",
-                    "central scar",
-                    "satellite lesions",
-                    "collarette scale",
-                    "purpura",
-                    "necrosis",
-                    "weeping",
-                    "not_assessable"
-                  ]
-                }
-              }
-            }
-          },
-          "missing": {
-            "type": "array",
-            "description": "Information not visible in the image that would discriminate this hypothesis. Empty if the image is sufficient for this item.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "duration_and_evolution",
-                "symptoms",
-                "palpation",
-                "other_body_sites",
-                "dermoscopy",
-                "scale_or_ruler",
-                "closer_or_overview_image",
-                "clinical_history"
-              ]
-            }
-          }
-        }
-      }
+  "$defs": {
+    "AnchorEvidenceStatus": {
+      "description": "How strongly the image and Stage A support the private gold anchor.",
+      "enum": [
+        "supported",
+        "weak",
+        "unsupported"
+      ],
+      "title": "AnchorEvidenceStatus",
+      "type": "string"
     },
-    "reasoning": {
-      "type": "string",
-      "description": "Short clinical justification. Use only Stage A findings already cited in supporting or contradicting. Explain why the gold diagnosis ranks above the next alternatives."
+    "ConfidenceLevel": {
+      "description": "Closed confidence vocabulary for observations and diagnoses.",
+      "enum": [
+        "low",
+        "moderate",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "DifferentialComparison": {
+      "additionalProperties": false,
+      "description": "Why the gold diagnosis is favoured over one plausible alternative.",
+      "properties": {
+        "alternative": {
+          "minLength": 1,
+          "title": "Alternative",
+          "type": "string"
+        },
+        "comparison": {
+          "minLength": 1,
+          "title": "Comparison",
+          "type": "string"
+        },
+        "features_favoring_alternative": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Features Favoring Alternative",
+          "type": "array"
+        },
+        "features_favoring_diagnosis": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Features Favoring Diagnosis",
+          "type": "array"
+        }
+      },
+      "required": [
+        "alternative",
+        "features_favoring_diagnosis",
+        "features_favoring_alternative",
+        "comparison"
+      ],
+      "title": "DifferentialComparison",
+      "type": "object"
+    },
+    "MissingDiscriminator": {
+      "enum": [
+        "duration_and_evolution",
+        "symptoms",
+        "palpation",
+        "other_body_sites",
+        "dermoscopy",
+        "scale_or_ruler",
+        "closer_image",
+        "overview_image",
+        "clinical_history",
+        "histopathology"
+      ],
+      "type": "string"
+    },
+    "ResponsePolicy": {
+      "description": "Response behavior derived from whether the image is evaluable.",
+      "enum": [
+        "ANSWER_DIFFERENTIAL",
+        "REQUEST_NEW_IMAGE"
+      ],
+      "title": "ResponsePolicy",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Gold-anchored facts and the teacher's student-facing justification.",
+  "properties": {
+    "anchor_evidence_status": {
+      "$ref": "#/$defs/AnchorEvidenceStatus"
+    },
+    "annotation_conflict": {
+      "title": "Annotation Conflict",
+      "type": "boolean"
+    },
+    "annotation_conflict_reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Annotation Conflict Reason"
+    },
+    "clinical_reasoning": {
+      "minLength": 1,
+      "title": "Clinical Reasoning",
+      "type": "string"
     },
     "diagnosis": {
-      "type": "string",
-      "description": "Must equal the provided gold diagnosis. This field records the destination, not an independent teacher prediction."
+      "minLength": 1,
+      "title": "Diagnosis",
+      "type": "string"
+    },
+    "diagnostic_confidence": {
+      "$ref": "#/$defs/ConfidenceLevel"
+    },
+    "differential_comparisons": {
+      "items": {
+        "$ref": "#/$defs/DifferentialComparison"
+      },
+      "maxItems": 4,
+      "title": "Differential Comparisons",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "$ref": "#/$defs/MissingDiscriminator"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "non_evaluable_reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Non Evaluable Reason"
+    },
+    "response_policy": {
+      "$ref": "#/$defs/ResponsePolicy"
     }
-  }
+  },
+  "required": [
+    "anchor_evidence_status",
+    "annotation_conflict",
+    "annotation_conflict_reason",
+    "diagnostic_confidence",
+    "diagnosis",
+    "differential_comparisons",
+    "limitations",
+    "response_policy",
+    "non_evaluable_reason",
+    "clinical_reasoning"
+  ],
+  "title": "StageBReasoning",
+  "type": "object"
 }

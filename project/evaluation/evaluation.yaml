@@ -1,53 +1,85 @@
 evaluation:
+  protocol:
+    checkpoint_selection:
+      split: sft_dev
+      metric: macro_f1
+      tie_break_metrics: [balanced_accuracy, eval_loss, earlier_epoch]
+    final_only_benchmarks:
+      - ISEPDermaBench
+      - DermoBench
+    never_use_for_checkpoint_selection:
+      - ISEPDermaBench
+      - DermoBench
+    comparison_order:
+      - Qwen3.5-4B-base
+      - E1-selected
+      - E2-selected
+      - E3-selected
+      - larger-generalist-baselines
+    comparison_type_required: true
+    comparison_types: [strictly_paired, contextual]
+
   quality:
     internal_classification:
       enabled: true
-      direction: maximize
+      metrics:
+        - top_1_accuracy
+        - top_3_accuracy
+        - macro_f1
+        - balanced_accuracy
+        - per_class_recall
+        - calibration_error
+        - invalid_output_rate
 
     internal_morphology:
       enabled: true
-      direction: maximize
+      metrics:
+        - exact_match_validity
+        - micro_f1
+        - macro_f1
+        - per_concept_precision_recall_f1
+        - hamming_loss
+
+    isep_dermabench:
+      enabled: true
+      role: final_external_evaluation
 
     dermobench:
       enabled: true
-      direction: maximize
+      role: contextual_external_evaluation
 
-    medqa:
-      enabled: true
-      direction: maximize
-      role: retention
-
-    mmlu_medical:
-      enabled: true
-      direction: maximize
-      role: retention
+    retention:
+      medqa: true
+      mmlu_medical: true
 
   efficiency:
-    cost_per_1000_cases:
-      direction: minimize
+    same_hardware_and_runtime_required: true
+    metrics:
+      - parameter_count
+      - trainable_parameter_count
+      - time_to_first_token_ms
+      - latency_end_to_end_p50_ms
+      - latency_end_to_end_p95_ms
+      - latency_end_to_end_p99_ms
+      - output_tokens_per_second
+      - requests_per_second
+      - gpu_seconds_per_request
+      - peak_vram_gb
+      - watt_hours_per_request
+      - watt_hours_per_correct_answer
+      - training_gpu_hours
+      - monetary_cost
+    api_energy_policy: unavailable_unless_provider_reports_verifiable_measurement
 
-    latency_p50_ms:
-      direction: minimize
-
-    latency_p95_ms:
-      direction: minimize
-
-    throughput_cases_per_second:
-      direction: maximize
-
-    peak_vram_gb:
-      direction: minimize
-
-  composite:
-    dermatology_quality:
-      internal_classification: 0.30
-      internal_morphology: 0.30
-      dermobench: 0.40
+  reporting_only_composite:
+    enabled: false
+    reason: >
+      A cross-benchmark composite must never select an epoch or checkpoint.
+      Quality dimensions are reported separately and through Pareto frontiers.
 
   pareto:
     plots:
-      - x: cost_per_1000_cases
-        y: dermatology_quality
-
-      - x: latency_p95_ms
-        y: dermatology_quality
+      - [quality, latency_end_to_end_p95_ms]
+      - [quality, peak_vram_gb]
+      - [quality, watt_hours_per_request]
+      - [quality, monetary_cost]

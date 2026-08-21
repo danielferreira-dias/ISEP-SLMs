@@ -37,6 +37,8 @@ teacher:
       A:
         name: morphology
         prompt_ref: configs/teacher_configs/prompts/stage_a.md
+        prompt_version: e3_stage_a_v1
+        prompt_sha256: c28f6ff4f9a47ba23bc02f2a6d14541ee5afeeaf134bca5cf48936f150121a4f
         response_format:
           type: json_schema
           json_schema:
@@ -46,6 +48,8 @@ teacher:
       B:
         name: reasoning
         prompt_ref: configs/teacher_configs/prompts/stage_b.md
+        prompt_version: e3_stage_b_v1
+        prompt_sha256: b8239b38c24eac6037c22bcfcbc3573deb37cd5011c97d234e4179f20718125e
         response_format:
           type: json_schema
           json_schema:

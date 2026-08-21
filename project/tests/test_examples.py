@@ -13,12 +13,17 @@ def test_example_from_hub_row_copies_rgb_and_gold() -> None:
             "gold_diagnosis": "melanoma",
             "image": image,
         },
+        repo_id="danielfdias98/ISEPDistillDataset",
+        revision="abc123",
         config="diagnosis",
         split="sft_train",
     )
     assert example.sample_id == "abc"
     assert example.gold_diagnosis == "melanoma"
-    assert example.source_ref == "hf://diagnosis/sft_train/abc"
+    assert example.source_ref == (
+        "hf://datasets/danielfdias98/ISEPDistillDataset@abc123/"
+        "diagnosis/sft_train/abc"
+    )
     assert example.image.mode == "RGB"
     assert example.image.size == (12, 8)
     assert example.image is not image

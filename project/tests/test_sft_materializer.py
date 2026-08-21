@@ -253,6 +253,26 @@ def test_missing_generation_attempts_fail_closed_unless_partial() -> None:
     assert result.stage_b_missing_attempt_ids == ()
 
 
+def test_stage_a_only_sample_is_tracked_as_missing_stage_b_attempt() -> None:
+    source = _source()
+
+    result = materialize_multitask_rows(
+        [source],
+        [_stage_a(source)],
+        [],
+        require_complete=False,
+    )
+
+    assert {row.task for row in result.rows} == {
+        SFTTask.DIAGNOSIS,
+        SFTTask.MORPHOLOGY,
+        SFTTask.CAPTION,
+    }
+    assert result.stage_b_status_counts["missing_attempt"] == 1
+    assert result.stage_b_missing_attempt_ids == ("s001",)
+    assert result.source_ids_without_stage_b == ("s001",)
+
+
 def test_stage_a_gold_leak_is_rejected() -> None:
     source = _source()
     payload = deepcopy(STAGE_A_PAYLOAD)

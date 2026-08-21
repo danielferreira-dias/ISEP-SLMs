@@ -1,6 +1,7 @@
 """TeacherClient extra_body split and completion error mapping."""
 
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
@@ -47,9 +48,11 @@ def test_complete_stage_sends_provider_in_extra_body() -> None:
     assert response.content_json == {"ok": True}
     kwargs = fake.calls[0]
     assert "provider" not in kwargs
-    extra = kwargs["extra_body"]
-    assert extra["provider"]["only"] == ["google-vertex"]
-    assert extra["reasoning"]["exclude"] is True
+    extra = cast(dict[str, object], kwargs["extra_body"])
+    provider = cast(dict[str, object], extra["provider"])
+    reasoning = cast(dict[str, object], extra["reasoning"])
+    assert provider["only"] == ["google-vertex"]
+    assert reasoning["exclude"] is True
     assert "temperature" not in kwargs
 
 

@@ -1,25 +1,29 @@
-"""OpenRouter chat client for one teacher stage."""
+"""Teacher HTTP clients. OpenRouter is the default; Vertex is opt-in via YAML."""
 
 import json
 from dataclasses import dataclass
-from typing import Literal, Protocol
+from typing import Literal, Protocol, cast
 
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 
 from project.teacher.schemas import UsageInfo
-from project.teacher.teacher import TeacherModel
+from project.teacher.teacher import TeacherAPI, TeacherModel, TeacherProvider
 
 DEFAULT_TIMEOUT_S = 180.0
-DEFAULT_MAX_RETRIES = 3
+DEFAULT_MAX_RETRIES = 0
 
 
 class TeacherCompletionError(RuntimeError):
     """The teacher HTTP call succeeded but the payload is unusable."""
 
+    def __init__(self, message: str, *, usage: UsageInfo | None = None) -> None:
+        super().__init__(message)
+        self.usage = usage
+
 
 @dataclass(slots=True, kw_only=True, frozen=True)
 class TeacherResponse:
-    """Parsed OpenRouter chat completion for one stage."""
+    """Parsed teacher completion for one stage."""
 
     content_json: dict[str, object]
     raw_content: str
@@ -39,6 +43,52 @@ class StageCompleter(Protocol):
         """Send one stage and return parsed JSON content."""
 
 
+class _CompletionsClient(Protocol):
+    """Small structural surface used from the OpenAI-compatible SDK."""
+
+    def create(self, **kwargs: object) -> object:
+        """Create one chat completion."""
+
+
+class _ChatClient(Protocol):
+    completions: _CompletionsClient
+
+
+class _OpenAICompatibleClient(Protocol):
+    chat: _ChatClient
+
+
+def create_teacher_client(
+    teacher: TeacherModel,
+    *,
+    timeout_s: float = DEFAULT_TIMEOUT_S,
+    max_retries: int = DEFAULT_MAX_RETRIES,
+    client: object | None = None,
+) -> StageCompleter:
+    """Return the completer matching ``teacher.provider``.
+
+    Args:
+        teacher: Loaded YAML config.
+        timeout_s: Per-request timeout forwarded to the SDK.
+        max_retries: OpenRouter SDK retries. Ignored for Vertex.
+        client: Optional injected SDK client for tests.
+    """
+    if teacher.provider is TeacherProvider.VERTEX:
+        from project.teacher.vertex import VertexTeacherClient
+
+        return VertexTeacherClient(
+            teacher,
+            timeout_s=timeout_s,
+            client=client,
+        )
+    return TeacherClient(
+        teacher,
+        timeout_s=timeout_s,
+        max_retries=max_retries,
+        client=client,
+    )
+
+
 class TeacherClient:
     """Call OpenRouter using ``TeacherModel.openrouter_body``."""
 
@@ -55,16 +105,22 @@ class TeacherClient:
         Args:
             teacher: Loaded YAML config.
             timeout_s: Per-request timeout forwarded to the SDK.
-            max_retries: SDK retries for 429/5xx. Do not add a second loop.
+            max_retries: SDK retries. Defaults to zero for auditable fail-closed
+                generation; a later retry must be an explicit new attempt.
             client: Optional injected OpenAI client for tests.
         """
         self._teacher = teacher
-        self._client = client or OpenAI(
+        if teacher.provider is not TeacherProvider.OPENROUTER or not isinstance(
+            teacher.api, TeacherAPI
+        ):
+            raise TypeError("TeacherClient requires provider=openrouter")
+        sdk_client = client or OpenAI(
             base_url=teacher.api.base_url,
             api_key=teacher.api.api_key(),
             timeout=timeout_s,
             max_retries=max_retries,
         )
+        self._client = cast(_OpenAICompatibleClient, sdk_client)
 
     def complete_stage(
         self,
@@ -88,18 +144,33 @@ class TeacherClient:
                 or ``finish_reason == "length"``.
         """
         body = self._teacher.openrouter_body(stage_key, messages)
-        completion = self._client.chat.completions.create(
-            model=body["model"],
-            messages=body["messages"],
-            max_tokens=body["max_tokens"],
-            seed=body["seed"],
-            response_format=body["response_format"],
-            extra_body={
-                "reasoning": body["reasoning"],
-                "provider": body["provider"],
-            },
-        )
+        try:
+            completion = self._client.chat.completions.create(
+                model=body["model"],
+                messages=body["messages"],
+                max_tokens=body["max_tokens"],
+                seed=body["seed"],
+                response_format=body["response_format"],
+                extra_body={
+                    "reasoning": body["reasoning"],
+                    "provider": body["provider"],
+                },
+            )
+        except OpenAIError as exc:
+            raise TeacherCompletionError(_provider_error_code(exc)) from exc
         return _response_from_completion(completion)
+
+
+def _provider_error_code(exc: OpenAIError) -> str:
+    """Return a stable provider outcome without response bodies or secrets."""
+    name = type(exc).__name__
+    normalized = str(exc).casefold()
+    if any(marker in normalized for marker in ("safety", "guardrail", "filtered")):
+        return f"provider_safety_refusal:{name}"
+    status_code = getattr(exc, "status_code", None)
+    if isinstance(status_code, int):
+        return f"provider_http_error:{status_code}:{name}"
+    return f"provider_error:{name}"
 
 
 def _response_from_completion(completion: object) -> TeacherResponse:
@@ -148,4 +219,6 @@ def _usage_from_completion(completion: object) -> UsageInfo | None:
         completion_tokens=getattr(usage, "completion_tokens", None),
         total_tokens=getattr(usage, "total_tokens", None),
         cost=cost if isinstance(cost, int | float) else None,
+        cost_currency="USD" if isinstance(cost, int | float) else None,
+        cost_basis="provider_reported" if isinstance(cost, int | float) else None,
     )

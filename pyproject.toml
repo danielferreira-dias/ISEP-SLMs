@@ -19,6 +19,8 @@ dependencies = [
     "pydantic>=2.12,<3",
     "pyyaml>=6.0.3",
     "streamlit>=1.59.2",
+    "tenacity>=9.1,<10",
+    "google-genai>=1.0.0,<3",
 ]
 
 [project.scripts]
@@ -28,6 +30,8 @@ isep-e3-teacher = "src.train.e3.generation_cli:main"
 isep-train = "src.train.cli:main"
 isep-stage-a = "project.stages.stage_a:main"
 isep-stage-b = "project.stages.stage_b:main"
+isep-generate-e3 = "project.pipeline.generate:main"
+isep-materialize-e3 = "project.pipeline.sft:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -38,6 +42,7 @@ include = [
     "project.teacher",
     "project.teacher.utils",
     "project.dataset",
+    "project.pipeline",
 ]
 
 [project.optional-dependencies]
@@ -76,6 +81,7 @@ dev = [
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+extend-exclude = ["project/scripts"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
@@ -84,3 +90,4 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 python_version = "3.12"
 strict = true
 warn_unused_configs = true
+exclude = "^project/scripts/"

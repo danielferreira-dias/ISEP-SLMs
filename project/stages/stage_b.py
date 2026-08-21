@@ -2,7 +2,7 @@
 
 import argparse
 import logging
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -12,8 +12,15 @@ from project.dataset.examples import (
     examples_from_manifest,
     iter_distill_examples,
 )
-from project.teacher.client import StageCompleter, TeacherClient, TeacherCompletionError
+from project.teacher.client import (
+    StageCompleter,
+    TeacherCompletionError,
+    create_teacher_client,
+)
+from project.teacher.provenance import generation_provenance
 from project.teacher.schemas import (
+    GenerationProvenance,
+    ImagePreprocessingInfo,
     RecordStatus,
     StageAFileRow,
     StageAMorphology,
@@ -22,10 +29,10 @@ from project.teacher.schemas import (
     parse_stage_b,
 )
 from project.teacher.teacher import DEFAULT_CONFIG, PROJECT_ROOT, TeacherModel
-from project.teacher.utils.images import encode_pil_image_data_url
+from project.teacher.utils.images import prepare_pil_image
 from project.teacher.utils.jsonl import (
     append_jsonl,
-    completed_ids,
+    completed_stage_b_ids,
     index_ok_stage_a,
     load_stage_a_rows,
 )
@@ -77,6 +84,7 @@ def generate_reasoning(
     example: DistillExample,
     stage_a: StageAFileRow,
     image_data_url: str,
+    image_preprocessing: ImagePreprocessingInfo | None = None,
 ) -> StageBFileRow:
     """Call the teacher, parse Stage B, and apply validation gates.
 
@@ -86,6 +94,7 @@ def generate_reasoning(
         example: Hub example that supplies gold_diagnosis and source_ref.
         stage_a: Frozen ok Stage A row.
         image_data_url: Encoded image.
+        image_preprocessing: Hash-addressed manifest of the encoded image.
 
     Returns:
         ok, rejected, or error row. Does not rewrite Stage A.
@@ -100,12 +109,23 @@ def generate_reasoning(
         example.gold_diagnosis,
     )
 
+    usage = None
     try:
         response = completer.complete_stage("B", messages)
+        usage = response.usage
         parsed = parse_stage_b(response.content_json)
     except (TeacherCompletionError, ValidationError, TypeError, ValueError) as exc:
         LOGGER.exception("Stage B failed for %s", example.sample_id)
-        return _error_row(teacher, example, _short_error(exc), usage=None)
+        if isinstance(exc, TeacherCompletionError) and exc.usage is not None:
+            usage = exc.usage
+        return _error_row(
+            teacher,
+            example,
+            _short_error(exc),
+            usage=usage,
+            image_preprocessing=image_preprocessing,
+            provenance=generation_provenance(teacher, "B"),
+        )
 
     check = validate_stage_b(stage_a.morphology, parsed, example.gold_diagnosis)
     status = RecordStatus.OK if check.ok else RecordStatus.REJECTED
@@ -120,6 +140,8 @@ def generate_reasoning(
         gold_diagnosis=example.gold_diagnosis,
         stage_a_sample_id=stage_a.sample_id,
         image_path=example.source_ref,
+        image_preprocessing=image_preprocessing,
+        provenance=generation_provenance(teacher, "B", response=response),
     )
 
 
@@ -132,6 +154,7 @@ def run_stage_b(
     output_path: Path,
     limit: int | None = None,
     resume: bool = True,
+    on_record: Callable[[StageBFileRow], None] | None = None,
 ) -> int:
     """Generate Stage B for examples that have an ok Stage A row.
 
@@ -142,28 +165,37 @@ def run_stage_b(
         stage_a_path: Stage A JSONL.
         output_path: Stage B JSONL.
         limit: Cap on new attempts after resume.
-        resume: Skip ids already ok in ``output_path``.
+        resume: Skip ids already terminal (ok or rejected) in ``output_path``.
+        on_record: Optional observer called after each durable JSONL append.
 
     Returns:
-        Count of error rows written (rejected does not count as process failure).
+        Count of error rows written. Rejected output is a terminal, auditable
+        quality-gate outcome and is not retried automatically.
     """
     stage_a_ok = index_ok_stage_a(load_stage_a_rows(stage_a_path))
-    skip = completed_ids(output_path) if resume else set()
+    skip = completed_stage_b_ids(output_path) if resume else set()
     failures = 0
     attempted = 0
 
     for example in examples:
         if example.sample_id in skip:
             continue
-        stage_a = stage_a_ok.get(example.sample_id)
-        if stage_a is None:
-            continue
         if limit is not None and attempted >= limit:
             break
 
         attempted += 1
-        record = _generate_one(teacher, completer, example, stage_a)
+        stage_a = stage_a_ok.get(example.sample_id)
+        if stage_a is None:
+            record = _error_row(
+                teacher,
+                example,
+                "missing_ok_stage_a_record",
+            )
+        else:
+            record = _generate_one(teacher, completer, example, stage_a)
         append_jsonl(output_path, record)
+        if on_record is not None:
+            on_record(record)
         if record.status is RecordStatus.ERROR:
             failures += 1
 
@@ -178,12 +210,19 @@ def _generate_one(
 ) -> StageBFileRow:
     """Encode the PIL image and run Stage B for one joined sample."""
     try:
-        image_data_url = encode_pil_image_data_url(example.image)
+        prepared = prepare_pil_image(example.image)
     except (TypeError, ValueError, OSError) as exc:
         LOGGER.exception("Stage B image failed for %s", example.sample_id)
         return _error_row(teacher, example, _short_error(exc))
 
-    return generate_reasoning(completer, teacher, example, stage_a, image_data_url)
+    return generate_reasoning(
+        completer,
+        teacher,
+        example,
+        stage_a,
+        prepared.data_url,
+        prepared.info,
+    )
 
 
 def _error_row(
@@ -191,6 +230,8 @@ def _error_row(
     example: DistillExample,
     error: str,
     usage: UsageInfo | None = None,
+    image_preprocessing: ImagePreprocessingInfo | None = None,
+    provenance: GenerationProvenance | None = None,
 ) -> StageBFileRow:
     """Build a Stage B error record."""
     return StageBFileRow(
@@ -204,6 +245,8 @@ def _error_row(
         gold_diagnosis=example.gold_diagnosis,
         stage_a_sample_id=example.sample_id,
         image_path=example.source_ref,
+        image_preprocessing=image_preprocessing,
+        provenance=provenance,
     )
 
 
@@ -238,7 +281,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--no-resume",
         action="store_true",
-        help="Do not skip sample ids already marked ok.",
+        help="Do not skip sample ids already terminal (ok or rejected).",
     )
     return parser.parse_args(argv)
 
@@ -251,7 +294,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     args = parse_args(argv)
     teacher = TeacherModel.from_yaml(args.config)
-    completer = TeacherClient(teacher)
+    completer = create_teacher_client(teacher)
     if args.manifest is not None:
         examples: Iterable[DistillExample] = examples_from_manifest(
             args.manifest,

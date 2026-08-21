@@ -1,8 +1,9 @@
 """Turn loaded ISEPDistillDataset rows into generation examples."""
 
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 from PIL import Image
 
@@ -31,23 +32,31 @@ def iter_distill_examples(
         split: Split to generate from. Default ``sft_train``.
 
     Yields:
-        Copied RGB images with sample_id and gold_diagnosis.
+        Independent PIL images with sample_id and gold_diagnosis.
 
     Raises:
         TypeError: If a row is missing image, sample_id, or gold_diagnosis.
     """
     dataset = DistillDataset.load(config=config, split=split)
-    table = dataset.get(config, split)
+    table = cast(Iterable[object], dataset.get(config, split))
 
     for row in table:
         if not isinstance(row, Mapping):
             raise TypeError("Hub row is not a mapping")
-        yield example_from_hub_row(row, config=config, split=split)
+        yield example_from_hub_row(
+            row,
+            repo_id=dataset.spec.huggingface.repo_id,
+            revision=dataset.spec.huggingface.revision,
+            config=config,
+            split=split,
+        )
 
 
 def example_from_hub_row(
     row: Mapping[str, object],
     *,
+    repo_id: str,
+    revision: str,
     config: str,
     split: str,
 ) -> DistillExample:
@@ -55,11 +64,14 @@ def example_from_hub_row(
 
     Args:
         row: Dataset row with image, sample_id, and gold_diagnosis.
+        repo_id: Immutable Hub repository identity.
+        revision: Immutable Hub commit used for this generation.
         config: Hub config name, used only in source_ref.
         split: Hub split name, used only in source_ref.
 
     Returns:
-        A generation example. The image is converted to RGB and copied.
+        A generation example. The image is copied without discarding EXIF/ICC;
+        deterministic preprocessing occurs immediately before the API call.
 
     Raises:
         TypeError: If required fields are missing or the wrong type.
@@ -75,13 +87,14 @@ def example_from_hub_row(
     if not isinstance(image, Image.Image):
         raise TypeError(f"Hub row {sample_id!r} image is {type(image).__name__}")
 
-    rgb = image.convert("RGB")
-    copied = rgb.copy()
+    copied = image.copy()
     return DistillExample(
         sample_id=sample_id.strip(),
         gold_diagnosis=gold.strip(),
         image=copied,
-        source_ref=f"hf://{config}/{split}/{sample_id.strip()}",
+        source_ref=(
+            f"hf://datasets/{repo_id}@{revision}/{config}/{split}/{sample_id.strip()}"
+        ),
     )
 
 
@@ -93,7 +106,7 @@ def examples_from_manifest(path: Path, *, project_root: Path) -> list[DistillExa
         project_root: Root for relative image paths.
 
     Returns:
-        Examples with RGB copies of each file.
+        Examples with independent image copies from each file.
     """
     from project.teacher.utils.jsonl import load_manifest
 
@@ -107,7 +120,7 @@ def examples_from_manifest(path: Path, *, project_root: Path) -> list[DistillExa
                 DistillExample(
                     sample_id=row.sample_id,
                     gold_diagnosis=row.gold_diagnosis,
-                    image=image.convert("RGB").copy(),
+                    image=image.copy(),
                     source_ref=str(image_path),
                 )
             )

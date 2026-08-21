@@ -1,7 +1,9 @@
 """Read and append UTF-8 JSONL used by Stage A and Stage B."""
 
 import json
+import os
 from collections.abc import Iterable
+from fcntl import LOCK_EX, LOCK_UN, flock
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -31,11 +33,11 @@ def load_manifest(path: Path) -> list[ManifestRow]:
         raise FileNotFoundError(f"Manifest not found: {path}")
 
     rows: list[ManifestRow] = []
-    lines = path.read_text(encoding="utf-8").splitlines()
-    for line_number, line in enumerate(lines, start=1):
-        if not line.strip():
-            continue
-        rows.append(_parse_manifest_line(line, line_number=line_number, path=path))
+    with path.open(encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            rows.append(_parse_manifest_line(line, line_number=line_number, path=path))
     return rows
 
 
@@ -72,11 +74,33 @@ def load_stage_a_rows(path: Path) -> list[StageAFileRow]:
         raise FileNotFoundError(f"Stage A JSONL not found: {path}")
 
     rows: list[StageAFileRow] = []
-    lines = path.read_text(encoding="utf-8").splitlines()
-    for line_number, line in enumerate(lines, start=1):
-        if not line.strip():
-            continue
-        rows.append(_parse_stage_a_line(line, line_number=line_number, path=path))
+    with path.open(encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            rows.append(_parse_stage_a_line(line, line_number=line_number, path=path))
+    return rows
+
+
+def load_stage_b_rows(path: Path) -> list[StageBFileRow]:
+    """Load and validate every Stage B audit row from JSONL."""
+    if not path.is_file():
+        raise FileNotFoundError(f"Stage B JSONL not found: {path}")
+
+    rows: list[StageBFileRow] = []
+    with path.open(encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            payload = _load_json_object(
+                line,
+                line_number=line_number,
+                path=path,
+            )
+            try:
+                rows.append(StageBFileRow.model_validate(payload))
+            except ValidationError as exc:
+                raise ValueError(f"{path}:{line_number}: invalid Stage B row") from exc
     return rows
 
 
@@ -114,19 +138,51 @@ def completed_ids(path: Path) -> set[str]:
         return set()
 
     done: set[str] = set()
-    lines = path.read_text(encoding="utf-8").splitlines()
-    for line_number, line in enumerate(lines, start=1):
-        if not line.strip():
-            continue
-        payload = _load_json_object(line, line_number=line_number, path=path)
-        sample_id = payload.get("sample_id")
-        status = payload.get("status")
-        if not isinstance(sample_id, str) or not sample_id:
-            raise ValueError(f"{path}:{line_number}: missing sample_id")
-        if sample_id in done:
-            continue
-        if status == RecordStatus.OK:
-            done.add(sample_id)
+    with path.open(encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            payload = _load_json_object(line, line_number=line_number, path=path)
+            sample_id = payload.get("sample_id")
+            status = payload.get("status")
+            if not isinstance(sample_id, str) or not sample_id:
+                raise ValueError(f"{path}:{line_number}: missing sample_id")
+            if sample_id in done:
+                continue
+            if status == RecordStatus.OK:
+                done.add(sample_id)
+    return done
+
+
+def completed_stage_b_ids(path: Path) -> set[str]:
+    """Return ids from fully valid, terminal Stage B rows.
+
+    Unlike :func:`completed_ids`, this validates the complete Stage B record,
+    including the teacher-generated clinical reasoning. Both ``ok`` and
+    ``rejected`` are terminal: accepted rows can enter training, while rejected
+    rows remain an auditable exclusion and are not requested again on resume.
+    ``error`` remains retryable. A legacy row therefore cannot be silently
+    treated as complete after contract changes.
+    """
+    if not path.is_file():
+        return set()
+
+    done: set[str] = set()
+    with path.open(encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            payload = _load_json_object(
+                line,
+                line_number=line_number,
+                path=path,
+            )
+            try:
+                row = StageBFileRow.model_validate(payload)
+            except ValidationError as exc:
+                raise ValueError(f"{path}:{line_number}: invalid Stage B row") from exc
+            if row.status in {RecordStatus.OK, RecordStatus.REJECTED}:
+                done.add(row.sample_id)
     return done
 
 
@@ -145,7 +201,8 @@ def _load_json_object(line: str, *, line_number: int, path: Path) -> dict[str, o
 def append_jsonl(path: Path, record: StageAFileRow | StageBFileRow) -> None:
     """Append one validated record as a JSON line.
 
-    Creates parent directories. Flushes after write.
+    Creates parent directories, serializes concurrent writers, flushes, and
+    fsyncs the append before returning.
 
     Args:
         path: JSONL destination.
@@ -154,8 +211,13 @@ def append_jsonl(path: Path, record: StageAFileRow | StageBFileRow) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     line = record.model_dump_json() + "\n"
     with path.open("a", encoding="utf-8") as handle:
-        handle.write(line)
-        handle.flush()
+        flock(handle.fileno(), LOCK_EX)
+        try:
+            handle.write(line)
+            handle.flush()
+            os.fsync(handle.fileno())
+        finally:
+            flock(handle.fileno(), LOCK_UN)
 
 
 def index_ok_stage_a(rows: Iterable[StageAFileRow]) -> dict[str, StageAFileRow]:
