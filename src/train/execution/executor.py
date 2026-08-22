@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 
+from project.metrics.resources import LocalResourceMonitor, ResourceMonitor
 from src.train.backends.contracts import (
     BackendFitResult,
     CheckpointObserver,
@@ -25,10 +27,6 @@ from src.train.execution.io import (
     JsonValue,
     atomic_write_json,
     read_json_array,
-)
-from src.train.execution.resources import (
-    LocalResourceMonitor,
-    ResourceMonitor,
 )
 from src.train.execution.sinks import create_default_metric_sink
 
@@ -81,6 +79,7 @@ class TrainingExecutor:
         *,
         resume_from_checkpoint: Path | None = None,
         initialize_from_checkpoint: bool = False,
+        result_validator: Callable[[BackendFitResult], None] | None = None,
     ) -> BackendFitResult:
         """Run a fit and atomically record completion, failure, or interruption.
 
@@ -90,6 +89,8 @@ class TrainingExecutor:
                 run's config, dataset, and model identity.
             initialize_from_checkpoint: Allow a newly created continuation run
                 to start from its separately staged parent checkpoint.
+            result_validator: Optional experiment-specific integrity check run
+                before the execution can transition to ``completed``.
 
         Returns:
             Backend result after durable local manifests are written.
@@ -150,6 +151,8 @@ class TrainingExecutor:
                 checkpoint_observer=recorder,
                 resume_from_checkpoint=resume_from_checkpoint,
             )
+            if result_validator is not None:
+                result_validator(result)
         except KeyboardInterrupt as exc:
             failure = _cleanup(monitor, metric_sink, primary=exc)
             status_store.transition(RunStatus.INTERRUPTED, error=failure)

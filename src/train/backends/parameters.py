@@ -143,7 +143,8 @@ def validate_trainable_parameter_manifest(
     if non_lora:
         preview = ", ".join(non_lora[:5])
         raise RuntimeError(
-            "E1 permits LoRA tensors only; unexpected trainable parameters: " + preview
+            "The controlled recipe permits LoRA tensors only; unexpected "
+            "trainable parameters: " + preview
         )
     if lora.finetune_vision_layers and vision_count == 0:
         raise RuntimeError(

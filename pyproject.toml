@@ -31,7 +31,10 @@ isep-train = "src.train.cli:main"
 isep-stage-a = "project.stages.stage_a:main"
 isep-stage-b = "project.stages.stage_b:main"
 isep-generate-e3 = "project.pipeline.generate:main"
-isep-materialize-e3 = "project.pipeline.sft:main"
+isep-materialize-e3 = "project.pipeline.materialize_sft:main"
+isep-post-train = "project.post_training.cli:main"
+isep-stage-a-batch = "project.pipeline.stage_a_batch:main"
+isep-stage-b-batch = "project.pipeline.stage_b_batch:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -43,6 +46,12 @@ include = [
     "project.teacher.utils",
     "project.dataset",
     "project.pipeline",
+    "project.metrics",
+    "project.post_training",
+    "project.post_training.common",
+    "project.post_training.sft",
+    "project.post_training.opd",
+    "project.post_training.grpo",
 ]
 
 [project.optional-dependencies]

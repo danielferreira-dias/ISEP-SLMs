@@ -6,6 +6,7 @@ import gc
 from collections.abc import Sequence, Sized
 from pathlib import Path
 
+from project.metrics.trainer_events import TrainerEventBridge
 from src.train.backends.contracts import (
     BackendFitResult,
     BackendPrediction,
@@ -19,7 +20,7 @@ from src.train.backends.contracts import (
     PredictionSample,
     RuntimeInfo,
 )
-from src.train.backends.masking import audit_response_only_mask
+from src.train.backends.masking import audit_response_only_masks
 from src.train.backends.parameters import (
     build_trainable_parameter_manifest,
     validate_trainable_parameter_manifest,
@@ -47,7 +48,6 @@ from src.train.backends.unsloth_compat import (
     required_attribute,
 )
 from src.train.backends.unsloth_inference import predict_samples
-from src.train.execution.callbacks import TrainerEventBridge
 
 
 class UnslothBackend:
@@ -99,7 +99,7 @@ class UnslothBackend:
             model=model,
             jsonl_path=sample_cost_path,
         )
-        mask_audit = audit_response_only_mask(
+        mask_audits = audit_response_only_masks(
             collator=collator,
             processor=processor,
             train_dataset=request.train_dataset,
@@ -112,7 +112,7 @@ class UnslothBackend:
         metric_sink.write(
             MetricEvent(
                 name="audit/supervised_answer_tokens",
-                value=mask_audit.supervised_token_count,
+                value=sum(audit.supervised_token_count for audit in mask_audits),
                 step=0,
                 epoch=0.0,
             )
@@ -120,7 +120,15 @@ class UnslothBackend:
         metric_sink.write(
             MetricEvent(
                 name="audit/ignored_prompt_visual_padding_tokens",
-                value=mask_audit.ignored_token_count,
+                value=sum(audit.ignored_token_count for audit in mask_audits),
+                step=0,
+                epoch=0.0,
+            )
+        )
+        metric_sink.write(
+            MetricEvent(
+                name="audit/assistant_mask_task_count",
+                value=len(mask_audits),
                 step=0,
                 epoch=0.0,
             )

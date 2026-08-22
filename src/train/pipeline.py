@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from project.metrics.resources import LocalResourceMonitor
 from src.train.artifacts import ArtifactStore
 from src.train.backends import (
     FineTuneRequest,
@@ -18,7 +19,6 @@ from src.train.e2 import E2HumanPhase, E2ReleaseAudit, inspect_e2_release
 from src.train.environment import collect_environment
 from src.train.evaluate import model_spec
 from src.train.execution import RunIdentity, TrainingExecutor
-from src.train.execution.resources import LocalResourceMonitor
 from src.train.execution.sinks import create_default_metric_sink
 from src.train.finalize import ensure_preupdate_panel, evaluate_run
 from src.train.phases.label_only import LabelOnlyPhase

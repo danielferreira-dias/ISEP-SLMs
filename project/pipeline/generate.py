@@ -371,7 +371,11 @@ def run_teacher_campaign(
     )
     _add_stage_b_costs(costs, stage_b_output, selected_set)
     costs.assert_below_budget()
-    stage_b_before_coverage = _stage_b_coverage(stage_b_output)
+    stage_b_before_coverage = (
+        _stage_b_coverage(stage_b_output)
+        if resume
+        else _StageBCoverage(frozenset(), frozenset(), frozenset())
+    )
     resumed_ok = len(selected_set.intersection(stage_b_before_coverage.ok_ids))
     resumed_rejected = len(
         selected_set.intersection(stage_b_before_coverage.rejected_ids)

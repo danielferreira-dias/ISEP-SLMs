@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from project.metrics.resource_metrics import resource_summary
 from src.train.backends.contracts import (
     BackendFitResult,
     BackendPrediction,
@@ -36,7 +37,6 @@ from src.train.execution.io import (
     read_json_object,
 )
 from src.train.reporting import _resource_points
-from src.train.resource_metrics import resource_summary
 
 
 class _Sink(MetricSink):

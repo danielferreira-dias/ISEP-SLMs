@@ -26,6 +26,7 @@ data/benchmarks/**/*.parquet
 data/training/**/*.parquet
 data/reports/*.parquet
 outputs/
+project/data/batch_jobs/
 
 # Local credentials
 .env

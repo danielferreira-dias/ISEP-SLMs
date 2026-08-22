@@ -9,6 +9,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
+from project.metrics.resource_metrics import resource_summary
 from src.train.artifacts import (
     ArtifactStore,
     CheckpointMetricPoint,
@@ -29,7 +30,6 @@ from src.train.artifacts.types import TableCell
 from src.train.data import load_assignments
 from src.train.e2.caption_plots import render_caption_and_multitask_plots
 from src.train.e2.plots import render_morphology_plots
-from src.train.resource_metrics import resource_summary
 
 
 def build_run_report(run_directory: Path) -> None:

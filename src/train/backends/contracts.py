@@ -8,9 +8,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, Protocol
 
+from project.metrics.contracts import MetricEvent as MetricEvent
+from project.metrics.contracts import MetricSink as MetricSink
+from project.metrics.contracts import MetricValue as MetricValue
+from project.metrics.trainer_events import CheckpointEvent as CheckpointEvent
+from project.metrics.trainer_events import CheckpointObserver as CheckpointObserver
+
 QWEN35_4B_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
 
-MetricValue = float | int
 ParameterComponent = Literal[
     "vision",
     "attention",
@@ -49,12 +54,12 @@ class ModelLoadSpec:
         if self.dtype != "bfloat16":
             raise ValueError("Only the declared bfloat16 recipe is supported")
         if self.load_in_4bit is not False:
-            raise ValueError("QLoRA/4-bit loading is outside the E1 recipe")
+            raise ValueError("QLoRA/4-bit loading is outside the controlled recipe")
 
 
 @dataclass(frozen=True, slots=True)
 class LoraSpec:
-    """Define the controlled LoRA intervention used by E1."""
+    """Define the controlled LoRA intervention shared by ISEP experiments."""
 
     finetune_vision_layers: bool
     finetune_language_layers: Literal[True] = True
@@ -84,7 +89,8 @@ class LoraSpec:
         )
         if not expected:
             raise ValueError(
-                "E1 permits only r16/alpha16/dropout0 all-linear LoRA; "
+                "The controlled recipe permits only r16/alpha16/dropout0 "
+                "all-linear LoRA; "
                 "the vision flag is the sole experimental difference"
             )
 
@@ -108,6 +114,7 @@ class TrainerSpec:
     max_length: int | None = None
     max_steps: int = -1
     dataset_num_proc: int = 1
+    save_total_limit: int | None = None
 
     def __post_init__(self) -> None:
         """Validate numeric settings before any CUDA allocation."""
@@ -132,6 +139,8 @@ class TrainerSpec:
             raise ValueError("max_steps must be -1 or a positive integer")
         if self.max_length is not None and self.max_length <= 0:
             raise ValueError("max_length must be positive when provided")
+        if self.save_total_limit is not None and self.save_total_limit <= 0:
+            raise ValueError("save_total_limit must be positive when provided")
 
 
 @dataclass(frozen=True, slots=True)
@@ -173,37 +182,6 @@ class TrainableParameterManifest:
     parameters: tuple[TrainableParameter, ...]
     total_trainable: int
     by_component: dict[ParameterComponent, int]
-
-
-@dataclass(frozen=True, slots=True)
-class MetricEvent:
-    """Represent one scalar observation emitted during training."""
-
-    name: str
-    value: MetricValue
-    step: int
-    epoch: float | None = None
-    timestamp_utc: str | None = None
-
-    def __post_init__(self) -> None:
-        """Reject non-finite metrics and invalid event coordinates."""
-        if not self.name:
-            raise ValueError("MetricEvent name must not be empty")
-        if not math.isfinite(float(self.value)):
-            raise ValueError("MetricEvent value must be finite")
-        if self.step < 0:
-            raise ValueError("MetricEvent step must be non-negative")
-        if self.epoch is not None and not math.isfinite(self.epoch):
-            raise ValueError("MetricEvent epoch must be finite when present")
-
-
-@dataclass(frozen=True, slots=True)
-class CheckpointEvent:
-    """Describe a checkpoint just after the trainer has persisted it."""
-
-    path: Path
-    global_step: int
-    epoch: float | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -272,23 +250,6 @@ class BackendPrediction:
 
     sample_id: str
     text: str
-
-
-class MetricSink(Protocol):
-    """Receive scalar metrics without depending on a tracking vendor."""
-
-    def write(self, event: MetricEvent) -> None:
-        """Persist one scalar metric event."""
-
-    def close(self) -> None:
-        """Flush resources held by the sink."""
-
-
-class CheckpointObserver(Protocol):
-    """Receive checkpoint events while a fit is still running."""
-
-    def on_checkpoint(self, event: CheckpointEvent) -> None:
-        """Record a newly persisted checkpoint."""
 
 
 class FineTuningBackend(Protocol):

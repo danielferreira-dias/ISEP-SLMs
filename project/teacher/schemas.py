@@ -188,7 +188,17 @@ class StageAMorphology(BaseModel):
             raise ValueError("Observation IDs must be unique")
 
         duplicates = tuple(
-            (item.concept_id, item.value.casefold(), item.status)
+            (
+                item.concept_id,
+                item.value.casefold().strip(),
+                item.status,
+                item.scope.casefold().strip(),
+                (
+                    item.evidence_region.casefold().strip()
+                    if item.evidence_region is not None
+                    else None
+                ),
+            )
             for item in self.observations
         )
         if len(duplicates) != len(set(duplicates)):

@@ -1,5 +1,6 @@
 """Durable execution primitives for ISEP training experiments."""
 
+from project.metrics.resources import LocalResourceMonitor
 from src.train.execution.executor import TrainingExecutor
 from src.train.execution.identity import (
     RunIdentity,
@@ -9,7 +10,6 @@ from src.train.execution.identity import (
     stable_json_hash,
     validate_resume_checkpoint,
 )
-from src.train.execution.resources import LocalResourceMonitor
 from src.train.execution.sinks import create_default_metric_sink
 
 __all__ = [

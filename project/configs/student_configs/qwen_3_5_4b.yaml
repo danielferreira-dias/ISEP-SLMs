@@ -1,5 +1,8 @@
-# Student model configuration
-# Target: multimodal dermatology SFT with Qwen3.5-4B + Unsloth
+# Immutable student recipe shared by the post-training stages.
+#
+# Stage-specific datasets, trainer settings, checkpoint policy, evaluation and
+# logging live under configs/training/. Keeping them out of this file makes it
+# explicit that every controlled stage starts from the same official base.
 #
 # Sources:
 # - https://unsloth.ai/docs/models/qwen3.5/fine-tune
@@ -37,14 +40,15 @@ student:
     full_finetuning: false
 
   precision:
-    # Recommended for Qwen3.5 LoRA training by Unsloth.
+    # BF16 is part of the frozen experiment contract. Fail on hardware without
+    # BF16 support; silently falling back to FP16 would create another arm.
+    dtype: "bfloat16"
     load_in_16bit: true
     load_in_4bit: false
     load_in_8bit: false
-
-    # Let runtime select BF16 when supported, FP16 otherwise.
-    bf16: "auto"
-    fp16_fallback: true
+    bf16: true
+    fp16: false
+    allow_precision_fallback: false
 
   vision:
     enabled: true
@@ -85,86 +89,5 @@ student:
 
     random_state: 42
 
-  training:
-    stage: "sft"
-
-    # Memory-safe baseline for multimodal training.
-    # Increase batch size if the GPU has sufficient VRAM.
-    per_device_train_batch_size: 2
-    gradient_accumulation_steps: 4
-
-    # Match the three-epoch E2 protocol for the controlled E2 -> E3 comparison.
-    num_train_epochs: 3
-
-    # Frozen E2 Vision-LoRA value for a controlled E2 → E3 comparison.
-    learning_rate: 1.0e-4
-
-    optimizer: "adamw_8bit"
-    weight_decay: 0.001
-
-    warmup_ratio: 0.05
-    lr_scheduler_type: "linear"
-
-    # Avoid truncating image tokens. A finite value requires a separate audit.
-    max_length: null
-
-    # Required/recommended for multimodal datasets in TRL/Unsloth.
-    remove_unused_columns: false
-    dataset_text_field: ""
-    skip_prepare_dataset: true
-
-    seed: 42
-
-  evaluation:
-    enabled: true
-    # Evaluate exactly at each epoch boundary so the three saved checkpoints
-    # remain directly comparable with E1/E2.
-    strategy: "epoch"
-
-    # Keep checkpoint selection reproducible.
-    load_best_model_at_end: true
-    metric_for_best_model: "macro_f1"
-    greater_is_better: true
-    tie_break_metrics:
-      - "balanced_accuracy"
-      - "eval_loss"
-      - "earlier_epoch"
-
-  checkpointing:
-    output_dir: "outputs/qwen3_5_4b_dermatology_sft"
-    save_strategy: "epoch"
-    save_total_limit: 3
-
-    save_lora_only: true
-
-  logging:
-    logging_steps: 10
-    report_to: "none"
-
   reproducibility:
     seed: 42
-
-  # Suggested hyperparameter sweep after establishing the baseline.
-  sweep:
-    enabled: false
-
-    learning_rate:
-      - 1.0e-4
-      - 5.0e-5
-
-    lora_r:
-      - 16
-      - 32
-
-    lora_alpha:
-      - 16
-      - 32
-
-    num_train_epochs:
-      - 1
-      - 2
-      - 3
-
-    max_seq_length:
-      - 4096
-      - 8192

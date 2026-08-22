@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
-from copy import deepcopy
 from collections.abc import Iterator
+from copy import deepcopy
 from io import StringIO
 from pathlib import Path
 from typing import Literal
@@ -211,6 +211,36 @@ def test_campaign_limit_selects_one_stable_a_b_sample(tmp_path: Path) -> None:
 
     assert result.selected_samples == 1
     assert completer.calls == ["A", "B"]
+
+
+def test_no_resume_can_append_explicit_new_attempts(tmp_path: Path) -> None:
+    teacher = TeacherModel.from_yaml()
+    stage_a = tmp_path / "stage_a.jsonl"
+    stage_b = tmp_path / "stage_b.jsonl"
+    run_teacher_campaign(
+        teacher=teacher,
+        completer=_SequentialCompleter(),
+        cohort=_cohort(count=1),
+        stage_a_output=stage_a,
+        stage_b_output=stage_b,
+        progress_stream=StringIO(),
+    )
+    repeated = _SequentialCompleter()
+
+    result = run_teacher_campaign(
+        teacher=teacher,
+        completer=repeated,
+        cohort=_cohort(count=1),
+        stage_a_output=stage_a,
+        stage_b_output=stage_b,
+        resume=False,
+        progress_stream=StringIO(),
+    )
+
+    assert repeated.calls == ["A", "B"]
+    assert result.stage_b_completed == 1
+    assert len(stage_a.read_text(encoding="utf-8").splitlines()) == 2
+    assert len(stage_b.read_text(encoding="utf-8").splitlines()) == 2
 
 
 def test_campaign_refuses_resume_across_prompt_or_schema_change(

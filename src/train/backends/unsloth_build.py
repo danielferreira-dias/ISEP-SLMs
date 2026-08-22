@@ -1,11 +1,14 @@
-"""Private Unsloth builders for the fixed E1 scientific recipe."""
+"""Private Unsloth builders for controlled ISEP training recipes."""
 
 from __future__ import annotations
 
+import json
+import math
 import re
 from collections.abc import Mapping
 from pathlib import Path
 
+from project.metrics.trainer_events import TrainerEventBridge
 from src.train.backends.contracts import (
     CheckpointEvent,
     CheckpointObserver,
@@ -19,7 +22,6 @@ from src.train.backends.unsloth_compat import (
     required_attribute,
     select_keyword,
 )
-from src.train.execution.callbacks import TrainerEventBridge
 
 
 class CollectingCheckpointObserver:
@@ -28,17 +30,61 @@ class CollectingCheckpointObserver:
     def __init__(self, downstream: CheckpointObserver) -> None:
         """Retain a downstream observer and an ordered local event history."""
         self._downstream = downstream
-        self._events: list[CheckpointEvent] = []
+        self._events: dict[Path, CheckpointEvent] = {}
 
     @property
     def events(self) -> tuple[CheckpointEvent, ...]:
-        """Return checkpoint events in callback order."""
-        return tuple(self._events)
+        """Return unique checkpoint events in global-step order."""
+        return tuple(
+            sorted(
+                self._events.values(),
+                key=lambda event: (event.global_step, str(event.path.resolve())),
+            )
+        )
 
     def on_checkpoint(self, event: CheckpointEvent) -> None:
         """Forward and retain one completed checkpoint event."""
-        self._downstream.on_checkpoint(event)
-        self._events.append(event)
+        self._record(event, notify_downstream=True)
+
+    def recover_checkpoint(
+        self,
+        event: CheckpointEvent,
+        *,
+        already_recorded: bool,
+    ) -> None:
+        """Merge one disk-discovered event without replaying durable observers.
+
+        A valid ``isep_checkpoint.json`` proves that the downstream recorder
+        already saw this checkpoint in an earlier process (notably on resume).
+        Framework checkpoints lacking that manifest still need the normal
+        downstream notification so the resumability contract is attached.
+        """
+
+        self._record(event, notify_downstream=not already_recorded)
+
+    def _record(
+        self,
+        event: CheckpointEvent,
+        *,
+        notify_downstream: bool,
+    ) -> None:
+        key = event.path.resolve()
+        previous = self._events.get(key)
+        if previous is not None:
+            if previous.global_step != event.global_step:
+                raise RuntimeError(
+                    "One checkpoint path was observed with conflicting global steps"
+                )
+            if previous.epoch is None and event.epoch is not None:
+                self._events[key] = CheckpointEvent(
+                    path=previous.path,
+                    global_step=previous.global_step,
+                    epoch=event.epoch,
+                )
+            return
+        if notify_downstream:
+            self._downstream.on_checkpoint(event)
+        self._events[key] = event
 
 
 def load_base_pair(api: UnslothApi, spec: ModelLoadSpec) -> tuple[object, object]:
@@ -74,7 +120,7 @@ def enforce_non_thinking_processor(processor: object) -> None:
     ) -> object:
         requested = kwargs.get("enable_thinking")
         if requested is not None and requested is not False:
-            raise RuntimeError("ISEP E1 forbids enable_thinking=True")
+            raise RuntimeError("Controlled ISEP training forbids enable_thinking=True")
         kwargs["enable_thinking"] = False
         return invoke(
             original,
@@ -153,8 +199,8 @@ def build_vision_collator(
 
     Qwen3.5 renders an empty ``<think>...</think>`` block even when
     ``enable_thinking=False``.  Starting supervision after the closing marker
-    keeps those template tokens outside the loss, so E1 learns exactly the
-    canonical diagnosis label.
+    keeps those template tokens outside the loss, so training supervises only
+    the declared assistant target (a label or a richer multitask response).
     """
     return invoke(
         api.vision_collator,
@@ -206,6 +252,7 @@ def build_sft_config(api: UnslothApi, request: FineTuneRequest) -> object:
         "optim": "adamw_8bit",
         "lr_scheduler_type": "linear",
         "save_strategy": "epoch",
+        "save_total_limit": spec.save_total_limit,
         eval_key: "steps",
         length_key: spec.max_length,
         "packing": False,
@@ -244,6 +291,7 @@ def build_sft_config(api: UnslothApi, request: FineTuneRequest) -> object:
             "optim",
             "lr_scheduler_type",
             "save_strategy",
+            "save_total_limit",
             eval_key,
             length_key,
             "packing",
@@ -321,23 +369,92 @@ def record_unobserved_checkpoints(
     output_dir: Path,
     collector: CollectingCheckpointObserver,
 ) -> None:
-    """Record checkpoint directories missed by a framework callback."""
-    observed = {event.path.resolve() for event in collector.events}
+    """Reconcile callback events with all completed checkpoint directories.
+
+    Transformers callbacks can be skipped by patched runtimes, while a resumed
+    run starts with earlier checkpoints that were recorded by another process.
+    Reconciliation therefore reads existing ISEP metadata first, falls back to
+    ``trainer_state.json`` for the epoch, and leaves ``collector.events`` as a
+    unique chronological history.
+    """
+
     for path in sorted(output_dir.glob("checkpoint-*"), key=checkpoint_step):
-        if path.is_dir() and path.resolve() not in observed:
-            collector.on_checkpoint(
-                CheckpointEvent(
-                    path=path,
-                    global_step=checkpoint_step(path),
-                    epoch=None,
-                )
-            )
+        step = checkpoint_step(path)
+        if not path.is_dir() or step < 0:
+            continue
+        epoch, has_isep_manifest = _checkpoint_metadata(path, step)
+        collector.recover_checkpoint(
+            CheckpointEvent(path=path, global_step=step, epoch=epoch),
+            already_recorded=has_isep_manifest,
+        )
 
 
 def checkpoint_step(path: Path) -> int:
     """Extract a global step from a Trainer checkpoint directory."""
     match = re.fullmatch(r"checkpoint-(\d+)", path.name)
     return int(match.group(1)) if match else -1
+
+
+def _checkpoint_metadata(path: Path, step: int) -> tuple[float | None, bool]:
+    """Recover epoch metadata without overwriting an existing ISEP manifest.
+
+    Even a malformed or mismatched manifest is treated as already recorded.
+    The experiment-level validator must reject it; silently replacing it here
+    would conceal corruption or a cross-run checkpoint.
+    """
+
+    isep_path = path / "isep_checkpoint.json"
+    has_isep_manifest = isep_path.is_file()
+    isep_payload = _read_json_mapping(isep_path)
+    valid_isep = _metadata_matches_step(isep_payload, step)
+    if valid_isep:
+        epoch = _metadata_epoch(isep_payload)
+        if epoch is not None:
+            return epoch, has_isep_manifest
+
+    trainer_payload = _read_json_mapping(path / "trainer_state.json")
+    trainer_epoch = (
+        _metadata_epoch(trainer_payload)
+        if _metadata_matches_step(trainer_payload, step)
+        else None
+    )
+    return trainer_epoch, has_isep_manifest
+
+
+def _read_json_mapping(path: Path) -> Mapping[str, object] | None:
+    """Read optional framework metadata without weakening checkpoint recovery."""
+
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    if not isinstance(payload, Mapping):
+        return None
+    return payload
+
+
+def _metadata_matches_step(
+    payload: Mapping[str, object] | None,
+    expected_step: int,
+) -> bool:
+    if payload is None:
+        return False
+    value = payload.get("global_step")
+    return (
+        not isinstance(value, bool)
+        and isinstance(value, int)
+        and value == expected_step
+    )
+
+
+def _metadata_epoch(payload: Mapping[str, object] | None) -> float | None:
+    if payload is None:
+        return None
+    value = payload.get("epoch")
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    epoch = float(value)
+    return epoch if math.isfinite(epoch) else None
 
 
 def numeric_mapping(value: object) -> dict[str, float | int]:

@@ -289,16 +289,11 @@ def _load_retry(raw: dict[str, Any]) -> TeacherRetry:
 
     status_codes = raw.get("retryable_status_codes")
     if not isinstance(status_codes, list) or not status_codes:
-        raise TypeError(
-            "teacher.retry.retryable_status_codes must be a non-empty list"
-        )
+        raise TypeError("teacher.retry.retryable_status_codes must be a non-empty list")
     if any(
-        isinstance(code, bool) or not isinstance(code, int)
-        for code in status_codes
+        isinstance(code, bool) or not isinstance(code, int) for code in status_codes
     ):
-        raise TypeError(
-            "teacher.retry.retryable_status_codes must contain integers"
-        )
+        raise TypeError("teacher.retry.retryable_status_codes must contain integers")
     if any(not 100 <= code <= 599 for code in status_codes):
         raise ValueError(
             "teacher.retry.retryable_status_codes contains an invalid HTTP status"
@@ -353,6 +348,25 @@ class TeacherPricing:
                 "cost_basis": "estimated_list_price",
             }
         )
+
+
+def _load_pricing(raw: dict[str, Any], *, path: str) -> TeacherPricing:
+    """Load one named pricing profile without conflating traffic classes."""
+    return TeacherPricing(
+        input_per_million_tokens_usd=_require_positive_number(
+            raw.get("input_per_million_tokens_usd"),
+            f"{path}.input_per_million_tokens_usd",
+        ),
+        output_per_million_tokens_usd=_require_positive_number(
+            raw.get("output_per_million_tokens_usd"),
+            f"{path}.output_per_million_tokens_usd",
+        ),
+        traffic_type=_require_str(raw.get("traffic_type"), f"{path}.traffic_type"),
+        effective_through=_require_str(
+            raw.get("effective_through"), f"{path}.effective_through"
+        ),
+        source_url=_require_str(raw.get("source_url"), f"{path}.source_url"),
+    )
 
 
 @dataclass(frozen=True)
@@ -429,6 +443,7 @@ class TeacherModel:
     reasoning: TeacherReasoning
     retry: TeacherRetry | None
     pricing: TeacherPricing | None
+    batch_pricing: TeacherPricing | None
     structured: bool
     stages: dict[str, TeacherStage]
     config_path: Path
@@ -517,15 +532,19 @@ class TeacherModel:
         reasoning = _require_mapping(teacher.get("reasoning"), "teacher.reasoning")
         retry_raw = teacher.get("retry")
         retry = (
-            None
-            if retry_raw is None
-            else _require_mapping(retry_raw, "teacher.retry")
+            None if retry_raw is None else _require_mapping(retry_raw, "teacher.retry")
         )
         pricing_raw = teacher.get("pricing")
         pricing = (
             None
             if pricing_raw is None
             else _require_mapping(pricing_raw, "teacher.pricing")
+        )
+        batch_pricing_raw = teacher.get("batch_pricing")
+        batch_pricing = (
+            None
+            if batch_pricing_raw is None
+            else _require_mapping(batch_pricing_raw, "teacher.batch_pricing")
         )
         output = _require_mapping(teacher.get("output"), "teacher.output")
         stages_raw = _require_mapping(output.get("stages"), "teacher.output.stages")
@@ -583,28 +602,12 @@ class TeacherModel:
             pricing=(
                 None
                 if pricing is None
-                else TeacherPricing(
-                    input_per_million_tokens_usd=_require_positive_number(
-                        pricing.get("input_per_million_tokens_usd"),
-                        "teacher.pricing.input_per_million_tokens_usd",
-                    ),
-                    output_per_million_tokens_usd=_require_positive_number(
-                        pricing.get("output_per_million_tokens_usd"),
-                        "teacher.pricing.output_per_million_tokens_usd",
-                    ),
-                    traffic_type=_require_str(
-                        pricing.get("traffic_type"),
-                        "teacher.pricing.traffic_type",
-                    ),
-                    effective_through=_require_str(
-                        pricing.get("effective_through"),
-                        "teacher.pricing.effective_through",
-                    ),
-                    source_url=_require_str(
-                        pricing.get("source_url"),
-                        "teacher.pricing.source_url",
-                    ),
-                )
+                else _load_pricing(pricing, path="teacher.pricing")
+            ),
+            batch_pricing=(
+                None
+                if batch_pricing is None
+                else _load_pricing(batch_pricing, path="teacher.batch_pricing")
             ),
             structured=_require_bool(
                 output.get("structured"), "teacher.output.structured"

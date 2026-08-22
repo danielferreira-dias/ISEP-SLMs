@@ -15,6 +15,7 @@ from unittest.mock import patch
 
 from src.train.backends.contracts import (
     BackendFitResult,
+    CheckpointEvent,
     FineTuneRequest,
     LoraSpec,
     MetricEvent,
@@ -23,7 +24,10 @@ from src.train.backends.contracts import (
     TrainableParameterManifest,
     TrainerSpec,
 )
-from src.train.backends.masking import audit_response_only_mask
+from src.train.backends.masking import (
+    audit_response_only_mask,
+    audit_response_only_masks,
+)
 from src.train.backends.parameters import (
     build_trainable_parameter_manifest,
     validate_trainable_parameter_manifest,
@@ -37,10 +41,12 @@ from src.train.backends.sample_costs import (
     materialize_sample_costs,
 )
 from src.train.backends.unsloth_build import (
+    CollectingCheckpointObserver,
     apply_lora,
     build_sft_config,
     build_vision_collator,
     load_base_pair,
+    record_unobserved_checkpoints,
 )
 from src.train.backends.unsloth_compat import UnslothApi
 
@@ -125,7 +131,102 @@ class _CostCollator:
         }
 
 
+class _CheckpointObserver:
+    def __init__(self) -> None:
+        self.events: list[CheckpointEvent] = []
+
+    def on_checkpoint(self, event: CheckpointEvent) -> None:
+        self.events.append(event)
+
+
 class TrainBackendContractTests(unittest.TestCase):
+    def test_checkpoint_recovery_is_chronological_and_resume_safe(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            checkpoint_100 = output / "checkpoint-100"
+            checkpoint_200 = output / "checkpoint-200"
+            checkpoint_300 = output / "checkpoint-300"
+            for checkpoint in (checkpoint_300, checkpoint_100, checkpoint_200):
+                checkpoint.mkdir()
+            (checkpoint_100 / "isep_checkpoint.json").write_text(
+                json.dumps({"global_step": 100, "epoch": 1.0}),
+                encoding="utf-8",
+            )
+            (checkpoint_200 / "trainer_state.json").write_text(
+                json.dumps({"global_step": 200, "epoch": 2.0}),
+                encoding="utf-8",
+            )
+            downstream = _CheckpointObserver()
+            collector = CollectingCheckpointObserver(downstream)
+            callback_event = CheckpointEvent(
+                checkpoint_300,
+                global_step=300,
+                epoch=3.0,
+            )
+            collector.on_checkpoint(callback_event)
+            collector.on_checkpoint(callback_event)
+
+            record_unobserved_checkpoints(output, collector)
+            record_unobserved_checkpoints(output, collector)
+
+        self.assertEqual(
+            [event.global_step for event in collector.events],
+            [100, 200, 300],
+        )
+        self.assertEqual(
+            [event.epoch for event in collector.events],
+            [1.0, 2.0, 3.0],
+        )
+        # The old resume checkpoint already has an ISEP manifest; only the
+        # callback checkpoint and the previously missed framework checkpoint
+        # are forwarded, exactly once each.
+        self.assertEqual(len(downstream.events), 2)
+
+    def test_checkpoint_recovery_enriches_callback_epoch_from_trainer_state(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "checkpoint-40"
+            checkpoint.mkdir()
+            (checkpoint / "trainer_state.json").write_text(
+                json.dumps({"global_step": 40, "epoch": 0.5}),
+                encoding="utf-8",
+            )
+            downstream = _CheckpointObserver()
+            collector = CollectingCheckpointObserver(downstream)
+            collector.on_checkpoint(
+                CheckpointEvent(checkpoint, global_step=40, epoch=None)
+            )
+
+            record_unobserved_checkpoints(Path(temporary), collector)
+
+        self.assertEqual(len(collector.events), 1)
+        self.assertEqual(collector.events[0].global_step, 40)
+        self.assertEqual(collector.events[0].epoch, 0.5)
+        self.assertEqual(len(downstream.events), 1)
+
+    def test_checkpoint_recovery_never_rewrites_an_existing_bad_manifest(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "checkpoint-40"
+            checkpoint.mkdir()
+            manifest = checkpoint / "isep_checkpoint.json"
+            original = b'{"global_step": 999, "epoch": 99.0}'
+            manifest.write_bytes(original)
+            (checkpoint / "trainer_state.json").write_text(
+                json.dumps({"global_step": 40, "epoch": 0.5}),
+                encoding="utf-8",
+            )
+            downstream = _CheckpointObserver()
+            collector = CollectingCheckpointObserver(downstream)
+
+            record_unobserved_checkpoints(Path(temporary), collector)
+
+            self.assertEqual(manifest.read_bytes(), original)
+            self.assertEqual(collector.events[0].epoch, 0.5)
+            self.assertEqual(downstream.events, [])
+
     def test_cost_collator_records_exact_geometry_and_token_decomposition(self) -> None:
         record: dict[object, object] = {
             "sample_id": "sample-1",
@@ -310,6 +411,36 @@ class TrainBackendContractTests(unittest.TestCase):
         self.assertEqual(audit.supervised_token_count, 1)
         self.assertEqual(audit.ignored_token_count, 2)
         self.assertEqual(audit.forbidden_visual_token_count, 0)
+
+    def test_runtime_mask_audit_covers_one_row_per_task(self) -> None:
+        class _TaskDataset:
+            def mask_audit_records(self) -> list[dict[str, str]]:
+                return [
+                    {
+                        "sample_id": "diagnosis-1",
+                        "task": "diagnosis",
+                        "label": "class_a",
+                    },
+                    {
+                        "sample_id": "caption-1",
+                        "task": "caption",
+                        "label": "class_a",
+                    },
+                ]
+
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "mask.json"
+            audits = audit_response_only_masks(
+                collator=_MaskCollator(),
+                processor=_MaskProcessor(),
+                train_dataset=_TaskDataset(),
+                output_path=output,
+            )
+            manifest = json.loads(output.read_text(encoding="utf-8"))
+
+        self.assertEqual([audit.task for audit in audits], ["diagnosis", "caption"])
+        self.assertEqual(manifest["audit_count"], 2)
+        self.assertEqual(manifest["tasks"], ["diagnosis", "caption"])
 
     def test_nonfinite_metrics_are_rejected_before_serialization(self) -> None:
         with self.assertRaisesRegex(ValueError, "finite"):

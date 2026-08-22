@@ -1,5 +1,5 @@
 # Pipeline de Treino — Dermatology SLM/VLM
-**Versão:** 20 de agosto de 2026
+**Versão:** 22 de agosto de 2026
 
 ## Objetivo
 
@@ -52,9 +52,20 @@ Stage D   → E4: experiência on-policy separada, se E3 justificar
 Stage E   → E5: experiência GRPO separada, após auditoria dos rewards
 ```
 
-O âmbito de implementação atual termina em Stage A/B. Cada stage posterior
-produz um checkpoint independente; não é obrigatório executar D ou E para
-considerar E3 completo.
+Stage A/B, a auditoria e a materialização da release multitarefa primária estão
+implementados. O runtime e a configuração reproduzível de Stage C também estão
+implementados, mas nenhum checkpoint E3 é considerado treinado ou selecionado
+até a execução e a avaliação generativa em `sft_dev` terminarem. Stage D e
+Stage E permanecem contratos futuros: não existe ainda implementação de treino
+OPD ou GRPO. Não é obrigatório executar D ou E para considerar E3 completo.
+
+| Stage | Estado do código | Artefacto científico |
+| --- | --- | --- |
+| A/B | implementado e congelado | targets Teacher auditáveis |
+| Materialização E3 | implementada e publicada | release multitarefa `e3_multitask_sft_v1` |
+| C / E3 SFT | runner e configuração implementados; treino pendente | quatro checkpoints LoRA por época, depois seleção em `sft_dev` |
+| D / E4 OPD | futuro, não implementado | checkpoint opcional derivado do E3 selecionado |
+| E / E5 GRPO | futuro, não implementado | checkpoint opcional com parent declarado |
 
 ---
 
@@ -342,16 +353,25 @@ Image
 ### Flow
 
 ```text
-Enriched Internal Dataset
+Pinned E3 multitask train release
         +
-SkinCoT
+Pinned human diagnosis sft_dev
+        +
+Qwen/Qwen3.5-4B official base
         ↓
-STUDENT
+Vision + language LoRA SFT
         ↓
-SFT
+epoch 1 / epoch 2 / epoch 3 / epoch 4 checkpoints
         ↓
-SFT CHECKPOINT
+generative selection on sft_dev only
+        ↓
+selected E3 SFT checkpoint
 ```
+
+O braço primário E3 não carrega o adapter de E1 ou E2. Começa novamente na
+revisão oficial fixada do Qwen, para que a diferença seja atribuível ao target
+multitarefa E3 e não a treino cumulativo. SkinCoT continua uma ablation futura
+separada e não está misturado na release primária.
 
 ### O que o SFT ensina?
 
@@ -393,11 +413,106 @@ dois comportamentos incompatíveis. Falhas do Teacher não eliminam o target
 humano de diagnóstico; apenas reduzem as tarefas dependentes desse stage e são
 registadas no manifest de cobertura.
 
+O estado final de Stage B é rastreado por `sample_id` como `ok`, `rejected`,
+`error`, `missing_attempt` ou `not_eligible_stage_a`, com precedência
+`ok > rejected > error`. Um `rejected` é terminal e auditável: não entra como
+target de Stage B e não volta a ser pedido automaticamente. Um `error` continua
+retryable numa invocação posterior. O manifest conserva IDs e motivos das
+rejeições, erros, IDs sem tentativa e contagens de tentativas duplicadas. Uma
+imagem apenas com Stage A aceite mantém diagnóstico, morfologia e caption; a
+ausência de Stage B deixa de ser um drop silencioso.
+
 O release materializado inclui imagem, `messages`, IDs de tarefa, origem e hash
 do target, referência e hash da imagem, grupo de leakage, IDs das tentativas A/B
 e um manifest de integridade com contagens, bytes e SHA-256. A geração completa
 é fail-closed por omissão; materialização parcial e overwrite requerem flags
 explícitas.
+
+A release privada publicada usada pelo treino está fixada em:
+
+```text
+repo:     danielfdias98/ISEPDistillDataset
+revision: 4437aff671af4f4e32a2ebf006fdd3f4e72dea4f
+config:   e3_multitask_sft_v1
+split:    sft_train
+rows:     25 084
+```
+
+As contagens esperadas são 6.312 `diagnosis`, 6.312 `morphology`, 6.312
+`caption`, 6.127 `grounded_differential` e 21 `request_new_image`. O
+materializador canónico é `project/pipeline/materialize_sft.py`; o antigo
+`project/pipeline/sft.py` existe apenas como facade de compatibilidade e não é
+um trainer.
+
+O post-training do Student vive separadamente em `project/post_training` e é
+invocado por `isep-post-train`. A recipe imutável do Student contém apenas o
+base, precisão BF16 sem fallback, visão, LoRA e reprodutibilidade. Dataset,
+optimizer, épocas, avaliação e outputs pertencem à configuração de Stage C em
+`configs/training/e3_qwen3_5_4b_sft.yaml`.
+
+```bash
+uv run isep-post-train sft validate-config \
+  --config configs/training/e3_qwen3_5_4b_sft.yaml
+uv run isep-post-train sft smoke-test \
+  --config configs/training/e3_qwen3_5_4b_sft.yaml
+uv run isep-post-train sft run \
+  --config configs/training/e3_qwen3_5_4b_sft.yaml
+```
+
+`validate-config` não carrega a GPU; `smoke-test` faz um fit técnico curto num
+prefixo e pode alocar a GPU, mas não produz um checkpoint científico; só `run`
+inicia a campanha completa.
+
+O treino guarda um checkpoint LoRA no fim de cada uma das quatro épocas. A
+seleção é um passo determinístico posterior sobre o split humano
+`diagnosis/sft_dev` fixado na revisão
+`b215f0474e4931b5951da768e79a0d579d26919d` (1.229 rows), usando
+`macro_f1`, depois `balanced_accuracy`, `eval_loss` e a época mais antiga como
+desempates. Enquanto essa avaliação não terminar, o estado correto é
+`pending_sft_dev_generative_evaluation`: o runner não deve inventar nem inferir
+um "best checkpoint" a partir de loss de treino.
+
+Antes de reservar a GPU, o runner valida e persiste as contagens observadas e
+esperadas das duas releases. Cada row E3 volta a verificar os hashes publicados
+da imagem, prompt e target, além da igualdade entre `messages`, `prompt` e
+`target_text`. Como o release histórico `sft_dev` não publicou
+`target_sha256`, esse split usa explicitamente
+`target_text == gold_diagnosis` e regista o digest calculado com o método
+`gold_diagnosis_equality`, sem fingir que o hash veio do Hub. Depois de construir
+o collator, a máscara assistant-only é testada numa row real de cada tarefa.
+
+Uma execução full só pode terminar com exatamente os checkpoints íntegros das
+épocas 1, 2, 3 e 4 (`checkpoint-3136`, `checkpoint-6272`, `checkpoint-9408` e
+`checkpoint-12544`). A
+retoma exige o `run_id` original, identidade imutável e o checkpoint mais
+recente da própria run; não é permitido fazer rewind silencioso nem reescrever
+manifestos com uma configuração diferente.
+
+Como E1/E2 usaram três épocas, `checkpoint-9408` é preservado como o ponto E3
+com orçamento de updates diretamente comparável. Os quatro checkpoints são
+avaliados pelo mesmo protocolo generativo congelado em `sft_dev`, e o E3
+selecionado pode ser a época 4. Se isso acontecer, a tese reporta separadamente
+o resultado budget-matched da época 3 e o checkpoint selecionado da época 4,
+marcando este último como comparação contextual com compute adicional face a
+E1/E2.
+
+### Métricas de treino e recursos
+
+O namespace canónico é `project/metrics`. Durante o fit, o Stage C preserva:
+
+- `loss`, `eval_loss`, learning rate, gradient norm, epoch e global step;
+- segundos por step, exemplos/tokens/steps por segundo e duração total;
+- utilização da GPU, VRAM usada, RAM do processo, potência e temperatura;
+- energia integrada em Wh, GPU-hours, parâmetros treináveis e tamanho do
+  checkpoint quando o checkpoint selecionado já estiver disponível;
+- estado da run, sessões de retoma e identidade de configuração/dataset/modelo.
+
+Estas métricas permitem apresentar curvas de otimização e, depois da avaliação
+do checkpoint selecionado, fronteiras qualidade-versus-tempo, VRAM, energia e
+custo. Os módulos históricos em `src.train` são apenas facades de
+compatibilidade; métricas de qualidade de tarefas e eficiência de inferência
+continuam nos respetivos módulos de avaliação/benchmark, porque têm protocolos
+e denominadores diferentes.
 
 ### Limitação
 
@@ -408,6 +523,11 @@ Ainda não estamos diretamente a ensinar o modelo a corrigir os seus próprios e
 ---
 
 ## 6. Stage D — On-Policy Distillation
+
+Este stage futuro é OPD, não DPO. O dataset E3 não contém pares
+`chosen`/`rejected`, por isso adicionar um `DPOTrainer` agora não corresponde ao
+contrato dos dados nem ao objetivo on-policy. DPO só seria uma experiência nova
+depois de criar e congelar um dataset de preferências próprio.
 
 Aqui o Student já passou pelo SFT.
 
@@ -716,8 +836,9 @@ Image + Morphology + Ground Truth
 → Teacher-generated clinical_reasoning preserved verbatim
         ↓
 STAGE C / E3
-Generated Dataset + SkinCoT
-→ SFT
+Qwen/Qwen3.5-4B official base + pinned E3 multitask release
+→ vision + language LoRA SFT
+→ select only on frozen human sft_dev
 → E3 SFT Checkpoint
         ↓
 STAGE D / E4 OPCIONAL
@@ -738,21 +859,18 @@ Student gera structured output
 
 ## 14. Checkpoints e ablations
 
-A pipeline preserva checkpoints independentes e comparáveis. E4/E5 só avançam
-depois de E3 ser congelado e analisado:
+A pipeline preserva checkpoints independentes e comparáveis. E1, E2 e E3 são
+braços paralelos que começam na mesma revisão oficial; não são uma cadeia de
+continuação de adapters. E4/E5 só avançam depois de E3 ser congelado e
+analisado:
 
 ```text
-Qwen3.5-4B Base
-  ↓ benchmark
-E1 selected
-  ↓ benchmark
-E2 selected
-  ↓ benchmark
-E3 SFT selected
-  ↓ benchmark
-E4 OPD selected (se executado)
-  ↓ benchmark
-E5 GRPO selected (se executado)
+                         ┌→ E1 selected
+Qwen3.5-4B official base├→ E2 selected
+                         └→ E3 SFT selected
+                                  └→ E4 OPD selected (opcional)
+
+E5 GRPO (opcional) → parent checkpoint declarado antes da execução
 ```
 
 Exemplo:
@@ -764,19 +882,21 @@ Exemplo:
 | + OPD | 82 | 64 |
 | + GRPO | 84 | 68 |
 
-Isto mostra ganho **incremental** sem apagar os baselines históricos. O
-checkpoint de cada condição é escolhido exclusivamente em `sft_dev`; o
-ISEPDermaBench e o DermoBench são avaliações finais, nunca seletores de epoch.
+Isto mostra ganho **incremental** sem apagar os baselines históricos. Para E3,
+os quatro checkpoints de época são comparados exclusivamente na avaliação
+generativa do `sft_dev` humano congelado; o `macro_f1` é o seletor primário. O
+ISEPDermaBench, o DermoBench e qualquer benchmark externo só podem ser corridos
+depois da seleção e do freeze e nunca selecionam epoch/checkpoint.
 
 Para atribuição mais rigorosa, fazer também ablations:
 
 ```text
 Base
-Base + SFT
-Base + OPD
-Base + SFT + OPD
-Base + SFT + GRPO
-Base + SFT + OPD + GRPO
+E1 diagnosis-only desde o Base
+E2 morphology/caption desde o Base
+E3 multitask distilled SFT desde o Base
+E3 + OPD (se executado)
+E3 + GRPO ou E3 + OPD + GRPO, com parent pré-declarado (se executado)
 ```
 
 ---
@@ -800,19 +920,51 @@ Pode ser implementado com:
 O runner operacional é `isep-generate-e3`. Ele fixa uma única coorte ordenada,
 executa Stage A até cobertura aceite completa e só depois inicia Stage B sobre
 os mesmos `sample_id`. A interface de terminal apresenta progresso, imagens em
-falta, resultados aceites/falhados, amostra atual, ETA e custo estimado
-acumulado quando a configuração fixa preços. Uma falha de provider,
-schema ou validação termina a campanha com código não-zero e impede a passagem
+falta, resultados aceites/rejeitados/falhados, amostra atual, ETA e custo
+estimado acumulado quando a configuração fixa preços. Uma falha de provider ou
+schema termina a campanha com código não-zero e impede a passagem
 de A para B. O cliente Vertex usa uma única política Tenacity configurada e
 limitada para erros HTTP transitórios (`408`, `429`, `500`, `502`, `503`,
 `504`), com seis tentativas totais e backoff exponencial com jitter; o retry
-implícito do SDK fica desativado para não multiplicar tentativas. Segurança,
-schema e validação clínica nunca são regenerados automaticamente. Cada row
+implícito do SDK fica desativado para não multiplicar tentativas. Segurança e
+schema nunca são regenerados automaticamente. Uma rejeição da validação clínica
+em Stage B é terminal, fica excluída do SFT e não é repetida automaticamente;
+apenas erros técnicos continuam elegíveis para retoma. Cada row
 regista quantos pedidos físicos foram necessários. Uma nova invocação é uma
-decisão explícita e retoma apenas os registos ainda não aceites, preservando
+decisão explícita e retoma apenas erros técnicos ou IDs sem resultado terminal,
+preservando
 todas as tentativas no JSONL de auditoria. A retoma também verifica a identidade
 do modelo, seed e hashes do prompt/schema; uma alteração de protocolo exige
 novos outputs e nunca é misturada silenciosamente com registos anteriores.
+
+### Freeze do protocolo de prompts E3 v1 — 2026-08-21
+
+Os bytes usados nos dry runs ficam congelados e verificados no carregamento da
+configuração:
+
+| Stage | Versão | SHA-256 |
+| --- | --- | --- |
+| A | `e3_stage_a_v1` | `c28f6ff4f9a47ba23bc02f2a6d14541ee5afeeaf134bca5cf48936f150121a4f` |
+| B | `e3_stage_b_v1` | `b8239b38c24eac6037c22bcfcbc3573deb37cd5011c97d234e4179f20718125e` |
+
+Qualquer alteração semântica ou textual exige prompts v2, novos hashes, novos
+outputs e novo pilot. Correções de retry, auditoria ou materialização podem ser
+feitas sem quebrar este freeze desde que o request protocol do Teacher não
+mude.
+
+### Freeze do dataset Stage A E3 v1 — 2026-08-22
+
+A geração Stage A está completa para os 6.312 IDs do `sft_train`. A release
+accepted-only final é
+`project/data/morphology/frozen/e3_stage_a_v1_20260822/stage_a.jsonl`, com
+SHA-256
+`1eefa665d791c5138ffc00d57c5d9161ab899985949d8d4c2f7e54d12db89bd2`.
+O audit log com todas as tentativas, os outputs Batch em quarentena e os
+backups de correções de metadata permanecem separados. O freeze preliminar de
+2026-08-21 foi supersedido apenas porque o canário tinha custo Standard em vez
+de Batch; os targets não mudaram. A auditoria e as limitações de aderência à
+prompt estão documentadas em
+`annotations/dataset_pipeline/14_e3_stage_a_teacher_dataset_freeze.md`.
 
 ---
 
@@ -834,7 +986,10 @@ Para VLMs, é importante evitar truncar image tokens. Uma configuração segura 
 SFTConfig(max_length=None)
 ```
 
-**Estado:** suporte oficial e adequado ao Stage C.
+**Estado:** suporte oficial e adequado ao Stage C. O adapter E3 para o backend,
+a validação dos pins e o runner existem em `project/post_training`; esta nota
+não significa que o treino E3 ou a seleção do checkpoint já tenham sido
+executados.
 
 ---
 
@@ -1227,64 +1382,59 @@ A infraestrutura pode ser desligada entre stages. Não precisamos de pagar todos
 
 ```text
 project/
-│
-├── data/
-│   ├── raw/
-│   ├── morphology/
-│   ├── reasoning/
-│   └── sft/
-│
-├── stages/
-│   ├── 01_generate_morphology.py
-│   ├── 02_generate_reasoning.py
-│   ├── 03_train_sft.py
-│   ├── 04_train_opd_gold.py
-│   ├── 05_train_grpo.py
-│   └── 06_evaluate.py
-│
-├── rewards/
-│   ├── diagnosis.py
-│   ├── morphology.py
-│   ├── differential.py
-│   ├── hierarchy.py
-│   └── reasoning.py
-│
-├── evaluation/
-│   ├── internal_derm.py
-│   ├── dermobench.py
-│   ├── medqa.py
-│   └── mmlu_medical.py
-│
-└── checkpoints/
-    ├── base/
-    ├── sft/
-    ├── opd/
-    └── grpo/
+├── configs/student_configs/qwen_3_5_4b.yaml  # recipe imutável
+├── metrics/
+│   ├── contracts.py                          # eventos/sinks escalares
+│   ├── trainer_events.py                     # loss/LR/tempo por step
+│   ├── resources.py                          # CPU/GPU/VRAM/potência
+│   └── resource_metrics.py                   # agregação por run
+└── pipeline/
+    ├── materialize_sft.py                    # dataset A/B → SFT
+    └── sft.py                                # facade legada
+
+configs/training/
+└── e3_qwen3_5_4b_sft.yaml                    # contrato Stage C
+
+project/post_training/
+├── cli.py                                    # isep-post-train
+├── _availability.py                          # estado dos stages
+├── common/
+│   ├── config.py                             # validação + pins
+│   └── data.py                               # adapter VLM/HF
+├── sft/
+│   └── runner.py                             # Stage C implementado
+├── opd/__init__.py                           # contrato futuro; sem trainer
+└── grpo/__init__.py                          # contrato futuro; sem trainer
+
+outputs/training/post_training/
+└── e3_qwen3_5_4b_sft/                        # manifests + LoRA checkpoints
 ```
+
+Esta separação impede confundir criação de dados com otimização do
+Student. O namespace `project.pipeline` não instancia `SFTTrainer`; o namespace
+`project.post_training` usa a monitorização canónica de `project.metrics` e
+reutiliza temporariamente o backend e os contratos gerais de execução maduros
+de `src/train`. Os módulos OPD/GRPO expõem apenas o estado
+"não implementado" e não simulam uma execução bem-sucedida.
 
 ---
 
 ## 28. Evaluation
 
-Avaliar exatamente o mesmo benchmark depois de cada checkpoint:
+Durante a seleção, avaliar os quatro checkpoints apenas no mesmo `sft_dev`
+humano congelado:
 
 ```text
-BASE
- ↓
-benchmark
-
-SFT
- ↓
-benchmark
-
-OPD
- ↓
-benchmark
-
-GRPO
- ↓
-benchmark
+epoch 1 / epoch 2 / epoch 3 / epoch 4
+                  ↓
+       generative sft_dev
+                  ↓
+      selected checkpoint frozen
 ```
+
+Só depois da seleção e do freeze se executam os benchmarks principais e de
+retenção no checkpoint selecionado. MMLU Medical, MedQA e MedMCQA nunca são
+usados para escolher a época e não são repetidos nos quatro checkpoints.
 
 ### Primary
 

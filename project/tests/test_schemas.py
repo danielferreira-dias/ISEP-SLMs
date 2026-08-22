@@ -20,6 +20,35 @@ def test_parse_stage_a_accepts_fixture() -> None:
     assert morphology.image_assessment.image_modality.value == "clinical"
 
 
+def test_stage_a_allows_same_finding_for_distinct_visible_lesions() -> None:
+    payload = deepcopy(STAGE_A_PAYLOAD)
+    observations = cast(list[dict[str, object]], payload["observations"])
+    repeated = deepcopy(observations[0])
+    repeated.update(
+        {
+            "id": "obs_007",
+            "scope": "second visible lesion",
+            "evidence_region": "right side of the image",
+        }
+    )
+    observations.append(repeated)
+
+    parsed = parse_stage_a(payload)
+
+    assert len(parsed.observations) == len(observations)
+
+
+def test_stage_a_rejects_exact_semantic_duplicate_observation() -> None:
+    payload = deepcopy(STAGE_A_PAYLOAD)
+    observations = cast(list[dict[str, object]], payload["observations"])
+    repeated = deepcopy(observations[0])
+    repeated["id"] = "obs_007"
+    observations.append(repeated)
+
+    with pytest.raises(ValidationError, match="duplicate observations"):
+        parse_stage_a(payload)
+
+
 def test_parse_stage_a_rejects_extra_key() -> None:
     payload = dict(STAGE_A_PAYLOAD)
     payload["diagnosis"] = "melanoma"

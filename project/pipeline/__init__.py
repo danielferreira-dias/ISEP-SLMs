@@ -1,6 +1,11 @@
-"""Materialization and training entry points for the E3 project pipeline."""
+"""Dataset-generation and materialization entry points for E3.
 
-from project.pipeline.sft import (
+Student post-training lives under :mod:`project.post_training`; the
+``project.pipeline`` namespace owns only the offline teacher-data pipeline.
+"""
+
+from project.pipeline.materialize_sft import (
+    SCHEMA_VERSION,
     MaterializationResult,
     MaterializationSource,
     MaterializedSFTRow,
@@ -9,6 +14,7 @@ from project.pipeline.sft import (
 )
 
 __all__ = [
+    "SCHEMA_VERSION",
     "MaterializationResult",
     "MaterializationSource",
     "MaterializedSFTRow",

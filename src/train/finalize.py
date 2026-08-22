@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from project.metrics.resource_metrics import resource_summary
 from src.train.artifacts import (
     ArtifactStore,
     export_thesis_artifacts,
@@ -39,7 +40,6 @@ from src.train.evaluation import (
 from src.train.execution import RunIdentity, validate_resume_checkpoint
 from src.train.phases.label_only import LabelOnlyPhase
 from src.train.reporting import build_run_report
-from src.train.resource_metrics import resource_summary
 from src.train.run_domain import TrainingRunResult
 from src.train.run_io import (
     checkpoint_directories,

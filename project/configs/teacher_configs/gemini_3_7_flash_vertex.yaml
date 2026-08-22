@@ -45,6 +45,16 @@ teacher:
     effective_through: "2026-12-31"
     source_url: "https://cloud.google.com/vertex-ai/generative-ai/pricing"
 
+  # Vertex Batch/Flex list prices are distinct from synchronous Standard
+  # traffic. Batch ingestion must use this profile and must never silently
+  # reuse the Standard profile above.
+  batch_pricing:
+    input_per_million_tokens_usd: 0.375
+    output_per_million_tokens_usd: 1.875
+    traffic_type: batch_global
+    effective_through: "2026-12-31"
+    source_url: "https://cloud.google.com/vertex-ai/generative-ai/pricing"
+
   output:
     structured: true
     stages:

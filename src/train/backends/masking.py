@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import cast
 
 from src.train.backends.unsloth_compat import invoke, invoke_method
-from src.train.execution.io import atomic_write_json
+from src.train.execution.io import JsonValue, atomic_write_json
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,6 +16,7 @@ class ResponseMaskAudit:
     """Observed label-mask properties for one real collated example."""
 
     sample_id: str
+    task: str | None
     target_label: str
     decoded_supervision: str
     supervised_token_count: int
@@ -32,6 +34,51 @@ def audit_response_only_mask(
     """Collate a real item and fail unless prompt/image/padding are ignored."""
 
     record = _first_record(train_dataset)
+    audit = _audit_record(
+        collator=collator,
+        processor=processor,
+        record=record,
+    )
+    atomic_write_json(output_path, asdict(audit))
+    return audit
+
+
+def audit_response_only_masks(
+    *,
+    collator: object,
+    processor: object,
+    train_dataset: object,
+    output_path: Path,
+) -> tuple[ResponseMaskAudit, ...]:
+    """Audit one representative real row for every available training task."""
+
+    audits = tuple(
+        _audit_record(collator=collator, processor=processor, record=record)
+        for record in _mask_audit_records(train_dataset)
+    )
+    tasks = [audit.task for audit in audits if audit.task is not None]
+    if len(tasks) != len(set(tasks)):
+        raise RuntimeError("Assistant-only mask audit received duplicate tasks")
+    atomic_write_json(
+        output_path,
+        cast(
+            JsonValue,
+            {
+                "audit_count": len(audits),
+                "tasks": tasks,
+                "audits": [asdict(audit) for audit in audits],
+            },
+        ),
+    )
+    return audits
+
+
+def _audit_record(
+    *,
+    collator: object,
+    processor: object,
+    record: Mapping[object, object],
+) -> ResponseMaskAudit:
     target = _required_string(record, "label")
     sample_id = _required_string(record, "sample_id")
     batch = invoke(collator, [record])
@@ -64,14 +111,31 @@ def audit_response_only_mask(
         )
     audit = ResponseMaskAudit(
         sample_id=sample_id,
+        task=_optional_string(record, "task"),
         target_label=target,
         decoded_supervision=decoded,
         supervised_token_count=len(supervised),
         ignored_token_count=ignored,
         forbidden_visual_token_count=forbidden_count,
     )
-    atomic_write_json(output_path, asdict(audit))
     return audit
+
+
+def _mask_audit_records(
+    dataset: object,
+) -> tuple[Mapping[object, object], ...]:
+    provider = getattr(dataset, "mask_audit_records", None)
+    if not callable(provider):
+        return (_first_record(dataset),)
+    raw_records = provider()
+    if not isinstance(raw_records, Sequence) or isinstance(raw_records, (str, bytes)):
+        raise TypeError("mask_audit_records must return a sequence")
+    records = tuple(
+        _mapping(record, "mask-audit training record") for record in raw_records
+    )
+    if not records:
+        raise TypeError("mask_audit_records returned no training records")
+    return records
 
 
 def _first_record(dataset: object) -> Mapping[object, object]:
@@ -90,6 +154,15 @@ def _mapping(value: object, context: str) -> Mapping[object, object]:
 
 def _required_string(record: Mapping[object, object], key: str) -> str:
     value = record.get(key)
+    if not isinstance(value, str) or not value:
+        raise TypeError(f"Training record {key} must be a non-empty string")
+    return value
+
+
+def _optional_string(record: Mapping[object, object], key: str) -> str | None:
+    value = record.get(key)
+    if value is None:
+        return None
     if not isinstance(value, str) or not value:
         raise TypeError(f"Training record {key} must be a non-empty string")
     return value

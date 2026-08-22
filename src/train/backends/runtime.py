@@ -36,7 +36,8 @@ def validate_nvidia_bf16_runtime() -> RuntimeInfo:
     count = _int_method(cuda, "device_count")
     if count != 1:
         raise RuntimeValidationError(
-            f"E1 requires exactly one visible NVIDIA GPU; CUDA reported {count} devices"
+            "Controlled ISEP training requires exactly one visible NVIDIA GPU; "
+            f"CUDA reported {count} devices"
         )
     device_name = _string_method(cuda, "get_device_name", 0)
     if "NVIDIA" not in device_name.upper():

@@ -12,7 +12,7 @@ from typing import cast
 import pytest
 from PIL import Image
 
-from project.pipeline.sft import (
+from project.pipeline.materialize_sft import (
     CAPTION_PROMPT,
     CLINICAL_ASSESSMENT_PROMPT,
     MORPHOLOGY_PROMPT,
@@ -32,6 +32,17 @@ from project.teacher.schemas import (
 from project.tests.fixtures import STAGE_A_PAYLOAD, STAGE_B_PAYLOAD
 
 _DIAGNOSIS_PROMPT = "Classify the dermatology image.\n\n/no_think"
+
+
+def test_legacy_sft_module_is_only_a_compatible_materializer_facade() -> None:
+    from project.pipeline import materialize_sft
+    from project.pipeline import sft as legacy
+
+    assert legacy.MaterializedSFTRow is materialize_sft.MaterializedSFTRow
+    assert (
+        legacy.materialize_multitask_rows is materialize_sft.materialize_multitask_rows
+    )
+    assert legacy.SCHEMA_VERSION == materialize_sft.SCHEMA_VERSION
 
 
 def _png_bytes() -> bytes:
@@ -231,9 +242,7 @@ def test_rejected_stage_b_is_audited_and_excluded_from_training() -> None:
     }
     assert result.stage_b_status_counts["rejected"] == 1
     assert result.source_ids_without_stage_b == ("s001",)
-    assert result.stage_b_rejected_attempts[0].reasons == (
-        "anchor_not_discriminative",
-    )
+    assert result.stage_b_rejected_attempts[0].reasons == ("anchor_not_discriminative",)
 
 
 def test_missing_generation_attempts_fail_closed_unless_partial() -> None:
