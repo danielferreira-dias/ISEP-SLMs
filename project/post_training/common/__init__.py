@@ -1,0 +1,51 @@
+"""Public configuration and dataset boundary for post-training stages."""
+
+from project.post_training.common.config import (
+    E3_DATASET_REPO,
+    E3_DEV_REVISION,
+    E3_TRAIN_REVISION,
+    E3_TRAIN_TASK_COUNTS,
+    QWEN35_4B_REPO,
+    QWEN35_4B_REVISION,
+    DatasetPair,
+    DatasetReference,
+    E3SFTStageConfig,
+    PostTrainingConfigError,
+    StudentRecipe,
+    configuration_contract_sha256,
+    load_sft_stage_config,
+    load_student_recipe,
+)
+from project.post_training.common.data import (
+    DatasetAudit,
+    DatasetLike,
+    DatasetLoader,
+    PreparedDatasets,
+    PreparedSFTDataset,
+    load_training_datasets,
+    prepare_dataset_rows,
+)
+
+__all__ = [
+    "E3_DATASET_REPO",
+    "E3_DEV_REVISION",
+    "E3_TRAIN_REVISION",
+    "E3_TRAIN_TASK_COUNTS",
+    "QWEN35_4B_REPO",
+    "QWEN35_4B_REVISION",
+    "DatasetAudit",
+    "DatasetLike",
+    "DatasetLoader",
+    "DatasetPair",
+    "DatasetReference",
+    "E3SFTStageConfig",
+    "PostTrainingConfigError",
+    "PreparedDatasets",
+    "PreparedSFTDataset",
+    "StudentRecipe",
+    "configuration_contract_sha256",
+    "load_sft_stage_config",
+    "load_student_recipe",
+    "load_training_datasets",
+    "prepare_dataset_rows",
+]

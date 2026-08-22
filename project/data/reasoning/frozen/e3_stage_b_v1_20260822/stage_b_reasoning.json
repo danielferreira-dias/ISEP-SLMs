@@ -1,0 +1,166 @@
+{
+  "$defs": {
+    "AnchorEvidenceStatus": {
+      "description": "How strongly the image and Stage A support the private gold anchor.",
+      "enum": [
+        "supported",
+        "weak",
+        "unsupported"
+      ],
+      "title": "AnchorEvidenceStatus",
+      "type": "string"
+    },
+    "ConfidenceLevel": {
+      "description": "Closed confidence vocabulary for observations and diagnoses.",
+      "enum": [
+        "low",
+        "moderate",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "DifferentialComparison": {
+      "additionalProperties": false,
+      "description": "Why the gold diagnosis is favoured over one plausible alternative.",
+      "properties": {
+        "alternative": {
+          "minLength": 1,
+          "title": "Alternative",
+          "type": "string"
+        },
+        "comparison": {
+          "minLength": 1,
+          "title": "Comparison",
+          "type": "string"
+        },
+        "features_favoring_alternative": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Features Favoring Alternative",
+          "type": "array"
+        },
+        "features_favoring_diagnosis": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Features Favoring Diagnosis",
+          "type": "array"
+        }
+      },
+      "required": [
+        "alternative",
+        "features_favoring_diagnosis",
+        "features_favoring_alternative",
+        "comparison"
+      ],
+      "title": "DifferentialComparison",
+      "type": "object"
+    },
+    "MissingDiscriminator": {
+      "enum": [
+        "duration_and_evolution",
+        "symptoms",
+        "palpation",
+        "other_body_sites",
+        "dermoscopy",
+        "scale_or_ruler",
+        "closer_image",
+        "overview_image",
+        "clinical_history",
+        "histopathology"
+      ],
+      "type": "string"
+    },
+    "ResponsePolicy": {
+      "description": "Response behavior derived from whether the image is evaluable.",
+      "enum": [
+        "ANSWER_DIFFERENTIAL",
+        "REQUEST_NEW_IMAGE"
+      ],
+      "title": "ResponsePolicy",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Gold-anchored facts and the teacher's student-facing justification.",
+  "properties": {
+    "anchor_evidence_status": {
+      "$ref": "#/$defs/AnchorEvidenceStatus"
+    },
+    "annotation_conflict": {
+      "title": "Annotation Conflict",
+      "type": "boolean"
+    },
+    "annotation_conflict_reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Annotation Conflict Reason"
+    },
+    "clinical_reasoning": {
+      "minLength": 1,
+      "title": "Clinical Reasoning",
+      "type": "string"
+    },
+    "diagnosis": {
+      "minLength": 1,
+      "title": "Diagnosis",
+      "type": "string"
+    },
+    "diagnostic_confidence": {
+      "$ref": "#/$defs/ConfidenceLevel"
+    },
+    "differential_comparisons": {
+      "items": {
+        "$ref": "#/$defs/DifferentialComparison"
+      },
+      "maxItems": 4,
+      "title": "Differential Comparisons",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "$ref": "#/$defs/MissingDiscriminator"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "non_evaluable_reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Non Evaluable Reason"
+    },
+    "response_policy": {
+      "$ref": "#/$defs/ResponsePolicy"
+    }
+  },
+  "required": [
+    "anchor_evidence_status",
+    "annotation_conflict",
+    "annotation_conflict_reason",
+    "diagnostic_confidence",
+    "diagnosis",
+    "differential_comparisons",
+    "limitations",
+    "response_policy",
+    "non_evaluable_reason",
+    "clinical_reasoning"
+  ],
+  "title": "StageBReasoning",
+  "type": "object"
+}

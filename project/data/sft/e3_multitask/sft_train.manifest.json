@@ -1,0 +1,2340 @@
+{
+  "bytes": 18202179385,
+  "output": "project/data/sft/e3_multitask/sft_train.parquet",
+  "rows": 25084,
+  "schema_version": "e3_multitask_sft_v1",
+  "sha256": "d80868921439542f0f11f327c30be94cef3bc030330ed37eb5666c01531e80e6",
+  "source_ids_without_stage_a": [],
+  "source_ids_without_stage_b": [
+    "FITZPATRICK17K_C_010d2857cd86ff9513317a8a142f6d5a",
+    "FITZPATRICK17K_C_095b1236345ee8c9df42361a321d6207",
+    "FITZPATRICK17K_C_0b035e5709e08c96e471bf050c805697",
+    "FITZPATRICK17K_C_0b3fa8c345e4d62b400471b5a43333bf",
+    "FITZPATRICK17K_C_0b8b83ce62370ea4931579b9c2997b87",
+    "FITZPATRICK17K_C_0d6b8b2b2f5a8b8c9b7cfe18034bb3a3",
+    "FITZPATRICK17K_C_102765ff09884862ea2f911b29a9b14d",
+    "FITZPATRICK17K_C_10cacf2e0873ae8f01f0f13202545ff7",
+    "FITZPATRICK17K_C_12b43527060343247fd614f1c7f37c3e",
+    "FITZPATRICK17K_C_1a95a0952dff3888dfafb444b9873081",
+    "FITZPATRICK17K_C_1bec7e2e587c13adb6887df1bd705a43",
+    "FITZPATRICK17K_C_1d5444c7b349f1e2c1bc3d32a26d959c",
+    "FITZPATRICK17K_C_1d880c5d06148a789e33af7c75cd7282",
+    "FITZPATRICK17K_C_20df5ec791e5974ab968a2bfe8b64308",
+    "FITZPATRICK17K_C_213936e7901e7fa1bae80d3df0c4e4c7",
+    "FITZPATRICK17K_C_26108459f12d77128a1d28cc21e3550a",
+    "FITZPATRICK17K_C_273c142626cf706139bba818bd008b9e",
+    "FITZPATRICK17K_C_27bde4c6ec61895fe01e6d9877960739",
+    "FITZPATRICK17K_C_2df4c60292d03b1278dac9d602481479",
+    "FITZPATRICK17K_C_2fb8013d78c2cd50d8d462e59b030cb2",
+    "FITZPATRICK17K_C_37f6c602dbb4948db41c70d0ae69c260",
+    "FITZPATRICK17K_C_39a3cb16f3c04399e09e3aadf32c84e1",
+    "FITZPATRICK17K_C_3e9d2492e9f6dec28e712a9e3e851ae3",
+    "FITZPATRICK17K_C_406848482bcec41add3568109e818d3f",
+    "FITZPATRICK17K_C_4a6f9113fff41397da716fc6f1bb1664",
+    "FITZPATRICK17K_C_4e21b16f514f906132e7d55825c98117",
+    "FITZPATRICK17K_C_5635e1cf125989c2ed9faa0bdfd7b981",
+    "FITZPATRICK17K_C_563c07deb927f07e5fac7da4ce43a1f7",
+    "FITZPATRICK17K_C_592b1e63f2c228b2481254fc97060600",
+    "FITZPATRICK17K_C_5966b609d5a737c6795c954cf373f94b",
+    "FITZPATRICK17K_C_5a441dca20e63f6bbe6485925846d05a",
+    "FITZPATRICK17K_C_5a7fda42a38599f347ae2e65dcf51879",
+    "FITZPATRICK17K_C_5c9bb8ebeeb90ebc169bb299b41466a9",
+    "FITZPATRICK17K_C_6372c52836107dd23cff2f8c972353ef",
+    "FITZPATRICK17K_C_69ee2924694efe5538f572c3fa9a5d87",
+    "FITZPATRICK17K_C_6a4d9ad466a5bf1767573abe3d03903a",
+    "FITZPATRICK17K_C_6af0a95515b388eac5fa547ca8f8e931",
+    "FITZPATRICK17K_C_6b6381ebe706b646414c6afc0116eade",
+    "FITZPATRICK17K_C_6e591f8824da87ea646538a845ac6d9a",
+    "FITZPATRICK17K_C_6ec85e191c512d3373971b12912cb83e",
+    "FITZPATRICK17K_C_74d48c265b80c322bef41a88464836ab",
+    "FITZPATRICK17K_C_7729a485abc264b1c58a995a49ec7f5b",
+    "FITZPATRICK17K_C_782e232de169de8134de4ef7b2cf5b66",
+    "FITZPATRICK17K_C_7def1372c07348c3f37b044802cff9c4",
+    "FITZPATRICK17K_C_7f7412968370a10d8efd55dc1f8751eb",
+    "FITZPATRICK17K_C_82977b8dac7ca887c812559945dce330",
+    "FITZPATRICK17K_C_832eb11215d6f0d856f8a1dfdd0f6754",
+    "FITZPATRICK17K_C_83c0726e5ff7c44e32a9b0b08143208c",
+    "FITZPATRICK17K_C_8627608bdfc5b904a0fbc23d86716e86",
+    "FITZPATRICK17K_C_8a10429e9c89822448998ea15aae1231",
+    "FITZPATRICK17K_C_8e93632358a1490fa191121b3fcddc98",
+    "FITZPATRICK17K_C_8ec952e3e6c462c3ddaff7b5cb2c39bc",
+    "FITZPATRICK17K_C_8f11fe151cb9ede441d591dbfc171948",
+    "FITZPATRICK17K_C_9071aa339d3fe202cd0fd9a9ae1de1e7",
+    "FITZPATRICK17K_C_96dde1402d8e7aef0727408efc103fb7",
+    "FITZPATRICK17K_C_993c2ed511a88ea5fb1cbfe46c1737f8",
+    "FITZPATRICK17K_C_9965621eb0e381dc51db0ffa0b3033e7",
+    "FITZPATRICK17K_C_9ad104c60632ed210dc16919afd36810",
+    "FITZPATRICK17K_C_9e2d47ec8247ee0cdc1dc0c7915a15fe",
+    "FITZPATRICK17K_C_a27012d54673fe854519f52780ded002",
+    "FITZPATRICK17K_C_a49abcfad0d9a5270d1c9488a6fc466f",
+    "FITZPATRICK17K_C_a5238bc97a49c9e75862f80fea3e7171",
+    "FITZPATRICK17K_C_a6403dc8647dfae9df1f3d220ffbe673",
+    "FITZPATRICK17K_C_ac10d5d4d0edd60b5b552276bbd90890",
+    "FITZPATRICK17K_C_af3c985f980b54b34337d08ee8b50d0d",
+    "FITZPATRICK17K_C_bdb668db00a5c6ac3e1f6e5af17bbc43",
+    "FITZPATRICK17K_C_be6b47c4e93da7d213c7359562ca99e5",
+    "FITZPATRICK17K_C_cc04b0ff2e327ced8cb695ec2d249fc8",
+    "FITZPATRICK17K_C_cef2dd1c93103711aed6687a619e0230",
+    "FITZPATRICK17K_C_d1630be09b8372b9740d7152b415055b",
+    "FITZPATRICK17K_C_d190a369cf2c6c534ef11b6a18d0a404",
+    "FITZPATRICK17K_C_d2561eaa981d137b29e3a058246645f4",
+    "FITZPATRICK17K_C_d3a460bfa3c7b968e0a9c73bdeb4d479",
+    "FITZPATRICK17K_C_d740f99aa0236f9972d66f0821cf14b0",
+    "FITZPATRICK17K_C_d884c99eea5c16906e1aa261b64e5f33",
+    "FITZPATRICK17K_C_dc412f2b0156391a5cd4f004eb50bb1f",
+    "FITZPATRICK17K_C_e29bcdc1a3ce2eade7897c348abacbcf",
+    "FITZPATRICK17K_C_e34646f6778dbdc86130a4babf62d01b",
+    "FITZPATRICK17K_C_e383acb8d0ad99dce03bfc4a0ef580b6",
+    "FITZPATRICK17K_C_e4984a2cef00ed3d8368363e3b348c9c",
+    "FITZPATRICK17K_C_e4f3e8c64584a988c122997cc2c09782",
+    "FITZPATRICK17K_C_e664e4221da845a0d5ad3b34f479d868",
+    "FITZPATRICK17K_C_e72441b255003bc02d629502ab1a15b6",
+    "FITZPATRICK17K_C_e783339effbc628d8b5392db27ba6716",
+    "FITZPATRICK17K_C_e8a6ed45c7c045c6de63944550ad6b1d",
+    "FITZPATRICK17K_C_ea9c24e0eb6917c90679dba3be0083cf",
+    "FITZPATRICK17K_C_eac4a3ef188d89ba3e376553ee926b01",
+    "FITZPATRICK17K_C_ecfbdbcc21c8869d788c9b24f4e28399",
+    "FITZPATRICK17K_C_ef6b1323e2822f37655d595f7d7494f7",
+    "FITZPATRICK17K_C_f0bad4eac2969ce9efe3116bda407e70",
+    "FITZPATRICK17K_C_f2fc1714d53f806603228724a49fd1e7",
+    "FITZPATRICK17K_C_ffbd5c2fcb3429d81b391dd05a6b5f34",
+    "PAD_UFES_20_PAT_1591_2648_855",
+    "PAD_UFES_20_PAT_1633_2855_460",
+    "PAD_UFES_20_PAT_187_287_482",
+    "PAD_UFES_20_PAT_2041_4298_408",
+    "PAD_UFES_20_PAT_210_316_401",
+    "PAD_UFES_20_PAT_997_14_40",
+    "SCIN_-1337979528936324516_IMAGE_2",
+    "SCIN_-1490620546587137533_IMAGE_2",
+    "SCIN_-1490620546587137533_IMAGE_3",
+    "SCIN_-1659559780402537085_IMAGE_1",
+    "SCIN_-1796688741678634515_IMAGE_3",
+    "SCIN_-185529518023482284_IMAGE_1",
+    "SCIN_-3239313504364543357_IMAGE_1",
+    "SCIN_-3407628263497825003_IMAGE_1",
+    "SCIN_-3815513116289146797_IMAGE_1",
+    "SCIN_-3815513116289146797_IMAGE_3",
+    "SCIN_-3940816727290109028_IMAGE_2",
+    "SCIN_-4315380494523344416_IMAGE_3",
+    "SCIN_-4323073538068791362_IMAGE_3",
+    "SCIN_-4374212557647415088_IMAGE_1",
+    "SCIN_-4584149572849454443_IMAGE_1",
+    "SCIN_-4644516716280136173_IMAGE_2",
+    "SCIN_-4717786449227921352_IMAGE_2",
+    "SCIN_-4949778095225877346_IMAGE_1",
+    "SCIN_-5049807704499166019_IMAGE_3",
+    "SCIN_-5885784853012441829_IMAGE_1",
+    "SCIN_-6987729819352868714_IMAGE_1",
+    "SCIN_-7227413334600424206_IMAGE_3",
+    "SCIN_-7819133539519710397_IMAGE_1",
+    "SCIN_-7851195646036204419_IMAGE_2",
+    "SCIN_-8018705038614693970_IMAGE_1",
+    "SCIN_-8054001866397330447_IMAGE_1",
+    "SCIN_-8054001866397330447_IMAGE_3",
+    "SCIN_-821110872479093372_IMAGE_1",
+    "SCIN_-8239529408406365093_IMAGE_1",
+    "SCIN_-8754678083190860015_IMAGE_1",
+    "SCIN_-8808510258616563225_IMAGE_1",
+    "SCIN_-8933122876369538878_IMAGE_3",
+    "SCIN_-998965366567233636_IMAGE_2",
+    "SCIN_1129555082201687214_IMAGE_1",
+    "SCIN_1320087784849034495_IMAGE_1",
+    "SCIN_1589466904862954952_IMAGE_1",
+    "SCIN_1610643527361135382_IMAGE_3",
+    "SCIN_1685418811189718839_IMAGE_3",
+    "SCIN_2093973831515705574_IMAGE_1",
+    "SCIN_2546805609403797552_IMAGE_1",
+    "SCIN_2620539304203771862_IMAGE_1",
+    "SCIN_3001411411444146079_IMAGE_1",
+    "SCIN_3377584127732041409_IMAGE_1",
+    "SCIN_3489401261164777258_IMAGE_1",
+    "SCIN_4668416589759931720_IMAGE_1",
+    "SCIN_4887966460252262963_IMAGE_2",
+    "SCIN_4981924219389224217_IMAGE_3",
+    "SCIN_5345993529885915940_IMAGE_3",
+    "SCIN_5567081113382937200_IMAGE_1",
+    "SCIN_5759072824389330562_IMAGE_1",
+    "SCIN_5837921410652230755_IMAGE_1",
+    "SCIN_6075470705800251807_IMAGE_1",
+    "SCIN_6343427293036790927_IMAGE_2",
+    "SCIN_6493256759329924144_IMAGE_3",
+    "SCIN_6610442252642332209_IMAGE_1",
+    "SCIN_6886983180384047204_IMAGE_2",
+    "SCIN_7220922374529634547_IMAGE_2",
+    "SCIN_7589120847935248859_IMAGE_3",
+    "SCIN_7791538138327469326_IMAGE_1",
+    "SCIN_799511949408239093_IMAGE_1",
+    "SCIN_8020891537658973646_IMAGE_2",
+    "SCIN_8097381513172060282_IMAGE_2",
+    "SCIN_8598795546166978679_IMAGE_2",
+    "SCIN_9028506565042482784_IMAGE_2",
+    "SCIN_9047654489067734884_IMAGE_1",
+    "SCIN_9076222836036925266_IMAGE_3"
+  ],
+  "source_samples": 6312,
+  "split": "sft_train",
+  "stage_a_ok": 6312,
+  "stage_b_coverage": {
+    "error": 0,
+    "missing_attempt": 0,
+    "not_eligible_stage_a": 0,
+    "ok": 6148,
+    "rejected": 164
+  },
+  "stage_b_duplicate_attempt_counts": {
+    "FITZPATRICK17K_C_0327466e2c74672e83a55b47e800fe05": 3,
+    "FITZPATRICK17K_C_0e53f04b270579940142d00c6165f0a5": 3,
+    "FITZPATRICK17K_C_10ed2d0e269bb1a60f466fef6cdf367b": 3,
+    "FITZPATRICK17K_C_1e296a64c838d0289cf7f49fa7dfb65d": 3,
+    "FITZPATRICK17K_C_4603fefbd2e921b0987e3aaf91e275e1": 3,
+    "FITZPATRICK17K_C_63011295726d7a524e87edd3c55a5820": 3,
+    "FITZPATRICK17K_C_6e9b03c88ecdc1885ad5f1b6586da01d": 3,
+    "FITZPATRICK17K_C_78c29770cb6db47ce3dd7e0ab7a365de": 3,
+    "FITZPATRICK17K_C_81614ef48a63119af1349a28cc86a2af": 3,
+    "FITZPATRICK17K_C_84bb739a297c4d52efe756a2f398f1da": 3,
+    "FITZPATRICK17K_C_864aa506ce741d927482bee6357f7cce": 3,
+    "FITZPATRICK17K_C_9a2703b526c057a1563b6579cb3024fa": 3,
+    "FITZPATRICK17K_C_9d0a9eb2a7892cdaa8beb1226df10c01": 3,
+    "FITZPATRICK17K_C_a589f826c885576e848a2a4d66235f1f": 3,
+    "FITZPATRICK17K_C_c02bd8d61feda28f1cf90efb126b5b1a": 3,
+    "FITZPATRICK17K_C_c3994c3b7fc8f7f537ce70972618c80d": 3,
+    "FITZPATRICK17K_C_ce01b20213533e4ab3cf7bc468549342": 3,
+    "FITZPATRICK17K_C_d821f5673f94063815e20f8db5e9501f": 3,
+    "FITZPATRICK17K_C_dd93fd24793795b2ead2131453c95356": 3,
+    "FITZPATRICK17K_C_e170d124649f3cddf0e8d2ac7a4e597f": 3,
+    "FITZPATRICK17K_C_e672dac0d8e357a7a6d9ee5e4fbedfd7": 3,
+    "FITZPATRICK17K_C_e6e57cfe0b37af73822bb1f779bab382": 3,
+    "FITZPATRICK17K_C_fa4ed547ba2ed8055c9d777ee729f70b": 3,
+    "HIBA_ISIC_4563689": 3,
+    "HIBA_ISIC_5847539": 3,
+    "HIBA_ISIC_7169848": 3,
+    "HIBA_ISIC_9795586": 3,
+    "PAD_UFES_20_PAT_154_235_162": 3,
+    "PAD_UFES_20_PAT_1693_3103_879": 3,
+    "PAD_UFES_20_PAT_238_364_387": 3,
+    "PAD_UFES_20_PAT_40_56_160": 3,
+    "PAD_UFES_20_PAT_478_1829_281": 3,
+    "PAD_UFES_20_PAT_91_356_456": 3,
+    "SCIN_-4696067359335613302_IMAGE_2": 3,
+    "SCIN_5648339779171772545_IMAGE_1": 3
+  },
+  "stage_b_error_attempts": [
+    {
+      "attempt_id": "41fa80d8-aa2a-4880-9c36-691cbd22223e",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'scar', '...r peripheral erythema.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_478_1829_281"
+    },
+    {
+      "attempt_id": "54d7ead0-f48a-4127-8ee4-f3a5e91dfa21",
+      "error": "batch_output_error:ValidationError: 2 validation errors for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'sebaceou... basal cell carcinoma.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'molluscu... basal cell carcinoma.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_9a2703b526c057a1563b6579cb3024fa"
+    },
+    {
+      "attempt_id": "65542a76-75d0-40f1-bc4b-26f804e5e042",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'candida ...igo satellite lesions.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_63011295726d7a524e87edd3c55a5820"
+    },
+    {
+      "attempt_id": "e54b99d3-6c56-4c1c-9518-d3d423fe3923",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'Kaposi s...egated fungating mass.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_e170d124649f3cddf0e8d2ac7a4e597f"
+    },
+    {
+      "attempt_id": "99057a7e-3155-43ca-b87e-44a83d31b6db",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...rly demonstrated here.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_91_356_456"
+    },
+    {
+      "attempt_id": "1b4a82e0-96c0-4466-a92c-1c77e8b2a643",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'pigmente... basal cell carcinoma.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "HIBA_ISIC_9795586"
+    },
+    {
+      "attempt_id": "483cfa10-721b-4027-9e6f-4285b3e29f14",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'sebaceou... prominent ulceration.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_c02bd8d61feda28f1cf90efb126b5b1a"
+    },
+    {
+      "attempt_id": "cddb97f8-1d07-434d-b08b-c9620e83cdf0",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...hyperkeratotic lesion.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_a589f826c885576e848a2a4d66235f1f"
+    },
+    {
+      "attempt_id": "0ec38734-c972-46d8-9786-677668ea9376",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.2\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'chronic ...orly defined erythema.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_4603fefbd2e921b0987e3aaf91e275e1"
+    },
+    {
+      "attempt_id": "861aba63-4a25-4e7b-a2d9-4d4262c23728",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...throughout the lesion.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_40_56_160"
+    },
+    {
+      "attempt_id": "c3463bd7-afe0-4eac-8f33-630615940e1f",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'keratoac...uamous cell carcinoma.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "HIBA_ISIC_7169848"
+    },
+    {
+      "attempt_id": "a0054abc-7867-4a84-8549-40c01aec6be5",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...ut tissue examination.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_fa4ed547ba2ed8055c9d777ee729f70b"
+    },
+    {
+      "attempt_id": "09bc23e1-f845-4e47-a3d3-712840d54d88",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous..., or verrucous change.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_81614ef48a63119af1349a28cc86a2af"
+    },
+    {
+      "attempt_id": "874f54b8-3f4b-4205-b53d-c626c587424a",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'keratoac...riform keratotic plug.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_154_235_162"
+    },
+    {
+      "attempt_id": "b31d57d0-10d9-4fbc-86c2-41da16f87788",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'dyshidro...dorsal foot and ankle.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_864aa506ce741d927482bee6357f7cce"
+    },
+    {
+      "attempt_id": "8565c529-85c3-4e71-868c-f1d7d693d713",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'tinea co...with central clearing.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "SCIN_-4696067359335613302_IMAGE_2"
+    },
+    {
+      "attempt_id": "c020ec3b-eeaf-4254-9f1a-c175633a4cec",
+      "error": "batch_output_error:ValidationError: 2 validation errors for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'rosacea'...he nasal localization.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'follicul...sion of acne vulgaris.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_0e53f04b270579940142d00c6165f0a5"
+    },
+    {
+      "attempt_id": "920f8169-3ad8-4208-9931-5915e2da6767",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'onychomy...ross inspection alone.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_ce01b20213533e4ab3cf7bc468549342"
+    },
+    {
+      "attempt_id": "7feb3430-fd7b-4233-9472-3dd4948f623b",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'hypertro...ceous silvery scaling.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_0327466e2c74672e83a55b47e800fe05"
+    },
+    {
+      "attempt_id": "99ae6089-99e0-42e0-8b33-7eab287f2467",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'bacteria...ints to acne vulgaris.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_dd93fd24793795b2ead2131453c95356"
+    },
+    {
+      "attempt_id": "05fc45ff-19cf-4752-b178-22b78206f417",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'follicul...not clearly seen here.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_6e9b03c88ecdc1885ad5f1b6586da01d"
+    },
+    {
+      "attempt_id": "52cb43ed-f074-4669-9d3d-133f117133d6",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'pyogenic...by prominent bleeding.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_84bb739a297c4d52efe756a2f398f1da"
+    },
+    {
+      "attempt_id": "9d6491b8-e90b-4f21-919f-e4aacdfbb1ac",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'impetigo...patible with impetigo.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_78c29770cb6db47ce3dd7e0ab7a365de"
+    },
+    {
+      "attempt_id": "87519202-b2f7-45ad-8108-634073362d03",
+      "error": "batch_output_error:ValidationError: 2 validation errors for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'pseudofo...-bearing distribution.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'arthropo...ollicular bite puncta.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_e6e57cfe0b37af73822bb1f779bab382"
+    },
+    {
+      "attempt_id": "4c58da86-266d-49fa-bffc-585a6c6b037b",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'keratoac...ll carcinoma spectrum.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "HIBA_ISIC_5847539"
+    },
+    {
+      "attempt_id": "aeae01a8-f2a2-46ff-87cc-30bcc80e904c",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'basal_ce...ausible consideration.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_c3994c3b7fc8f7f537ce70972618c80d"
+    },
+    {
+      "attempt_id": "63bacf37-25c5-4b6a-b950-d554804b067b",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.2\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'perioral...es and small pustules.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_d821f5673f94063815e20f8db5e9501f"
+    },
+    {
+      "attempt_id": "c7820499-dd80-4209-ba47-20bbd7e6660f",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.2\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'lentigo_...ythematous background.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "HIBA_ISIC_4563689"
+    },
+    {
+      "attempt_id": "f9741d1f-61a2-4fb1-97f6-e80a69ec3a1d",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'milia', ... inflammatory lesions.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_9d0a9eb2a7892cdaa8beb1226df10c01"
+    },
+    {
+      "attempt_id": "ffc5c853-7970-4a24-a78d-28e3af6a8c92",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'solar le...ing scale or erythema.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_1693_3103_879"
+    },
+    {
+      "attempt_id": "f6c9a57e-0086-44b2-a666-da1a5e3bb4fb",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'hidrocys...h cystic translucency.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_10ed2d0e269bb1a60f466fef6cdf367b"
+    },
+    {
+      "attempt_id": "5229a9dd-62e5-491b-82c0-00b61a72c4d2",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'impetigo...portant consideration.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_1e296a64c838d0289cf7f49fa7dfb65d"
+    },
+    {
+      "attempt_id": "7141edf3-1406-4a7d-8509-8bdc93f25ea5",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'morphea'...ion or histopathology.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "SCIN_5648339779171772545_IMAGE_1"
+    },
+    {
+      "attempt_id": "56d4652b-bcbd-42b0-8fa0-a94aeb3e4366",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'tinea ma...yperkeratotic plaques.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_e672dac0d8e357a7a6d9ee5e4fbedfd7"
+    },
+    {
+      "attempt_id": "b3bdea04-d2d1-4fb4-a353-58dfb305d022",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...ratosis is pronounced.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_238_364_387"
+    },
+    {
+      "attempt_id": "90f1eac3-d9d2-4fa6-8043-d0192b00430f",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'solar le...ing scale or erythema.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_1693_3103_879"
+    },
+    {
+      "attempt_id": "07bf8c04-b466-42e3-8032-e97c426c591a",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'onychomy...ross inspection alone.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_ce01b20213533e4ab3cf7bc468549342"
+    },
+    {
+      "attempt_id": "438dc31e-65c2-4881-8528-e9bee5812640",
+      "error": "batch_output_error:ValidationError: 2 validation errors for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'rosacea'...he nasal localization.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'follicul...sion of acne vulgaris.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_0e53f04b270579940142d00c6165f0a5"
+    },
+    {
+      "attempt_id": "03c87e08-a667-4410-9e50-c44a506eb585",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.2\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'perioral...es and small pustules.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_d821f5673f94063815e20f8db5e9501f"
+    },
+    {
+      "attempt_id": "bc51e34f-bd5a-4c71-9df2-e1825340f607",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'hypertro...ceous silvery scaling.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_0327466e2c74672e83a55b47e800fe05"
+    },
+    {
+      "attempt_id": "f18d8913-b341-491b-961b-5753280a65f6",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...ut tissue examination.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_fa4ed547ba2ed8055c9d777ee729f70b"
+    },
+    {
+      "attempt_id": "64e7d564-d038-41e8-9eda-9f9414a7c456",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...ratosis is pronounced.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_238_364_387"
+    },
+    {
+      "attempt_id": "2fe2563e-28f2-4a0c-abdd-9ada924f11c4",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'candida ...igo satellite lesions.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_63011295726d7a524e87edd3c55a5820"
+    },
+    {
+      "attempt_id": "88b6370f-c963-4969-a65e-8713ae3510da",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'tinea co...with central clearing.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "SCIN_-4696067359335613302_IMAGE_2"
+    },
+    {
+      "attempt_id": "472d073b-a6d3-4cf5-84c9-d9a20f7caa37",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'milia', ... inflammatory lesions.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_9d0a9eb2a7892cdaa8beb1226df10c01"
+    },
+    {
+      "attempt_id": "6a160972-84e5-4d81-9663-ff1621f75b7e",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'scar', '...r peripheral erythema.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_478_1829_281"
+    },
+    {
+      "attempt_id": "6ba65de5-1890-41d3-bac7-0ae7e9ccfb42",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...throughout the lesion.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_40_56_160"
+    },
+    {
+      "attempt_id": "05a22cdf-3d8d-4fb7-a3cc-d64b639526cf",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...rly demonstrated here.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_91_356_456"
+    },
+    {
+      "attempt_id": "efdb70cd-ecc0-4dfe-9953-ff0d89c83005",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'impetigo...portant consideration.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_1e296a64c838d0289cf7f49fa7dfb65d"
+    },
+    {
+      "attempt_id": "68feaa71-258a-4d7b-a83a-9e8d180aa68a",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'impetigo...patible with impetigo.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_78c29770cb6db47ce3dd7e0ab7a365de"
+    },
+    {
+      "attempt_id": "c93bf600-8acc-4862-addb-8798f333d87b",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.2\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'chronic ...orly defined erythema.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_4603fefbd2e921b0987e3aaf91e275e1"
+    },
+    {
+      "attempt_id": "264344d8-61c3-4954-8263-6cec0f392448",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'Kaposi s...egated fungating mass.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_e170d124649f3cddf0e8d2ac7a4e597f"
+    },
+    {
+      "attempt_id": "ac66f338-895a-4b58-a45f-8d06f19eb77c",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'pigmente... basal cell carcinoma.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "HIBA_ISIC_9795586"
+    },
+    {
+      "attempt_id": "01403a66-3569-4155-9990-36967e6ccb49",
+      "error": "batch_output_error:ValidationError: 2 validation errors for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'pseudofo...-bearing distribution.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'arthropo...ollicular bite puncta.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_e6e57cfe0b37af73822bb1f779bab382"
+    },
+    {
+      "attempt_id": "d8b63ad2-b4a1-4ae9-a82c-5eee398a141f",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'hidrocys...h cystic translucency.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_10ed2d0e269bb1a60f466fef6cdf367b"
+    },
+    {
+      "attempt_id": "320a1c2f-90f4-4c85-ba25-58d51d82a5b8",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'dyshidro...dorsal foot and ankle.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_864aa506ce741d927482bee6357f7cce"
+    },
+    {
+      "attempt_id": "8de47439-6ef5-497c-b1f1-69068455e110",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'sebaceou... prominent ulceration.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_c02bd8d61feda28f1cf90efb126b5b1a"
+    },
+    {
+      "attempt_id": "7e391b99-4739-4458-a72b-6d363fe4cf4f",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'follicul...not clearly seen here.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_6e9b03c88ecdc1885ad5f1b6586da01d"
+    },
+    {
+      "attempt_id": "2948eff5-eb57-40f6-955d-9d37fbd6e690",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'basal_ce...ausible consideration.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_c3994c3b7fc8f7f537ce70972618c80d"
+    },
+    {
+      "attempt_id": "63a83b09-23f8-4085-a3b8-8a1719d1e862",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'keratoac...riform keratotic plug.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "PAD_UFES_20_PAT_154_235_162"
+    },
+    {
+      "attempt_id": "31901ef0-23b7-4fde-a6f8-0858a3901757",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'pyogenic...by prominent bleeding.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_84bb739a297c4d52efe756a2f398f1da"
+    },
+    {
+      "attempt_id": "0e81a00d-bdf7-41f8-9595-5e6ad0cfff59",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'morphea'...ion or histopathology.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "SCIN_5648339779171772545_IMAGE_1"
+    },
+    {
+      "attempt_id": "0703db17-a9c2-43bf-929b-4f3dcdecd740",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous...hyperkeratotic lesion.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_a589f826c885576e848a2a4d66235f1f"
+    },
+    {
+      "attempt_id": "0ef4541d-699f-4351-b31d-da34c858bc5f",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'keratoac...uamous cell carcinoma.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "HIBA_ISIC_7169848"
+    },
+    {
+      "attempt_id": "18e5cd3d-6e5b-454b-abb9-1d67baef54af",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.2\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'lentigo_...ythematous background.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "HIBA_ISIC_4563689"
+    },
+    {
+      "attempt_id": "4d26ac7c-d4e5-4f3c-9349-3ce32c837c41",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'bacteria...ints to acne vulgaris.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_dd93fd24793795b2ead2131453c95356"
+    },
+    {
+      "attempt_id": "567ff1b3-7b82-4a79-ae7e-6e16785d45c2",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'keratoac...ll carcinoma spectrum.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "HIBA_ISIC_5847539"
+    },
+    {
+      "attempt_id": "0449ebb1-4285-42fa-aad8-f7d7b9585ce0",
+      "error": "batch_output_error:ValidationError: 2 validation errors for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'sebaceou... basal cell carcinoma.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'molluscu... basal cell carcinoma.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_9a2703b526c057a1563b6579cb3024fa"
+    },
+    {
+      "attempt_id": "6a070e7e-1ce6-44e4-8595-7ce61214e869",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.0\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'squamous..., or verrucous change.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_81614ef48a63119af1349a28cc86a2af"
+    },
+    {
+      "attempt_id": "23a0f0f4-3f2f-4f93-b842-9c7126daa7b6",
+      "error": "batch_output_error:ValidationError: 1 validation error for StageBReasoning\ndifferential_comparisons.1\n  Value error, An observation cannot favour both sides of one comparison [type=value_error, input_value={'alternative': 'tinea ma...yperkeratotic plaques.'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error",
+      "sample_id": "FITZPATRICK17K_C_e672dac0d8e357a7a6d9ee5e4fbedfd7"
+    }
+  ],
+  "stage_b_missing_attempt_ids": [],
+  "stage_b_ok": 6148,
+  "stage_b_rejected_attempts": [
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "1d260319-309a-4c89-ab79-21651e6358f6",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_213936e7901e7fa1bae80d3df0c4e4c7"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "cddc4135-e3aa-4fe0-ab14-1f30231de7da",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_bdb668db00a5c6ac3e1f6e5af17bbc43"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "72085c45-d6a5-4cfa-b7e2-d1534875cc17",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_5635e1cf125989c2ed9faa0bdfd7b981"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "babb8e5b-9376-4a35-a9d2-5fb291f9b2d0",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_1d880c5d06148a789e33af7c75cd7282"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "cdfc9029-9556-443a-96a7-7508587a57e5",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_10cacf2e0873ae8f01f0f13202545ff7"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "0f29d3d0-e656-45d1-92ba-a0c8026e8600",
+      "diagnostic_confidence": "high",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_-4584149572849454443_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "be7d7817-ad04-4d45-a48d-4fae3881b4d6",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_d740f99aa0236f9972d66f0821cf14b0"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "f5846317-79c7-47c9-9f42-d256e6d3defd",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_ef6b1323e2822f37655d595f7d7494f7"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "351c4c78-038e-44da-a258-a065abebe100",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "SCIN_6610442252642332209_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "f64de8b5-558a-4dc9-bf99-15a4e8329678",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_8ec952e3e6c462c3ddaff7b5cb2c39bc"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "3fb1b0ff-e6ac-4e58-975d-04b3e01dffd3",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_6343427293036790927_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "b87bddbd-e6b7-40ab-a093-473b4b2fc351",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_9e2d47ec8247ee0cdc1dc0c7915a15fe"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "43b9cb82-0dd1-4df4-b02a-4d8438915e58",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_7def1372c07348c3f37b044802cff9c4"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "de8ea587-ee63-40c7-8887-f15a652e05a2",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_96dde1402d8e7aef0727408efc103fb7"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "9dd44ed4-943f-474d-b6fa-44a68caf30a7",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_74d48c265b80c322bef41a88464836ab"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "52b8b8e4-3b03-4d1c-9490-931f3e2169fe",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_6075470705800251807_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "d0c47a7d-c5f3-41b8-9831-cb3223d80cc7",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_5759072824389330562_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "efa65bcb-8c5d-4c9f-93e0-7b1311568b58",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_5a441dca20e63f6bbe6485925846d05a"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "8f65c99b-19cd-4e49-a21d-2fe1150fdaff",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "FITZPATRICK17K_C_d190a369cf2c6c534ef11b6a18d0a404"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "7e8e0aa3-c2ad-464d-ada3-2a0108a7b986",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "SCIN_-8754678083190860015_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "75042aad-16c7-4ffa-aa3b-b04a6dccdfc8",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-3407628263497825003_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "f571e406-b430-457c-97ec-4465a629c5c3",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_ecfbdbcc21c8869d788c9b24f4e28399"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "8f622c57-39a7-43b6-b5d9-ef798d2b3014",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "PAD_UFES_20_PAT_1633_2855_460"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "54586be0-d9e9-4a2c-a215-a4762e9f9e6f",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_1589466904862954952_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "df8d9334-6f3f-4ad5-a901-dbea78d843ae",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e8a6ed45c7c045c6de63944550ad6b1d"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "82c1eaec-5f3f-4b01-a1ce-f21c0e64f6a0",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_a6403dc8647dfae9df1f3d220ffbe673"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "f0b998ee-98a5-471e-87df-f8abfdb06137",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_6a4d9ad466a5bf1767573abe3d03903a"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "8f9b4b9f-ffe6-4aaf-a329-d43fd749ce40",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_0b8b83ce62370ea4931579b9c2997b87"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "e989b5f3-212f-43d5-a9d7-e6d4bce9b3f8",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "SCIN_8020891537658973646_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "2b49793a-96de-4749-acb5-335eceff9340",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_-3940816727290109028_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "92a14ae7-6e73-4a8c-8e67-f7b6d73f6f5a",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e383acb8d0ad99dce03bfc4a0ef580b6"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "0acaac59-2a0c-4686-96c2-e914eae1ecdd",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_4a6f9113fff41397da716fc6f1bb1664"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "c17df007-eb58-4f82-bc3a-7828a91357f3",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-7227413334600424206_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "a534b7e3-356b-4e97-adf8-dff8292a4a75",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "SCIN_-4949778095225877346_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "b9f9bd75-2f90-4c48-b19a-de85a2852797",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_a49abcfad0d9a5270d1c9488a6fc466f"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "f0af95e9-2fc2-4f76-9a12-22976df3edce",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e34646f6778dbdc86130a4babf62d01b"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "e9fb2282-2ea7-4ad9-95c5-17f3c7504492",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_010d2857cd86ff9513317a8a142f6d5a"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "421984c2-267b-4d67-9f9a-3e435d57c4a6",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_3489401261164777258_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "7e53c79a-e712-4211-8c5d-a0adcc19e73b",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_-8054001866397330447_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "51b96dfa-1bfe-488e-bb7f-0aa5052b5ea7",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_6b6381ebe706b646414c6afc0116eade"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "e508f7c0-e401-48cc-b3d9-50789d1b283a",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "SCIN_9028506565042482784_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "0c912fc4-5a86-46f7-adba-b9e258d69c2f",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-1796688741678634515_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "35fa63ca-7617-4ab4-adc9-84a63c7cac4b",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_9071aa339d3fe202cd0fd9a9ae1de1e7"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "2abc6c4f-b177-4dd0-8b87-bb75b37d7e12",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_-7819133539519710397_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "a890c6c9-6dee-4f82-b970-a08ab5519d88",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_9076222836036925266_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "6d08223b-9420-4867-ad98-227ae6cc45d6",
+      "diagnostic_confidence": "high",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_-3239313504364543357_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "fad490e9-ecc7-4fa1-a05f-f78318727430",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e72441b255003bc02d629502ab1a15b6"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "294b866d-bb8b-4ee4-8a5b-a37086e11a52",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_0d6b8b2b2f5a8b8c9b7cfe18034bb3a3"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "22dc3883-a924-4bf8-b3d3-2b293a78323c",
+      "diagnostic_confidence": "high",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e29bcdc1a3ce2eade7897c348abacbcf"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "fc612966-5045-4597-bf8a-19d4291e55d2",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_8598795546166978679_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "5b48b952-78d1-4f8b-8686-a72cb8b0b4c7",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-4644516716280136173_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "b8b5068a-dd47-4f9c-80ff-1f0af2f6f67a",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "PAD_UFES_20_PAT_210_316_401"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "49b64036-85bd-42ef-a6a4-8b823b547fcb",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_-1337979528936324516_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "ad11d295-ded0-4435-ab9f-3351c153ce34",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e783339effbc628d8b5392db27ba6716"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "bbfa37de-6b37-4ce5-83e5-d858d43be98b",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_-5885784853012441829_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "a0fe8b01-6d00-4d01-b0ef-a6edfa9021e6",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e664e4221da845a0d5ad3b34f479d868"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "29ed8add-551a-45d7-b1bd-dfa383b19b8c",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_a27012d54673fe854519f52780ded002"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "41260380-6769-4570-a676-80fb4b97d84e",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_8e93632358a1490fa191121b3fcddc98"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "fe51678e-fbab-4ee0-bbba-313c522af946",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_ffbd5c2fcb3429d81b391dd05a6b5f34"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "03f0b8aa-8006-4f34-8207-2ac20664d7c4",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_5837921410652230755_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "2771960c-09a2-4e11-b3dd-3cffc0f838cf",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_dc412f2b0156391a5cd4f004eb50bb1f"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "da81d084-d6aa-4046-b7ba-1c85e5c69c81",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_ac10d5d4d0edd60b5b552276bbd90890"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "ab7db6bb-2df6-47d0-8720-c4a83db751c1",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "PAD_UFES_20_PAT_2041_4298_408"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "f1b985ad-fa8f-4925-a257-a51b89f6c317",
+      "diagnostic_confidence": "high",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_1610643527361135382_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "029ab4ee-dd43-41a4-ac15-74a6b7553dfe",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_-185529518023482284_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "8b54f426-df9c-4105-a279-21b655ff2b85",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_799511949408239093_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "867991a5-debc-4e0d-97ee-47caf12207d9",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_cef2dd1c93103711aed6687a619e0230"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "e2ccad7c-da6e-4db6-ab91-b35f55e57747",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_0b3fa8c345e4d62b400471b5a43333bf"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "18c97182-d233-4815-8cc6-b03fe007d4cf",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_8f11fe151cb9ede441d591dbfc171948"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "75a7fd68-0d3b-4ae4-a4ee-5ed2d280eaa0",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_26108459f12d77128a1d28cc21e3550a"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "c8f226ff-6280-48ba-adf7-fe366d03d7af",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_5567081113382937200_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "7548e051-f259-4af0-be58-9473ff9a6a5a",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "SCIN_-6987729819352868714_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "2a5c86d5-eb15-4f20-bb4c-0ea8a6677033",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_102765ff09884862ea2f911b29a9b14d"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "3ec53c29-7c8b-461a-8ef5-d6e64048bfea",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "SCIN_-4323073538068791362_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "018178d2-66e5-4451-ba3c-550040b95b1f",
+      "diagnostic_confidence": "high",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_6493256759329924144_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "30c91ae6-a665-47fb-9617-7d67c9f1e729",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_4668416589759931720_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "66b68a1f-86c1-4300-8727-c587a1fec9c9",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_6ec85e191c512d3373971b12912cb83e"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "ab0308e5-39d8-4e12-810b-f43d564c2c92",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_2620539304203771862_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "68efc893-7dbd-4e17-8d76-5875fe6b33a0",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_0b035e5709e08c96e471bf050c805697"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "a1fa2677-ef26-4f01-8983-01e5447bc135",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_832eb11215d6f0d856f8a1dfdd0f6754"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "99601a48-982c-4264-b942-20fbfbc20fe0",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_6af0a95515b388eac5fa547ca8f8e931"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "4dd9ade9-d0d8-4f1f-a7cf-a1c8a6e9d13b",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_563c07deb927f07e5fac7da4ce43a1f7"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "493fce16-9187-4bc2-8aee-146987605578",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_1bec7e2e587c13adb6887df1bd705a43"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "d494b7ef-3bff-41dd-9bb8-9c05c98ad4cb",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_83c0726e5ff7c44e32a9b0b08143208c"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "1e898111-b31c-4b9c-ae27-3f15b9667a80",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_-7851195646036204419_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "a2df4223-4820-4ad8-ae1a-57e5c5980dd2",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-4374212557647415088_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "eeb0b301-71d1-4e3d-b591-be04aa5337c6",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e4984a2cef00ed3d8368363e3b348c9c"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "cf1cd486-9414-4f55-bbc8-e0c810b7ff06",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_12b43527060343247fd614f1c7f37c3e"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "b6d0bcac-40c7-43c8-bebe-7a33682d1b47",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_-8054001866397330447_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "58d7d361-cd18-4d01-b1b5-ac2afe86e60d",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_4887966460252262963_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "9b3132bd-7a1b-4692-9f76-4ed5efa465b2",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_095b1236345ee8c9df42361a321d6207"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "5f082ea9-01bd-4121-9ad4-85d33bd28cf4",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_7220922374529634547_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "3a0bb477-ab83-42cf-893b-ef3af1d69f22",
+      "diagnostic_confidence": "high",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_8a10429e9c89822448998ea15aae1231"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "13ae5b87-f02c-4d32-9ba3-d873ff99d64c",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_2df4c60292d03b1278dac9d602481479"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "6629ceb3-7a77-4a32-a7ca-d5a248c196a7",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-1659559780402537085_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "b64b28b4-ad61-421c-98a1-2fe805d705f6",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_ea9c24e0eb6917c90679dba3be0083cf"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "f7a073dc-524e-47ba-ba5f-1c935e718f96",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_27bde4c6ec61895fe01e6d9877960739"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "db5688d4-4f72-4982-a590-dcdd1266a111",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_1a95a0952dff3888dfafb444b9873081"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "d6610bab-4af2-4ce5-9341-059fd51275fe",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_be6b47c4e93da7d213c7359562ca99e5"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "6879d3fd-9f63-48ac-bbc4-b75291095dbd",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-998965366567233636_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "56dc69f2-b249-42e6-9235-b4568d4f6ae2",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_1320087784849034495_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "4ce415de-7cc2-4252-916d-005ddeb1ffab",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_d2561eaa981d137b29e3a058246645f4"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "be99261e-7d1f-44a0-b659-c9f2e5a5ab94",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "PAD_UFES_20_PAT_997_14_40"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "eb63733c-6236-4d56-a38b-c9e51b09c970",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "gold_mismatch"
+      ],
+      "sample_id": "PAD_UFES_20_PAT_187_287_482"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "82fb2e96-3046-41a2-b7db-7b15ac97220a",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_9ad104c60632ed210dc16919afd36810"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "0746b870-48b4-4c56-8c9f-8649e4ab88b9",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_e4f3e8c64584a988c122997cc2c09782"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "bd963e69-adc2-41aa-b215-fc88ba507601",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "SCIN_-4717786449227921352_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "a9db9ba0-1137-44d0-9316-f94e0e7251db",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_592b1e63f2c228b2481254fc97060600"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "e425bc03-57ec-44a2-afc4-2bd4d9f629bb",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_782e232de169de8134de4ef7b2cf5b66"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "8ca2dbc9-1b4d-4368-8856-565b09a64bff",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_3377584127732041409_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "471d52db-ff6a-459e-9eba-13dda3d69de8",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "SCIN_-5049807704499166019_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "49e0f7be-28a1-455e-b4d8-88eccb73c99d",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "PAD_UFES_20_PAT_1591_2648_855"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "86bcb6ab-a059-4e60-9d8a-f2b4b128d99d",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_9047654489067734884_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "0e84b35f-93bd-4f7d-a789-5b512f92d2d3",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_4981924219389224217_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "c6fe87dd-3a42-4b4d-97ca-5049c7b9141b",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_eac4a3ef188d89ba3e376553ee926b01"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "b388957f-d598-4968-82d3-1ba601391fd2",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_2fb8013d78c2cd50d8d462e59b030cb2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "cd73e884-460f-411e-996c-c69b54fd2761",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_d1630be09b8372b9740d7152b415055b"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "5379abd2-fd0e-4ed9-9e02-8cd4bac45ff8",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_8097381513172060282_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "29121923-38a1-4ceb-9cdc-a7023f563bc3",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_-8018705038614693970_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "92acc153-05f9-4c42-8fa1-ee01657c3929",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_-8933122876369538878_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "b211004c-8231-48fd-aadb-126660e49db1",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_273c142626cf706139bba818bd008b9e"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "a2db403c-7329-4850-8a10-70b8d22befec",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "SCIN_1129555082201687214_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "58e805d5-628c-4c27-87a7-4a16810a871e",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_9965621eb0e381dc51db0ffa0b3033e7"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "98c34585-c8ad-4606-84ff-0b8ad79db0aa",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "SCIN_-1490620546587137533_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "2271efe3-5db3-4ab1-ba67-cd6284efc90c",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_993c2ed511a88ea5fb1cbfe46c1737f8"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "6c435d79-702d-44e1-99be-2a737cc6894b",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_2093973831515705574_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "0664c8a2-0e9e-40cd-86d5-646fa4f5bc18",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_2546805609403797552_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "78b1113c-90bd-4bf9-97a9-09231052baa5",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_6372c52836107dd23cff2f8c972353ef"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "e9eb6784-6591-41a9-8c6c-98712da39d1e",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative",
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_7791538138327469326_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "5b618cc3-39e7-473b-bfb2-e2736067df36",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "FITZPATRICK17K_C_4e21b16f514f906132e7d55825c98117"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "e4621bfb-e22f-4cf8-a680-027d58e29c1f",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "FITZPATRICK17K_C_7f7412968370a10d8efd55dc1f8751eb"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "faa40488-3f5a-48a7-aac2-f9b655114ce2",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_1d5444c7b349f1e2c1bc3d32a26d959c"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "d06132b2-cb82-49d1-93e6-d507d89751ac",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_1685418811189718839_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "1485f6be-1ec4-4939-8028-9a22d26a1801",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_7589120847935248859_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "77c057a6-4d6a-4c26-a53e-3d3c2f1b7d01",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_8627608bdfc5b904a0fbc23d86716e86"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "b3beda60-455f-4158-89ea-f669de18a399",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_5a7fda42a38599f347ae2e65dcf51879"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "f9b06837-4bd0-4e7f-ac3a-8fbb5149fb51",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_f0bad4eac2969ce9efe3116bda407e70"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "1c97d80f-57ea-40f5-9115-7ab10b1b3f29",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "SCIN_-3815513116289146797_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "1d1ac917-4014-4646-bdde-8582bd3a9a89",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_20df5ec791e5974ab968a2bfe8b64308"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "fc9953f5-05e4-418b-9efb-ac23d9d2e646",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "SCIN_-8808510258616563225_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "6ef8bd14-b230-480d-9cf8-3e591560981d",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_3001411411444146079_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "e8937d5f-23be-4cc3-a9fa-328174eb9001",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_5c9bb8ebeeb90ebc169bb299b41466a9"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "8591d4d9-16d4-4282-8d4c-61877b154af5",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_6e591f8824da87ea646538a845ac6d9a"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "bd131dcf-db79-4cad-b18c-62c25abe068d",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_d3a460bfa3c7b968e0a9c73bdeb4d479"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "39ec50be-be2a-4a85-9fc2-687f37ffd018",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_a5238bc97a49c9e75862f80fea3e7171"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "44d755a7-2bde-435c-b9c5-914be6fb3a32",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-4315380494523344416_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "4564634c-51fa-40af-b2ec-da67b04b62a0",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "SCIN_-3815513116289146797_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "7b404ce5-8166-4381-99b3-1c761ebee7d3",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "SCIN_-1490620546587137533_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "4b7120d7-b581-4ab9-8210-0fa2c32d0696",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_39a3cb16f3c04399e09e3aadf32c84e1"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "0396d44b-9c0f-4a4a-9fb2-2f16b05e605e",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_5966b609d5a737c6795c954cf373f94b"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "65319dcd-6422-4c9c-9197-53c28f2ad572",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_7729a485abc264b1c58a995a49ec7f5b"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "924f2e44-d4be-4989-a14f-b25c7b8b1fa5",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_69ee2924694efe5538f572c3fa9a5d87"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "56bdaf8a-6c82-4dec-8987-eb7d39af4f15",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_37f6c602dbb4948db41c70d0ae69c260"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "b24f1859-9951-440b-b92d-6b88f3b9db5e",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_af3c985f980b54b34337d08ee8b50d0d"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "90e35673-c6b7-4a40-b5d2-8ff006aa6b65",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "comparison_missing_alternative"
+      ],
+      "sample_id": "SCIN_-821110872479093372_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "ade82b2c-ee6f-4bd3-b3f2-d8eedcb7d982",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_82977b8dac7ca887c812559945dce330"
+    },
+    {
+      "anchor_evidence_status": "supported",
+      "annotation_conflict": false,
+      "attempt_id": "86a787f9-53ad-453e-b88c-f0a86a4a9215",
+      "diagnostic_confidence": "moderate",
+      "reasons": [
+        "clinical_reasoning_missing_alternative"
+      ],
+      "sample_id": "SCIN_5345993529885915940_IMAGE_3"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "7802a10f-e54e-494c-9925-1f85a881823c",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_406848482bcec41add3568109e818d3f"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "6871f09e-abba-43b2-8c84-bd0574f8509d",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_d884c99eea5c16906e1aa261b64e5f33"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": true,
+      "attempt_id": "4ad26179-893c-4d2f-99d9-5fde34914b1c",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict"
+      ],
+      "sample_id": "FITZPATRICK17K_C_cc04b0ff2e327ced8cb695ec2d249fc8"
+    },
+    {
+      "anchor_evidence_status": "weak",
+      "annotation_conflict": false,
+      "attempt_id": "57509412-2a8b-4d6d-9a5c-33d5e91fb238",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "comparison_missing_gold"
+      ],
+      "sample_id": "SCIN_-8239529408406365093_IMAGE_1"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "adf06aa6-c5d3-4b2b-94e1-d44bf296e86d",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor"
+      ],
+      "sample_id": "FITZPATRICK17K_C_3e9d2492e9f6dec28e712a9e3e851ae3"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "a44a453b-a160-415c-82cc-a19f6b5934ac",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "SCIN_6886983180384047204_IMAGE_2"
+    },
+    {
+      "anchor_evidence_status": "unsupported",
+      "annotation_conflict": true,
+      "attempt_id": "22b978f3-9332-4055-b824-d8552be1b334",
+      "diagnostic_confidence": "low",
+      "reasons": [
+        "annotation_conflict",
+        "unsupported_anchor",
+        "unsupported_anchor_has_support"
+      ],
+      "sample_id": "FITZPATRICK17K_C_f2fc1714d53f806603228724a49fd1e7"
+    }
+  ],
+  "task_counts": {
+    "caption": 6312,
+    "diagnosis": 6312,
+    "grounded_differential": 6127,
+    "morphology": 6312,
+    "request_new_image": 21
+  }
+}

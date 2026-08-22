@@ -1,0 +1,9 @@
+{
+  "audit_sha256": "df37f514ba548cdd59cabcbbf2288a1d4a9129ebea804d3c0bb8e653eef612d3",
+  "clinical_reasoning_changed": false,
+  "diagnosis_changed": false,
+  "normalization_version": "stage_b_overlap_normalization_v1",
+  "normalized_rows": 35,
+  "policy": "remove_intersection_from_both_evidence_lists",
+  "raw_provider_outputs_published": false
+}

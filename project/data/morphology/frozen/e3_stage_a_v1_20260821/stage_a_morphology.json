@@ -1,0 +1,233 @@
+{
+  "$defs": {
+    "ConfidenceLevel": {
+      "description": "Closed confidence vocabulary for observations and diagnoses.",
+      "enum": [
+        "low",
+        "moderate",
+        "high"
+      ],
+      "title": "ConfidenceLevel",
+      "type": "string"
+    },
+    "ImageAssessment": {
+      "additionalProperties": false,
+      "description": "What can and cannot be assessed from the supplied image.",
+      "properties": {
+        "color_reliability": {
+          "enum": [
+            "reliable",
+            "limited",
+            "not_assessable"
+          ],
+          "title": "Color Reliability",
+          "type": "string"
+        },
+        "distribution_assessability": {
+          "enum": [
+            "full",
+            "partial",
+            "not_assessable"
+          ],
+          "title": "Distribution Assessability",
+          "type": "string"
+        },
+        "has_anatomic_overview": {
+          "title": "Has Anatomic Overview",
+          "type": "boolean"
+        },
+        "has_lateral_profile": {
+          "title": "Has Lateral Profile",
+          "type": "boolean"
+        },
+        "has_scale": {
+          "title": "Has Scale",
+          "type": "boolean"
+        },
+        "image_modality": {
+          "$ref": "#/$defs/ImageModality"
+        },
+        "is_evaluable": {
+          "title": "Is Evaluable",
+          "type": "boolean"
+        },
+        "quality_defects": {
+          "items": {
+            "$ref": "#/$defs/QualityDefect"
+          },
+          "title": "Quality Defects",
+          "type": "array"
+        },
+        "views_available": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Views Available",
+          "type": "array"
+        }
+      },
+      "required": [
+        "is_evaluable",
+        "image_modality",
+        "views_available",
+        "quality_defects",
+        "has_anatomic_overview",
+        "has_scale",
+        "has_lateral_profile",
+        "distribution_assessability",
+        "color_reliability"
+      ],
+      "title": "ImageAssessment",
+      "type": "object"
+    },
+    "ImageModality": {
+      "description": "Acquisition type declared by Stage A.",
+      "enum": [
+        "clinical",
+        "dermoscopy",
+        "unknown"
+      ],
+      "title": "ImageModality",
+      "type": "string"
+    },
+    "Observation": {
+      "additionalProperties": false,
+      "description": "One atomic, image-grounded clinical observation from Stage A.",
+      "properties": {
+        "concept_id": {
+          "$ref": "#/$defs/ObservationConcept"
+        },
+        "confidence": {
+          "$ref": "#/$defs/ConfidenceLevel"
+        },
+        "evidence_region": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Evidence Region"
+        },
+        "id": {
+          "description": "Sequential observation identifier with exactly three digits; the tenth identifier is obs_010, never obs_0010.",
+          "pattern": "^obs_[0-9]{3}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "scope": {
+          "minLength": 1,
+          "title": "Scope",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/ObservationStatus"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "concept_id",
+        "value",
+        "status",
+        "scope",
+        "confidence",
+        "evidence_region"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "ObservationConcept": {
+      "enum": [
+        "image.anatomic_site",
+        "lesion.count",
+        "lesion.primary",
+        "lesion.size",
+        "lesion.color",
+        "lesion.shape",
+        "lesion.symmetry",
+        "lesion.border_demarcation",
+        "lesion.border_regularity",
+        "lesion.profile",
+        "lesion.surface_texture",
+        "lesion.secondary_change",
+        "lesion.configuration",
+        "lesion.distribution",
+        "lesion.additional_feature"
+      ],
+      "type": "string"
+    },
+    "ObservationStatus": {
+      "description": "Evidence states that do not invent unobserved absence.",
+      "enum": [
+        "present",
+        "absent_in_observed_scope",
+        "uncertain",
+        "not_assessable",
+        "not_shown"
+      ],
+      "title": "ObservationStatus",
+      "type": "string"
+    },
+    "QualityDefect": {
+      "enum": [
+        "blur",
+        "low_resolution",
+        "poor_lighting",
+        "color_cast",
+        "occlusion",
+        "compression_artifact",
+        "tight_crop",
+        "other"
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Answer-blind Stage A target containing visual findings only.",
+  "properties": {
+    "clinical_caption": {
+      "minLength": 1,
+      "title": "Clinical Caption",
+      "type": "string"
+    },
+    "dominant_visual_pattern": {
+      "minLength": 1,
+      "title": "Dominant Visual Pattern",
+      "type": "string"
+    },
+    "image_assessment": {
+      "$ref": "#/$defs/ImageAssessment"
+    },
+    "not_assessable_features": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Not Assessable Features",
+      "type": "array"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/Observation"
+      },
+      "title": "Observations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "image_assessment",
+    "dominant_visual_pattern",
+    "observations",
+    "not_assessable_features",
+    "clinical_caption"
+  ],
+  "title": "StageAMorphology",
+  "type": "object"
+}

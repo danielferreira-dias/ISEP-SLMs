@@ -1,0 +1,27 @@
+{
+  "all_rows_quality_status": "accepted",
+  "normalized_overlap_rows": 35,
+  "release_id": "e3_multitask_sft_v1",
+  "schema_version": "e3_multitask_quality_v1",
+  "source_samples": 6312,
+  "stage_a_accepted": 6312,
+  "stage_b_accepted": 6148,
+  "stage_b_coverage": {
+    "error": 0,
+    "missing_attempt": 0,
+    "not_eligible_stage_a": 0,
+    "ok": 6148,
+    "rejected": 164
+  },
+  "stage_b_error_attempts_excluded": 70,
+  "stage_b_missing_attempts": 0,
+  "stage_b_rejected_targets_excluded": 164,
+  "task_counts": {
+    "caption": 6312,
+    "diagnosis": 6312,
+    "grounded_differential": 6127,
+    "morphology": 6312,
+    "request_new_image": 21
+  },
+  "trainer_rows": 25084
+}

@@ -1,0 +1,151 @@
+{
+  "accepted_release": {
+    "bytes": 22563698,
+    "path": "/Users/danielfd98/Code/ISEP/project/data/reasoning/frozen/e3_stage_b_v1_20260822/stage_b.jsonl",
+    "rows": 6148,
+    "sha256": "53d4e67ac6909aefea5f880c2aba9c77cc238301b95fa4b4b73ee32a27fc1ae7",
+    "status": "ok",
+    "unique_sample_ids": 6148
+  },
+  "cost": {
+    "currency": "USD",
+    "normalized_terminal_usage_not_double_counted": true,
+    "provider_cost_usd_all_requests": 24.7412955,
+    "terminal_release_source_cost_usd": 24.6086505
+  },
+  "created_at": "2026-08-22T13:14:22.555622+00:00",
+  "dataset": {
+    "config": "diagnosis",
+    "repo_id": "danielfdias98/ISEPDistillDataset",
+    "revision": "b215f0474e4931b5951da768e79a0d579d26919d",
+    "source_sample_count": 6312,
+    "split": "sft_train"
+  },
+  "freeze_id": "e3_stage_b_v1_20260822",
+  "frozen_artifacts": {
+    "prompt": {
+      "bytes": 6101,
+      "path": "/Users/danielfd98/Code/ISEP/project/data/reasoning/frozen/e3_stage_b_v1_20260822/stage_b.md",
+      "sha256": "b8239b38c24eac6037c22bcfcbc3573deb37cd5011c97d234e4179f20718125e"
+    },
+    "schema": {
+      "bytes": 4017,
+      "path": "/Users/danielfd98/Code/ISEP/project/data/reasoning/frozen/e3_stage_b_v1_20260822/stage_b_reasoning.json",
+      "sha256": "244430e9e7ead45c8f777a41f21712bc5c03072962c480f77bfb968e72e7bdf3"
+    },
+    "teacher_config": {
+      "bytes": 2717,
+      "path": "/Users/danielfd98/Code/ISEP/project/data/reasoning/frozen/e3_stage_b_v1_20260822/gemini_3_7_flash_vertex.yaml",
+      "sha256": "8d6dd5feae3af2b955e9e370e012750f97c09024beaf77505c0731cbd0218963"
+    }
+  },
+  "normalization": {
+    "artifacts": [
+      {
+        "bytes": 26377,
+        "manifest": {
+          "bytes": 1345,
+          "path": "/Users/danielfd98/Code/ISEP/project/data/reasoning/frozen/e3_stage_b_v1_20260822/normalization/01_overlap_normalization_manifest.json",
+          "sha256": "edeedc49ac7024c6b33deb5a674a60984aabd0ea2360131e364fb6787a3ceead"
+        },
+        "path": "/Users/danielfd98/Code/ISEP/project/data/reasoning/frozen/e3_stage_b_v1_20260822/normalization/01_overlap_normalization.jsonl",
+        "rows": 35,
+        "sha256": "df37f514ba548cdd59cabcbbf2288a1d4a9129ebea804d3c0bb8e653eef612d3",
+        "source_path": "/Users/danielfd98/Code/ISEP/project/data/batch_jobs/e3_stage_b_batch_retry1_v1_20260822/overlap_normalization.jsonl"
+      }
+    ],
+    "normalized_rows": 35
+  },
+  "protocol": {
+    "clinical_reasoning_changed_by_normalization": false,
+    "diagnosis_changed_by_normalization": false,
+    "normalization_policy": "remove_intersection_from_both_evidence_lists",
+    "normalization_version": "stage_b_overlap_normalization_v1",
+    "prompt_sha256": "b8239b38c24eac6037c22bcfcbc3573deb37cd5011c97d234e4179f20718125e",
+    "prompt_version": "e3_stage_b_v1",
+    "schema_sha256": "711b543753b77c8eee45a79c7cbec6fb7107e4f307b4e6642501dbeb9686ca5d"
+  },
+  "rejected_release": {
+    "bytes": 603842,
+    "path": "/Users/danielfd98/Code/ISEP/project/data/reasoning/frozen/e3_stage_b_v1_20260822/rejected.jsonl",
+    "rows": 164,
+    "sha256": "a697cc6614b2d059498c42872949a56afe90d2d442d89c8b947414ca175047b0",
+    "status": "rejected",
+    "unique_sample_ids": 164
+  },
+  "schema_version": 1,
+  "source_audit_log": {
+    "bytes": 23307188,
+    "duplicate_attempt_counts": {
+      "FITZPATRICK17K_C_0327466e2c74672e83a55b47e800fe05": 3,
+      "FITZPATRICK17K_C_0e53f04b270579940142d00c6165f0a5": 3,
+      "FITZPATRICK17K_C_10ed2d0e269bb1a60f466fef6cdf367b": 3,
+      "FITZPATRICK17K_C_1e296a64c838d0289cf7f49fa7dfb65d": 3,
+      "FITZPATRICK17K_C_4603fefbd2e921b0987e3aaf91e275e1": 3,
+      "FITZPATRICK17K_C_63011295726d7a524e87edd3c55a5820": 3,
+      "FITZPATRICK17K_C_6e9b03c88ecdc1885ad5f1b6586da01d": 3,
+      "FITZPATRICK17K_C_78c29770cb6db47ce3dd7e0ab7a365de": 3,
+      "FITZPATRICK17K_C_81614ef48a63119af1349a28cc86a2af": 3,
+      "FITZPATRICK17K_C_84bb739a297c4d52efe756a2f398f1da": 3,
+      "FITZPATRICK17K_C_864aa506ce741d927482bee6357f7cce": 3,
+      "FITZPATRICK17K_C_9a2703b526c057a1563b6579cb3024fa": 3,
+      "FITZPATRICK17K_C_9d0a9eb2a7892cdaa8beb1226df10c01": 3,
+      "FITZPATRICK17K_C_a589f826c885576e848a2a4d66235f1f": 3,
+      "FITZPATRICK17K_C_c02bd8d61feda28f1cf90efb126b5b1a": 3,
+      "FITZPATRICK17K_C_c3994c3b7fc8f7f537ce70972618c80d": 3,
+      "FITZPATRICK17K_C_ce01b20213533e4ab3cf7bc468549342": 3,
+      "FITZPATRICK17K_C_d821f5673f94063815e20f8db5e9501f": 3,
+      "FITZPATRICK17K_C_dd93fd24793795b2ead2131453c95356": 3,
+      "FITZPATRICK17K_C_e170d124649f3cddf0e8d2ac7a4e597f": 3,
+      "FITZPATRICK17K_C_e672dac0d8e357a7a6d9ee5e4fbedfd7": 3,
+      "FITZPATRICK17K_C_e6e57cfe0b37af73822bb1f779bab382": 3,
+      "FITZPATRICK17K_C_fa4ed547ba2ed8055c9d777ee729f70b": 3,
+      "HIBA_ISIC_4563689": 3,
+      "HIBA_ISIC_5847539": 3,
+      "HIBA_ISIC_7169848": 3,
+      "HIBA_ISIC_9795586": 3,
+      "PAD_UFES_20_PAT_154_235_162": 3,
+      "PAD_UFES_20_PAT_1693_3103_879": 3,
+      "PAD_UFES_20_PAT_238_364_387": 3,
+      "PAD_UFES_20_PAT_40_56_160": 3,
+      "PAD_UFES_20_PAT_478_1829_281": 3,
+      "PAD_UFES_20_PAT_91_356_456": 3,
+      "SCIN_-4696067359335613302_IMAGE_2": 3,
+      "SCIN_5648339779171772545_IMAGE_1": 3
+    },
+    "path": "/Users/danielfd98/Code/ISEP/project/data/reasoning/stage_b.jsonl",
+    "rows": 6382,
+    "sha256": "f9cc5ff511bab3d4578879e9e4edbf1898c567c755a4a6e8c64660ee79faa617",
+    "status_counts": {
+      "error": 70,
+      "ok": 6148,
+      "rejected": 164
+    },
+    "unique_sample_ids": 6312
+  },
+  "stage_a_input": {
+    "bytes": 29881370,
+    "path": "/Users/danielfd98/Code/ISEP/project/data/morphology/frozen/e3_stage_a_v1_20260822/stage_a.jsonl",
+    "rows": 6312,
+    "sha256": "1eefa665d791c5138ffc00d57c5d9161ab899985949d8d4c2f7e54d12db89bd2"
+  },
+  "status": "completed",
+  "teacher": {
+    "max_output_tokens": 16384,
+    "model": "gemini-3.7-flash",
+    "name": "gemini_3_7_flash",
+    "provider": "vertex",
+    "reasoning_effort": "medium",
+    "reasoning_excluded": true,
+    "seed": 42
+  },
+  "terminal_coverage": {
+    "missing_sample_ids": 0,
+    "rows": 6312,
+    "status_counts": {
+      "ok": 6148,
+      "rejected": 164
+    },
+    "unique_sample_ids": 6312
+  }
+}

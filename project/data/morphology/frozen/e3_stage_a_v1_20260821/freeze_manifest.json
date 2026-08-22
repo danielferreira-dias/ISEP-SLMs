@@ -1,0 +1,72 @@
+{
+  "accepted_release": {
+    "bytes": 29881369,
+    "estimated_cost_usd_in_accepted_rows": 30.968478375,
+    "path": "/Users/danielfd98/Code/ISEP/project/data/morphology/frozen/e3_stage_a_v1_20260821/stage_a.jsonl",
+    "rows": 6312,
+    "sha256": "b8ce2135a176a0920685aafdf39a623f65143fc17681c3bd88315dbf9f229782",
+    "status": "ok",
+    "unique_sample_ids": 6312
+  },
+  "created_at": "2026-08-21T22:58:30.963166+00:00",
+  "dataset": {
+    "config": "diagnosis",
+    "repo_id": "danielfdias98/ISEPDistillDataset",
+    "revision": "b215f0474e4931b5951da768e79a0d579d26919d",
+    "source_sample_count": 6312,
+    "split": "sft_train"
+  },
+  "freeze_id": "e3_stage_a_v1_20260821",
+  "frozen_artifacts": {
+    "prompt": {
+      "bytes": 5183,
+      "path": "/Users/danielfd98/Code/ISEP/project/data/morphology/frozen/e3_stage_a_v1_20260821/stage_a.md",
+      "sha256": "c28f6ff4f9a47ba23bc02f2a6d14541ee5afeeaf134bca5cf48936f150121a4f"
+    },
+    "schema": {
+      "bytes": 5758,
+      "path": "/Users/danielfd98/Code/ISEP/project/data/morphology/frozen/e3_stage_a_v1_20260821/stage_a_morphology.json",
+      "sha256": "d2c328f33e819bb87bf886055a7005e65bcc13f594a9a3af23b73a56da8d8029"
+    },
+    "teacher_config": {
+      "bytes": 2717,
+      "path": "/Users/danielfd98/Code/ISEP/project/data/morphology/frozen/e3_stage_a_v1_20260821/gemini_3_7_flash_vertex.yaml",
+      "sha256": "8d6dd5feae3af2b955e9e370e012750f97c09024beaf77505c0731cbd0218963"
+    }
+  },
+  "protocol": {
+    "prompt_sha256": "c28f6ff4f9a47ba23bc02f2a6d14541ee5afeeaf134bca5cf48936f150121a4f",
+    "prompt_version": "e3_stage_a_v1",
+    "schema_sha256": "06b984d0c7338058b65bf765c8ec0f67815fd3d24b1336241d622c66fea18245"
+  },
+  "schema_version": 1,
+  "source_audit_log": {
+    "bytes": 29891450,
+    "duplicate_attempt_counts": {
+      "FITZPATRICK17K_C_0a94359e7eaacd7178e06b2823777789": 2,
+      "FITZPATRICK17K_C_0abe9c1b010d8480f1ccad30f0c2f7d1": 2,
+      "FITZPATRICK17K_C_0af9a73bbe0b7ca9217b0dc27d665377": 2,
+      "FITZPATRICK17K_C_167130954a357579a6cf950563928091": 2,
+      "FITZPATRICK17K_C_9592684eb42a6fc366f9120d54d3e9ae": 2,
+      "FITZPATRICK17K_C_98c8c173707c296687a67fade1e0cc5b": 2
+    },
+    "path": "/Users/danielfd98/Code/ISEP/project/data/morphology/stage_a.jsonl",
+    "rows": 6318,
+    "sha256": "3a10bff1e73b8180da2256bccfc298aa36c1c953989e94c46fca9e6467b684cb",
+    "status_counts": {
+      "error": 6,
+      "ok": 6312
+    },
+    "unique_sample_ids": 6312
+  },
+  "status": "completed",
+  "teacher": {
+    "max_output_tokens": 16384,
+    "model": "gemini-3.7-flash",
+    "name": "gemini_3_7_flash",
+    "provider": "vertex",
+    "reasoning_effort": "medium",
+    "reasoning_excluded": true,
+    "seed": 42
+  }
+}

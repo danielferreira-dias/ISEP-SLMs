@@ -1,0 +1,40 @@
+{
+  "columns": {
+    "disease_id": "string",
+    "gold_diagnosis": "string",
+    "image": "struct<bytes: binary, path: string>",
+    "image_sha256": "string",
+    "leakage_group_id": "string",
+    "messages": "list<element: struct<role: string, content: list<element: struct<type: string, text: string>>>>",
+    "prompt": "string",
+    "prompt_sha256": "string",
+    "quality_status": "string",
+    "row_id": "string",
+    "sample_id": "string",
+    "schema_version": "string",
+    "source_dataset": "string",
+    "source_ref": "string",
+    "source_sample_id": "string",
+    "split": "string",
+    "stage_a_attempt_id": "string",
+    "stage_b_attempt_id": "string",
+    "target_sha256": "string",
+    "target_source": "string",
+    "target_text": "string",
+    "task": "string",
+    "task_id": "string"
+  },
+  "schema_version": "e3_multitask_sft_v1",
+  "target_contract": "messages contains one user turn with image plus task prompt and one assistant turn equal to target_text",
+  "tasks": {
+    "caption": 6312,
+    "diagnosis": 6312,
+    "grounded_differential": 6127,
+    "morphology": 6312,
+    "request_new_image": 21
+  },
+  "trainer_input_columns": [
+    "image",
+    "messages"
+  ]
+}

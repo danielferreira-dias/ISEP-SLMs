@@ -1,0 +1,30 @@
+{
+  "schema_version": "e3_multitask_prompt_registry_v1",
+  "tasks": {
+    "caption": {
+      "prompt": "Describe only the visible dermatological findings in one complete short clinical sentence. Do not provide a diagnosis, differential diagnosis, testing, management, prognosis, or advice.\n\n/no_think",
+      "prompt_sha256": "c95bf274a8c828b5a84c212e74efb144e60d5ed32cc94e8f27e2f6fdb4eb43cd",
+      "target_source": "teacher_stage_a_clinical_caption"
+    },
+    "diagnosis": {
+      "prompt": "Classify the clinical dermatology image using the closed taxonomy below. Return exactly one canonical label and nothing else: no explanation, reasoning, punctuation, or additional text.\n\nAllowed labels:\n- melanoma\n- melanocytic_nevus\n- psoriasis\n- basal_cell_carcinoma\n- squamous_cell_carcinoma\n- seborrheic_keratosis\n- actinic_keratosis\n- contact_dermatitis\n- acne_vulgaris\n- rosacea\n- vitiligo\n- eczema\n- seborrheic_dermatitis\n- folliculitis\n- urticaria\n- scabies\n- pityriasis_rosea\n- prurigo_nodularis\n- granuloma_annulare\n- erythema_multiforme\n- drug_eruption\n\n/no_think",
+      "prompt_sha256": "42283147906a72810260303944f153f2f151d9577615d839f6f15e1693d52051",
+      "target_source": "human_gold_diagnosis"
+    },
+    "grounded_differential": {
+      "prompt": "Assess the dermatology image using only visible evidence. Describe the visible morphology, provide the most likely diagnosis, and briefly distinguish it from plausible alternatives. If the image is not evaluable, explain why and request a better image without guessing a diagnosis. Do not invent history, tests, or non-visible findings.\n\n/no_think",
+      "prompt_sha256": "312f3ee8575d5ca0f1923c9a11cdde53a614abf0f37fad0363f95cd567a2296a",
+      "target_source": "teacher_stage_b_clinical_reasoning"
+    },
+    "morphology": {
+      "prompt": "Assess only what is visible in the dermatology image. Return one compact JSON object containing image_assessment, dominant_visual_pattern, observations, and not_assessable_features. Do not diagnose a disease or invent history, palpation, tests, or metadata.\n\n/no_think",
+      "prompt_sha256": "698314386d7973cfb97f0117f4f5f6df5862b704fbc1f1daaad2690f48f328b7",
+      "target_source": "teacher_stage_a_structured"
+    },
+    "request_new_image": {
+      "prompt": "Assess the dermatology image using only visible evidence. Describe the visible morphology, provide the most likely diagnosis, and briefly distinguish it from plausible alternatives. If the image is not evaluable, explain why and request a better image without guessing a diagnosis. Do not invent history, tests, or non-visible findings.\n\n/no_think",
+      "prompt_sha256": "312f3ee8575d5ca0f1923c9a11cdde53a614abf0f37fad0363f95cd567a2296a",
+      "target_source": "teacher_stage_b_clinical_reasoning"
+    }
+  }
+}

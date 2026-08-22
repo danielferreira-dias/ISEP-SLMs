@@ -25,6 +25,7 @@ data/combined/*.parquet
 data/benchmarks/**/*.parquet
 data/training/**/*.parquet
 data/reports/*.parquet
+project/data/**/*.parquet
 outputs/
 project/data/batch_jobs/
 
